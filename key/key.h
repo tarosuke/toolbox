@@ -14,7 +14,7 @@ namespace TOOLBOX{
 template<class LOCK> class KEY{
 public:
 	KEY(LOCK& lock, long long uptime = -1) :
-		lock(lock),valid(lock.Lock(uptime)){};
+		valid(lock.Lock(uptime)), lock(lock){};
 	~KEY(){ if(valid){ lock.Unlock(); } };
 	const bool valid;
 private:
