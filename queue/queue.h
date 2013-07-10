@@ -10,7 +10,7 @@
 
 namespace TOOLBOX{
 
-template<class T> class NODE{
+template<class T, class LOCK = NULLLOCK> class NODE{
 public:
 	NODE(T& owner) : owner(&owner), next(this), prev(this){};
 	//thisをnの前に接続
@@ -130,31 +130,28 @@ private:
 };
 
 
-template<typename T, uint max, class LOCK = NULLLOCK> class MULTIQUEUE{
+template<typename T, unsigned max, class LOCK = NULLLOCK> class MULTIQUEUE{
 public:
-	T* Get(uint e = max){
-		assert(e <= max);
+	T* Get(unsigned e = max){
 		KEY<LOCK> key(lock);
-		for(uint i(0); i < e; i++){
+		for(unsigned i(0); i < e; i++){
 			if(q[i].IsThere()){
 				return q[i].Get();
 			}
 		}
 		return 0;
 	};
-	void Add(uint index, NODE<T>& node){
+	void Add(unsigned index, NODE<T>& node){
 		KEY<LOCK> key(lock);
-		assert(index < max);
 		q[index].Add(node);
 	};
-	void Insert(uint index, NODE<T>& node){
+	void Insert(unsigned index, NODE<T>& node){
 		KEY<LOCK> key(lock);
-		assert(index < max);
 		q[index].Insert(node);
 	};
-	uint GetMax(){
+	unsigned GetMax(){
 		KEY<LOCK> key(lock);
-		for(uint i(0); i < max; i++){
+		for(unsigned i(0); i < max; i++){
 			if(q[i].IsThere()){
 				return i;
 			}
