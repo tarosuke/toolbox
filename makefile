@@ -1,4 +1,5 @@
+all: test
 
-clean:
 
-
+test:
+	make -C qon test
