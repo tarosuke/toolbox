@@ -1,2 +1,2 @@
-target = rift.a
+target = qon.a
 include ../make.in
