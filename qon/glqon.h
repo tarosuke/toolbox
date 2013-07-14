@@ -4,13 +4,13 @@
 #ifndef _GLQON_
 #define _GLQON_
 
-#include <qon/qon.h>
+#include "qon.h"
 
 class GLQON{
 public:
 	GLQON(const QON& q) : qon(q){}
-	void GetModel();
-	void GetView();
+	void GetModel() const;
+	void GetView() const;
 private:
 	const QON& qon;
 };
@@ -18,8 +18,8 @@ private:
 class GLVQON{
 public:
 	GLVQON(const VQON& v) : vqon(v){}
-	void GetModel();
-	void GetView();
+	void GetModel() const;
+	void GetView() const;
 private:
 	const VQON& vqon;
 };

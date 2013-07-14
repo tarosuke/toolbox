@@ -7,24 +7,25 @@
 #include <qon/glqon.h>
 
 
-void GLQON::GetView(){
+void GLQON::GetView() const{
+	glScalef(1, 2, 1);
 	QON::ROTATION r;
 	qon.GetRotation(r);
 	glRotated(-r.angle * 180 / M_PI, r.x, r.y, r.z);
 }
 
-void GLQON::GetModel(){
+void GLQON::GetModel() const{
 	QON::ROTATION r;
 	qon.GetRotation(r);
 	glRotated(r.angle * 180 / M_PI, r.x, r.y, r.z);
 }
 
 
-void GLVQON::GetView(){
+void GLVQON::GetView() const{
 	glTranslatef(-vqon.i, -vqon.j, -vqon.k);
 }
 
-void GLVQON::GetModel(){
+void GLVQON::GetModel() const{
 	glTranslatef(vqon.i, vqon.j, vqon.k);
 }
 
