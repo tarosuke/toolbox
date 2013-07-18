@@ -1,8 +1,11 @@
-all: test
+all:
+	make -C qon
+	make -C input
 
 
 test:
 	make -C qon test
+	make -C input test
 
 
 clean:

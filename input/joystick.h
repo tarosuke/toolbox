@@ -5,18 +5,26 @@
 #ifndef _JOYSTICK_
 #define _JOYSTICK_
 
+
+#include <pthread.h>
+
 class JOYSTICK{
 public:
-	struct STATUS{
-		int x0
-	};
-	operator const STATUS(){ return status; };
 	JOYSTICK();
 	~JOYSTICK();
+	int GetAxis(unsigned index){
+		return index < maxAxis ? axis[index] : 0.0;
+	};
+	unsigned GetButtons(){ return buttons; };
 private:
+	static const unsigned maxAxis = 8;
 	const int device;
 	int OpenDevice();
-	STATUS status;
+	int axis[maxAxis];
+	unsigned buttons;
+	pthread_t sensorThread;
+	static void* _JSThread(void*);
+	void JSThread();
 };
 
 #endif

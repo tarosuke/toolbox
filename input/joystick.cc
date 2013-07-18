@@ -6,10 +6,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/file.h>
+#include <linux/joystick.h>
 #include <assert.h>
-#include <linux/types.h>
-#include <linux/input.h>
-#include <linux/hidraw.h>
 
 #include "joystick.h"
 
@@ -38,9 +36,45 @@ int JOYSTICK::OpenDevice(){
 	return -1;
 }
 
-JOYSTICK::JOYSTICK() : device(OpenDevice()){}
+JOYSTICK::JOYSTICK() : device(OpenDevice()){
+	//データ取得開始
+	pthread_create(&sensorThread, NULL, _JSThread, (void*)this);
+}
 
 JOYSTICK::~JOYSTICK(){
-	close(device);
+	if(0 <= device){
+		close(device);
+		pthread_cancel(sensorThread);
+	}
+}
+
+void* JOYSTICK::_JSThread(void* js_){
+	(*(JOYSTICK*)js_).JSThread();
+	return 0;
+}
+
+void JOYSTICK::JSThread(){
+	for(;; pthread_testcancel()){
+		struct js_event ev;
+		const int rb(read(device, &ev, sizeof(ev)));
+		if(sizeof(ev) != rb){
+			switch(ev.type){
+			case JS_EVENT_AXIS :
+				if(ev.number < maxAxis){
+					axis[ev.number] = ev.value;
+				}
+				break;
+			case JS_EVENT_BUTTON :
+				if(ev.value){
+					buttons |= 1U << ev.number;
+				}else{
+					buttons &= ~(1U << ev.number);
+				}
+				break;
+			}
+		}else{
+			printf("JS:wrong size:%5d.\n", rb);
+		}
+	}
 }
 
