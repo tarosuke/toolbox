@@ -37,7 +37,7 @@ public:
 		(*prev).next = next;
 		prev = next = this;
 	};
-	inline T* Owner(){ return owner; };
+	inline T* Owner() const{ return owner; };
 	NODE* Next(){ return next; };
 	NODE* Prev(){ return prev; };
 protected:
@@ -95,7 +95,7 @@ public:
 				return 0;
 			};
 			operator bool(){
-				return !!(*n).owner;
+				return !!(*n).Owner();
 			};
 	private:
 		NODE<T>* const q;
