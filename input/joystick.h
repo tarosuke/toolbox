@@ -12,10 +12,11 @@ class JOYSTICK{
 public:
 	JOYSTICK();
 	~JOYSTICK();
-	int GetAxis(unsigned index){
-		return index < maxAxis ? axis[index] : 0.0;
+	float GetAxis(unsigned index) const{
+		return index < maxAxis ?
+			(1.0 / 32768) * axis[index] : 0.0;
 	};
-	unsigned GetButtons(){ return buttons; };
+	unsigned GetButtons() const{ return buttons; };
 private:
 	static const unsigned maxAxis = 8;
 	const int device;
