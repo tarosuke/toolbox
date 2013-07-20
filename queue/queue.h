@@ -121,11 +121,11 @@ private:
 	};
 	inline void Add(KEY<LOCK>&, NODE<T>& n){
 		//リンクは輪になっているのでアンカーであるキューの前は最後
-		NODE<T>::Insert(n);
+		n.Insert(*this);
 	};
 	inline void Insert(KEY<LOCK>&, NODE<T>& n){
 		//リンクは輪になっているのでアンカーであるキューの後は最初
-		NODE<T>::Attach(n);
+		n.Attach(*this);
 	};
 };
 
