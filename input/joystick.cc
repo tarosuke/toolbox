@@ -43,8 +43,8 @@ JOYSTICK::JOYSTICK() : device(OpenDevice()){
 
 JOYSTICK::~JOYSTICK(){
 	if(0 <= device){
-		close(device);
 		pthread_cancel(sensorThread);
+		close(device);
 	}
 }
 
