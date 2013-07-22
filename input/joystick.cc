@@ -56,9 +56,8 @@ void* JOYSTICK::_JSThread(void* js_){
 void JOYSTICK::JSThread(){
 	for(;; pthread_testcancel()){
 		struct js_event ev;
-		const int rs(read(device, &ev, sizeof(ev)));
-		if(8 == rs){
-			switch(ev.type){
+		if(8 == read(device, &ev, sizeof(ev))){
+			switch(ev.type & ~JS_EVENT_INIT){
 			case JS_EVENT_AXIS :
 				if(ev.number < maxAxis){
 					axis[ev.number] = ev.value;
@@ -72,8 +71,6 @@ void JOYSTICK::JSThread(){
 				}
 				break;
 			}
-		}else{
-			printf("JOYSTICK:wrong size(%d) detected.\n", rs);
 		}
 	}
 }
