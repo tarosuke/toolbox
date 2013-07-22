@@ -18,7 +18,7 @@ int JOYSTICK::OpenDevice(){
 	for(int i(0); i < 99; i++){
 		char name[32];
 		snprintf(name, 32, "/dev/input/js%d", i);
-		const int fd(open(name, O_RDWR | O_NONBLOCK));
+		const int fd(open(name, O_RDWR));
 		if(fd < 0){
 			//開けなかった
 			continue;
@@ -56,7 +56,8 @@ void* JOYSTICK::_JSThread(void* js_){
 void JOYSTICK::JSThread(){
 	for(;; pthread_testcancel()){
 		struct js_event ev;
-		if(8 == read(device, &ev, sizeof(ev))){
+		const int rs(read(device, &ev, sizeof(ev)));
+		if(8 == rs){
 			switch(ev.type){
 			case JS_EVENT_AXIS :
 				if(ev.number < maxAxis){
@@ -71,6 +72,8 @@ void JOYSTICK::JSThread(){
 				}
 				break;
 			}
+		}else{
+			printf("JOYSTICK:wrong size(%d) detected.\n", rs);
 		}
 	}
 }
