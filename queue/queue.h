@@ -37,6 +37,7 @@ public:
 		(*prev).next = next;
 		prev = next = this;
 	};
+	operator T*(){ return owner; };
 	inline T* Owner() const{ return owner; };
 	NODE* Next(){ return next; };
 	NODE* Prev(){ return prev; };
@@ -64,6 +65,9 @@ public:
 					return t;
 				}
 				return 0;
+			};
+			operator T*(){
+				return *n;
 			};
 			inline T* Owner(){
 				return (*n).Owner();
