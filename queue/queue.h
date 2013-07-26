@@ -12,7 +12,7 @@ namespace TOOLBOX{
 
 template<class T, class LOCK = NULLLOCK> class NODE{
 public:
-	NODE(T& owner) : owner(&owner), next(this), prev(this){};
+	NODE(T& owner) : owner(&owner), next(this), prev(this){}; //TODO:Tの通知メソッドを設定。デフォルトは0
 	//thisをnの前に接続
 	void Insert(NODE& n){
 		if(prev != next){
@@ -41,6 +41,7 @@ public:
 	inline T* Owner() const{ return owner; };
 	NODE* Next(){ return next; };
 	NODE* Prev(){ return prev; };
+	void Notify(){ /*TODO:初期化時に設定された通知メソッドのポインタを呼ぶ*/ };
 protected:
 	NODE() : owner(0), next(this), prev(this){}; //QUEUEのため
 	T* const owner;
@@ -50,7 +51,6 @@ protected:
 
 
 template<class T, class LOCK = NULLLOCK> class QUEUE : public NODE<T>{
-	friend class ITOR;
 public:
 	class ITOR{
 		/** インスタンスが存在する間は対象キューが変化しないことが保証される
@@ -110,6 +110,15 @@ public:
 	T* Get(){ KEY<LOCK> key(lock); return Get(key); };
 	void Add(NODE<T>& n){ KEY<LOCK> key(lock); Add(key, n); };
 	void Insert(NODE<T>& n){ KEY<LOCK> key(lock); Insert(key, n); };
+	T* Peek() const{ return (*NODE<T>::next).Owner(); };
+	~QUEUE(){
+		//TODO:各ノードにおいてリンクを外しつつnodeに設定されている通知メソッドを呼ぶ
+// 		while(next != this){
+// 			NODE<T>* n(next);
+// 			(*next).Detach();
+// 			(*n).Notify();
+// 		}
+	};
 private:
 	LOCK lock;
 	inline bool IsThere(KEY<LOCK>&){
