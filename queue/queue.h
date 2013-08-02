@@ -15,7 +15,7 @@ public:
 	NODE(T& owner) : owner(&owner), next(this), prev(this){}; //TODO:Tの通知メソッドを設定。デフォルトは0
 	//thisをnの前に接続
 	void Insert(NODE& n){
-		if(prev != next){
+		if(prev != this){
 			Detach();
 		}
 		prev = n.prev;
@@ -24,7 +24,7 @@ public:
 	};
 	//thisをnの後に接続
 	void Attach(NODE& n){
-		if(prev != next){
+		if(prev != this){
 			Detach();
 		}
 		next = n.next;
