@@ -34,7 +34,7 @@ public:
 	void GetMatrix(double matrix[16]);
 
 	QON(const VQON&, const VQON&); //二つの単位ベクタの差分で初期化
-	QON operator-(){
+	QON operator-() const{
 		QON r(w, -i, -j, -k);
 		return r;
 	};
