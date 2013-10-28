@@ -111,6 +111,11 @@ public:
 	void Add(NODE<T>& n){ KEY<LOCK> key(lock); Add(key, n); };
 	void Insert(NODE<T>& n){ KEY<LOCK> key(lock); Insert(key, n); };
 	T* Peek() const{ return (*NODE<T>::next).Owner(); };
+	void Pick(NODE<T>& n){
+		KEY<LOCK> key(lock);
+		n.Detach();
+		Insert(key, n);
+	};
 	~QUEUE(){
 		//TODO:各ノードにおいてリンクを外しつつnodeに設定されている通知メソッドを呼ぶ
 // 		while(next != this){
