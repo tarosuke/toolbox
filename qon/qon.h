@@ -40,6 +40,7 @@ public:
 	};
 	void print(const char* label) const;
 	double Length() const;
+	double Abs() const;
 	void Normalize();
 // protected:
 	// (w; i, j, k)

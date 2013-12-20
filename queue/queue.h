@@ -106,6 +106,14 @@ public:
 		NODE<T>* n;
 		KEY<LOCK> key;
 	};
+	template<typename U> T* Scan(bool (T::*isThis)(const U), const U key) const{
+		for(ITOR i(*this); i; i++){
+			if((*i).*isThis(key)){
+				return i;
+			}
+		}
+		return 0;
+	};
 	bool IsThere(){ KEY<LOCK> key(lock); return IsThere(key); };
 	T* Get(){ KEY<LOCK> key(lock); return Get(key); };
 	void Add(NODE<T>& n){ KEY<LOCK> key(lock); Add(key, n); };

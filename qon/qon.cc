@@ -107,11 +107,15 @@ QON::QON(const VQON& f, const VQON& t){
 }
 
 void QON::print(const char* label) const{
-	printf("%s(%lf):% lf; % lf, % lf, % lf.\n", label, sqrt(i*i+j*j+k*k), w, i, j, k);
+	printf("%s(%lf):% lf; % lf, % lf, % lf.\n", label, Abs(), w, i, j, k);
 }
 
 double QON::Length() const{
 	return sqrt(w*w + i*i + j*j + k*k);
+}
+
+double QON::Abs() const{
+	return sqrt(i*i + j*j + k*k);
 }
 
 void QON::Normalize(){
