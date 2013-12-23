@@ -11,21 +11,23 @@ void GLQON::GetView() const{
 	glScalef(1, 2, 1);
 	QON::ROTATION r;
 	qon.GetRotation(r);
-	glRotated(-r.angle * 180 / M_PI, r.x, r.y, r.z);
+	glRotated(-r.angle * 180 / M_PI, r.axis[0], r.axis[1], r.axis[2]);
 }
 
 void GLQON::GetModel() const{
 	QON::ROTATION r;
 	qon.GetRotation(r);
-	glRotated(r.angle * 180 / M_PI, r.x, r.y, r.z);
+	glRotated(r.angle * 180 / M_PI, r.axis[0], r.axis[1], r.axis[2]);
 }
 
 
 void GLVQON::GetView() const{
-	glTranslatef(-vqon.i, -vqon.j, -vqon.k);
+	const double* const v(vqon);
+	glTranslatef(-v[0], -v[1], -v[2]);
 }
 
 void GLVQON::GetModel() const{
-	glTranslatef(vqon.i, vqon.j, vqon.k);
+	const double* const v(vqon);
+	glTranslatef(v[0], v[1], v[2]);
 }
 

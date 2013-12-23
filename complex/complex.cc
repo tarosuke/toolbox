@@ -33,6 +33,24 @@ template<> VECTOR<3> VECTOR<3>::Ex(const VECTOR<3>& t) const{ //外積(3次元)
 	VECTOR<3> r(arr);
 	return r;
 };
+template<> COMPLEX<4>::COMPLEX(const VECTOR<3>& f, const VECTOR<3>& t){
+	VECTOR<3> ff(f);
+	VECTOR<3> tt(t);
+	ff.Normalize();
+	tt.Normalize();
+
+	const double in(tt * ff); //内積(差分の回転角)
+	VECTOR<3> ex(tt.Ex(ff)); //外積(差分の回転軸)
+
+	const double c(sqrt(0.5 * (1 + in)));
+	const double s(sqrt(0.5 * (1 - in)));
+	R = c;
+	const double* const ea(ex);
+	for(unsigned n(0); n < D; ++n){
+		a[n] = s * ea[n];
+	}
+	Normalize();
+}
 
 template<> double VECTOR<2>::Cross(const VECTOR<2>& t) const{ //外積(2次元)
 	//2次元の外積は存在しないが、代わりに三次元で計算して三軸目の値を返す

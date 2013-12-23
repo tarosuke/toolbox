@@ -1,6 +1,13 @@
 #ifndef _QON_
 #define _QON_
 
+#include "../complex/complex.h"
+
+typedef COMPLEX<4> QON;
+typedef VECTOR<3> VQON;
+
+#if 0
+
 //クオータニオン
 class VQON;
 class QON{
@@ -116,5 +123,5 @@ public:
 	};
 };
 
-
+#endif
 #endif

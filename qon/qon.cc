@@ -1,3 +1,4 @@
+#if 0
 #include <math.h>
 #include <stdio.h>
 
@@ -169,6 +170,7 @@ void VQON::Normalize(){
 	j *= r;
 	k *= r;
 }
+#endif
 
 
 
