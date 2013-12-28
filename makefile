@@ -1,10 +1,10 @@
 all:
-	make -C qon
+	make -C complex
 	make -C input
 
 
 test:
-	make -C qon test
+	make -C complex test
 	make -C input test
 
 

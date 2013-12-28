@@ -1,2 +1,2 @@
-target = qon.a
+target = glpose.a
 include ../make.in
