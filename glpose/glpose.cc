@@ -19,7 +19,6 @@ void GLPOSE::GetModel() const{
 
 void GLPOSE::GetView() const{
 	//回転
-	glScalef(1, 2, 1); //TODO:VIEWへ移動する必要がある
 	const COMPLEX<4>::ROTATION r(direction);
 	glRotated(-r.angle * 180 / M_PI, r.axis[0], r.axis[1], r.axis[2]);
 

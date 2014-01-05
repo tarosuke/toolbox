@@ -79,14 +79,14 @@ public:
 	};
 
 	//ノルム算出
-	double Norm(){
+	double Norm() const{
 		double n2(R * R);
 		for(unsigned n(0); n < D; ++n){
 			n2 += a[n] * a[n];
 		}
 		return sqrt(n2);
 	};
-	double Length(){ return Norm(); };
+	double Length() const{ return Norm(); };
 
 	//ノルムを1.0にする
 	void Normalize(){
@@ -125,13 +125,6 @@ public:
 		Normalize();
 	};
 
-	//値の取得
-	operator const double*(){
-		return a;
-	};
-	operator double(){
-		return R;
-	};
 protected:
 	//データ(R;a[]になってる)
 	double R; //実部

@@ -15,7 +15,7 @@ public:
 	const COMPLEX<4>& GetDirection(){ return direction; };
 	//回転操作
 	void operator=(const COMPLEX<4>& d){ direction = d; }; //機体座標系
-	void Rotate(COMPLEX<4>& r){ direction *= r; };
+	void Rotate(const COMPLEX<4>& r){ direction *= r; };
 	void RotateAzimuth(const COMPLEX<4>& r); //絶対座標系
 	void ResetAzimuth(double ratio = 1.0, unsigned axis = 2);
 	//移動操作
