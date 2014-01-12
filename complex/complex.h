@@ -124,6 +124,7 @@ public:
 		}
 		Normalize();
 	};
+	double W(){ return R; };
 
 protected:
 	//データ(R;a[]になってる)
