@@ -28,7 +28,7 @@ void GLPOSE::GetView() const{
 }
 
 //方位角リセット(絶対座標系)
-void GLPOSE::ResetAzimuth(double ratio, unsigned axis){
+void GLPOSE::ResetAzimuthOffset(double ratio, unsigned axis){
 	COMPLEX<4> o(-direction);
 	o *= ratio;
 	o.FilterAxis(axis); //指定軸だけを残す
