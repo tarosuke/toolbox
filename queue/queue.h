@@ -10,9 +10,10 @@
 
 namespace TOOLBOX{
 
-template<class T, class LOCK = NULLLOCK> class NODE{
+template<class T, class LOCK = NULLLOCK> class NODE{ //TODO:ロック対応改修
 public:
 	NODE(T& owner) : owner(&owner), next(this), prev(this){}; //TODO:Tの通知メソッドを設定。デフォルトは0
+	~NODE(){ Detach(); };
 	//thisをnの前に接続
 	void Insert(NODE& n){
 		if(prev != this){
@@ -54,8 +55,9 @@ template<class T, class LOCK = NULLLOCK> class QUEUE : public NODE<T>{
 public:
 	class ITOR{
 		/** インスタンスが存在する間は対象キューが変化しないことが保証される
-		* が、その間他の一切の操作はブロックされるのでキュー操作はすべて
-		* ITORを通す必要がある */
+		 * が、その間他の一切の操作はブロックされるのでキュー操作はすべて
+		 * ITORを通す必要がある
+		 */
 		public:
 			ITOR(QUEUE& q) : q(&q), n(q.next), key(q.lock){};
 			T* operator++(int){

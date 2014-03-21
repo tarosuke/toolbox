@@ -16,8 +16,7 @@ public:
 	void RotateOffset(const COMPLEX<4>&){  };
 	//オフセット移動操作(絶対座標系)
 	void MoveOffsetTo(const VECTOR<3>& v){ positionOffset = v; };
-	//取得系 TODO:平面との交点を求めるメソッドを追加してこれはprotectedへ移動
-	const COMPLEX<4>& GetDirection(){ return direction; };
+	const COMPLEX<4>& GetDirection() const { return direction; };
 protected:
 	//実際の回転操作
 	void operator=(const COMPLEX<4>& d){ direction = d; }; //機体座標系
