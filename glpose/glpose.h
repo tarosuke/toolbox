@@ -16,7 +16,7 @@ public:
 	void RotateOffset(const COMPLEX<4>&){  };
 	//オフセット移動操作(絶対座標系)
 	void MoveOffsetTo(const VECTOR<3>& v){ positionOffset = v; };
-	const COMPLEX<4>& GetDirection() const { return direction; };
+	COMPLEX<4> GetDirection() const;
 protected:
 	//実際の回転操作
 	void operator=(const COMPLEX<4>& d){ direction = d; }; //機体座標系
