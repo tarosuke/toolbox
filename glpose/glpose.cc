@@ -44,7 +44,5 @@ void GLPOSE::ResetAzimuthOffset(double ratio, unsigned axis){
 
 //方位角回転(絶対座標系で回転)
 void GLPOSE::RotateAzimuth(const COMPLEX<4>& r){
-	COMPLEX<4> o(-r);
-	o *= direction;
-	direction = o;
+	directionOffset *= r;
 }
