@@ -58,51 +58,80 @@ public:
 		 * が、その間他の一切の操作はブロックされるのでキュー操作はすべて
 		 * ITORを通す必要がある
 		 */
-		public:
-			ITOR(QUEUE& q) : q(&q), n(q.next), key(q.lock){};
-			T* operator++(int){
-				if(n != q){
-					T* t((*n).Owner());
-					n = (*n).Next();
-					return t;
-				}
-				return 0;
-			};
-			operator T*(){
-				return *n;
-			};
-			inline T* Owner(){
-				return (*n).Owner();
+	public:
+		ITOR(QUEUE& q) : q(&q), n(q.next), key(q.lock){};
+		T* operator++(int){
+			if(n != q){
+				T* t((*n).Owner());
+				n = (*n).Next();
+				return t;
 			}
-			void Insert(NODE<T>& node){
-				//ITORが指すノードの前にnodeを追加する
-				if(!n){
-					(*q).Insert(node);
-				}else{
-					(*n).Insert(node);
-				}
-			};
-			void Add(NODE<T>& node){
-				//ITORが指すノードの後にnodeを追加する
-				if(!n){
-					(*q).Add(node);
-				}else{
-					(*n).Attach(node);
-				}
-			};
-			T* Detach(){
-				//ITORが指すノードを除去し、次の要素を指す
-				if(n != q){
-					T* const t((*n).Owner());
-					n = (*n).Next();
-					return t;
-				}
-				//ITORが何も指していなければ0を返す
-				return 0;
-			};
-			operator bool(){
-				return !!(*n).Owner();
-			};
+			return 0;
+		};
+		operator T*(){
+			return *n;
+		};
+		inline T* Owner(){
+			return (*n).Owner();
+		}
+		void Insert(NODE<T>& node){
+			//ITORが指すノードの前にnodeを追加する
+			if(!n){
+				(*q).Insert(node);
+			}else{
+				(*n).Insert(node);
+			}
+		};
+		void Add(NODE<T>& node){
+			//ITORが指すノードの後にnodeを追加する
+			if(!n){
+				(*q).Add(node);
+			}else{
+				(*n).Attach(node);
+			}
+		};
+		T* Detach(){
+			//ITORが指すノードを除去し、次の要素を指す
+			if(n != q){
+				T* const t((*n).Owner());
+				n = (*n).Next();
+				return t;
+			}
+			//ITORが何も指していなければ0を返す
+			return 0;
+		};
+		operator bool(){
+			return !!(*n).Owner();
+		};
+	private:
+		NODE<T>* const q;
+		NODE<T>* n;
+		KEY<LOCK> key;
+	};
+	class RITOR{
+		/** インスタンスが存在する間は対象キューが変化しないことが保証される
+		  * が、その間他の一切の操作はブロックされるのでキュー操作はすべて
+		  * ITORを通す必要がある
+		  */
+	public:
+		RITOR(QUEUE& q) : q(&q), n(q.prev), key(q.lock){};
+		T* operator--(int){
+			if(n != q){
+				T* t((*n).Owner());
+				n = (*n).Prev();
+				return t;
+			}
+			return 0;
+		};
+		operator T*(){
+			return *n;
+		};
+		inline T* Owner(){
+			return (*n).Owner();
+		}
+		operator bool(){
+			return !!(*n).Owner();
+		};
 	private:
 		NODE<T>* const q;
 		NODE<T>* n;
