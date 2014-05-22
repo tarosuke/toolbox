@@ -56,7 +56,9 @@ public:
 	class ITOR{
 		/** インスタンスが存在する間は対象キューが変化しないことが保証される
 		 * が、その間他の一切の操作はブロックされるのでキュー操作はすべて
-		 * ITORを通す必要がある
+		 * ITORを通す必要がある。
+		 * それと、ITORが指しているノードはDetachしないこと。
+		 * Detachする必要があるならノードを保存したあとITORを一つ進めてから。
 		 */
 	public:
 		ITOR(QUEUE& q) : q(&q), n(q.next), key(q.lock){};
@@ -164,6 +166,13 @@ public:
 // 			(*next).Detach();
 // 			(*n).Notify();
 // 		}
+	};
+	void Each(void (T::*job)()){
+		for(ITOR i(*this); i;){
+			T& t(*i);
+			i++;
+			(t.*job)();
+		}
 	};
 private:
 	LOCK lock;
