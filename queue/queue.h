@@ -167,7 +167,7 @@ public:
 // 			(*n).Notify();
 // 		}
 	};
-	void Each(void (T::*job)()){
+	template<typename J> void Each(J job){
 		for(ITOR i(*this); i;){
 			T& t(*i);
 			i++;
