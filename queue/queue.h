@@ -174,6 +174,13 @@ public:
 			(t.*job)();
 		}
 	};
+	template<typename J, typename K> void Each(J job, K& param){
+		for(ITOR i(*this); i;){
+			T& t(*i);
+			i++;
+			(t.*job)(param);
+		}
+	};
 private:
 	LOCK lock;
 	inline bool IsThere(KEY<LOCK>&){
