@@ -62,11 +62,35 @@ public:
 		 */
 	public:
 		ITOR(QUEUE& q) : q(&q), n(q.next), key(q.lock){};
+		ITOR(QUEUE& q, bool backword) :
+			q(&q), n(backword ? q.prev : q.next), key(q.lock){};
 		T* operator++(int){
 			if(n != q){
 				T* t((*n).Owner());
 				n = (*n).Next();
 				return t;
+			}
+			return 0;
+		};
+		T* operator++(){
+			if(n != q){
+				n = (*n).Next();
+				return (*n).Owner();
+			}
+			return 0;
+		};
+		T* operator--(int){
+			if(n != q){
+				T* t((*n).Owner());
+				n = (*n).Prev();
+				return t;
+			}
+			return 0;
+		};
+		T* operator--(){
+			if(n != q){
+				n = (*n).Prev();
+				return (*n).Owner();
 			}
 			return 0;
 		};
