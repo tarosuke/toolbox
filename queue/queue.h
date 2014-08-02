@@ -6,7 +6,7 @@
 #ifndef _QUEUE_
 #define _QUEUE_
 
-#include <toolbox/key/key.h>
+#include "../key/key.h"
 
 namespace TOOLBOX{
 
