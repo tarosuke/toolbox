@@ -61,9 +61,10 @@ public:
 		 * Detachする必要があるならノードを保存したあとITORを一つ進めてから。
 		 */
 	public:
+		enum DIRECTION{ front, backword };
 		ITOR(QUEUE& q) : q(&q), n(q.next), key(q.lock){};
-		ITOR(QUEUE& q, bool backword) :
-			q(&q), n(backword ? q.prev : q.next), key(q.lock){};
+		ITOR(QUEUE& q, DIRECTION d) :
+			q(&q), n(backword == d ? q.prev : q.next), key(q.lock){};
 		T* operator++(int){
 			if(n != q){
 				T* t((*n).Owner());
