@@ -1,6 +1,6 @@
 /************************************************************ lock handler:KEY
  *
- *
+ * NOTE:module key is obsoluted. use lock instead.
  */
 
 #ifndef _KEY_
