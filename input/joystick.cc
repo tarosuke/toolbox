@@ -18,7 +18,7 @@ int JOYSTICK::OpenDevice(){
 	for(int i(0); i < 99; i++){
 		char name[32];
 		snprintf(name, 32, "/dev/input/js%d", i);
-		const int fd(open(name, O_RDWR | O_NONBLOCK));
+		const int fd(open(name, O_RDWR));
 		if(fd < 0){
 			//開けなかった
 			continue;
@@ -43,8 +43,8 @@ JOYSTICK::JOYSTICK() : device(OpenDevice()){
 
 JOYSTICK::~JOYSTICK(){
 	if(0 <= device){
-		close(device);
 		pthread_cancel(sensorThread);
+		close(device);
 	}
 }
 
@@ -57,7 +57,7 @@ void JOYSTICK::JSThread(){
 	for(;; pthread_testcancel()){
 		struct js_event ev;
 		if(8 == read(device, &ev, sizeof(ev))){
-			switch(ev.type){
+			switch(ev.type & ~JS_EVENT_INIT){
 			case JS_EVENT_AXIS :
 				if(ev.number < maxAxis){
 					axis[ev.number] = ev.value;
