@@ -3,4 +3,4 @@
 *.so
 *.a
 
-*..kate-swp
+*.kate-swp
