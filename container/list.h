@@ -14,7 +14,7 @@ namespace wO{
 		//ノード：これを継承して使う。複数のListを使うときは多重継承
 		class Node{
 			friend class List;
-			frient class ITOR;
+			friend class ITOR;
 		public:
 			~Node(){ Detach(); };
 		protected:
@@ -69,18 +69,18 @@ namespace wO{
 			Node* node;
 		};
 		template<typename U> T* Foreach(bool (T::*handler)(U), U param){
-			for(ITOR i(*this), ++i; *i && (*i).handler(param); ++i);
+			for(ITOR i(*this); *++i && (*i).handler(param););
 		};
 		void Foreach(void (T::*handler)()){
-			for(ITOR i(*this), ++i; *i; ++i){
+			for(ITOR i(*this); *++i;){
 				(*i).handler();
 			}
 		}
 		template<typename U> T* Reveach(bool (T::*handler)(U), U param){
-			for(ITOR i(*this), --i; *i && (*i).handler(param); --i);
+			for(ITOR i(*this); *--i && (*i).handler(param););
 		};
-		void Foreach(void (T::*handler)()){
-			for(ITOR i(*this), --i; *i; --i){
+		void Reveach(void (T::*handler)()){
+			for(ITOR i(*this); *--i;){
 				(*i).handler();
 			}
 		};
@@ -105,7 +105,7 @@ namespace wO{
 
 		T* Get(Lock::Key<L>& k){
 			Node* const top(Top(k));
-			if(top != ancher){
+			if(top != &anchor){
 				(*top).Detach(k);
 			}
 			return *top;
