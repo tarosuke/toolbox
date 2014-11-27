@@ -7,6 +7,7 @@
 #include "../lock/key.h"
 
 
+
 namespace wO{
 
 	template<class T, int index = 0, class L=Lock::NullLock> class List : public L{
@@ -52,7 +53,7 @@ namespace wO{
 		//STLよりJavaのそれに近い反復子
 		class ITOR{
 		public:
-			ITOR(List& l) : key(l), node(l.anchor){};
+			ITOR(List& l) : key(l), node(&l.anchor){};
 			operator T*(){
 				return *node;
 			};
@@ -69,18 +70,18 @@ namespace wO{
 			Node* node;
 		};
 		template<typename U> T* Foreach(bool (T::*handler)(U), U param){
-			for(ITOR i(*this); *++i && ((*i).*handler)(param););
+			for(ITOR i(*this); ++i && ((*i).*handler)(param););
 		};
 		void Foreach(void (T::*handler)()){
-			for(ITOR i(*this); *++i;){
+			for(ITOR i(*this); ++i;){
 				((*i).*handler)();
 			}
 		}
 		template<typename U> T* Reveach(bool (T::*handler)(U), U param){
-			for(ITOR i(*this); *--i && ((*i).*handler)(param););
+			for(ITOR i(*this); --i && ((*i).*handler)(param););
 		};
 		void Reveach(void (T::*handler)()){
-			for(ITOR i(*this); *--i;){
+			for(ITOR i(*this); --i;){
 				((*i).*handler)();
 			}
 		};
