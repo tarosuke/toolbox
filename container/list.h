@@ -69,19 +69,19 @@ namespace wO{
 			Node* node;
 		};
 		template<typename U> T* Foreach(bool (T::*handler)(U), U param){
-			for(ITOR i(*this); *++i && (*i).handler(param););
+			for(ITOR i(*this); *++i && ((*i).*handler)(param););
 		};
 		void Foreach(void (T::*handler)()){
 			for(ITOR i(*this); *++i;){
-				(*i).handler();
+				((*i).*handler)();
 			}
 		}
 		template<typename U> T* Reveach(bool (T::*handler)(U), U param){
-			for(ITOR i(*this); *--i && (*i).handler(param););
+			for(ITOR i(*this); *--i && ((*i).*handler)(param););
 		};
 		void Reveach(void (T::*handler)()){
 			for(ITOR i(*this); *--i;){
-				(*i).handler();
+				((*i).*handler)();
 			}
 		};
 		//普通に操作するメソッド

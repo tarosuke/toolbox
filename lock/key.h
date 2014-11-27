@@ -11,7 +11,7 @@ namespace Lock{
 	//RAIIキー
 	template<class L> class Key{
 	public:
-		Key(L& l) : lock(l){ l.lock(); };
+		Key(L& l) : lock(l){ l.Lock(); };
 		~Key(){ lock.Unlock(); };
 	private:
 		L& lock;
