@@ -89,14 +89,14 @@ namespace wO{
 			n.Insert(anchor);
 		};
 		void Add(Node& n){
-			Lock::Key<L> k;
+			Lock::Key<L> k(lock);
 			Add(k, n);
 		};
 		void Insert(Lock::Key<L>&, Node& n){
-			n.Append(anchor);
+			n.Attach(anchor);
 		};
 		void Insert(Node& n){
-			Lock::Key<L> k;
+			Lock::Key<L> k(lock);
 			Insert(k, n);
 		};
 		T* Top(Lock::Key<L>&){
@@ -113,6 +113,7 @@ namespace wO{
 
 	private:
 		Node anchor;
+		L lock;
 	};
 
 }
