@@ -104,10 +104,11 @@ namespace wO{
 			return (*anchor.next).origin;
 		};
 
-		T* Get(Lock::Key<L>& k){
+		T* Get(){
+			Lock::Key<L> k(lock);
 			Node* const top(Top(k));
 			if(top != &anchor){
-				(*top).Detach(k);
+				(*top).Detach();
 			}
 			return *top;
 		};
