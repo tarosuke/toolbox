@@ -17,7 +17,7 @@ namespace wO{
 			friend class List;
 			friend class ITOR;
 		public:
-			~Node(){ Detach(); };
+			virtual ~Node(){ Detach(); };
 		protected:
 			Node(T& org) : prev(this), next(this), origin(&org){};
 		private:
@@ -90,14 +90,14 @@ namespace wO{
 			n.Insert(anchor);
 		};
 		void Add(Node& n){
-			Lock::Key<L> k(lock);
+			Lock::Key<L> k(*this);
 			Add(k, n);
 		};
 		void Insert(Lock::Key<L>&, Node& n){
 			n.Attach(anchor);
 		};
 		void Insert(Node& n){
-			Lock::Key<L> k(lock);
+			Lock::Key<L> k(*this);
 			Insert(k, n);
 		};
 		T* Top(Lock::Key<L>&){
@@ -105,7 +105,7 @@ namespace wO{
 		};
 
 		T* Get(){
-			Lock::Key<L> k(lock);
+			Lock::Key<L> k(*this);
 			Node* const top(Top(k));
 			if(top != &anchor){
 				(*top).Detach();
@@ -115,7 +115,6 @@ namespace wO{
 
 	private:
 		Node anchor;
-		L lock;
 	};
 
 }
