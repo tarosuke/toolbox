@@ -189,6 +189,11 @@ public:
 		}
 	};
 	//算術オペレータ
+	VECTOR operator*(double t) const{ //スカラ値を乗算
+		VECTOR r(*this);
+		r *= t;
+		return r;
+	};
 	double operator*(const VECTOR& r) const{ //内積
 		double in(0);
 		for(unsigned n(0); n < dim; ++n){
