@@ -6,11 +6,12 @@
 #ifndef _QUEUE_
 #define _QUEUE_
 
-#include "../key/key.h"
+#include "../lock/key.h"
+
 
 namespace TOOLBOX{
 
-template<class T, class LOCK = NULLLOCK> class NODE{ //TODO:ロック対応改修
+template<class T, class LOCK = Lock::NullLock> class NODE{ //TODO:ロック対応改修
 public:
 	NODE(T& owner) : owner(&owner), next(this), prev(this){}; //TODO:Tの通知メソッドを設定。デフォルトは0
 	~NODE(){ Detach(); };
@@ -51,7 +52,7 @@ protected:
 };
 
 
-template<class T, class LOCK = NULLLOCK> class QUEUE : public NODE<T>{
+template<class T, class LOCK = Lock::NullLock> class QUEUE : public NODE<T>{
 public:
 	class ITOR{
 		/** インスタンスが存在する間は対象キューが変化しないことが保証される
@@ -133,7 +134,7 @@ public:
 	private:
 		NODE<T>* const q;
 		NODE<T>* n;
-		KEY<LOCK> key;
+		Lock::Key<LOCK> key;
 	};
 	class RITOR{
 		/** インスタンスが存在する間は対象キューが変化しないことが保証される
@@ -162,7 +163,7 @@ public:
 	private:
 		NODE<T>* const q;
 		NODE<T>* n;
-		KEY<LOCK> key;
+		Lock::Key<LOCK> key;
 	};
 	template<typename U> T* Scan(bool (T::*isThis)(const U), const U key) const{
 		for(ITOR i(*this); i; i++){
@@ -172,13 +173,13 @@ public:
 		}
 		return 0;
 	};
-	bool IsThere(){ KEY<LOCK> key(lock); return IsThere(key); };
-	T* Get(){ KEY<LOCK> key(lock); return Get(key); };
-	void Add(NODE<T>& n){ KEY<LOCK> key(lock); Add(key, n); };
-	void Insert(NODE<T>& n){ KEY<LOCK> key(lock); Insert(key, n); };
+	bool IsThere(){ Lock::Key<LOCK> key(lock); return IsThere(key); };
+	T* Get(){ Lock::Key<LOCK> key(lock); return Get(key); };
+	void Add(NODE<T>& n){ Lock::Key<LOCK> key(lock); Add(key, n); };
+	void Insert(NODE<T>& n){ Lock::Key<LOCK> key(lock); Insert(key, n); };
 	T* Peek() const{ return (*NODE<T>::next).Owner(); };
 	void Pick(NODE<T>& n){
-		KEY<LOCK> key(lock);
+		Lock::Key<LOCK> key(lock);
 		if(&n != NODE<T>::next){
 			n.Detach();
 			Insert(key, n);
@@ -208,10 +209,10 @@ public:
 	};
 private:
 	LOCK lock;
-	inline bool IsThere(KEY<LOCK>&){
+	inline bool IsThere(Lock::Key<LOCK>&){
 		return (*this).next != this;
 	};
-	T* Get(KEY<LOCK>& key){
+	T* Get(Lock::Key<LOCK>& key){
 		if(IsThere(key)){
 			T* o((*this).owner);
 			(*(*this).next).Detach();
@@ -219,21 +220,21 @@ private:
 		}
 		return 0;
 	};
-	inline void Add(KEY<LOCK>&, NODE<T>& n){
+	inline void Add(Lock::Key<LOCK>&, NODE<T>& n){
 		//リンクは輪になっているのでアンカーであるキューの前は最後
 		n.Insert(*this);
 	};
-	inline void Insert(KEY<LOCK>&, NODE<T>& n){
+	inline void Insert(Lock::Key<LOCK>&, NODE<T>& n){
 		//リンクは輪になっているのでアンカーであるキューの後は最初
 		n.Attach(*this);
 	};
 };
 
 
-template<typename T, unsigned max, class LOCK = NULLLOCK> class MULTIQUEUE{
+template<typename T, unsigned max, class LOCK = Lock::NullLock> class MULTIQUEUE{
 public:
 	T* Get(unsigned e = max){
-		KEY<LOCK> key(lock);
+		Lock::Key<LOCK> key(lock);
 		for(unsigned i(0); i < e; i++){
 			if(q[i].IsThere()){
 				return q[i].Get();
@@ -242,15 +243,15 @@ public:
 		return 0;
 	};
 	void Add(unsigned index, NODE<T>& node){
-		KEY<LOCK> key(lock);
+		Lock::Key<LOCK> key(lock);
 		q[index].Add(node);
 	};
 	void Insert(unsigned index, NODE<T>& node){
-		KEY<LOCK> key(lock);
+		Lock::Key<LOCK> key(lock);
 		q[index].Insert(node);
 	};
 	unsigned GetMax(){
-		KEY<LOCK> key(lock);
+		Lock::Key<LOCK> key(lock);
 		for(unsigned i(0); i < max; i++){
 			if(q[i].IsThere()){
 				return i;
