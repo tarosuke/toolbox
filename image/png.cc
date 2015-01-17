@@ -1,3 +1,5 @@
+#include <fcntl.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <setjmp.h>
 #include <stdlib.h>
@@ -5,19 +7,35 @@
 
 #include "png.h"
 
+#include "../factory/factory.h"
+
+
+FACTORY<IMAGE> PNG::factory(New);
+
 
 PNG::PNG(const char* path){
-	FILE* f(fopen(path, "rb"));
-	void** rows(0);
-	if(!f){
+	int fd(open(path, O_RDONLY));
+	if(fd < 0){
 		throw "PNG:ファイルが開けない";
 	}
+	try{
+		Setup(fd);
+	}
+	catch(const char* m){
+		close(fd);
+		throw m;
+	}
+}
 
+void PNG::Setup(int fd){
+	lseek(fd, 0, SEEK_SET);
+	FILE* f(fdopen(fd, "rb")); //NOTE:fがメモリリークするので注意
+
+	void** rows(0);
 	// png_struct
 	png_structp png_ptr(png_create_read_struct(
 		PNG_LIBPNG_VER_STRING, NULL, NULL, NULL));
 	if(!png_ptr){
-		fclose(f);
 		throw "PNG:png構造を確保できない";
 	}
 
@@ -25,13 +43,11 @@ PNG::PNG(const char* path){
 	png_infop info_ptr(png_create_info_struct(png_ptr));
 	if(!info_ptr){
 		png_destroy_read_struct(&png_ptr,NULL,NULL);
-		fclose(f);
 		throw "PNG:png情報(前)を取得できない";
 	}
 	png_infop end_info(png_create_info_struct(png_ptr));
 	if(!end_info) {
 		png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
-		fclose(f);
 		throw "PNG:png情報(後)を取得できない";
 	}
 	//エラーハンドル設定
@@ -40,7 +56,6 @@ PNG::PNG(const char* path){
 		if(rows){
 			free(rows);
 		}
-		fclose(f);
 		throw "PNG:読み込みに失敗";
 	}
 
@@ -101,4 +116,14 @@ PNG::PNG(const char* path){
 	png_read_end(png_ptr, info_ptr);
 	png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
 }
+
+IMAGE* PNG::New(){
+	try{
+		return new PNG(new_fd);
+	}
+	catch(...){
+	}
+	return 0;
+}
+
 
