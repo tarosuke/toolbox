@@ -1,8 +1,26 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+#include "../factory/factory.h"
 
 #include "image.h"
+
+
+template<> FACTORY<IMAGE>* FACTORY<IMAGE>::start(0);
+int IMAGE::new_fd(-1);
+
+IMAGE* IMAGE::New(const char* path){
+	if(0 <= (new_fd = open(path, O_RDONLY))){
+		IMAGE* const image(FACTORY<IMAGE>::New());
+		close(new_fd);
+		new_fd = -1;
+		return image;
+	}
+	return 0;
+}
 
 
 IMAGE::IMAGE() :

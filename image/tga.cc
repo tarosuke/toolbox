@@ -10,6 +10,12 @@
 #include <string.h>
 
 
+#include "../factory/factory.h"
+
+
+FACTORY<IMAGE> TGAFile::factory(New);
+
+
 TGA::TGA(const void* rawTGA) : IMAGE(
 	(*static_cast<const RAW*>(rawTGA)).data,
 	(*static_cast<const RAW*>(rawTGA)).width,
@@ -53,6 +59,10 @@ const TGA::RAW* TGAFile::Map(const char* path) throw(const char*){
 	if(fd < 0){
 		throw "TGAFile:ファイルが開けなかった。";
 	}
+	return Map(fd);
+}
+
+const TGA::RAW* TGAFile::Map(int fd) throw(const char*){
 
 	struct stat stat;
 	fstat(fd, &stat);
@@ -82,3 +92,15 @@ TGAFile::~TGAFile(){
 		munmap(const_cast<void*>((const void*)raw), len);
 	}
 }
+
+IMAGE* TGAFile::New(){
+	//シグネチャチェック
+	if(lseek(new_fd, -18, SEEK_END) < 0){ return 0; };
+	char buff[18];
+	if(read(new_fd, buff, 18) < 0
+		|| strncmp(buff, "TRUEVISION-XFILE.", 17)){ return 0; };
+	lseek(new_fd, 0, SEEK_SET);
+
+	return new TGAFile(new_fd);
+}
+

@@ -2,6 +2,7 @@
 
 
 #include "image.h"
+#include "../factory/factory.h"
 
 
 class TGA : public IMAGE{
@@ -44,5 +45,10 @@ private:
 	unsigned len;
 
 	const RAW* Map(const char*)throw(const char*);
+	const RAW* Map(int)throw(const char*);
+
+	static FACTORY<IMAGE> factory;
+	static IMAGE* New(); //IMAGE::fdをチェックしTARGAファイルならnew
+	TGAFile(int fd) : TGA((void*)Map(fd)){};
 };
 
