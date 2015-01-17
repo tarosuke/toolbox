@@ -9,6 +9,8 @@ public:
 	IMAGE(const void*, unsigned w, unsigned h, unsigned bytesDepth);
 	IMAGE(unsigned w, unsigned h, unsigned bytesDepth);
 
+	static IMAGE* New(const char*); //ファイル読み込み
+
 	virtual ~IMAGE();
 
 	void Update(const IMAGE&, int x, int y);
@@ -23,6 +25,8 @@ public:
 	const void* Buffer() const{ return buffer ? buffer : constBuffer; };
 	void* WritableBuffer() const{ return buffer; };
 protected:
+	static int new_fd; //各Newで使われるファイル
+
 	void AssignBuffer(void*);
 	void AssignBuffer(unsigned w, unsigned h, unsigned d);
 	bool IsInRange(unsigned x, unsigned y) const;
