@@ -10,11 +10,6 @@
 #include <string.h>
 
 
-#include "../factory/factory.h"
-
-
-FACTORY<IMAGE> TGAFile::factory(New);
-
 
 TGA::TGA(const void* rawTGA) : IMAGE(
 	(*static_cast<const RAW*>(rawTGA)).data,
@@ -93,14 +88,14 @@ TGAFile::~TGAFile(){
 	}
 }
 
-IMAGE* TGAFile::New(){
+IMAGE* TGAFile::New(int fd){
 	//シグネチャチェック
-	if(lseek(new_fd, -18, SEEK_END) < 0){ return 0; };
+	if(lseek(fd, -18, SEEK_END) < 0){ return 0; };
 	char buff[18];
-	if(read(new_fd, buff, 18) < 0
+	if(read(fd, buff, 18) < 0
 		|| strncmp(buff, "TRUEVISION-XFILE.", 17)){ return 0; };
-	lseek(new_fd, 0, SEEK_SET);
+	lseek(fd, 0, SEEK_SET);
 
-	return new TGAFile(new_fd);
+	return new TGAFile(fd);
 }
 

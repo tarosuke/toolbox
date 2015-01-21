@@ -25,8 +25,6 @@ public:
 	const void* Buffer() const{ return buffer ? buffer : constBuffer; };
 	void* WritableBuffer() const{ return buffer; };
 protected:
-	static int new_fd; //各Newで使われるファイル
-
 	void AssignBuffer(void*);
 	void AssignBuffer(unsigned w, unsigned h, unsigned d);
 	bool IsInRange(unsigned x, unsigned y) const;

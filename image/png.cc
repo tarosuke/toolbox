@@ -7,123 +7,114 @@
 
 #include "png.h"
 
-#include "../factory/factory.h"
 
-
-FACTORY<IMAGE> PNG::factory(New);
-
-
-PNG::PNG(const char* path){
-	int fd(open(path, O_RDONLY));
-	if(fd < 0){
-		throw "PNG:ファイルが開けない";
-	}
-	try{
-		Setup(fd);
-	}
-	catch(const char* m){
-		close(fd);
-		throw m;
+static void PNGRead(png_structp png_ptr,png_bytep data,png_size_t length){
+	const int& fd(*(int*)png_get_io_ptr(png_ptr));
+	const int result(read(fd, data, length));
+	if(result < 0){
+		//読み込み失敗
+		png_error(png_ptr, "error at read(2)");
+	}else if((unsigned)result != length){
+		png_warning(png_ptr, "not cobpletely at read(2)");
 	}
 }
 
-void PNG::Setup(int fd){
+
+IMAGE* PNG::New(int fd){
 	lseek(fd, 0, SEEK_SET);
-	FILE* f(fdopen(fd, "rb")); //NOTE:fがメモリリークするので注意
 
 	void** rows(0);
 	// png_struct
 	png_structp png_ptr(png_create_read_struct(
 		PNG_LIBPNG_VER_STRING, NULL, NULL, NULL));
 	if(!png_ptr){
-		throw "PNG:png構造を確保できない";
+		//throw "PNG:png構造を確保できない";
+		return 0;
 	}
 
 	// PNGの情報
 	png_infop info_ptr(png_create_info_struct(png_ptr));
 	if(!info_ptr){
 		png_destroy_read_struct(&png_ptr,NULL,NULL);
-		throw "PNG:png情報(前)を取得できない";
+		//throw "PNG:png情報(前)を取得できない";
+		return 0;
 	}
-	png_infop end_info(png_create_info_struct(png_ptr));
-	if(!end_info) {
+
+	IMAGE* image(0);
+	try{
+		//エラーハンドル設定
+		if(setjmp(png_jmpbuf(png_ptr))){
+			throw 0;
+		}
+
+		//読み込みコールバックの設定
+		png_set_read_fn(png_ptr,&fd,PNGRead);
+
+		// 画像情報の取得
+		png_uint_32 width;
+		png_uint_32 height;
+		int bit_depth;
+		int color_type;
+		int interlace_type;
+		int compression_type;
+		int filter_type;
+
+		png_read_info(png_ptr,info_ptr);
+		png_get_IHDR(png_ptr,info_ptr,&width,&height,&bit_depth,&color_type,
+			&interlace_type,&compression_type,&filter_type);
+
+		//16/chanelは扱えないので8ビットにして取り出す
+		if(16 == bit_depth){
+			png_set_strip_16(png_ptr);
+		}
+
+		//チャンネル数取得
+		const unsigned channels(png_get_channels(png_ptr, info_ptr));
+
+		switch(channels){
+		case 3 :
+		case 4 :
+			break;
+		default:
+			//throw "PNG:サポートしていないチャネル数";
+			throw 0;
+		}
+
+		//画像の割り当て
+		image = new IMAGE(width, height, channels);
+		if(!image){
+			throw 0;
+		}
+		char* const buffer((char*)(*image).WritableBuffer());
+
+		//各行の先頭を配列に
+		const unsigned rowbytes(png_get_rowbytes(png_ptr,info_ptr));
+		rows = new void*[height];
+		if(!rows){
+			//throw "PNG:rowsの確保に失敗";
+			throw 0;
+		}
+		for(unsigned h(0); h < height; ++h){
+			rows[h] = &buffer[h * rowbytes];
+		}
+
+		//読み込み
+		png_set_bgr(png_ptr);
+		png_read_image(png_ptr, (png_bytepp)rows);
+
+		//あとしまつ
+		free(rows);
+		png_read_end(png_ptr, info_ptr);
 		png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
-		throw "PNG:png情報(後)を取得できない";
 	}
-	//エラーハンドル設定
-	if(setjmp(png_jmpbuf(png_ptr))){
-		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+	catch(...){
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		if(rows){
 			free(rows);
 		}
-		throw "PNG:読み込みに失敗";
+		//throw "PNG:読み込みに失敗";
+		return 0;
 	}
-
-	//読み込みコールバックの設定
-	png_init_io(png_ptr, f);
-
-	// 画像情報の取得
-	png_uint_32 width;
-	png_uint_32 height;
-	int bit_depth;
-	int color_type;
-	int interlace_type;
-	int compression_type;
-	int filter_type;
-
-	png_read_info(png_ptr,info_ptr);
-	png_get_IHDR(png_ptr,info_ptr,&width,&height,&bit_depth,&color_type,
-		&interlace_type,&compression_type,&filter_type);
-
-	//16/chanelなら8ビットにして取り出す
-	if(16 == bit_depth){
-		png_set_strip_16(png_ptr);
-	}
-
-//	png_size_t rowbytes=png_get_rowbytes(png_ptr,info_ptr);//行データのバイト数
-
-	//チャンネル数取得
-	const unsigned channels(png_get_channels(png_ptr, info_ptr));
-
-	switch(channels){
-	case 3 :
-	case 4 :
-		break;
-	default:
-		throw "PNG:サポートしていないチャネル数";
-	}
-
-	//画像メモリの割り当て
-	AssignBuffer(width, height, channels);
-
-	//各行の先頭を配列に
-	rows = new void*[height];
-	if(!rows){
-		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-		fclose(f);
-		throw "PNG:rowsの確保に失敗";
-	}
-	for(unsigned h(0); h < height; ++h){
-		rows[h] = GetPoint(0, h);
-	}
-
-	//読み込み
-	png_set_bgr(png_ptr);
-	png_read_image(png_ptr, (png_bytepp)rows);
-
-	//あとしまつ
-	free(rows);
-	png_read_end(png_ptr, info_ptr);
-	png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
+	return image;
 }
-
-IMAGE* PNG::New(){
-	try{
-		return new PNG(new_fd);
-	}
-	catch(...){
-	}
-	return 0;
-}
-
 

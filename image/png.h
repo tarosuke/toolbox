@@ -6,15 +6,12 @@
 
 
 class PNG : public IMAGE{
+	friend class IMAGE;
 	PNG();
 	PNG(const PNG&);
 	void operator=(const PNG&);
 public:
-	PNG(const char* path);
 private:
-	static FACTORY<IMAGE> factory;
-	static IMAGE* New(); //IMAGE::fdをチェックしPNGファイルならnew
-	PNG(int fd){ Setup(fd); }; //ファイルディスクリプタで生成
-	void Setup(int fd); //初期化、読み込み
+	static IMAGE* New(int); //IMAGE::fdをチェックしPNGファイルなら読み込む
 };
 

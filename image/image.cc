@@ -4,20 +4,28 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "../factory/factory.h"
-
 #include "image.h"
 
 
-template<> FACTORY<IMAGE>* FACTORY<IMAGE>::start(0);
-int IMAGE::new_fd(-1);
+#include "png.h"
+
+
 
 IMAGE* IMAGE::New(const char* path){
-	if(0 <= (new_fd = open(path, O_RDONLY))){
-		IMAGE* const image(FACTORY<IMAGE>::New());
-		close(new_fd);
-		new_fd = -1;
-		return image;
+	static IMAGE* (* const news[])(int) = {
+		&PNG::New,
+		0,
+	};
+
+	const int fd(open(path, O_RDONLY));
+	if(fd < 0){
+		return 0;
+	}
+
+	for(IMAGE* (* const *i)(int) = news; i; i++){
+		if(IMAGE* image = (**i)(fd)){
+			return image;
+		}
 	}
 	return 0;
 }
