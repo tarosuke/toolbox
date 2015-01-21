@@ -3,9 +3,11 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <stdlib.h>
+#include <string.h>
 #include <png.h>
 
 #include "png.h"
+
 
 
 static void PNGRead(png_structp png_ptr,png_bytep data,png_size_t length){
@@ -21,7 +23,12 @@ static void PNGRead(png_structp png_ptr,png_bytep data,png_size_t length){
 
 
 IMAGE* PNG::New(int fd){
-	lseek(fd, 0, SEEK_SET);
+	//シグネチャチェック
+	unsigned char head[8];
+	read(fd, head, 8);
+	if(png_sig_cmp(head, 0, 8)){
+		return 0;
+	}
 
 	void** rows(0);
 	// png_struct
@@ -31,6 +38,7 @@ IMAGE* PNG::New(int fd){
 		//throw "PNG:png構造を確保できない";
 		return 0;
 	}
+	png_set_sig_bytes(png_ptr, 8);
 
 	// PNGの情報
 	png_infop info_ptr(png_create_info_struct(png_ptr));

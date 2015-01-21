@@ -49,53 +49,47 @@ void TGA::Dump(const void* rawTga){
 	printf("attribute:%x.\n", r.attribute);
 }
 
-const TGA::RAW* TGAFile::Map(const char* path) throw(const char*){
-	fd = open(path, O_RDONLY);
-	if(fd < 0){
-		throw "TGAFile:ファイルが開けなかった。";
-	}
-	return Map(fd);
-}
 
-const TGA::RAW* TGAFile::Map(int fd) throw(const char*){
-
-	struct stat stat;
-	fstat(fd, &stat);
-	len = stat.st_size;
-
-	raw = (const RAW*)mmap(NULL, len, PROT_READ, MAP_SHARED, fd, 0);
-	if(!raw){
-		throw "TGAFile:ファイルをマップできなかった。";
-	}
-
-	//サイズチェック
-	const unsigned mayBeSize(
-		(*raw).width * (*raw).height * (*raw).colorDepth/8 + sizeof(RAW));
-	if(len < mayBeSize || mayBeSize * 2 < len){
-		printf("size:%u mayBe:%u.\n", len, mayBeSize);
-		throw "TGAFile:ファイルサイズに異常がある。";
-	}
-
-	return raw;
-}
-
-TGAFile::~TGAFile(){
-	if(0 <= fd){
-		close(fd);
-	}
-	if(raw){
-		munmap(const_cast<void*>((const void*)raw), len);
-	}
-}
-
-IMAGE* TGAFile::New(int fd){
+IMAGE* TGA::New(int fd){
 	//シグネチャチェック
 	if(lseek(fd, -18, SEEK_END) < 0){ return 0; };
 	char buff[18];
 	if(read(fd, buff, 18) < 0
 		|| strncmp(buff, "TRUEVISION-XFILE.", 17)){ return 0; };
-	lseek(fd, 0, SEEK_SET);
 
-	return new TGAFile(fd);
+	//ヘッダ読み出し
+	RAW head;
+	lseek(fd, 0, SEEK_SET);
+	if(read(fd, &head, sizeof(head)) != sizeof(head)){
+		return 0;
+	};
+
+	//サイズ計算
+	const unsigned bpp((head.colorDepth + 7) >> 3);
+	const unsigned size(head.width * head.height * bpp);
+
+	//ケーパビリティチェック
+	if(head.IsColorMap || (head.type != 2) || !(bpp == 3 || bpp == 4)){
+		return 0;
+	}
+
+	//IMAGE確保
+	IMAGE* image(new IMAGE(head.width, head.height, bpp));
+	if(!image){
+		return 0;
+	}
+
+	//読み込み
+	if(read(fd, (*image).WritableBuffer(), size) != size){
+		delete image;
+		return 0;
+	}
+
+	//方向確認
+	if(~head.attribute & 0x20){
+		(*image).FlipVertical();
+	}
+
+	return image;
 }
 

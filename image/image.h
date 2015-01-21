@@ -13,6 +13,7 @@ public:
 
 	virtual ~IMAGE();
 
+	void FlipVertical();
 	void Update(const IMAGE&, int x, int y);
 
 	void operator=(const IMAGE&);

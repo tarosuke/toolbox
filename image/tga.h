@@ -5,6 +5,7 @@
 
 
 class TGA : public IMAGE{
+	friend class IMAGE;
 	TGA();
 	TGA(const TGA&);
 	void operator=(const TGA&);
@@ -25,28 +26,8 @@ public:
 		unsigned char data[0]; //並び准はBGR(A)
 	}__attribute__((packed));
 	TGA(const void* rawTGA);
-private:
 
-	static RAW& Map(const char*);
+private:
+	static IMAGE* New(int);
 	static void Dump(const void*);
 };
-
-class TGAFile : public TGA{
-	TGAFile();
-	TGAFile(const TGAFile&);
-	void operator=(const TGAFile&);
-public:
-	TGAFile(const char* path) : TGA((void*)Map(path)){};
-	~TGAFile();
-private:
-	int fd;
-	const RAW* raw;
-	unsigned len;
-
-	const RAW* Map(const char*)throw(const char*);
-	const RAW* Map(int)throw(const char*);
-
-	static IMAGE* New(int); //IMAGE::fdをチェックしTARGAファイルならnew
-	TGAFile(int fd) : TGA((void*)Map(fd)){};
-};
-

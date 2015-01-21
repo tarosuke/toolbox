@@ -6,27 +6,37 @@
 
 #include "image.h"
 
-
 #include "png.h"
+#include "tga.h"
 
 
 
 IMAGE* IMAGE::New(const char* path){
+	//各種Newの配列
 	static IMAGE* (* const news[])(int) = {
 		&PNG::New,
+		&TGA::New,
 		0,
 	};
 
+	//ファイルを開いて...
 	const int fd(open(path, O_RDONLY));
 	if(fd < 0){
 		return 0;
 	}
 
+	//内容チェック、読み込み
 	for(IMAGE* (* const *i)(int) = news; i; i++){
+		//Newで途中になっている可能性もあるので頭出ししとく
+		lseek(fd, 0, SEEK_SET);
+
+		//正常そうならfdを読んでIMAGE*が返ってくる
 		if(IMAGE* image = (**i)(fd)){
+			close(fd);
 			return image;
 		}
 	}
+	close(fd);
 	return 0;
 }
 
@@ -160,3 +170,29 @@ void IMAGE::Update(const IMAGE& org, int x, int y){
 		}
 	}
 }
+
+
+void IMAGE::FlipVertical(){
+	if(!buffer){
+		return;
+	}
+
+	void* t(malloc(width * depth));
+	if(!t){
+		return;
+	}
+
+	const unsigned lineSize(width * depth);
+
+	for(unsigned v(0); v < height / 2; ++v){
+		void* const s(&((char*)buffer)[lineSize * v]);
+		void* const d(&((char*)buffer)[lineSize * (height - v - 1)]);
+		memcpy(t, s, lineSize);
+		memcpy(s, d, lineSize);
+		memcpy(d, t, lineSize);
+	}
+	free(t);
+}
+
+
+
