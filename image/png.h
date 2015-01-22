@@ -2,8 +2,6 @@
 
 #include "image.h"
 
-#include "../factory/factory.h"
-
 
 class PNG : public IMAGE{
 	friend class IMAGE;
