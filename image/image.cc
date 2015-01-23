@@ -15,9 +15,9 @@
 IMAGE* IMAGE::New(const char* path){
 	//各種Newの配列
 	static IMAGE* (* const news[])(int) = {
-		&JPEG::New,
 		&PNG::New,
 		&TGA::New,
+		&JPEG::New,
 		0,
 	};
 
