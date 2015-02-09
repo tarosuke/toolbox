@@ -106,11 +106,12 @@ namespace wO{
 
 		T* Get(){
 			Lock::Key<L> k(*this);
-			Node* const top(Top(k));
-			if(top != &anchor){
-				(*top).Detach();
+			Node* const tn(anchor.next);
+			if(tn != &anchor){
+				(*tn).Detach();
+				return (*tn).origin;
 			}
-			return *top;
+			return 0;
 		};
 
 	private:
