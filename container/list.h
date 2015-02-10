@@ -132,7 +132,6 @@ namespace wO{
 
 	private:
 		Node anchor;
-		void (*notifier)(T*);
 	};
 
 }
