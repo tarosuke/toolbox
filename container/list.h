@@ -76,6 +76,11 @@ namespace wO{
 		template<typename U> T* Foreach(bool (T::*handler)(U), U param){
 			for(ITOR i(*this); ++i && ((*i).*handler)(param););
 		};
+		template<typename U> T* Foreach(void (T::*handler)(U), U param){
+			for(ITOR i(*this); ++i;){
+				((*i).*handler)(param);
+			}
+		};
 		void Foreach(void (T::*handler)()){
 			for(ITOR i(*this); ++i;){
 				((*i).*handler)();
@@ -83,6 +88,11 @@ namespace wO{
 		}
 		template<typename U> T* Reveach(bool (T::*handler)(U), U param){
 			for(ITOR i(*this); --i && ((*i).*handler)(param););
+		};
+		template<typename U> T* Reveach(void (T::*handler)(U), U param){
+			for(ITOR i(*this); --i;){
+				((*i).*handler)(param);
+			}
 		};
 		void Reveach(void (T::*handler)()){
 			for(ITOR i(*this); --i;){
