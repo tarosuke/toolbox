@@ -13,13 +13,17 @@ namespace wO{
 	template<class T, int index = 0, class L=Lock::NullLock> class List : public L{
 	public:
 		//ノード：これを継承して使う。複数のListを使うときは多重継承
+		//List自体がdeleteするとNotifyListDeletedが呼ばれる
 		class Node{
 			friend class List;
 			friend class ITOR;
+			Node(const Node&);
+			void operator=(const Node&);
 		public:
 			virtual ~Node(){ Detach(); };
 		protected:
 			Node(T& org) : prev(this), next(this), origin(&org){};
+			virtual void NotifyListDeleted(){};
 		private:
 			Node* prev;
 			Node* next;
@@ -85,6 +89,7 @@ namespace wO{
 				((*i).*handler)();
 			}
 		};
+
 		//普通に操作するメソッド
 		void Add(Lock::Key<L>&, Node& n){
 			n.Insert(anchor);
@@ -105,7 +110,6 @@ namespace wO{
 		};
 
 		T* Get(){
-			Lock::Key<L> k(*this);
 			Node* const tn(anchor.next);
 			if(tn != &anchor){
 				(*tn).Detach();
@@ -114,8 +118,20 @@ namespace wO{
 			return 0;
 		};
 
+		//コンストラクタ／デストラクタ
+		~List(){
+			while(Node* const n = anchor.next){
+				if(n == &anchor){
+					continue;
+				}
+				(*n).Detach();
+				(*n).NotifyListDeleted();
+			}
+		};
+
 	private:
 		Node anchor;
+		void (*notifier)(T*);
 	};
 
 }
