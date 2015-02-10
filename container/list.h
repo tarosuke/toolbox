@@ -120,7 +120,8 @@ namespace wO{
 
 		//コンストラクタ／デストラクタ
 		~List(){
-			while(Node* const n = anchor.next){
+			while(anchor.next != &anchor){
+				Node* const n(anchor.next);
 				if(n == &anchor){
 					continue;
 				}
