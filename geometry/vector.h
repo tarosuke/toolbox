@@ -45,6 +45,9 @@ namespace wO{
 			}
 			return r;
 		};
+		T X() const { return value[0]; };
+		T Y() const { return value[1]; };
+		T Z() const { return value[2]; };
 	private:
 		T value[dimension];
 	};
