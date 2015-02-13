@@ -5,7 +5,7 @@ namespace wO{
 
 	template<typename T, unsigned dimension = 2> class Vector{
 	public:
-		operator const T*(){
+		operator const T*() const{
 			return value;
 		};
 		template<typename U> void operator=(const U t[]){
