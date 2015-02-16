@@ -14,7 +14,9 @@ namespace wO{
 			}
 		};
 		template<typename U> Vector(const Vector<U, dimension>& iv){
-			*this = iv;
+			for(unsigned n(0); n < dimension; ++n){
+				value[n] = (T)iv[n];
+			}
 		};
 		Vector(){};
 		template<typename U> Vector(const U iv[]){
