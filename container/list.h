@@ -73,10 +73,15 @@ namespace wO{
 			Lock::Key<L> key;
 			Node* node;
 		};
-		template<typename U> T* Foreach(bool (T::*handler)(U), U param){
-			for(ITOR i(*this); ++i && ((*i).*handler)(param););
+		template<typename U> T* Foreach(bool (T::*handler)(U&), U& param){
+			for(ITOR i(*this); ++i;){
+				if(((*i).*handler)(param)){
+					return i;
+				}
+			}
+			return 0;
 		};
-		template<typename U> T* Foreach(void (T::*handler)(U), U param){
+		template<typename U> void Foreach(void (T::*handler)(U&), U& param){
 			for(ITOR i(*this); ++i;){
 				((*i).*handler)(param);
 			}
@@ -86,10 +91,15 @@ namespace wO{
 				((*i).*handler)();
 			}
 		}
-		template<typename U> T* Reveach(bool (T::*handler)(U), U param){
-			for(ITOR i(*this); --i && ((*i).*handler)(param););
+		template<typename U> T* Reveach(bool (T::*handler)(U&), U& param){
+			for(ITOR i(*this); --i;){
+				if(((*i).*handler)(param)){
+					return i;
+				}
+			}
+			return 0;
 		};
-		template<typename U> T* Reveach(void (T::*handler)(U), U param){
+		template<typename U> T* Reveach(void (T::*handler)(U&), U& param){
 			for(ITOR i(*this); --i;){
 				((*i).*handler)(param);
 			}
