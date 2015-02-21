@@ -41,6 +41,7 @@ namespace GL{
 		const unsigned tid;
 		bool empty;
 		void SetupAttributes(const PARAMS&);
+		static unsigned GetNewTID();
 
 		static const PARAMS defaultParams;
 	};

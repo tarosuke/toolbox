@@ -33,16 +33,13 @@ namespace GL{
 		pointSprite : false,
 	};
 
-	TEXTURE::TEXTURE(const PARAMS& p) : tid(0), empty(true){
-		glGenTextures(1, const_cast<unsigned*>(&tid));
-	}
+	TEXTURE::TEXTURE(const PARAMS& p) : tid(GetNewTID()), empty(true){}
 
 	TEXTURE::TEXTURE(
 		unsigned w,
 		unsigned h,
 		bool a,
-		const PARAMS& p) : tid(0), empty(true){
-		glGenTextures(1, const_cast<unsigned*>(&tid));
+		const PARAMS& p) : tid(GetNewTID()), empty(true){
 		BINDER b(*this);
 		glTexStorage2D(GL_TEXTURE_2D, 0, a ? GL_RGBA : GL_RGB, w, h);
 		SetupAttributes(p);
@@ -50,8 +47,7 @@ namespace GL{
 	}
 
 	TEXTURE::TEXTURE(
-		const class IMAGE& image, const PARAMS& p) : tid(0), empty(true){
-		glGenTextures(1, const_cast<unsigned*>(&tid));
+		const class IMAGE& image, const PARAMS& p) : tid(GetNewTID()), empty(true){
 		Assign(image, p);
 	}
 
@@ -68,7 +64,7 @@ namespace GL{
 			d <= 3 ? GL_RGB : GL_RGBA,
 			image.Width(), image.Height(), 0,
 			d <= 3 ? GL_BGR : GL_BGRA,
-			GL_UNSIGNED_BYTE, const_cast<void*>(image.Buffer()));
+			GL_UNSIGNED_BYTE, image.Buffer());
 		empty = false;
 
 		//属性を設定
@@ -102,6 +98,12 @@ namespace GL{
 			image.Depth()==4 ? GL_BGRA : GL_BGR,
 			GL_UNSIGNED_BYTE,
 			image.Buffer());
+	}
+
+	unsigned TEXTURE::GetNewTID(){
+		unsigned id;
+		glGenTextures(1, &id);
+		return id;
 	}
 
 }
