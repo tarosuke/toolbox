@@ -197,4 +197,31 @@ void IMAGE::FlipVertical(){
 }
 
 
+template<typename T> void IMAGE::FH(T* buff) {
+	for (unsigned y(0); y < height; ++y) {
+		T* s(buff);
+		T* e(buff + width - 1);
+		for (unsigned x(0); x < width /2; ++x, ++s, ++e) {
+			const T tmp(*s);
+			*s = *e;
+			*e = tmp;
+		}
+		buff += width;
+	}
+}
+
+void IMAGE::FlipHorizonal(){
+	switch(depth){
+	case 3 :
+		FH((B3*)buffer);
+		break;
+	 case 4 :
+		FH((B4*)buffer);
+		break;
+	default :
+		break;
+	}
+}
+
+
 

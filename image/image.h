@@ -14,7 +14,9 @@ public:
 	virtual ~IMAGE();
 
 	void FlipVertical();
-	void Update(const IMAGE&, int x, int y);
+	void FlipHorizonal();
+	void Update(const IMAGE&, int x, int y); // overwrite even transparent
+	void Put(const IMAGE&, int x, int y); //write image trasnparent as transparent
 
 	void operator=(const IMAGE&);
 
@@ -38,4 +40,8 @@ private:
 	unsigned width;
 	unsigned height;
 	unsigned depth;
+
+	struct B3{ unsigned char data[3]; };
+	struct B4{ unsigned char data[4]; };
+	template<typename T> void FH(T*);
 };
