@@ -15,8 +15,8 @@ public:
 
 	void FlipVertical();
 	void FlipHorizonal();
-	void Update(const IMAGE&, int x, int y); // overwrite even transparent
-	void Put(const IMAGE&, int x, int y); //write image trasnparent as transparent
+	void Update(const IMAGE&, int x, int y); // overwrite image
+//TODO 	void Draw(const IMAGE&, int x, int y); //draw image
 
 	void operator=(const IMAGE&);
 
@@ -44,4 +44,25 @@ private:
 	struct B3{ unsigned char data[3]; };
 	struct B4{ unsigned char data[4]; };
 	template<typename T> void FH(T*);
+
+	class Pixel{
+	public:
+		Pixel() : p(0), i(0){};
+		Pixel(void* p, IMAGE& i) : p(p), i(&i){};
+		Pixel operator[](int);
+		void operator++();
+		void operator--();
+		void operator=(unsigned);
+		operator unsigned();
+	private:
+		Pixel(IMAGE& i, void* p, unsigned o) :
+			p((void*)((char*)p + o * i.depth)),
+			i(&i){};
+
+		void* p;
+		IMAGE* const i;
+	};
+
+	Pixel operator[](int); //get leftside of line
+
 };

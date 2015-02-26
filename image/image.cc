@@ -134,6 +134,20 @@ void IMAGE::AssignBuffer(unsigned w, unsigned h, unsigned d){
 }
 
 
+IMAGE::Pixel IMAGE::operator[](int y){
+	if(!buffer || height <= (unsigned)y){
+		return Pixel();
+	}
+	return Pixel((void*)(((char*)buffer) + y * width * depth), *this);
+}
+
+IMAGE::Pixel IMAGE::Pixel::operator[](int x){
+	if(!p || (*i).width <= (unsigned)x){
+		return Pixel();
+	}
+	return Pixel(*i, p, (unsigned)x);
+}
+
 
 bool IMAGE::IsInRange(unsigned x, unsigned y) const{
 	return x < width && y < height;
@@ -222,6 +236,8 @@ void IMAGE::FlipHorizonal(){
 		break;
 	}
 }
+
+
 
 
 
