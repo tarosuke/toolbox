@@ -50,8 +50,8 @@ private:
 		Pixel() : p(0), i(0){};
 		Pixel(void* p, IMAGE& i) : p(p), i(&i){};
 		Pixel operator[](int);
-		void operator++();
-		void operator--();
+		void operator++(){ 	p = (void*)((char*)p + (* i).depth); }
+		void operator--(){ p = (void*)((char*)p - (* i).depth); };
 		void operator=(unsigned);
 		operator unsigned();
 	private:

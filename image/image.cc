@@ -140,13 +140,25 @@ IMAGE::Pixel IMAGE::operator[](int y){
 	}
 	return Pixel((void*)(((char*)buffer) + y * width * depth), *this);
 }
-
 IMAGE::Pixel IMAGE::Pixel::operator[](int x){
 	if(!p || (*i).width <= (unsigned)x){
 		return Pixel();
 	}
 	return Pixel(*i, p, (unsigned)x);
 }
+void IMAGE::Pixel::operator=(unsigned color){
+	if(!i){ return; }
+	const unsigned unmask(~0U << ((*i).depth * 8));
+	unsigned& target(*((unsigned*)p));
+	target = (target & unmask) | (color & ~unmask);
+}
+IMAGE::Pixel::operator unsigned(){
+	if(!i){ return 0; }
+	const unsigned unmask(~0U << ((*i).depth * 8));
+	unsigned& target(*((unsigned*)p));
+	return target & ~unmask;
+}
+
 
 
 bool IMAGE::IsInRange(unsigned x, unsigned y) const{
