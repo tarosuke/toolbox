@@ -201,9 +201,7 @@ void IMAGE::Update(const IMAGE& org, int x, int y){
 
 
 void IMAGE::FlipVertical(){
-	if(!buffer){
-		return;
-	}
+	if(!buffer){ return; }
 
 	void* t(malloc(width * depth));
 	if(!t){
@@ -222,34 +220,23 @@ void IMAGE::FlipVertical(){
 	free(t);
 }
 
+void IMAGE::FlipHorizontal(){
+	if(!buffer){ return; }
 
-template<typename T> void IMAGE::FH(T* buff) {
-	for (unsigned y(0); y < height; ++y) {
-		T* s(buff);
-		T* e(buff + width - 1);
-		for (unsigned x(0); x < width /2; ++x, ++s, ++e) {
-			const T tmp(*s);
-			*s = *e;
-			*e = tmp;
+	for(unsigned y(0); y < height; ++y){
+		Pixel s((*this)[y]);
+		Pixel d((*this)[y][width - 1]);
+		for(unsigned x(0); x < width / 2; ++x, ++s, --d){
+			const unsigned t(s);
+			s = (unsigned)d;
+			d = t;
 		}
-		buff += width;
-	}
-}
-
-void IMAGE::FlipHorizonal(){
-	switch(depth){
-	case 3 :
-		FH((B3*)buffer);
-		break;
-	 case 4 :
-		FH((B4*)buffer);
-		break;
-	default :
-		break;
 	}
 }
 
 void IMAGE::Rotate90(){
+	if(!buffer){ return; }
+
 	if(height == 1){
 		height = width;
 		width = 1;
@@ -259,28 +246,34 @@ void IMAGE::Rotate90(){
 	for(unsigned y(0); y < height; ++y){
 		Pixel s((*this)[y]);
 		for(unsigned x(0); x < width; ++x, ++s){
-			newImage[x][width - y - 1] = (unsigned)s;
+			newImage[x][height - y - 1] = (unsigned)s;
 		}
 	}
 	free(buffer);
 	buffer = newImage.buffer;
+	width = newImage.width;
+	height = newImage.height;
 	newImage.buffer = 0;
 }
 
 void IMAGE::Rotate180(){
+	if(!buffer){ return; }
+
 	for(unsigned y(0); y < (height + 1) / 2; ++y){
 		Pixel p((*this)[y]);
 		Pixel r((*this)[height - y - 1][width - 1]);
 		const unsigned w(y != height - y ? width : width / 2);
 		for(unsigned x(0); x < w; ++x, ++p, --r){
-			const Pixel t(p);
+			const unsigned t(p);
 			p =(unsigned) r;
-			r = (const unsigned)t;
+			r = t;
 		}
 	}
 }
 
 void IMAGE::Rotate270(){
+	if(!buffer){ return; }
+
 	if(width == 1){
 		width = height;
 		height = 1;
@@ -290,11 +283,13 @@ void IMAGE::Rotate270(){
 	for(unsigned y(0); y < height; ++y){
 		Pixel s((*this)[y]);
 		for(unsigned x(width - 1); x < width; --x, ++s){
-			newImage[height - x - 1][y] = (unsigned)s;
+			newImage[x][y] = (unsigned)s;
 		}
 	}
 	free(buffer);
 	buffer = newImage.buffer;
+	width = newImage.width;
+	height = newImage.height;
 	newImage.buffer = 0;
 }
 

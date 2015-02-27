@@ -14,7 +14,7 @@ public:
 	virtual ~IMAGE();
 
 	void FlipVertical();
-	void FlipHorizonal();
+	void FlipHorizontal();
 	void Rotate90();
 	void Rotate180();
 	void Rotate270();
@@ -43,10 +43,6 @@ private:
 	unsigned width;
 	unsigned height;
 	unsigned depth;
-
-	struct B3{ unsigned char data[3]; };
-	struct B4{ unsigned char data[4]; };
-	template<typename T> void FH(T*);
 
 	class Pixel{
 	public:
