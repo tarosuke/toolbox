@@ -15,6 +15,9 @@ public:
 
 	void FlipVertical();
 	void FlipHorizonal();
+	void Rotate90();
+	void Rotate180();
+	void Rotate270();
 	void Update(const IMAGE&, int x, int y); // overwrite image
 //TODO 	void Draw(const IMAGE&, int x, int y); //draw image
 
@@ -53,7 +56,7 @@ private:
 		void operator++(){ 	p = (void*)((char*)p + (* i).depth); }
 		void operator--(){ p = (void*)((char*)p - (* i).depth); };
 		void operator=(unsigned);
-		operator unsigned();
+		operator unsigned() const;
 	private:
 		Pixel(IMAGE& i, void* p, unsigned o) :
 			p((void*)((char*)p + o * i.depth)),

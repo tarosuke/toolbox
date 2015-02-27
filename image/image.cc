@@ -152,7 +152,7 @@ void IMAGE::Pixel::operator=(unsigned color){
 	unsigned& target(*((unsigned*)p));
 	target = (target & unmask) | (color & ~unmask);
 }
-IMAGE::Pixel::operator unsigned(){
+IMAGE::Pixel::operator unsigned() const{
 	if(!i){ return 0; }
 	const unsigned unmask(~0U << ((*i).depth * 8));
 	unsigned& target(*((unsigned*)p));
@@ -249,6 +249,54 @@ void IMAGE::FlipHorizonal(){
 	}
 }
 
+void IMAGE::Rotate90(){
+	if(height == 1){
+		height = width;
+		width = 1;
+		return;
+	}
+	IMAGE newImage(height, width, depth);
+	for(unsigned y(0); y < height; ++y){
+		Pixel s((*this)[y]);
+		for(unsigned x(0); x < width; ++x, ++s){
+			newImage[x][width - y - 1] = (unsigned)s;
+		}
+	}
+	free(buffer);
+	buffer = newImage.buffer;
+	newImage.buffer = 0;
+}
+
+void IMAGE::Rotate180(){
+	for(unsigned y(0); y < (height + 1) / 2; ++y){
+		Pixel p((*this)[y]);
+		Pixel r((*this)[height - y - 1][width - 1]);
+		const unsigned w(y != height - y ? width : width / 2);
+		for(unsigned x(0); x < w; ++x, ++p, --r){
+			const Pixel t(p);
+			p =(unsigned) r;
+			r = (const unsigned)t;
+		}
+	}
+}
+
+void IMAGE::Rotate270(){
+	if(width == 1){
+		width = height;
+		height = 1;
+		return;
+	}
+	IMAGE newImage(height, width, depth);
+	for(unsigned y(0); y < height; ++y){
+		Pixel s((*this)[y]);
+		for(unsigned x(width - 1); x < width; --x, ++s){
+			newImage[height - x - 1][y] = (unsigned)s;
+		}
+	}
+	free(buffer);
+	buffer = newImage.buffer;
+	newImage.buffer = 0;
+}
 
 
 
