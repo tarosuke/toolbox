@@ -14,7 +14,12 @@ public:
 	virtual ~IMAGE();
 
 	void FlipVertical();
-	void Update(const IMAGE&, int x, int y);
+	void FlipHorizonal();
+	void Rotate90();
+	void Rotate180();
+	void Rotate270();
+	void Update(const IMAGE&, int x, int y); // overwrite image
+//TODO 	void Draw(const IMAGE&, int x, int y); //draw image
 
 	void operator=(const IMAGE&);
 
@@ -38,4 +43,29 @@ private:
 	unsigned width;
 	unsigned height;
 	unsigned depth;
+
+	struct B3{ unsigned char data[3]; };
+	struct B4{ unsigned char data[4]; };
+	template<typename T> void FH(T*);
+
+	class Pixel{
+	public:
+		Pixel() : p(0), i(0){};
+		Pixel(void* p, IMAGE& i) : p(p), i(&i){};
+		Pixel operator[](int);
+		void operator++(){ 	p = (void*)((char*)p + (* i).depth); }
+		void operator--(){ p = (void*)((char*)p - (* i).depth); };
+		void operator=(unsigned);
+		operator unsigned() const;
+	private:
+		Pixel(IMAGE& i, void* p, unsigned o) :
+			p((void*)((char*)p + o * i.depth)),
+			i(&i){};
+
+		void* p;
+		IMAGE* const i;
+	};
+
+	Pixel operator[](int); //get leftside of line
+
 };
