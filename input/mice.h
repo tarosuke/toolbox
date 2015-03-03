@@ -19,14 +19,14 @@ private:
 	void (*const reporter)(const Report&);
 
 	struct PS2{
+		unsigned char buttons : 3;
+		unsigned char : 1;
+		unsigned char Y_sign : 1;
+		unsigned char X_sign : 1;
 		unsigned char Y_overFlow : 1;
 		unsigned char X_overFlow : 1;
-		unsigned char X_sign : 1;
-		unsigned char Y_sign : 1;
-		unsigned char : 1;
-		unsigned char buttons : 3;
-		unsigned char Xmovement;
-		unsigned char Ymovement;
+		char Xmovement;
+		char Ymovement;
 	};
 
 	void Thread();

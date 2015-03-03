@@ -9,15 +9,16 @@
 
 
 void MICE::Thread(){
-	if(file < 0 || !reporter){
+	if(file < 0){
+		puts("devicefile could not open.\nTry to join input group or chmod to read /dev/input/mice.");
 		return;
 	}
 
 	PS2 pack;
 	while(3 == read(file, &pack, sizeof(pack))){
 		const Report report = { pack.buttons,
-			{	pack.X_sign ? -pack.Xmovement : pack.Xmovement,
-				pack.Y_sign ? -pack.Ymovement : pack.Ymovement }};
+			{	pack.Xmovement,
+				pack.Ymovement }};
 		reporter(report);
 	}
 }
