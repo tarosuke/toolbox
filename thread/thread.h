@@ -16,7 +16,7 @@ class THREAD : public TOOLBOX::NODE<class THREAD>{
 private:
 protected:
 	THREAD(); //スレッドを起こしてスレッドからThreadを呼ぶ。
-	virtual void Thread()=0; //本処理:終了するとpthread_extiしdelete待ちになる。
+	virtual void Thread()=0; //本処理:終了するとpthread_exitしdelete待ちになる。
 	virtual ~THREAD(){};
 private:
 	//本体
