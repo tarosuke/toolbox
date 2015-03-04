@@ -40,12 +40,22 @@ namespace wO{
 			}
 			return r;
 		};
+		void operator+=(const Vector& t){
+			for(unsigned n(0); n < dimension; ++n){
+				value[n] += t.value[n];
+			}
+		};
 		Vector operator-(const Vector& t) const{
 			Vector r;
 			for(unsigned n(0); n < dimension; ++n){
 				r.value[n] = value[n] - t.value[n];
 			}
 			return r;
+		};
+		void operator-=(const Vector& t){
+			for(unsigned n(0); n < dimension; ++n){
+				value[n] -= t.value[n];
+			}
 		};
 		T X() const { return value[0]; };
 		T Y() const { return value[1]; };

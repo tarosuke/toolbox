@@ -12,8 +12,11 @@ public:
 		int axis[2];
 	};
 
-	MICE(void (*reporter)(const Report&)) : file(OpenFile()), reporter(reporter){}
+	MICE(void (*reporter)(const Report&)) : enable(true),file(OpenFile()), reporter(reporter){}
+	void Quit(){ enable = false; };
 private:
+	bool enable;
+
 	const int file;
 	static int OpenFile();
 	void (*const reporter)(const Report&);

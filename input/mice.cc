@@ -15,7 +15,7 @@ void MICE::Thread(){
 	}
 
 	PS2 pack;
-	while(3 == read(file, &pack, sizeof(pack))){
+	while(enable && 3 == read(file, &pack, sizeof(pack))){
 		const Report report = { pack.buttons,
 			{	pack.Xmovement,
 				pack.Ymovement }};
