@@ -57,6 +57,22 @@ namespace wO{
 				value[n] -= t.value[n];
 			}
 		};
+		void Min(const Vector& t){
+			for(unsigned n(0); n < dimension; ++n){
+				if(t.value[n] < value[n]){
+					value[n] = t.value[n];
+				}
+			}
+		};
+		void Max(const Vector& t){
+			for(unsigned n(0); n < dimension; ++n){
+				if(value[n] < t.value[n]){
+					value[n] = t.value[n];
+				}
+			}
+		};
+
+
 		T X() const { return value[0]; };
 		T Y() const { return value[1]; };
 		T Z() const { return value[2]; };
