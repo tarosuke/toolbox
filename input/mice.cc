@@ -15,12 +15,16 @@ void MICE::Thread(){
 	}
 
 	PS2 pack;
-	while(enable && 3 == read(file, &pack, sizeof(pack))){
-		const Report report = { pack.buttons,
-			{	pack.Xmovement,
-				pack.Ymovement }};
-		reporter(report);
+	while(enable){
+		if(3 == read(file, &pack, sizeof(pack))){
+			const Report report = { pack.buttons,
+				{	pack.Xmovement,
+					pack.Ymovement }};
+			reporter(report);
+		}
+		TestCancel();
 	}
+	puts("MICE:quitting.");
 }
 
 int MICE::OpenFile(){

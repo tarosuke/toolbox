@@ -26,7 +26,6 @@ void* THREAD::Igniter(void* p){
 
 
 
-
 TOOLBOX::QUEUE<THREAD> THREAD::CEMETARY::bodies;
 pthread_t THREAD::CEMETARY::thread;
 pthread_mutex_t THREAD::CEMETARY::igniter;

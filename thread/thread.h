@@ -18,6 +18,7 @@ protected:
 	THREAD(); //スレッドを起こしてスレッドからThreadを呼ぶ。
 	virtual void Thread()=0; //本処理:終了するとpthread_exitしdelete待ちになる。
 	virtual ~THREAD(){};
+	void TestCancel(){ return pthread_testcancel(); };
 private:
 	//本体
 	TOOLBOX::NODE<THREAD> node;
