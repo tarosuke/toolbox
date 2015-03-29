@@ -19,6 +19,11 @@ namespace wO{
 			}
 		};
 		Vector(){};
+		void Clear(){
+			for(unsigned n(0); n < dimension; ++n){
+				value[n] = 0;
+			}
+		};
 		template<typename U> Vector(const U iv[]){
 			*this = iv;
 		};
