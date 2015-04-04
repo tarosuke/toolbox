@@ -12,6 +12,7 @@ namespace wO{
 		void operator|=(const Rect& t){
 			//check volume
 			if(!t.HaveVolume()){
+				//no volume to append
 				return;
 			}
 			if(!HaveVolume()){
