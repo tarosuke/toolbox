@@ -62,6 +62,16 @@ namespace wO{
 				value[n] -= t.value[n];
 			}
 		};
+		void operator*=(T t){
+			for(unsigned n(0); n < dimension; ++n){
+				value[n] *= t;
+			}
+		};
+		void operator/=(T t){
+			for(unsigned n(0); n < dimension; ++n){
+				value[n] /= t;
+			}
+		};
 		void Min(const Vector& t){
 			for(unsigned n(0); n < dimension; ++n){
 				if(t.value[n] < value[n]){

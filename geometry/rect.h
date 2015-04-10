@@ -59,6 +59,12 @@ namespace wO{
 		};
 		const T* Left(){ return points[0]; };
 		const T* Right(){ return points[1]; };
+		Rect operator+(const Vector<T, dimensions>& t){
+			return Rect(points[0] + t, points[1] + t);
+		};
+		Rect operator-(const Vector<T, dimensions>& t){
+			return Rect(points[0] - t, points[1] - t);
+		};
 	private:
 		Vector<T, dimensions> points[2]; //keep points[0] lesser value
 		static Vector<T, dimensions> Less(
