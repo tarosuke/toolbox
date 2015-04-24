@@ -9,6 +9,7 @@
 namespace wO{
 
 	class Resource{
+		Resource();
 		Resource(const Resource&);
 		void operator=(const Resource&);
 	public:
@@ -20,7 +21,7 @@ namespace wO{
 	protected:
 		/** コンストラクタ＆デストラクタ
 		 */
-		Resource();
+		Resource(class Socket*);
 		~Resource();
 
 		/** 受信キューからメッセージをひとつ取り出して返す
@@ -30,13 +31,14 @@ namespace wO{
 		
 		/** 設定された送信先へメッセージを送る
 		 */
-		void SendMessage(class Socket&, class Message&);
+		void SendMessage(class Message&);
 	private:
 		/** 新しいユニークなIDを生成する
 		 * 「ユニーク」とはid->Resource*変換用マップに登録されていないことを意味する
 		 */
 		static unsigned NewID();
 
+		class Socket* const socket;
 		const unsigned id;
 		wO::List<Message> receivedMessages;
 		class Message* processingMessage;

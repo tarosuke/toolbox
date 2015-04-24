@@ -14,10 +14,12 @@ namespace{
 
 namespace wO{
 
-	Resource::Resource() : id(NewID()), processingMessage(0){
+	Resource::Resource(Socket* s) : socket(s), id(NewID()), processingMessage(0){
+		// マップへidとインスタンスのポインタを登録
 		id2p[id] = this;
 	}
 	Resource::~Resource(){
+		//マップからidとインスタンスのポインタを削除
 		id2p.erase(id);
 	}
 
@@ -37,7 +39,7 @@ namespace wO{
 		processingMessage = receivedMessages.Get();
 		return processingMessage;
 	}
-	void Resource::SendMessage(Socket& s, Message& p){
+	void Resource::SendMessage(Message& m){
 	}
 	
 
