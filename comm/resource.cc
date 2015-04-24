@@ -2,17 +2,19 @@
 #include <map>
 
 #include "resource.h"
-#include "packet.h"
+#include "message.h"
+#include "socket.h"
 
 
 namespace{
-	//ヘッダにmapをincludeするのを避けるためここに置いてる。
+	//idからResourceへの変換マップ：ヘッダにmapをincludeするのを避けるためここに置いてある
+	//TODO:stlを使えない環境のために将来的には自前実装に置き換える
 	std::map<unsigned, wO::Resource*> id2p;
 }
 
 namespace wO{
 
-	Resource::Resource() : id(NewID()){
+	Resource::Resource() : id(NewID()), processingMessage(0){
 		id2p[id] = this;
 	}
 	Resource::~Resource(){
@@ -22,13 +24,20 @@ namespace wO{
 	//新規のIDを取得する
 	unsigned Resource::NewID(){
 		static unsigned idHead(0);
-		while(idHead++, id2p.find(idHead) != id2p.end());
+		while(++idHead, id2p.find(idHead) != id2p.end());
 		return idHead;
 	}
 
 
-	void Resource::Receive(unsigned, Packet* p){ if(p){ delete p; } };
-	void Resource::Send(Packet& p){
+	//receivedMessagesに入っているメッセージをひとつ取り出して返す
+	const Message* Resource::GetNextMessage(){
+		if(processingMessage){
+			delete processingMessage;
+		}
+		processingMessage = receivedMessages.Get();
+		return processingMessage;
+	}
+	void Resource::SendMessage(Socket& s, Message& p){
 	}
 	
 
