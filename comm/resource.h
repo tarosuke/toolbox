@@ -18,11 +18,15 @@ namespace wO{
 		 */
 		static void Received(class Message&);
 		
+		/** リソースの通信先を返す
+		 */
+		class Comm& GetComm() const { return comm; };
+
 	protected:
 		/** コンストラクタ＆デストラクタ
 		 */
-		Resource(class Comm*); //こちらでIDを生成 TODO:Comm&を受け取る
-		Resource(unsigned id, class Comm*); //指定されたIDで TODO:Comm&を受け取る
+		Resource(class Comm&); //こちらでIDを生成
+		Resource(unsigned id, class Comm&); //指定されたIDで
 		~Resource();
 
 		/** 受信キューからメッセージをひとつ取り出して返す
@@ -35,6 +39,9 @@ namespace wO{
 		 */
 		void SendMessage(class Message&);
 	private:
+		static const unsigned serverServerMask = ~(~0U >> 1);
+		static const unsigned clientServerMask = 0;
+
 		/** 新しいユニークなIDを生成する
 		 * 「ユニーク」とはid->Resource*変換用マップに登録されていないことを意味する
 		 */
@@ -47,7 +54,7 @@ namespace wO{
 		/** 内部変数
 		 */
 		class Comm& comm;
-		const unsigned serverMask; //client:0 / server: ~0U >> 1
+		const unsigned serverMask; //IDのマスク
 		unsigned id;
 		wO::List<Message> receivedMessages;
 		class Message* processingMessage;

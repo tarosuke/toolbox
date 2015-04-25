@@ -16,8 +16,8 @@ namespace{
 namespace wO{
 
 	//IDを生成して生成
-	Resource::Resource(Comm* c) :
-		comm(*c),
+	Resource::Resource(Comm& c) :
+		comm(c),
 		serverMask(ServerMask()),
 		id(NewID()),
 		processingMessage(0){
@@ -25,8 +25,8 @@ namespace wO{
 		id2p[id] = this;
 	}
 	//指定IDで生成
-	Resource::Resource(unsigned id, Comm* c) :
-		comm(*c),
+	Resource::Resource(unsigned id, Comm& c) :
+		comm(c),
 		serverMask(ServerMask()),
 		id(id),
 		processingMessage(0){
@@ -46,7 +46,7 @@ namespace wO{
 	//サーバマスク計算
 	unsigned Resource::ServerMask(){
 		return 0;
-//TODO:		return (comm && !(*comm).IsServer()) ? 0 : !0U >> 1;
+//TODO:		return (comm && !(*comm).IsServer()) ? clientServerMask : serverServerMask;
 	}
 
 	//新規のIDを取得する
@@ -70,6 +70,7 @@ namespace wO{
 		return processingMessage;
 	}
 	void Resource::SendMessage(Message& m){
+		comm.Send(m);
 	}
 	
 
