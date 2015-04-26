@@ -8,7 +8,7 @@
 
 namespace wO{
 
-	class Resource{
+	class Resource : public List<Resource>::Node{
 		Resource();
 		Resource(const Resource&);
 		void operator=(const Resource&);
@@ -17,7 +17,7 @@ namespace wO{
 		 * Messageの振り分けやdeleteはResourceの仕事
 		 */
 		static void Received(class Message&);
-		
+
 		/** リソースの通信先を返す
 		 */
 		class Comm& GetComm() const { return comm; };
@@ -29,27 +29,26 @@ namespace wO{
 		Resource(unsigned id, class Comm&); //指定されたIDで
 		~Resource();
 
-		/** 受信キューからメッセージをひとつ取り出して返す
-		 * 返されたメッセージはまたこのメソッドが呼ばれるまで有効
-		 * 最後の一個がなかなか解放されないけどキニシナーイ
+		/** 受信キューからメッセージをひとつ取り出してハンドラを呼び出す
 		 */
-		const Message* GetNextMessage();
-		
+		void GetNextMessage();
+
 		/** 設定された送信先へメッセージを送る
 		 */
 		void SendMessage(class Message&);
 	private:
-		static const unsigned serverServerMask = ~(~0U >> 1);
-		static const unsigned clientServerMask = 0;
-
 		/** 新しいユニークなIDを生成する
-		 * 「ユニーク」とはid->Resource*変換用マップに登録されていないことを意味する
+		 * 「ユニーク」とはid→Resource*変換用マップに登録されていないことを意味する
 		 */
 		unsigned NewID();
 
-		/** サーバマスクを計算する
+		/** commの属性を読んでサーバマスクを計算する
 		 */
 		unsigned ServerMask();
+
+		/** 使用中のCommがなくなったときに一緒に消滅する
+		 */
+		void NotifyListDeleted(){ delete this; };
 
 		/** 内部変数
 		 */
@@ -57,7 +56,7 @@ namespace wO{
 		const unsigned serverMask; //IDのマスク
 		unsigned id;
 		wO::List<Message> receivedMessages;
-		class Message* processingMessage;
+
 	};
-	
+
 }

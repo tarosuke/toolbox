@@ -17,62 +17,68 @@ namespace wO{
 
 	//IDを生成して生成
 	Resource::Resource(Comm& c) :
+		List<Resource>::Node(*this),
 		comm(c),
 		serverMask(ServerMask()),
-		id(NewID()),
-		processingMessage(0){
+		id(NewID()){
 		// マップへidとインスタンスのポインタを登録
 		id2p[id] = this;
+		//Commに登録
+		comm.RegisterUser(*this);
 	}
 	//指定IDで生成
 	Resource::Resource(unsigned id, Comm& c) :
+		List<Resource>::Node(*this),
 		comm(c),
 		serverMask(ServerMask()),
-		id(id),
-		processingMessage(0){
+		id(id){
 		// マップへidとインスタンスのポインタを登録
 		id2p[id] = this;
+		//Commに登録
+		comm.RegisterUser(*this);
 	}
 	//デストラクタ
 	Resource::~Resource(){
 		//マップからidとインスタンスのポインタを削除
 		id2p.erase(id);
-		//処理中メッセージの解放
-		if(processingMessage){
-			delete processingMessage;
-		}
 	}
 
 	//サーバマスク計算
 	unsigned Resource::ServerMask(){
-		return 0;
-//TODO:		return (comm && !(*comm).IsServer()) ? clientServerMask : serverServerMask;
+		return comm.IsServer() ? 1 : 0;
 	}
 
 	//新規のIDを取得する
 	unsigned Resource::NewID(){
 		static unsigned idHead(0);
+		int id(0);
 		do{
 			++idHead;
-			idHead &= ~serverMask;
-			idHead |= serverMask;
-		}while(id2p.find(idHead) != id2p.end());
-		return idHead;
+			id = (idHead << 1) | serverMask;
+		}while(id2p.find(id) != id2p.end());
+		return id;
 	}
 
-
-	//receivedMessagesに入っているメッセージをひとつ取り出して返す
-	const Message* Resource::GetNextMessage(){
-		if(processingMessage){
-			delete processingMessage;
+	//受信したメッセージを振り分けて蓄積
+	void Resource::Received(Message& m){
+		const unsigned id(m.GetID());
+		if(id2p.find(id) == id2p.end()){
+			//未知のIDなので無視
+			delete &m;
+			return;
 		}
-		processingMessage = receivedMessages.Get();
-		return processingMessage;
+		(*id2p[id]).receivedMessages.Add(m);
+	}
+
+	//receivedMessagesに入っているメッセージをひとつ取り出してハンドラを呼び出す
+	void Resource::GetNextMessage(){
+		Message* m(receivedMessages.Get());
+		if(m){
+			(*m).Deleive(*this);
+		}
 	}
 	void Resource::SendMessage(Message& m){
 		comm.Send(m);
 	}
-	
-
 
 }
