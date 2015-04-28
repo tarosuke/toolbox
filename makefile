@@ -28,7 +28,8 @@ exobjs =
 ######################################################################## RULES
 
 toolbox.a: makefile $(objs)
-	ar rc $@ $(objs)
+	@echo " AR $@"
+	@ar rc $@ $(objs)
 
 clean:
 	rm -f objs/* toolbox*
@@ -45,21 +46,24 @@ vpath % $(dirs)
 
 
 objs/%.o : %.cc makefile
-	$(CC) $(CCOPTS) -c -o $@ $<
+	@echo " CC $@"
+	@$(CC) $(CCOPTS) -c -o $@ $<
 
 objs/%.o : %.c makefile
-	${CC} $(COPTS) -c -o $@ $<
+	@echo " CC $@"
+	@${CC} $(COPTS) -c -o $@ $<
 
 objs/%.o : %.glsl makefile
-	objcopy -I binary -O elf64-x86-64 -B i386 $< $@
+	@echo " OBJCOPY $@"
+	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
 
 objs/%.d : %.cc
-	@echo $@
+	@echo " CPP $@"
 	@echo -n objs/ > $@
 	@$(CPP) $(CCOPTS) -MM $< >> $@
 
 objs/%.d : %.c
-	@echo $@
+	@echo " CPP $@"
 	@echo -n objs/ > $@
 	@$(CPP) $(COPTS) -MM $< >> $@
 
