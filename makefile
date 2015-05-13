@@ -7,7 +7,7 @@ all: toolbox.a
 ####################################################################### VALUES
 
 COPTS += -Wall -Werror -IX11 -I.
-CCOPTS += $(COPTS)
+CCOPTS += $(COPTS) -std=c++11
 
 
 ssfc = .c .cc .glsl
