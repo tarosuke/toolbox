@@ -41,7 +41,16 @@ namespace GL{
 		bool a,
 		const PARAMS& p) : tid(GetNewTID()), empty(true){
 		BINDER b(*this);
+#if 0
 		glTexStorage2D(GL_TEXTURE_2D, 0, a ? GL_RGBA : GL_RGB, w, h);
+#else
+		glTexImage2D(
+			GL_TEXTURE_2D, 0,
+			a ? GL_RGB : GL_RGBA,
+			w, h, 0,
+			GL_RGB,
+			GL_UNSIGNED_BYTE, 0);
+#endif
 		SetupAttributes(p);
 		empty = false;
 	}
@@ -98,6 +107,23 @@ namespace GL{
 			image.Depth()==4 ? GL_BGRA : GL_BGR,
 			GL_UNSIGNED_BYTE,
 			image.Buffer());
+	}
+	void TEXTURE::Update(
+		const void* buffer, int format, int x, int y, unsigned width, unsigned height){
+		if(empty){
+			//テクスチャメモリが割り当てられていないので終了
+			return;
+		}
+		BINDER b(*this);
+		glTexSubImage2D(
+			GL_TEXTURE_2D, 0,
+			x,
+			y,
+			width,
+			height,
+			format,
+			GL_UNSIGNED_BYTE,
+			buffer);
 	}
 
 	unsigned TEXTURE::GetNewTID(){

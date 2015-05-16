@@ -37,6 +37,7 @@ namespace GL{
 
 		void Assign(const IMAGE&, const PARAMS& p=defaultParams);
 		void Update(const IMAGE&, int x, int y);
+		void Update(const void*, int format, int x, int y, unsigned width, unsigned height);
 	private:
 		const unsigned tid;
 		bool empty;
