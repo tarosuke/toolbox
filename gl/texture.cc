@@ -46,7 +46,7 @@ namespace GL{
 #else
 		glTexImage2D(
 			GL_TEXTURE_2D, 0,
-			a ? GL_RGB : GL_RGBA,
+			a ? GL_RGBA : GL_RGB,
 			w, h, 0,
 			GL_RGB,
 			GL_UNSIGNED_BYTE, 0);
