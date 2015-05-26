@@ -133,7 +133,19 @@ namespace GL{
 	}
 
 	int TEXTURE::GLTexFormat(Format f){
-		return (f == RGB || f == BGR || f == cairoRGB) ? GL_RGB : GL_RGBA;
+		switch(f){
+		case RGB:
+		case BGR:
+		case cairoRGB:
+			return GL_RGB;
+		case RGBA:
+		case BGRA:
+		case cairoRGBA:
+			return GL_RGBA;
+		case GRAYSCALE:
+			return GL_LUMINANCE8;
+		}
+		return GL_LUMINANCE8;
 	}
 	int TEXTURE::GLImageFormat(Format f){
 		switch(f){
@@ -147,6 +159,8 @@ namespace GL{
 		case cairoRGBA:
 		case BGRA:
 			return GL_BGRA;
+		case GRAYSCALE:
+			return GL_LUMINANCE;
 		}
 		return GL_RGB;
 	}

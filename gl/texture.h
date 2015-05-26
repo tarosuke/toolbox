@@ -35,6 +35,7 @@ namespace GL{
 			RGBA,
 			BGRA,
 			cairoRGBA,
+			GRAYSCALE,
 		};
 
 		TEXTURE(const PARAMS& p=defaultParams);
