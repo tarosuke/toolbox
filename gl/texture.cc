@@ -109,7 +109,7 @@ namespace GL{
 			image.Buffer());
 	}
 	void TEXTURE::Update(
-		const void* buffer, int format, int x, int y, unsigned width, unsigned height){
+		const void* buffer, Format format, int x, int y, unsigned width, unsigned height){
 		if(empty){
 			//テクスチャメモリが割り当てられていないので終了
 			return;
@@ -121,7 +121,7 @@ namespace GL{
 			y,
 			width,
 			height,
-			format,
+			GLImageFormat(format),
 			GL_UNSIGNED_BYTE,
 			buffer);
 	}
@@ -130,6 +130,25 @@ namespace GL{
 		unsigned id;
 		glGenTextures(1, &id);
 		return id;
+	}
+
+	int TEXTURE::GLTexFormat(Format f){
+		return (f == RGB || f == BGR || f == cairoRGB) ? GL_RGB : GL_RGBA;
+	}
+	int TEXTURE::GLImageFormat(Format f){
+		switch(f){
+		case RGB:
+			return GL_RGB;
+		case BGR:
+			return GL_BGR;
+		case RGBA:
+			return GL_RGBA;
+		case cairoRGB:
+		case cairoRGBA:
+		case BGRA:
+			return GL_BGRA;
+		}
+		return GL_RGB;
 	}
 
 }

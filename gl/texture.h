@@ -27,6 +27,16 @@ namespace GL{
 			int texture_mode;
 			bool pointSprite;
 		};
+
+		enum Format{
+			RGB,
+			BGR,
+			cairoRGB,
+			RGBA,
+			BGRA,
+			cairoRGBA,
+		};
+
 		TEXTURE(const PARAMS& p=defaultParams);
 		TEXTURE(unsigned w,
 			unsigned h,
@@ -37,12 +47,14 @@ namespace GL{
 
 		void Assign(const IMAGE&, const PARAMS& p=defaultParams);
 		void Update(const IMAGE&, int x, int y);
-		void Update(const void*, int format, int x, int y, unsigned width, unsigned height);
+		void Update(const void*, Format format, int x, int y, unsigned width, unsigned height);
 	private:
 		const unsigned tid;
 		bool empty;
 		void SetupAttributes(const PARAMS&);
 		static unsigned GetNewTID();
+		static int GLTexFormat(Format);
+		static int GLImageFormat(Format);
 
 		static const PARAMS defaultParams;
 	};
