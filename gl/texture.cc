@@ -38,7 +38,7 @@ namespace GL{
 	TEXTURE::TEXTURE(
 		unsigned w,
 		unsigned h,
-		bool a,
+		Format f,
 		const PARAMS& p) : tid(GetNewTID()), empty(true){
 		BINDER b(*this);
 #if 0
@@ -46,9 +46,9 @@ namespace GL{
 #else
 		glTexImage2D(
 			GL_TEXTURE_2D, 0,
-			a ? GL_RGBA : GL_RGB,
+			GLTexFormat(f),
 			w, h, 0,
-			GL_RGB,
+			GLImageFormat(f),
 			GL_UNSIGNED_BYTE, 0);
 #endif
 		SetupAttributes(p);

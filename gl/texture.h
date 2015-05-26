@@ -40,7 +40,7 @@ namespace GL{
 		TEXTURE(const PARAMS& p=defaultParams);
 		TEXTURE(unsigned w,
 			unsigned h,
-			bool alpha=false,
+			Format format=RGB,
 			const PARAMS& p=defaultParams);
 		TEXTURE(const IMAGE&, const PARAMS& p=defaultParams);
 		~TEXTURE();
