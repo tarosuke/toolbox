@@ -8,17 +8,25 @@
 
 namespace GL{
 
-	unsigned TEXTURE::BINDER::lastBinded(0);
-	TEXTURE::BINDER::BINDER(const TEXTURE& t) : prevBinded(lastBinded){
-		if(lastBinded != t.tid){
+	TEXTURE* TEXTURE::BINDER::lastBinded(0);
+	TEXTURE::BINDER::BINDER(TEXTURE& t) : prevBinded(lastBinded){
+		if(!lastBinded || (*lastBinded).tid != t.tid){
 			glBindTexture(GL_TEXTURE_2D, t.tid);
-			lastBinded = t.tid;
+			glBlendFunc(
+				t.cairoTransparent ? GL_SRC_COLOR : GL_SRC_ALPHA ,
+				GL_ONE_MINUS_SRC_ALPHA);
+			lastBinded = &t;
 		}
 	}
 	TEXTURE::BINDER::~BINDER(){
 		if(prevBinded != lastBinded){
-			glBindTexture(GL_TEXTURE_2D, prevBinded);
+			glBindTexture(GL_TEXTURE_2D, prevBinded ? (*prevBinded).tid : 0);
 			lastBinded = prevBinded;
+			if(prevBinded){
+				glBlendFunc(
+					(*prevBinded).cairoTransparent ? GL_SRC_COLOR : GL_SRC_ALPHA ,
+					GL_ONE_MINUS_SRC_ALPHA);
+			}
 		}
 	}
 
@@ -33,16 +41,17 @@ namespace GL{
 		pointSprite : false,
 	};
 
-	TEXTURE::TEXTURE(const PARAMS& p) : tid(GetNewTID()), empty(true){}
+	TEXTURE::TEXTURE(const PARAMS& p) :
+		tid(GetNewTID()), empty(true), cairoTransparent(false){}
 
 	TEXTURE::TEXTURE(
 		unsigned w,
 		unsigned h,
 		Format f,
-		const PARAMS& p) : tid(GetNewTID()), empty(true){
+		const PARAMS& p) : tid(GetNewTID()), empty(true), cairoTransparent(f == cairoRGBA){
 		BINDER b(*this);
 #if 0
-		glTexStorage2D(GL_TEXTURE_2D, 0, a ? GL_RGBA : GL_RGB, w, h);
+		glTexStorage2D(GL_TEXTURE_2D, 0, GLTexFormat(f), w, h);
 #else
 		glTexImage2D(
 			GL_TEXTURE_2D, 0,
@@ -56,7 +65,8 @@ namespace GL{
 	}
 
 	TEXTURE::TEXTURE(
-		const class IMAGE& image, const PARAMS& p) : tid(GetNewTID()), empty(true){
+		const class IMAGE& image, const PARAMS& p) :
+		tid(GetNewTID()), empty(true), cairoTransparent(false){
 		Assign(image, p);
 	}
 

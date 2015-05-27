@@ -13,11 +13,11 @@ namespace GL{
 			BINDER(const BINDER&);
 			void operator=(const BINDER&);
 		public:
-			BINDER(const TEXTURE&);
+			BINDER(TEXTURE&);
 			~BINDER();
 		private:
-			static unsigned lastBinded;
-			const unsigned prevBinded;
+			static TEXTURE* lastBinded;
+			TEXTURE* const  prevBinded;
 		};
 		struct PARAMS{
 			int wrap_s;
@@ -52,6 +52,8 @@ namespace GL{
 	private:
 		const unsigned tid;
 		bool empty;
+		const bool cairoTransparent;
+
 		void SetupAttributes(const PARAMS&);
 		static unsigned GetNewTID();
 		static int GLTexFormat(Format);
