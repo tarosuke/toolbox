@@ -65,6 +65,14 @@ namespace wO{
 		Rect operator-(const Vector<T, dimensions>& t){
 			return Rect(points[0] - t, points[1] - t);
 		};
+		operator bool(){
+			for(unsigned n(0); n < dimensions; ++n){
+				if(points[0][n] == points[1][n]){
+					return false;
+				}
+			}
+			return true;
+		};
 	private:
 		Vector<T, dimensions> points[2]; //keep points[0] lesser value
 		static Vector<T, dimensions> Less(
