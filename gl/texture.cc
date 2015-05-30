@@ -22,11 +22,10 @@ namespace GL{
 		if(prevBinded != lastBinded){
 			glBindTexture(GL_TEXTURE_2D, prevBinded ? (*prevBinded).tid : 0);
 			lastBinded = prevBinded;
-			if(prevBinded){
-				glBlendFunc(
-					(*prevBinded).cairoTransparent ? GL_SRC_COLOR : GL_SRC_ALPHA ,
-					GL_ONE_MINUS_SRC_ALPHA);
-			}
+			glBlendFunc(
+				(prevBinded && (*prevBinded).cairoTransparent) ?
+					GL_SRC_COLOR : GL_SRC_ALPHA ,
+				GL_ONE_MINUS_SRC_ALPHA);
 		}
 	}
 
