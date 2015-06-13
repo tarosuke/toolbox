@@ -12,6 +12,7 @@
 
 
 
+//TODO:不要リンクを防ぐためこのメソッドは別ファイルにする
 IMAGE* IMAGE::New(const char* path){
 	//各種Newの配列
 	static IMAGE* (* const news[])(int) = {
