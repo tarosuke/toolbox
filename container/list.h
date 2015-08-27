@@ -12,6 +12,8 @@ namespace wO{
 
 	template<class T, int index = 0, class L=Lock::NullLock> class List : public L{
 	public:
+		//このリストのためのKey(このリストを初期値にして作る)
+		typedef Lock::Key<L> Key;
 		//ノード：これを継承して使う。複数のListを使うときは多重継承
 		//List自体がdeleteするとNotifyListDeletedが呼ばれる
 		class Node{
@@ -70,7 +72,7 @@ namespace wO{
 				return *node;
 			};
 		private:
-			Lock::Key<L> key;
+			Key key;
 			Node* node;
 		};
 		template<typename U> T* Foreach(bool (T::*handler)(U&), U& param){
@@ -101,31 +103,38 @@ namespace wO{
 		};
 
 		//普通に操作するメソッド
-		void Add(Lock::Key<L>&, Node& n){
+		void Add(Key&, Node& n){
 			n.Insert(anchor);
 		};
 		void Add(Node& n){
-			Lock::Key<L> k(*this);
+			Key k(*this);
 			Add(k, n);
 		};
-		void Insert(Lock::Key<L>&, Node& n){
+		void Insert(Key&, Node& n){
 			n.Attach(anchor);
 		};
 		void Insert(Node& n){
-			Lock::Key<L> k(*this);
+			Key k(*this);
 			Insert(k, n);
 		};
-		T* Top(Lock::Key<L>&){
+		T* Top(Key&){
 			return (*anchor.next).origin;
 		};
+		T* Bottom(Key&){
+			return (*anchor.prev).origin;
+		};
 
-		T* Get(){
+		T* Get(Key&){
 			Node* const tn(anchor.next);
 			if(tn != &anchor){
 				(*tn).Detach();
 				return (*tn).origin;
 			}
 			return 0;
+		};
+		T* Get(){
+			Key key(*this);
+			return Get(key);
 		};
 
 		//コンストラクタ／デストラクタ
