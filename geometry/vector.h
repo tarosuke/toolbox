@@ -8,6 +8,8 @@ namespace wO{
 		operator const T*() const{
 			return value;
 		};
+		Vector(T x, T y){ value[0] = x; value[1] = y; };
+		Vector(T x, T y, T z){ value[0] = x; value[1] = y; value[2] = z; };
 		template<typename U> void operator=(const U t[]){
 			for(unsigned n(0); n < dimension; ++n){
 				value[n] = (T)t[n];
@@ -86,7 +88,6 @@ namespace wO{
 				}
 			}
 		};
-
 
 		T X() const { return value[0]; };
 		T Y() const { return value[1]; };
