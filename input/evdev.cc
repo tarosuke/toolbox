@@ -9,6 +9,7 @@
 #include "../directory/directory.h"
 
 #include <sys/select.h>
+#include <sys/file.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
@@ -16,11 +17,8 @@
 
 namespace wO{
 
-	void Evdev::Thread(){
-
-		fd_set rfds;
+	Evdev::Evdev(bool grab) : keep(true), maxfd(0){
 		FD_ZERO(&rfds);
-		int maxfd(0);
 
 		//ファイルを開いていく
 		Directory dir("/dev/input/by-path");
@@ -30,8 +28,22 @@ namespace wO{
 			if(!strstr("-event-mouse", n) ||
 				strstr("-event-kbd", n) ||
 				strstr("-event-js", n)){
+
 				//eventが取得すべき対象なので開く
 				const int fd(open(n, O_RDWR));
+				if(fd < 0){
+					//開けなかった
+					continue;
+				}
+
+				//ロック
+				if(grab && flock(fd, LOCK_EX | LOCK_NB) < 0){
+					//使用中
+					close(fd);
+					continue;
+				}
+
+				//rdfsの設定
 				FD_SET(fd, &rfds);
 				if(maxfd < fd){
 					//maxfd更新
@@ -39,12 +51,15 @@ namespace wO{
 				}
 			}
 		}
+	}
 
+	void Evdev::Thread(){
 		//何か読めたら解釈...の繰り返し
 		while(keep){
 			fd_set fds(rfds);
 
 			if(select(maxfd, &fds, NULL, NULL, NULL) < 0){
+				//selectがエラー
 				break;
 			}
 
@@ -60,16 +75,51 @@ namespace wO{
 					//読めたevを解釈
 					switch(ev.type){
 					case EV_KEY :
+						if(!OnKEY(n, ev)){
+							Evdev::OnKEY(n, ev);
+						}
+						break;
 					case EV_REL :
+						if(!OnREL(n, ev)){
+							Evdev::OnREL(n, ev);
+						}
+						break;
 					case EV_ABS :
+						if(!OnABS(n, ev)){
+							Evdev::OnABS(n, ev);
+						}
+						break;
 					default :
 						break;
 					}
 				}
 			}
-
 		}
+	}
 
+	bool Evdev::OnKEY(int fd, const input_event& ev){
+		if(ev.code < 256){
+			//キーボード
+			keyBuff = ev.value ? ev.code : ev.code << 8;
+			return true;
+		}
+		switch(ev.code & 0xfff0){
+		case BTN_MOUSE:
+			if(ev.value){
+				mButtons.On(ev.code - BTN_MOUSE);
+			}else{
+				mButtons.Off(ev.code - BTN_MOUSE);
+			}
+			break;
+		case BTN_GAMEPAD:
+			if(ev.value){
+				gpButtons.On(ev.code - BTN_GAMEPAD);
+			}else{
+				gpButtons.Off(ev.code - BTN_GAMEPAD);
+			}
+			break;
+		}
+		return true;
 	}
 
 }

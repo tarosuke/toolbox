@@ -1,5 +1,5 @@
 /** evdevクラス
- * スレッドを起こして/dev/input/event*を全部開いて入力を待つ
+ * スレッドを起こして関係するevdevを全部開いて入力を待つ
  * グラブするかはコンストラクタ引数次第
  * 入力があったら種別ごとのハンドラ処理させ、後で読めるようにしておく
  * またハンドラは仮想関数なので継承すると即時イベントを取得できる
@@ -9,6 +9,8 @@
 #include <linux/input.h>
 
 #include "../thread/thread.h"
+#include "../container/ring.h"
+
 
 namespace wO{
 
@@ -16,17 +18,66 @@ namespace wO{
 	public:
 		Evdev(bool);
 
+	protected:
+		class  ButtonState{
+		public:
+			unsigned on; //前回読んだ時から押されたもの(読んだらクリアされる)
+			unsigned off; //前回読んだ時から放されたもの(読んだらクリアされる)
+			unsigned state; //現在の状態
+
+			void On(unsigned bit){
+				const unsigned b(1U << (bit & 15));
+				on |= b;
+				state |= b;
+			};
+			void Off(unsigned bit){
+				const unsigned b(1U << (bit & 15));
+				off |= b;
+				state &= ~b;
+			};
+			void Reset(){
+				on = off = state = 0;
+			};
+		};
+
 		/** 各種ハンドラ
 		 * 第一引数はデバイスを区別するためのファイルデスクリプタ
 		 * 第二引数はイベント
 		 */
-		virtual void OnKEY(int, input_event); //キーボード、特殊なキーボードっぽいもの
-		virtual void OnBTN(int, input_event); //マウスボタン、ジョイスティックのボタンなど
-		virtual void OnREL(int, input_event); //マウスなどの相対位置
-		virtual void OnABS(int, input_event); //タブレット、タッチパネルなどの絶対位置
+		virtual bool OnKEY(int, const input_event&); //キーボードやマウスのボタンなど
+		virtual bool OnREL(int, const input_event&); //マウスなどの相対位置
+		virtual bool OnABS(int, const input_event&); //タブレット、タッチパネルなどの絶対位置
+
+		/** 二次ハンドラ
+		 * 分類されたイベントのハンドラ
+		 */
+		virtual bool OnKey(int, const input_event&);
+		virtual bool OnMouseButton(int, const input_event&);
+		virtual bool OnMouseMove(int, const input_event&);
+		virtual bool OnAbs(int, const input_event&);
+
+		/** 状態読み取り
+		 */
+		int ReadKey(){ return keyBuff; };
+		ButtonState MouseButtons(){
+			const ButtonState s(mButtons);
+			mButtons.Reset();
+			return s;
+		};
+		ButtonState GamepadButtons(){
+			const ButtonState s(mButtons);
+			mButtons.Reset();
+			return s;
+		};
 
 	private:
+		Ring<unsigned short, int> keyBuff; //上位がbreak、下位がmark
+		ButtonState mButtons;
+		ButtonState gpButtons;
+
 		bool keep;
+		int maxfd;
+		fd_set rfds;
 		void Thread();
 	};
 
