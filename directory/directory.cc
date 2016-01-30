@@ -5,7 +5,7 @@
 #include "directory.h"
 
 
-namespace wOToolbox{
+namespace wO{
 
 	Directory::Directory(const char* path) :
 		entries(0), numOfEntries(scandir(path, &entries, &DefaultFilter, 0)){}
@@ -22,10 +22,11 @@ namespace wOToolbox{
 
 
 	Directory::ITOR::ITOR(Directory& dir) : index(0), dir(dir){}
-	void Directory::ITOR::operator++(){
+	Directory::ITOR& Directory::ITOR::operator++(){
 		if(dir.numOfEntries <= index){
 			++index;
 		}
+		return *this;
 	}
 	const char* Directory::ITOR::Name(){
 		if(IsEnd()){ return 0; };

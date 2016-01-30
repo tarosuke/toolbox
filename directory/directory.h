@@ -5,7 +5,7 @@ extern "C"{
 	struct dirent;
 }
 
-namespace wOToolbox{
+namespace wO{
 
 	class Directory{
 		Directory(const Directory&);
@@ -17,8 +17,9 @@ namespace wOToolbox{
 			void operator=(const ITOR&);
 		public:
 			ITOR(Directory&);
-			void operator++();
+			ITOR& operator++();
 			bool IsEnd(){ return index < 0 ||  dir.numOfEntries <= index; };
+			operator bool(){ return !IsEnd(); };
 			const char* Name();
 			bool IsDir();
 		private:
