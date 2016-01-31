@@ -5,8 +5,8 @@
  * テンプレート引数Tはバッファの型、Sは読み出し型
  * emptyはバッファが空の時に読み出される値、elementsはバッファの要素数
  * SはTを包摂する必要がある(T=unsigned char、S=intなど)。
- * NOTE:Tをsignedな型にするのは推奨しないするならevには区別できる値を設定すること
- * 例えばデータがunsigned charならT=unsigned char、S=int、ev=-1など。
+ * NOTE:Tをsignedな型にするのは推奨しないが、するならevには区別できる値を設定すること
+ * 例えばデータがcharならT=char、S=int、ev=0x8000000など。
  */
 #pragma once
 

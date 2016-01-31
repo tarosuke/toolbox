@@ -97,7 +97,7 @@ namespace wO{
 		}
 	}
 
-	bool Evdev::OnKEY(int fd, const input_event& ev){
+	bool Evdev::OnKEY(int, const input_event& ev){
 		if(ev.code < 256){
 			//キーボード
 			keyBuff = ev.value ? ev.code : ev.code << 8;
@@ -118,6 +118,18 @@ namespace wO{
 				gpButtons.Off(ev.code - BTN_GAMEPAD);
 			}
 			break;
+		}
+		return true;
+	}
+	bool Evdev::OnREL(int, const input_event& ev){
+		if(ev.code < REL_CNT){
+			rel[ev.code] += ev.value;
+		}
+		return true;
+	}
+	bool Evdev::OnABS(int, const input_event& ev){
+		if(ev.code < ABS_CNT){
+			abs[ev.code] = ev.value;
 		}
 		return true;
 	}

@@ -36,7 +36,7 @@ namespace wO{
 				state &= ~b;
 			};
 			void Reset(){
-				on = off = state = 0;
+				on = off = 0;
 			};
 		};
 
@@ -47,14 +47,6 @@ namespace wO{
 		virtual bool OnKEY(int, const input_event&); //キーボードやマウスのボタンなど
 		virtual bool OnREL(int, const input_event&); //マウスなどの相対位置
 		virtual bool OnABS(int, const input_event&); //タブレット、タッチパネルなどの絶対位置
-
-		/** 二次ハンドラ
-		 * 分類されたイベントのハンドラ
-		 */
-		virtual bool OnKey(int, const input_event&);
-		virtual bool OnMouseButton(int, const input_event&);
-		virtual bool OnMouseMove(int, const input_event&);
-		virtual bool OnAbs(int, const input_event&);
 
 		/** 状態読み取り
 		 */
@@ -69,11 +61,24 @@ namespace wO{
 			mButtons.Reset();
 			return s;
 		};
+		int GetRel(unsigned n){
+			if(n < REL_CNT){
+				const int v(rel[n]);
+				rel[n] = 0;
+				return v;
+			}
+			return 0;
+		};
+		int GetAbs(unsigned n){
+			return n < ABS_CNT ? abs[n] : 0;
+		};
 
 	private:
 		Ring<unsigned short, int> keyBuff; //上位がbreak、下位がmark
 		ButtonState mButtons;
 		ButtonState gpButtons;
+		int rel[REL_CNT];
+		int abs[ABS_CNT];
 
 		bool keep;
 		int maxfd;
