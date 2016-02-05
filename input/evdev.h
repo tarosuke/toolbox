@@ -16,7 +16,7 @@ namespace wO{
 
 	class Evdev : public THREAD{
 	public:
-		Evdev(bool);
+		Evdev(bool = false);
 
 	protected:
 		class  ButtonState{

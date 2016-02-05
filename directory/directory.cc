@@ -23,7 +23,7 @@ namespace wO{
 
 	Directory::ITOR::ITOR(Directory& dir) : index(0), dir(dir){}
 	Directory::ITOR& Directory::ITOR::operator++(){
-		if(dir.numOfEntries <= index){
+		if(index < dir.numOfEntries){
 			++index;
 		}
 		return *this;

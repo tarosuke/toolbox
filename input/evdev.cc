@@ -13,47 +13,54 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
+
+//TODO:あとで消す
+#include "../../wOLIB/debug.h"
 
 
 namespace wO{
 
-	Evdev::Evdev(bool grab) : keep(true), maxfd(0){
+	Evdev::Evdev(bool grab) : keep(true), maxfd(0){}
+
+	void Evdev::Thread(){
 		FD_ZERO(&rfds);
 
 		//ファイルを開いていく
-		Directory dir("/dev/input/by-path");
+		static const char* const  dirName = "/dev/input/by-path";
+		Directory dir(dirName);
 		for(Directory::ITOR i(dir); i; ++i){
 			if(i.IsDir()){ continue; } //ディレクトリは対象外だし追いかけない
 			const char* const n(i.Name());
-			if(!strstr("-event-mouse", n) ||
-				strstr("-event-kbd", n) ||
-				strstr("-event-js", n)){
+			if(strstr(n, "-event-mouse") ||
+				strstr(n, "-event-kbd") ||
+				strstr(n, "-event-js")){
 
 				//eventが取得すべき対象なので開く
-				const int fd(open(n, O_RDWR));
-				if(fd < 0){
-					//開けなかった
-					continue;
-				}
-
-				//ロック
-				if(grab && flock(fd, LOCK_EX | LOCK_NB) < 0){
-					//使用中
-					close(fd);
-					continue;
-				}
-
-				//rdfsの設定
-				FD_SET(fd, &rfds);
-				if(maxfd < fd){
-					//maxfd更新
-					maxfd = fd;
-				}
+				char path[256];
+			snprintf(path, sizeof(path) , "%s/%s", dirName, n);
+			const int fd(open(path, O_RDWR));
+			if(fd < 0){
+				//開けなかった
+				continue;
 			}
-		}
-	}
 
-	void Evdev::Thread(){
+			//ロック
+// 			if(grab && flock(fd, LOCK_EX | LOCK_NB) < 0){
+// 				//使用中
+// 				close(fd);
+// 				continue;
+// 			}
+
+			//rdfsの設定
+			FD_SET(fd, &rfds);
+			if(maxfd < fd){
+				//maxfd更新
+				maxfd = fd;
+			}
+				}
+		}
+
 		//何か読めたら解釈...の繰り返し
 		while(keep){
 			fd_set fds(rfds);
@@ -72,6 +79,7 @@ namespace wO{
 						close(n);
 					}
 
+DPRINTF("ev.code:%x.\n", ev.code);
 					//読めたevを解釈
 					switch(ev.type){
 					case EV_KEY :
