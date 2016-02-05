@@ -51,7 +51,7 @@ namespace wO{
 // 				close(fd);
 // 				continue;
 // 			}
-
+DPRINTF("evdev open:%s(%d).\n", path, fd);
 			//rdfsの設定
 			FD_SET(fd, &rfds);
 			if(maxfd < fd){
@@ -65,12 +65,12 @@ namespace wO{
 		while(keep){
 			fd_set fds(rfds);
 
-			if(select(maxfd, &fds, NULL, NULL, NULL) < 0){
+			if(select(maxfd + 1, &fds, NULL, NULL, NULL) < 0){
 				//selectがエラー
 				break;
 			}
 
-			for(int n(0); n < maxfd; ++n){
+			for(int n(0); n <= maxfd; ++n){
 				if(FD_ISSET(n, &fds)){
 					input_event ev;
 					if(read(n, &ev, sizeof(ev)) < 0){
@@ -79,7 +79,7 @@ namespace wO{
 						close(n);
 					}
 
-DPRINTF("ev.code:%x.\n", ev.code);
+DPRINTF("ev.code:%x(%d).\n", ev.code, n);
 					//読めたevを解釈
 					switch(ev.type){
 					case EV_KEY :
