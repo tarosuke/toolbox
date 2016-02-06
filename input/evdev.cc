@@ -21,9 +21,17 @@
 
 namespace wO{
 
-	Evdev::Evdev(bool grab) : keep(true), maxfd(0){}
+	bool Evdev::keep(false);
+	int Evdev::maxfd(0);
+	fd_set Evdev::rfds;
 
 	void Evdev::Thread(){
+		if(keep){
+			//起動済み
+			return;
+		}
+		keep = true;
+
 		FD_ZERO(&rfds);
 
 		//ファイルを開いていく
@@ -79,23 +87,16 @@ DPRINTF("evdev open:%s(%d).\n", path, fd);
 						close(n);
 					}
 
-DPRINTF("ev.code:%x(%d).\n", ev.code, n);
 					//読めたevを解釈
 					switch(ev.type){
 					case EV_KEY :
-						if(!OnKEY(n, ev)){
-							Evdev::OnKEY(n, ev);
-						}
+						OnKEY(n, ev);
 						break;
 					case EV_REL :
-						if(!OnREL(n, ev)){
-							Evdev::OnREL(n, ev);
-						}
+						OnREL(n, ev);
 						break;
 					case EV_ABS :
-						if(!OnABS(n, ev)){
-							Evdev::OnABS(n, ev);
-						}
+						OnABS(n, ev);
 						break;
 					default :
 						break;
@@ -105,8 +106,9 @@ DPRINTF("ev.code:%x(%d).\n", ev.code, n);
 		}
 	}
 
-	bool Evdev::OnKEY(int, const input_event& ev){
+	bool Evdev::OnKEY(int fd, const input_event& ev){
 		if(ev.code < 256){
+DPRINTF("ev.code:%x(%d).\n", ev.code, fd);
 			//キーボード
 			keyBuff = ev.value ? ev.code : ev.code << 8;
 			return true;

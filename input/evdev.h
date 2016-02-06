@@ -16,13 +16,16 @@ namespace wO{
 
 	class Evdev : public THREAD{
 	public:
-		Evdev(bool = false);
+		Evdev(bool = false){};
 
 	protected:
+		/** ボタン状態保持
+		 * NOTE:読んだらResetして変化をクリアすること
+		 */
 		class  ButtonState{
 		public:
-			unsigned on; //前回読んだ時から押されたもの(読んだらクリアされる)
-			unsigned off; //前回読んだ時から放されたもの(読んだらクリアされる)
+			unsigned on;
+			unsigned off;
 			unsigned state; //現在の状態
 
 			void On(unsigned bit){
@@ -39,14 +42,6 @@ namespace wO{
 				on = off = 0;
 			};
 		};
-
-		/** 各種ハンドラ
-		 * 第一引数はデバイスを区別するためのファイルデスクリプタ
-		 * 第二引数はイベント
-		 */
-		virtual bool OnKEY(int, const input_event&); //キーボードやマウスのボタンなど
-		virtual bool OnREL(int, const input_event&); //マウスなどの相対位置
-		virtual bool OnABS(int, const input_event&); //タブレット、タッチパネルなどの絶対位置
 
 		/** 状態読み取り
 		 */
@@ -80,10 +75,18 @@ namespace wO{
 		int rel[REL_CNT];
 		int abs[ABS_CNT];
 
-		bool keep;
-		int maxfd;
-		fd_set rfds;
+		static bool keep;
+		static int maxfd;
+		static fd_set rfds;
 		void Thread();
+
+		/** 各種ハンドラ
+		 * 第一引数はデバイスを区別するためのファイルデスクリプタ
+		 * 第二引数はイベント
+		 */
+		bool OnKEY(int, const input_event&); //キーボードやマウスのボタンなど
+		bool OnREL(int, const input_event&); //マウスなどの相対位置
+		bool OnABS(int, const input_event&); //タブレット、タッチパネルなどの絶対位置
 	};
 
 }
