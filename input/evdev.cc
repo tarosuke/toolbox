@@ -15,9 +15,6 @@
 #include <string.h>
 #include <stdio.h>
 
-//TODO:あとで消す
-#include "../../wOLIB/debug.h"
-
 
 namespace wO{
 
@@ -59,7 +56,7 @@ namespace wO{
 // 				close(fd);
 // 				continue;
 // 			}
-DPRINTF("evdev open:%s(%d).\n", path, fd);
+
 			//rdfsの設定
 			FD_SET(fd, &rfds);
 			if(maxfd < fd){
@@ -108,7 +105,6 @@ DPRINTF("evdev open:%s(%d).\n", path, fd);
 
 	bool Evdev::OnKEY(int fd, const input_event& ev){
 		if(ev.code < 256){
-DPRINTF("ev.code:%x(%d).\n", ev.code, fd);
 			//キーボード
 			keyBuff = ev.value ? ev.code : ev.code << 8;
 			return true;
