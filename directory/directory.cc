@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "directory.h"
+#include <toolbox/directory/directory.h>
 
 
 namespace wO{

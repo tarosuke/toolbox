@@ -2,8 +2,8 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 
-#include "texture.h"
-#include "../image/image.h"
+#include <toolbox/gl/texture.h>
+#include <toolbox/image/image.h>
 
 
 namespace GL{

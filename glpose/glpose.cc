@@ -4,7 +4,7 @@
 #include <GL/gl.h>
 #include <math.h>
 
-#include "glpose.h"
+#include <toolbox/glpose/glpose.h>
 
 
 

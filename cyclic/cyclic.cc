@@ -3,7 +3,7 @@
  */
 #include <time.h>
 #include <unistd.h>
-#include "cyclic.h"
+#include <toolbox/cyclic/cyclic.h>
 
 
 CYCLIC::CYCLIC(long ct, long pm) :

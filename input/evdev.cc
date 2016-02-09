@@ -4,9 +4,9 @@
  * 入力があったら種別ごとのハンドラ処理させ、後で読めるようにしておく
  * またハンドラは仮想関数なので継承すると即時イベントを取得できる
  */
-#include "evdev.h"
+#include <toolbox/input/evdev.h>
 
-#include "../directory/directory.h"
+#include <toolbox/directory/directory.h>
 
 #include <sys/select.h>
 #include <sys/file.h>

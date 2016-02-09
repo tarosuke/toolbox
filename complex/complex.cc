@@ -3,7 +3,7 @@
  * NOTE:COMPLEXはdim=2,4の時のみ乗算や回転が可能
  */
 
-#include "complex.h"
+#include <toolbox/complex/complex.h>
 
 
 template<> const COMPLEX<2>& COMPLEX<2>::operator*=(const COMPLEX<2>& r){

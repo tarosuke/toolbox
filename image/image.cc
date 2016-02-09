@@ -4,11 +4,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "image.h"
+#include <toolbox/image/image.h>
 
-#include "jpeg.h"
-#include "png.h"
-#include "tga.h"
+#include <toolbox/image/jpeg.h>
+#include <toolbox/image/png.h>
+#include <toolbox/image/tga.h>
 
 
 

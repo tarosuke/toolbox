@@ -1,7 +1,7 @@
 /**************************************************************** pthreadなオブジェクト
  * スレッドを使うオブジェクトは自己deleteできないため代わりに定期巡回でdeleteする
  */
-#include "thread.h"
+#include <toolbox/thread/thread.h>
 
 
 THREAD::CEMETARY THREAD::cemetary;

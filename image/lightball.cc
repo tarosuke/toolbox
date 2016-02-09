@@ -1,7 +1,7 @@
 
 #include <math.h>
 
-#include "lightball.h"
+#include <toolbox/image/lightball.h>
 
 
 LIGHTBALL::LIGHTBALL(unsigned size) : IMAGE(size, size, 4){

@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "progressBar.h"
+#include <toolbox/image/progressBar.h>
 
 
 const unsigned char PROGRESSBAR::barColor[] = { 0x80, 0xff, 0 };

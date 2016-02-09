@@ -6,7 +6,7 @@
 #include <string.h>
 #include <png.h>
 
-#include "png.h"
+#include <toolbox/image/png.h>
 
 
 

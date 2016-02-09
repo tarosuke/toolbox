@@ -1,4 +1,4 @@
-#include "tga.h"
+#include <toolbox/image/tga.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>

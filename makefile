@@ -6,7 +6,7 @@ all: toolbox.a
 
 ####################################################################### VALUES
 
-COPTS += -Wall -Werror -IX11 -I.
+COPTS += -Wall -Werror -IX11
 CCOPTS += $(COPTS) -std=c++11
 
 

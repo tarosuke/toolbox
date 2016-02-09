@@ -9,7 +9,7 @@
 #include <linux/joystick.h>
 #include <assert.h>
 
-#include "joystick.h"
+#include <toolbox/input/joystick.h>
 
 
 

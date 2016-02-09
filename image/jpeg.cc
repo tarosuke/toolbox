@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #include <jpeglib.h>
 
-#include "jpeg.h"
+#include <toolbox/image/jpeg.h>
 
 
 

@@ -5,7 +5,7 @@
 #include <linux/input.h>
 #include <assert.h>
 
-#include "mice.h"
+#include <toolbox/input/mice.h>
 
 
 void MICE::Thread(){

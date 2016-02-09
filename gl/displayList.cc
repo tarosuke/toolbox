@@ -3,7 +3,7 @@
 
 #include <assert.h>
 
-#include "displayList.h"
+#include <toolbox/gl/displayList.h>
 
 
 namespace GL{
