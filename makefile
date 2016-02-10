@@ -1,4 +1,4 @@
-all: toolbox.a
+all: libtoolbox.a
 
 .PHONY : clean test watch
 .DELETE_ON_ERROR : $(wildcard objs/*)
@@ -27,9 +27,13 @@ exobjs =
 
 ######################################################################## RULES
 
-toolbox.a: makefile $(objs)
+libtoolbox.a: makefile $(objs)
 	@echo " AR $@"
 	@ar rc $@ $(objs)
+
+install: libtoolbox.a
+	@cp libtoolbox.a /usr/local/lib
+	@cp -a include/toolbox /usr/local/include
 
 clean:
 	rm -f objs/* toolbox*
