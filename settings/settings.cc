@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "settings.h"
+#include <toolbox/settings/settings.h>
 
 
 char* SETTINGS::path(0);
