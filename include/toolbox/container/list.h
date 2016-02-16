@@ -76,39 +76,57 @@ namespace wO{
 			Node* node;
 		};
 		template<typename U> T* Foreach(bool (T::*handler)(U&), U& param){
-			for(ITOR i(*this); ++i;){
-				if(((*i).*handler)(param)){
+			ITOR i(*this);
+			for(++i; i;){
+				T* const p(i);
+				++i;
+				if(((*p).*handler)(param)){
 					return i;
 				}
 			}
 			return 0;
 		};
 		template<typename U> void Foreach(void (T::*handler)(U&), U& param){
-			for(ITOR i(*this); ++i;){
-				((*i).*handler)(param);
+			ITOR i(*this);
+			for(++i; i;){
+				T* const p(i);
+				++i;
+				((*p).*handler)(param);
 			}
 		};
 		void Foreach(void (T::*handler)()){
-			for(ITOR i(*this); ++i;){
-				((*i).*handler)();
+			ITOR i(*this);
+			for(++i; i;){
+				T* const p(i);
+				++i;
+				((*p).*handler)();
 			}
 		}
 		template<typename U> T* Reveach(bool (T::*handler)(U&), U& param){
-			for(ITOR i(*this); --i;){
-				if(((*i).*handler)(param)){
+			ITOR i(*this);
+			for(--i; i;){
+				T* const p(i);
+				--i;
+				if(((*p).*handler)(param)){
 					return i;
 				}
 			}
 			return 0;
 		};
 		template<typename U> void Reveach(void (T::*handler)(U&), U& param){
-			for(ITOR i(*this); --i;){
-				((*i).*handler)(param);
+			ITOR i(*this);
+			for(--i; i;){
+				T* const p(i);
+				--i;
+				((*p).*handler)(param);
 			}
 		};
 		void Reveach(void (T::*handler)()){
-			for(ITOR i(*this); --i;){
-				((*i).*handler)();
+			ITOR i(*this);
+			for(--i; i;){
+				T* const p(i);
+				--i;
+				((*p).*handler)();
 			}
 		};
 

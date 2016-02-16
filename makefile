@@ -1,6 +1,6 @@
 all: libtoolbox.a
 
-.PHONY : clean test watch
+.PHONY : clean test watch uninstall
 .DELETE_ON_ERROR : $(wildcard objs/*)
 
 
@@ -34,6 +34,10 @@ libtoolbox.a: makefile $(objs)
 install: libtoolbox.a
 	@cp libtoolbox.a /usr/local/lib
 	@cp -a include/toolbox /usr/local/include
+
+uninstall:
+	@rm -f /usr/local/lib/libtoolbox.a
+	@rm -rf  /usr/local/include/toolbox
 
 clean:
 	rm -f objs/* toolbox*
