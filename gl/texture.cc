@@ -11,22 +11,29 @@ namespace GL{
 	TEXTURE* TEXTURE::BINDER::lastBinded(0);
 	TEXTURE::BINDER::BINDER(TEXTURE& t) : prevBinded(lastBinded){
 		if(!lastBinded || (*lastBinded).tid != t.tid){
-			glBindTexture(GL_TEXTURE_2D, t.tid);
-			glBlendFunc(
-				t.cairoTransparent ? GL_SRC_COLOR : GL_SRC_ALPHA ,
-				GL_ONE_MINUS_SRC_ALPHA);
+			Set(&t);
 			lastBinded = &t;
+		}
+	}
+	TEXTURE::BINDER::BINDER(TEXTURE* t) : prevBinded(lastBinded){
+		if(!lastBinded || (*lastBinded).tid != !!t ? (*t).tid : 0){
+			Set(t);
+			lastBinded = t;
 		}
 	}
 	TEXTURE::BINDER::~BINDER(){
 		if(prevBinded != lastBinded){
-			glBindTexture(GL_TEXTURE_2D, prevBinded ? (*prevBinded).tid : 0);
+			Set(lastBinded);
 			lastBinded = prevBinded;
-			glBlendFunc(
-				(prevBinded && (*prevBinded).cairoTransparent) ?
-					GL_SRC_COLOR : GL_SRC_ALPHA ,
-				GL_ONE_MINUS_SRC_ALPHA);
 		}
+	}
+
+	void TEXTURE::BINDER::Set(TEXTURE* t){
+		if(!t){ return; }
+		glBindTexture(GL_TEXTURE_2D, (*t).tid);
+		glBlendFunc(
+			(*t).cairoTransparent ? GL_SRC_COLOR : GL_SRC_ALPHA ,
+				GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 

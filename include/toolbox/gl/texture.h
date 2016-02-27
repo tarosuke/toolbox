@@ -14,10 +14,12 @@ namespace GL{
 			void operator=(const BINDER&);
 		public:
 			BINDER(TEXTURE&);
+			BINDER(TEXTURE*);
 			~BINDER();
 		private:
 			static TEXTURE* lastBinded;
 			TEXTURE* const  prevBinded;
+			static void Set(TEXTURE*);
 		};
 		struct PARAMS{
 			int wrap_s;
