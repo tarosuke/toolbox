@@ -14,21 +14,20 @@
 
 //TODO:不要リンクを防ぐためこのメソッドは別ファイルにする
 IMAGE* IMAGE::New(const char* path){
-	//各種Newの配列
+	//ファイルを開いて...
+	return New(open(path, O_RDONLY));
+}
+
+IMAGE* IMAGE::New(int fd){
+	if(fd < 0){ return 0; }
+
+	//内容チェック、読み込み
 	static IMAGE* (* const news[])(int) = {
 		&PNG::New,
 		&TGA::New,
 		&JPEG::New,
 		0,
 	};
-
-	//ファイルを開いて...
-	const int fd(open(path, O_RDONLY));
-	if(fd < 0){
-		return 0;
-	}
-
-	//内容チェック、読み込み
 	for(IMAGE* (* const *i)(int) = news; i; i++){
 		//Newで途中になっている可能性もあるので頭出ししとく
 		lseek(fd, 0, SEEK_SET);

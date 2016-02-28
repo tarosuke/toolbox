@@ -10,6 +10,7 @@ public:
 	IMAGE(unsigned w, unsigned h, unsigned bytesDepth);
 
 	static IMAGE* New(const char*); //ファイル読み込み
+	static IMAGE* New(int); //ファイルハンドルのファイルを読み込み
 
 	virtual ~IMAGE();
 
