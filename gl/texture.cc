@@ -51,16 +51,14 @@ namespace GL{
 		Format f,
 		const PARAMS& p) : tid(GetNewTID()), empty(true), cairoTransparent(f == cairoRGBA){
 		BINDER b(*this);
-#if 0
-		glTexStorage2D(GL_TEXTURE_2D, 0, GLTexFormat(f), w, h);
-#else
+
 		glTexImage2D(
 			GL_TEXTURE_2D, 0,
 			GLTexFormat(f),
 			w, h, 0,
 			GLImageFormat(f),
 			GL_UNSIGNED_BYTE, 0);
-#endif
+
 		SetupAttributes(p);
 		empty = false;
 	}
