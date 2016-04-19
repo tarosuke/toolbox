@@ -5,6 +5,9 @@ namespace wO{
 
 	template<typename T, unsigned dimension = 2> class Vector{
 	public:
+		operator T*(){
+			return value;
+		};
 		operator const T*() const{
 			return value;
 		};
