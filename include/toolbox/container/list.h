@@ -31,6 +31,7 @@ namespace wO{
 			Node* next;
 			T* const origin;
 			Node() : prev(this), next(this), origin(0){}; //anchor用
+		protected:
 			void Insert(Node& n){
 				if(prev != this){
 					Detach();

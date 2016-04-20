@@ -23,7 +23,7 @@ namespace wO{
 				value[n] = (T)iv[n];
 			}
 		};
-		Vector(){};
+		Vector(){ Clear(); };
 		void Clear(){
 			for(unsigned n(0); n < dimension; ++n){
 				value[n] = 0;
