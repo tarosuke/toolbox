@@ -16,6 +16,11 @@ private:
 public:
 	COMPLEX(){ InitIdentity(); };
 
+	//ベタに初期化
+	COMPLEX(double r, double i, double j, double k) : R(r){
+		a[0] = i; a[1] = j; a[2] = k;
+	};
+
 	//ベクタの差分で初期化
 	COMPLEX(const class VECTOR<D>&, const class VECTOR<D>&);
 
