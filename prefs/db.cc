@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <toolbox/settings/db.h>
+#include <toolbox/prefs/db.h>
 
 
 DB::DB(const char* path) : replaceable(true){
