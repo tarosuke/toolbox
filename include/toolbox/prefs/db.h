@@ -1,5 +1,5 @@
 /************************************************************* gdbm wrapper:db
- * datamun型は、dptrとdsizeのメンバを持つ
+ * NOTE:THS MODULE IS OBSOLUTED: NO LONGER MAINTAINED
  */
 
 #ifndef _DB_

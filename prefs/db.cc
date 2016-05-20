@@ -1,5 +1,5 @@
 /************************************************************* gdbm wrapper:db
- *
+ * NOTE:THS MODULE IS OBSOLUTED: NO LONGER MAINTAINED
  */
 
 #include <string.h>
