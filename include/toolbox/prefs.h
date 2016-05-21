@@ -43,10 +43,11 @@ namespace wO{
 
 		const char* const key;
 		const int keyLen;
-		 void* const body;
-		 const int length;
+		void* const body;
+		const int length;
 
-		 static void Load(const char*);
+		static bool Open();
+		static void Load(const char*);
 		static void Store();
 
 		void Read();
@@ -59,14 +60,14 @@ namespace wO{
 	 * NOTE:「=」で代入できる必要がある
 	 * NOTE:operatorによる変換は用意してはあるが、代入以外はキャストする必要がある
 	 */
-	template<typename T, unsigned maxLen=0> class Prefs : public CommonPrefs{
+	template<typename T, unsigned maxLen=256> class Prefs : public CommonPrefs{
 		Prefs();
 		Prefs(const Prefs&);
 		void operator=(const Prefs&);
 	public:
-		Prefs(const char* key) : CommonPrefs(key, (void*)body, sizeof(T)){};
+		Prefs(const char* key) : CommonPrefs(key, (void*)&body, sizeof(T)){};
 		Prefs(const char* key, const T& defaultValue) :
-			CommonPrefs(key, (void*)body, sizeof(T)), body(defaultValue){};
+			CommonPrefs(key, (void*)&body, sizeof(T)), body(defaultValue){};
 		~Prefs(){};
 
 		operator const T&(){ return body; };
@@ -84,6 +85,10 @@ namespace wO{
 	public:
 		Prefs(const char* key) : CommonPrefs(key, (void*)body, maxLen){
 			body[maxLen - 1] = 0;
+		};
+		Prefs(const char* key, const char* defaultValue) :
+			CommonPrefs(key, (void*)body, maxLen){
+			*this = defaultValue;;
 		};
 		~Prefs(){};
 		operator char*(){ return body; };
