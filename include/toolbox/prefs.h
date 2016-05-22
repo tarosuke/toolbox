@@ -1,11 +1,14 @@
 /** 設定管理
  * 設定を与えてstaticなインスタンスを作っておくと登録した変数を設定値として管理してくれる便利クラス
+ *
+ * 設定はKeeperを作ると読み込まれ、Keeperが消滅すると保存される。
+ *
+ * 末端の設定に何かさせたい時はPrefsの子クラスを作ってExtendedHandlerをオーバーライドした上で
+ * 呼び出す。また全ての設定を辿る時はItorを作って0になるまでループする。
  */
 #pragma once
 
 #include <string.h>
-
-#include "prefs/db.h"
 
 
 
@@ -20,6 +23,7 @@ namespace wO{
 		CommonPrefs(const CommonPrefs&);
 		void operator=(const CommonPrefs&);
 	public:
+		//設定の読み込みと保存キー
 		class Keeper{
 			Keeper();
 			Keeper(const Keeper&);
@@ -32,6 +36,21 @@ namespace wO{
 				Store();
 			};
 		};
+
+		//設定を辿るための反復子
+		class Itor{
+			Itor(const Itor&);
+			void operator=(const Itor&);
+		public:
+			Itor() : node(q){};
+			operator CommonPrefs*(){ return node; };
+			void operator++(){ if(node){ node = (*node).next; } };
+		private:
+			CommonPrefs* node;
+		};
+
+		// 拡張用ハンドラ
+		virtual void ExtendedHandler(void* =0){};
 
 	protected:
 		CommonPrefs(const char* key, void* body, unsigned length);
@@ -73,7 +92,7 @@ namespace wO{
 		operator const T&(){ return body; };
 		void operator =(const T& v){ body = v; };
 
-	private:
+	protected:
 		const char* key;
 		T body;
 	};
@@ -94,7 +113,7 @@ namespace wO{
 		operator char*(){ return body; };
 		void operator =(const char* v){ strncpy(body, v, maxLen); };
 
-	private:
+	protected:
 		const char* key;
 		char body[maxLen];
 	};
