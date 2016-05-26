@@ -12,7 +12,7 @@
 
 
 
-namespace wO{
+namespace TB{
 
 	/**
 	 * テンプレートでstaticメンバを作っても型ごとにインスタンスができてしまうので

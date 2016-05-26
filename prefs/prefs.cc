@@ -19,7 +19,7 @@ namespace{
 }
 
 
-namespace wO{
+namespace TB{
 
 	CommonPrefs* CommonPrefs::q(0);
 
