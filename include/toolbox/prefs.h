@@ -103,15 +103,18 @@ namespace TB{
 		void operator=(const Prefs&);
 	public:
 		Prefs(const char* key) : CommonPrefs(key, (void*)body, maxLen){
-			body[maxLen - 1] = 0;
+			body[0] = 0;
 		};
 		Prefs(const char* key, const char* defaultValue) :
 			CommonPrefs(key, (void*)body, maxLen){
-			*this = defaultValue;;
+			*this = defaultValue;
 		};
 		~Prefs(){};
 		operator char*(){ return body; };
-		void operator =(const char* v){ strncpy(body, v, maxLen); };
+		void operator =(const char* v){
+			strncpy(body, v, maxLen);
+			body[maxLen - 1] = 0;
+		};
 
 	protected:
 		const char* key;
