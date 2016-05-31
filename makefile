@@ -6,6 +6,8 @@ all: libtoolbox.a
 
 ####################################################################### VALUES
 
+COPTS ?= -Iinclude
+
 COPTS += -Wall -Werror -IX11
 CCOPTS += $(COPTS) -std=c++11
 

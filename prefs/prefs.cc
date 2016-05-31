@@ -7,8 +7,6 @@
 #include <string>
 #include <gdbm/gdbm.h>
 
-#include <wOLIB/debug.h>
-
 #include "../include/toolbox/prefs.h"
 
 
@@ -31,7 +29,6 @@ namespace TB{
 				return true;
 			}
 		}
-		DPRINTF("Pref database %s could not open.\n", path.c_str());
 		return false;
 	}
 
@@ -96,8 +93,6 @@ namespace TB{
 		if(content.dptr){
 			memcpy(body, content.dptr,  length < content.dsize ? length : content.dsize);
 			free(content.dptr);
-		}else{
-			DPRINTF("Pref key %s could not read.\n", key);
 		}
 	}
 	void CommonPrefs::Write(){
