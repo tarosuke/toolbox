@@ -43,7 +43,8 @@ namespace TB{
 		if(!q){ return; }
 
 		//データベースのパス生成
-		path = getenv("HOME");
+		const char* const home(getenv("HOME"));
+		path = home ? home : "/root";
 		path += "/";
 		path += name;
 
