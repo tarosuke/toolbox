@@ -5,7 +5,7 @@
 #include <toolbox/directory/directory.h>
 
 
-namespace wO{
+namespace TB{
 
 	Directory::Directory(const char* path) :
 		entries(0), numOfEntries(scandir(path, &entries, &DefaultFilter, 0)){}

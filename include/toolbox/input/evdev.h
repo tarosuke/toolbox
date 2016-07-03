@@ -1,8 +1,8 @@
 /** evdevクラス
- * スレッドを起こして関係するevdevを全部開いて入力を待つ
- * グラブするかはコンストラクタ引数次第
- * 入力があったら種別ごとのハンドラ処理させ、後で読めるようにしておく
- * またハンドラは仮想関数なので継承すると即時イベントを取得できる
+ * マッチしたするevdevを全部開いてスレッドを起こして入力を待つ
+ * pathにあるpatternにマッチするファイルを開く
+ * 例：Evdev("/dev/input/by-id/", "3Dconnexion")とすると/dev/input/by-id/内の*3Dconnexion*を開く
+ * On〜は仮想関数なので置き換えると
  */
 #pragma once
 
@@ -12,15 +12,13 @@
 #include "../container/ring.h"
 
 
-namespace wO{
+namespace TB{
 
 	class Evdev : public THREAD{
 	public:
-		Evdev(bool = false){};
+		Evdev(const char* path, const char* pattern ,bool grab = false);
 
-	protected:
 		/** ボタン状態保持
-		 * NOTE:読んだらResetして変化をクリアすること
 		 */
 		class  ButtonState{
 		public:
@@ -46,14 +44,9 @@ namespace wO{
 		/** 状態読み取り
 		 */
 		int ReadKey(){ return keyBuff; };
-		ButtonState MouseButtons(){
-			const ButtonState s(mButtons);
-			mButtons.Reset();
-			return s;
-		};
-		ButtonState GamepadButtons(){
-			const ButtonState s(mButtons);
-			mButtons.Reset();
+		ButtonState Buttons(){
+			const ButtonState s(buttons);
+			buttons.Reset();
 			return s;
 		};
 		int GetRel(unsigned n){
@@ -68,25 +61,25 @@ namespace wO{
 			return n < ABS_CNT ? abs[n] : 0;
 		};
 
-	private:
-		Ring<unsigned short, int> keyBuff; //上位がbreak、下位がmark
-		ButtonState mButtons;
-		ButtonState gpButtons;
-		int rel[REL_CNT];
-		int abs[ABS_CNT];
-
-		static bool keep;
-		static int maxfd;
-		static fd_set rfds;
-		void Thread();
-
-		/** 各種ハンドラ
+	protected:
+		/** イベントハンドラ
 		 * 第一引数はデバイスを区別するためのファイルデスクリプタ
 		 * 第二引数はイベント
 		 */
-		bool OnKEY(int, const input_event&); //キーボードやマウスのボタンなど
-		bool OnREL(int, const input_event&); //マウスなどの相対位置
-		bool OnABS(int, const input_event&); //タブレット、タッチパネルなどの絶対位置
+		virtual void OnKEY(int, const input_event&); //キーボードやマウスのボタンなど
+		virtual void OnREL(int, const input_event&); //マウスなどの相対位置
+		virtual void OnABS(int, const input_event&); //タブレット、タッチパネルなどの絶対位置
+
+	private:
+		wO::Ring<unsigned short, int> keyBuff; //上位がbreak、下位がmark
+		ButtonState buttons;
+		int rel[REL_CNT];
+		int abs[ABS_CNT];
+
+		bool keep;
+		 int maxfd;
+		fd_set rfds;
+		void Thread();
 	};
 
 }

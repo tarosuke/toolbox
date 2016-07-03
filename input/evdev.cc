@@ -16,34 +16,24 @@
 #include <stdio.h>
 
 
-namespace wO{
+namespace TB{
 
-	bool Evdev::keep(false);
-	int Evdev::maxfd(0);
-	fd_set Evdev::rfds;
+	Evdev::Evdev(const char* dirName, const char* pattern, bool grab) : keep(false){
+		buttons.Reset();
 
-	void Evdev::Thread(){
-		if(keep){
-			//起動済み
-			return;
-		}
-		keep = true;
-
+		//selectの準備
 		FD_ZERO(&rfds);
 
 		//ファイルを開いていく
-		static const char* const  dirName = "/dev/input/by-path";
 		Directory dir(dirName);
 		for(Directory::ITOR i(dir); i; ++i){
 			if(i.IsDir()){ continue; } //ディレクトリは対象外だし追いかけない
-			const char* const n(i.Name());
-			if(strstr(n, "-event-mouse") ||
-				strstr(n, "-event-kbd") ||
-				strstr(n, "-event-js")){
 
-				//eventが取得すべき対象なので開く
-				char path[256];
-			snprintf(path, sizeof(path) , "%s/%s", dirName, n);
+			if(strstr(i.Name(), pattern)){ continue; } //ファイル名がマッチしなかった
+
+			//パターンがマッチしたので開く
+			char path[512];
+			snprintf(path, sizeof(path) , "%s/%s", dirName, i.Name());
 			const int fd(open(path, O_RDWR));
 			if(fd < 0){
 				//開けなかった
@@ -51,11 +41,11 @@ namespace wO{
 			}
 
 			//ロック
-// 			if(grab && flock(fd, LOCK_EX | LOCK_NB) < 0){
-// 				//使用中
-// 				close(fd);
-// 				continue;
-// 			}
+			if(!grab && flock(fd, LOCK_EX | LOCK_NB) < 0){
+				//使用中
+				close(fd);
+				continue;
+			}
 
 			//rdfsの設定
 			FD_SET(fd, &rfds);
@@ -63,8 +53,12 @@ namespace wO{
 				//maxfd更新
 				maxfd = fd;
 			}
-				}
 		}
+	}
+
+
+	void Evdev::Thread(){
+		keep = true;
 
 		//何か読めたら解釈...の繰り返し
 		while(keep){
@@ -103,41 +97,37 @@ namespace wO{
 		}
 	}
 
-	bool Evdev::OnKEY(int fd, const input_event& ev){
+	void Evdev::OnKEY(int fd, const input_event& ev){
 		if(ev.code < 256){
 			//キーボード
 			keyBuff = ev.value ? ev.code : ev.code << 8;
-			return true;
 		}
 		switch(ev.code & 0xfff0){
 		case BTN_MOUSE:
 			if(ev.value){
-				mButtons.On(ev.code - BTN_MOUSE);
+				buttons.On(ev.code - BTN_MOUSE);
 			}else{
-				mButtons.Off(ev.code - BTN_MOUSE);
+				buttons.Off(ev.code - BTN_MOUSE);
 			}
 			break;
 		case BTN_GAMEPAD:
 			if(ev.value){
-				gpButtons.On(ev.code - BTN_GAMEPAD);
+				buttons.On(ev.code - BTN_GAMEPAD);
 			}else{
-				gpButtons.Off(ev.code - BTN_GAMEPAD);
+				buttons.Off(ev.code - BTN_GAMEPAD);
 			}
 			break;
 		}
-		return true;
 	}
-	bool Evdev::OnREL(int, const input_event& ev){
+	void Evdev::OnREL(int, const input_event& ev){
 		if(ev.code < REL_CNT){
 			rel[ev.code] += ev.value;
 		}
-		return true;
 	}
-	bool Evdev::OnABS(int, const input_event& ev){
+	void Evdev::OnABS(int, const input_event& ev){
 		if(ev.code < ABS_CNT){
 			abs[ev.code] = ev.value;
 		}
-		return true;
 	}
 
 }
