@@ -5,7 +5,7 @@ extern "C"{
 	struct dirent;
 }
 
-namespace wO{
+namespace TB{
 
 	class Directory{
 		Directory(const Directory&);
