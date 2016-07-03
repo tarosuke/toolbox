@@ -29,10 +29,10 @@ namespace TB{
 		for(Directory::ITOR i(dir); i; ++i){
 			if(i.IsDir()){ continue; } //ディレクトリは対象外だし追いかけない
 
-			if(strstr(i.Name(), pattern)){ continue; } //ファイル名がマッチしなかった
+			if(!strstr(i.Name(), pattern)){ continue; } //ファイル名がマッチしなかった
 
 			//パターンがマッチしたので開く
-			char path[512];
+			char path[256];
 			snprintf(path, sizeof(path) , "%s/%s", dirName, i.Name());
 			const int fd(open(path, O_RDWR));
 			if(fd < 0){

@@ -2,7 +2,6 @@
  * マッチしたするevdevを全部開いてスレッドを起こして入力を待つ
  * pathにあるpatternにマッチするファイルを開く
  * 例：Evdev("/dev/input/by-id/", "3Dconnexion")とすると/dev/input/by-id/内の*3Dconnexion*を開く
- * On〜は仮想関数なので置き換えると
  */
 #pragma once
 
@@ -15,6 +14,9 @@
 namespace TB{
 
 	class Evdev : public THREAD{
+		Evdev();
+		Evdev(const Evdev&);
+		void operator=(const Evdev&);
 	public:
 		Evdev(const char* path, const char* pattern ,bool grab = false);
 
@@ -61,16 +63,15 @@ namespace TB{
 			return n < ABS_CNT ? abs[n] : 0;
 		};
 
-	protected:
+	private:
 		/** イベントハンドラ
 		 * 第一引数はデバイスを区別するためのファイルデスクリプタ
 		 * 第二引数はイベント
 		 */
-		virtual void OnKEY(int, const input_event&); //キーボードやマウスのボタンなど
-		virtual void OnREL(int, const input_event&); //マウスなどの相対位置
-		virtual void OnABS(int, const input_event&); //タブレット、タッチパネルなどの絶対位置
+		void OnKEY(int, const input_event&); //キーボードやマウスのボタンなど
+		void OnREL(int, const input_event&); //マウスなどの相対位置
+		void OnABS(int, const input_event&); //タブレット、タッチパネルなどの絶対位置
 
-	private:
 		wO::Ring<unsigned short, int> keyBuff; //上位がbreak、下位がmark
 		ButtonState buttons;
 		int rel[REL_CNT];
