@@ -19,6 +19,7 @@ namespace TB{
 		void operator=(const Evdev&);
 	public:
 		Evdev(const char* path, const char* pattern ,bool grab = false);
+		Evdev(const char* path, const char** patterns ,bool grab = false); //複数パターン用
 
 		/** ボタン状態保持
 		 */
@@ -72,15 +73,21 @@ namespace TB{
 		void OnREL(int, const input_event&); //マウスなどの相対位置
 		void OnABS(int, const input_event&); //タブレット、タッチパネルなどの絶対位置
 
+		/** 各種バッファ
+		 */
 		wO::Ring<unsigned short, int> keyBuff; //上位がbreak、下位がmark
 		ButtonState buttons;
 		int rel[REL_CNT];
 		int abs[ABS_CNT];
 
+		/** 実行管理
+		 */
 		bool keep;
 		 int maxfd;
 		fd_set rfds;
 		void Thread();
+
+		void Open(const char*, const char**, bool);
 	};
 
 }

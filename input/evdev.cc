@@ -19,6 +19,13 @@
 namespace TB{
 
 	Evdev::Evdev(const char* dirName, const char* pattern, bool grab) : keep(false){
+		const char* patterns[] = { pattern, 0 };
+		Open(dirName, patterns, grab);
+	}
+	Evdev::Evdev(const char* dirName, const char** patterns, bool grab) : keep(false){
+		Open(dirName, patterns, grab);
+	}
+	void Evdev::Open(const char* dirName, const char** patterns, bool grab){
 		buttons.Reset();
 
 		//selectの準備
@@ -29,33 +36,36 @@ namespace TB{
 		for(Directory::ITOR i(dir); i; ++i){
 			if(i.IsDir()){ continue; } //ディレクトリは対象外だし追いかけない
 
-			if(!strstr(i.Name(), pattern)){ continue; } //ファイル名がマッチしなかった
+			for(const char** p(patterns); *p; ++p){
+				const char* pattern(*p);
 
-			//パターンがマッチしたので開く
-			char path[256];
-			snprintf(path, sizeof(path) , "%s/%s", dirName, i.Name());
-			const int fd(open(path, O_RDWR));
-			if(fd < 0){
-				//開けなかった
-				continue;
-			}
+				if(!strstr(i.Name(), pattern)){ continue; } //ファイル名がマッチしなかった
 
-			//ロック
-			if(!grab && flock(fd, LOCK_EX | LOCK_NB) < 0){
-				//使用中
-				close(fd);
-				continue;
-			}
+				//パターンがマッチしたので開く
+				char path[256];
+				snprintf(path, sizeof(path) , "%s/%s", dirName, i.Name());
+				const int fd(open(path, O_RDWR));
+				if(fd < 0){
+					//開けなかった
+					continue;
+				}
 
-			//rdfsの設定
-			FD_SET(fd, &rfds);
-			if(maxfd < fd){
-				//maxfd更新
-				maxfd = fd;
+				//ロック
+				if(!grab && flock(fd, LOCK_EX | LOCK_NB) < 0){
+					//使用中
+					close(fd);
+					continue;
+				}
+
+				//rdfsの設定
+				FD_SET(fd, &rfds);
+				if(maxfd < fd){
+					//maxfd更新
+					maxfd = fd;
+				}
 			}
 		}
 	}
-
 
 	void Evdev::Thread(){
 		keep = true;
