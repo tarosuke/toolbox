@@ -2,6 +2,7 @@
  * マッチしたするevdevを全部開いてスレッドを起こして入力を待つ
  * pathにあるpatternにマッチするファイルを開く
  * 例：Evdev("/dev/input/by-id/", "3Dconnexion")とすると/dev/input/by-id/内の*3Dconnexion*を開く
+ * NOTE:patternsの方を使う時はchar*の配列を0終端すること
  */
 #pragma once
 
