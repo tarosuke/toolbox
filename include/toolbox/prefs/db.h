@@ -2,11 +2,12 @@
  * NOTE:THS MODULE IS OBSOLUTED: NO LONGER MAINTAINED
  */
 
+#if 0
 #ifndef _DB_
 #define _DB_
 
 
-#include <gdbm/gdbm.h>
+#include <gdbm.h>
 
 
 class DB{
@@ -39,3 +40,5 @@ private:
 };
 
 #endif
+#endif
+

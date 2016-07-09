@@ -1,7 +1,7 @@
 /************************************************************* gdbm wrapper:db
  * NOTE:THS MODULE IS OBSOLUTED: NO LONGER MAINTAINED
  */
-
+#if 0
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -49,3 +49,5 @@ template<> bool DB::Fetch(const char* key, char* body, unsigned maxLen){
 	body[stat ? maxLen - 1 : 0] = 0;
 	return stat;
 }
+#endif
+

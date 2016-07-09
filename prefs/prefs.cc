@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string>
-#include <gdbm/gdbm.h>
+#include <gdbm.h>
 
 #include "../include/toolbox/prefs.h"
 
@@ -24,7 +24,7 @@ namespace TB{
 	bool CommonPrefs::Open(){
 		//開けなかったら待ってリトライ。何度かやってみてダメなら諦めて戻る
 		for(unsigned r(0); r < 5; ++r, sleep(r + 1)){
-			if(!!(db = gdbm_open(path.c_str(),  512, GDBM_WRCREAT, 0600, 0))){
+			if(!!(db = gdbm_open(const_cast<char*>(path.c_str()),  512, GDBM_WRCREAT, 0600, 0))){
 				//開けたので戻る
 				return true;
 			}
