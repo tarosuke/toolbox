@@ -10,7 +10,7 @@
 
 namespace TB{
 	
-	class Thread : public wO::List<Thread>::Node{
+	class Thread : public List<Thread>::Node{
 		Thread(const Thread&);
 		void operator=(const Thread&);
 	public:
@@ -31,12 +31,12 @@ namespace TB{
 		static class Graveyard{
 		public:
 			Graveyard();
-			static void Bury(wO::List<Thread>::Node&);
+			static void Bury(List<Thread>::Node&);
 		private:
 			static pthread_t thread;
 			static pthread_mutex_t igniter; //これが非0になったらdelete処理
 			
-			static wO::List<Thread> bodies;
+			static List<Thread> bodies;
 			static void* Keeper(void*);
 		}graveyard;
 	};
