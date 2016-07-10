@@ -10,7 +10,7 @@ namespace TB{
 	
 	Thread::Graveyard Thread::graveyard;
 	
-	Thread::Thread(bool qwd) : wO::List<Thread>::Node(*this), quitWithDelete(qwd), alive(true){
+	Thread::Thread(bool qwd) : TB::List<Thread>::Node(*this), quitWithDelete(qwd), alive(true){
 		pthread_attr_t attr;
 		pthread_attr_init(&attr);
 		pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
@@ -36,7 +36,7 @@ namespace TB{
 	
 	pthread_t Thread::Graveyard::thread;
 	pthread_mutex_t Thread::Graveyard::igniter;
-	wO::List<Thread> Thread::Graveyard::bodies;
+	TB::List<Thread> Thread::Graveyard::bodies;
 	
 	Thread::Graveyard::Graveyard(){
 		//セマフォ初期化
@@ -49,7 +49,7 @@ namespace TB{
 		pthread_create(&thread, &attr, Keeper, (void*)this);
 	}
 	
-	void Thread::Graveyard::Bury(wO::List<Thread>::Node& n){
+	void Thread::Graveyard::Bury(TB::List<Thread>::Node& n){
 		bodies.Add(n);
 		pthread_mutex_unlock(&igniter);
 	}
