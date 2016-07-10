@@ -2,7 +2,7 @@
 
 #include "../thread/thread.h"
 
-class MICE : public THREAD{
+class MICE : public TB::Thread{
 	MICE();
 	MICE(const MICE&);
 	void operator=(const MICE&);
@@ -32,6 +32,6 @@ private:
 		char Ymovement;
 	};
 
-	void Thread();
+	void ThreadBody() final;
 };
 

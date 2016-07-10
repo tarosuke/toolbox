@@ -67,7 +67,7 @@ namespace TB{
 		}
 	}
 
-	void Evdev::Thread(){
+	void Evdev::ThreadBody(){
 		keep = true;
 
 		//何か読めたら解釈...の繰り返し

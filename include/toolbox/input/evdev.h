@@ -14,7 +14,7 @@
 
 namespace TB{
 
-	class Evdev : public THREAD{
+	class Evdev : public Thread{
 		Evdev();
 		Evdev(const Evdev&);
 		void operator=(const Evdev&);
@@ -86,7 +86,7 @@ namespace TB{
 		bool keep;
 		 int maxfd;
 		fd_set rfds;
-		void Thread();
+		void ThreadBody() final;
 
 		void Open(const char*, const char**, bool);
 	};
