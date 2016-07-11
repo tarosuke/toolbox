@@ -1,4 +1,5 @@
 /************************************************************************ 汎用配列
+ * NOTE:コピーコンストラクタや代入演算子はありません。導出して作ってください
  * NOTE:作ったばかりの領域は初期化されていないのでまず書き込むこと
  */
 #pragma once
@@ -6,36 +7,46 @@
 #include <stdlib.h>
 
 
+
 namespace TB{
 
-	template<typename T, unsigned initialSize=16> class Array{
-
+	template<typename T> class Array{
+		Array(const Array&);
+		void operator=(const Array&);
 	public:
-		Array() :
-			limit(initialSize),
-			body(malloc(sizeof(T) * initialSize){
+		Array(unsigned initialSize=16) :
+			elements(initialSize),
+			body((T*)malloc(sizeof(T) * initialSize)){
 		};
+
 		~Array(){
-			if(body){
-				free(body);
-			}
+			if(body){ free(body); }
 		};
 		T& operator[](unsigned index){
-			if(limit <= index){
-				//伸長処理
-				limit *= 2;
-				body = realloc(body, sizeof(T) * limit);
-			}
+			Resize(index + 1);
 			if(!body){
 				//確保できなかったなどの理由で無効状態
 				return dummyEntry;
 			}
 			return body[index];
 		};
-		
+
+	protected:
+		void Resize(unsigned requierd){
+			if(requierd <= elements){
+				return;
+			}
+			for(;elements < requierd; elements <<= 1);
+			body = (T*)realloc(body, sizeof(T) * elements);
+		};
+		T* GetRawBody()const{
+			return body;
+		};
+
 	private:
-		unsigned limit;
+		unsigned elements;
 		T* body;
 		T dummyEntry;
+
 	};
 }

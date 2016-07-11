@@ -13,7 +13,7 @@ CCOPTS += $(COPTS) -std=c++11
 
 
 ssfc = .c .cc .glsl
-spth = */* */*/*
+spth = * */* */*/*
 srcs = $(foreach p, $(spth), $(foreach s, $(ssfc), $(wildcard $(p)$(s))))
 hdrs = $(foreach p, * $(spth), $(foreach s, .h, $(wildcard $(p)$(s))))
 
