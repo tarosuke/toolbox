@@ -8,7 +8,7 @@ all: libtoolbox.a
 
 COPTS ?= -Iinclude
 
-COPTS += -Wall -Werror -IX11
+COPTS += -Wall -Werror -g -IX11
 CCOPTS += $(COPTS) -std=c++11
 
 

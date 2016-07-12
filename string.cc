@@ -57,4 +57,24 @@ namespace TB{
 		return newString;
 	}
 
+	String String::SubStr(unsigned b, unsigned l){
+		String newString;
+
+		if(!l || length <= b){
+			//結果が空
+			return newString;
+		}
+
+		if(length < b + l){
+			//長さ調整
+			l = length - b;
+		}
+
+		newString.Resize(l + 1);
+		char* const newBody(newString.GetRawBody());
+		memcpy(GetRawBody() + b, newBody, l);
+		newBody[l] = 0;
+		return newString;
+	}
+
 }

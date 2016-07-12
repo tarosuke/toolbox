@@ -24,6 +24,10 @@ namespace TB{
 		String operator +(const String&) const;
 		String operator +(const char*) const;
 
+		bool IsEmpty(){ return !length; };
+		String SubStr(unsigned start, unsigned length);
+		void Clear(){ GetRawBody()[0] = 0; length = 0; };
+
 	private:
 		unsigned length;
 	};
