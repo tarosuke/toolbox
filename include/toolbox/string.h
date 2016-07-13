@@ -10,14 +10,14 @@ namespace TB{
 
 	class String : public Array<char>{
 	public:
-		String() : length(0){ *GetRawBody() = 0; };
+		String() : length(0){ (*this)[0] = 0; };
 		String(const String&);
 		String(const char*);
 
 		String& operator=(const String&);
 		String& operator=(const char*);
 		operator char*(){
-			return GetRawBody();
+			return &(*this)[0];
 		};
 		String& operator +=(const String&);
 		String& operator +=(const char*);
@@ -26,7 +26,7 @@ namespace TB{
 
 		bool IsEmpty(){ return !length; };
 		String SubStr(unsigned start, unsigned length);
-		void Clear(){ GetRawBody()[0] = 0; length = 0; };
+		void Clear(){ (*this)[0] = 0; length = 0; };
 
 	private:
 		unsigned length;

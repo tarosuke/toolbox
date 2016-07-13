@@ -20,30 +20,41 @@ namespace TB{
 
 	String& String::operator=(const String& t){
 		length = t.length;
-		Resize(length + 1); //+1はゼロ終端の分
-		memcpy(GetRawBody(), t.GetRawBody(), length + 1);
+		if(length){
+			Resize(length + 1); //+1はゼロ終端の分
+			memcpy(&(*this)[0], t.GetRawBody(), length + 1);
+		}
+		(*this)[length] = 0;
 		return *this;
 	}
 	String& String::operator=(const char* t){
-		length = strlen(t);
-		Resize(length + 1);
-		memcpy(GetRawBody(), t, length + 1);
+		length = t ? strlen(t) : 0;
+		if(length){
+			Resize(length + 1);
+			memcpy(&(*this)[0], t, length + 1);
+		}
+		(*this)[length] = 0;
 		return *this;
 	}
 
 	String& String::operator+=(const String& t){
+		if(!t.length){ return *this; }
 		const unsigned newLength(length + t.length);
 		Resize(newLength + 1);
-		memcpy(GetRawBody() + length, t.GetRawBody(), t.length + 1);
+		memcpy(&(*this)[length], t.GetRawBody(), t.length + 1);
 		length = newLength;
+		(*this)[length] = 0;
 		return *this;
 	}
 	String& String::operator+=(const char* t){
+		if(!t){ return *this; }
 		const unsigned orgLength(strlen(t));
+		if(!orgLength){ return *this; }
 		const unsigned newLength(length + orgLength);
 		Resize(newLength + 1);
-		memcpy(GetRawBody() + length, t, orgLength + 1);
+		memcpy(&(*this)[length], t, orgLength + 1);
 		length = newLength;
+		(*this)[length] = 0;
 		return *this;
 	}
 	String String::operator+(const String& t)const{
@@ -71,9 +82,8 @@ namespace TB{
 		}
 
 		newString.Resize(l + 1);
-		char* const newBody(newString.GetRawBody());
-		memcpy(GetRawBody() + b, newBody, l);
-		newBody[l] = 0;
+		memcpy(&newString[0], GetRawBody() + b, l);
+		newString[l] = 0;
 		return newString;
 	}
 

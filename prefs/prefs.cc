@@ -6,20 +6,19 @@
 #include <stdlib.h>
 #include <gdbm.h>
 
-#include <toolbox/string.h>
 #include <toolbox/prefs.h>
 
 
 
 namespace{
 	GDBM_FILE db;
-	TB::String path;
 }
 
 
 namespace TB{
 
 	CommonPrefs* CommonPrefs::q(0);
+	TB::String CommonPrefs::path;
 
 	bool CommonPrefs::Open(){
 		//開けなかったら待ってリトライ。何度かやってみてダメなら諦めて戻る

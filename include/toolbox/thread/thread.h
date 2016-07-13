@@ -24,8 +24,10 @@ namespace TB{
 	private:
 		const bool quitWithDelete;
 		bool alive;
+		Thread* next; //起動、終了スタック用。
+
 		pthread_t thread;
-		static void* Igniter(void*); //スレッドの出入り口
+		static void* Entry(void*); //スレッドの出入り口
 
 		//墓場
 		static class Keeper{
@@ -37,8 +39,8 @@ namespace TB{
 			static pthread_t thread;
 			static pthread_mutex_t igniter; //これが非0になったら処理
 
-			static List<Thread> babies;
-			static List<Thread> bodies;
+			static Thread* babies;
+			static Thread* bodies;
 			static void* Body(void*);
 		}keeper;
 	};

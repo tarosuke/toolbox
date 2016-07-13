@@ -9,6 +9,7 @@
 #pragma once
 
 #include <string.h>
+#include <toolbox/string.h>
 
 
 
@@ -57,6 +58,8 @@ namespace TB{
 		~CommonPrefs(){};
 
 	private:
+		static TB::String path;
+
 		static CommonPrefs* q;
 		CommonPrefs* next;
 
