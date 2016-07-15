@@ -4,6 +4,7 @@
 
 #include <GL/glew.h>
 #include <GL/gl.h>
+#include <syslog.h>
 
 
 namespace GL{
@@ -26,5 +27,7 @@ namespace GL{
 	private:
 		const int function;
 	};
+
+	bool ErrorCheck();
 
 }
