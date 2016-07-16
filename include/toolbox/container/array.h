@@ -5,6 +5,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
 
@@ -34,10 +35,12 @@ namespace TB{
 			if(requierd <= elements){
 				return;
 			}
+			const unsigned oldElements(elements);
 			if(!elements){ elements = 16; }
 			for(;elements < requierd; elements <<= 1);
 			body = (T*)realloc(body, sizeof(T) * elements);
-			assert(body);
+			assert(body); //TODO:継続動作するための方法を考えておく
+			memset(&body[oldElements], 0, elements - oldElements);
 		};
 		const T* GetRawBody()const{
 			assert(body);
