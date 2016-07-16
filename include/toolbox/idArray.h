@@ -8,10 +8,11 @@
 #include <toolbox/container/array.h>
 
 
+
 namespace TB{
 
 
-	template<typename T> class IDArray : Array<T*>{
+	template<typename T>class IDArray{
 		IDArray(const IDArray&);
 		void operator=(const IDArray&);
 	public:
@@ -23,33 +24,47 @@ namespace TB{
 			if(pool){
 				//スタックから再利用
 				id = pool;
-				pool = static_cast<unsigned>((*this)[id]);
+				pool = array[id].next;
 			}else{
 				//新規割当
 				id = used++;
 			}
 
 			//値を格納して終了
-			(*this)[id] = content;
+			array[id] = (E){ content, 0 };
 			return id;
 		};
 
 		//IDを返却する
 		void ReleaseID(unsigned id){
-			(*this)[id] = static_cast<T*>(pool);
+			E& e(array[id]);
+			e.content = 0;
+			e.next = pool;
 			pool = id;
+		};
+
+
+		//値の設定
+		void SetContent(unsigned id, T* content){
+			array[id].content = content;
 		};
 
 		//値の取得
 		T* operator[](unsigned id){
 			if(used <= id){ return 0; }
-			//TODO:(*this)(id)の値をチェックして返却済IDなら0を返す
-			return (*this)[id};
+			E& e(array[id]);
+			return e.next ? 0 : e.content;
 		};
 
 	private:
+		//管理領域(unionだと使用中判定しにくいのでstructにした)
+		struct E{
+			T* content;
+			unsigned next;
+		};
 		unsigned used; //すでに払いだされた値
 		unsigned pool; //返却されたIDのスタック
+		Array<E> array;
 	};
 
 
