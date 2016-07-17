@@ -14,6 +14,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <syslog.h>
+
 
 
 namespace TB{
@@ -30,6 +32,7 @@ namespace TB{
 
 		//selectの準備
 		FD_ZERO(&rfds);
+		maxfd = 0;
 
 		//ファイルを開いていく
 		Directory dir(dirName);
@@ -75,8 +78,8 @@ namespace TB{
 			fd_set fds(rfds);
 
 			if(select(maxfd + 1, &fds, NULL, NULL, NULL) < 0){
-				//selectがエラー
-				break;
+				syslog(LOG_ERR, "Evdev:select gets error");
+				return;
 			}
 
 			for(int n(0); n <= maxfd; ++n){
@@ -84,8 +87,10 @@ namespace TB{
 					input_event ev;
 					if(read(n, &ev, sizeof(ev)) < 0){
 						//読み込みエラーなのでそのevdevは閉じる
+						syslog(LOG_ERR, "Evdev:read gets error");
 						FD_CLR(n, &rfds);
 						close(n);
+						continue;
 					}
 
 					//読めたevを解釈
