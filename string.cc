@@ -82,6 +82,7 @@ namespace TB{
 		}
 
 		newString.Resize(l + 1);
+		newString.length = l;
 		memcpy(&newString[0], GetRawBody() + b, l);
 		newString[l] = 0;
 		return newString;

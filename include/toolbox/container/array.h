@@ -5,6 +5,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
 
@@ -15,11 +16,7 @@ namespace TB{
 		Array(const Array&);
 		void operator=(const Array&);
 	public:
-		Array(unsigned initialElements=16) :
-			elements(initialElements),
-			body((T*)malloc(sizeof(T) * initialElements)){
-			assert(body);
-		};
+		Array() : elements(0), body(0){};
 
 		~Array(){
 			if(body){ free(body); }
@@ -35,17 +32,27 @@ namespace TB{
 
 	protected:
 		void Resize(unsigned requierd){
-			assert(body);
 			if(requierd <= elements){
 				return;
 			}
+			const unsigned oldElements(elements);
+			if(!elements){ elements = 16; }
 			for(;elements < requierd; elements <<= 1);
 			body = (T*)realloc(body, sizeof(T) * elements);
-			assert(body);
+			assert(body); //TODO:継続動作するための方法を考えておく
+			memset(&body[oldElements], 0, elements - oldElements);
 		};
 		const T* GetRawBody()const{
 			assert(body);
 			return body;
+		};
+		void Set(unsigned index, T content){
+			Resize(index + 1);
+			body[index] = content;
+		};
+		T Get(unsigned index){
+			Resize(index + 1);
+			return body[index];
 		};
 
 	private:
