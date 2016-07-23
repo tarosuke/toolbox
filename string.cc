@@ -68,7 +68,7 @@ namespace TB{
 		return newString;
 	}
 
-	String String::SubStr(unsigned b, unsigned l){
+	String String::SubStr(unsigned b, unsigned l)const{
 		String newString;
 
 		if(!l || length <= b){
