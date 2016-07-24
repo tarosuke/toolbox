@@ -46,7 +46,7 @@ namespace TB{
 
 		//値の設定
 		void SetContent(unsigned id, T* content){
-			array[id].content = content;
+			array[id] = (E){ content, 0 };
 		};
 
 		//値の取得
