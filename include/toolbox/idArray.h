@@ -12,7 +12,7 @@
 namespace TB{
 
 
-	template<typename T>class IDArray{
+	template<typename T, unsigned offset = 0>class IDArray{
 		IDArray(const IDArray&);
 		void operator=(const IDArray&);
 	public:
@@ -32,11 +32,12 @@ namespace TB{
 
 			//値を格納して終了
 			array[id] = (E){ content, 0 };
-			return id;
+			return id + offset;
 		};
 
 		//IDを返却する
 		void ReleaseID(unsigned id){
+			id -= offset;
 			E& e(array[id]);
 			e.content = 0;
 			e.next = pool;
@@ -46,11 +47,12 @@ namespace TB{
 
 		//値の設定
 		void SetContent(unsigned id, T* content){
-			array[id] = (E){ content, 0 };
+			array[id - offset] = (E){ content, 0 };
 		};
 
 		//値の取得
 		T* operator[](unsigned id){
+			id -= offset;
 			if(used <= id){ return 0; }
 			E& e(array[id]);
 			return e.next ? 0 : e.content;
