@@ -6,7 +6,7 @@ all: libtoolbox.a
 
 ####################################################################### VALUES
 
-COPTS ?= -Iinclude
+COPTS ?= -Iinclude -I/usr/include/gdbm
 
 COPTS += -Wall -Werror -g -IX11
 CCOPTS += $(COPTS) -std=c++11
