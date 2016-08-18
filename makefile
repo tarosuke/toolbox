@@ -34,12 +34,12 @@ libtoolbox.a: makefile $(objs)
 	@ar rc $@ $(objs)
 
 install: libtoolbox.a
-	@cp libtoolbox.a /usr/local/lib
-	@cp -a include/toolbox /usr/local/include
+	@sudo cp libtoolbox.a /usr/local/lib
+	@sudo cp -a include/toolbox /usr/local/include
 
 uninstall:
-	@rm -f /usr/local/lib/libtoolbox.a
-	@rm -rf  /usr/local/include/toolbox
+	@sudo rm -f /usr/local/lib/libtoolbox.a
+	@sudo rm -rf  /usr/local/include/toolbox
 
 clean:
 	rm -f objs/* toolbox*
