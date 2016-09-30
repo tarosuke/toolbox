@@ -7,6 +7,7 @@
 #include <gdbm.h>
 
 #include <toolbox/prefs.h>
+#include <toolbox/complex/complex.h>
 
 
 
@@ -101,5 +102,19 @@ namespace TB{
 		datum content = { (char*)body, length };
 		gdbm_store(db, k, content, GDBM_REPLACE);
 	}
+
+
+
+	template<> void Prefs<VECTOR<3> >::operator=(const char* v){
+		for(unsigned n(0); n < 3; ++n){
+			body[n] = strtod(v, const_cast<char**>(&v));
+		}
+	}
+
+	template<> void Prefs<unsigned>::operator=(const char* v){
+		body = strtoul(v, 0, 10);
+	}
+
+
 
 }
