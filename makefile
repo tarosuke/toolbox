@@ -42,7 +42,7 @@ uninstall:
 	@sudo rm -rf  /usr/local/include/toolbox
 
 clean:
-	rm -f objs/* toolbox*
+	rm -f objs/* libtoolbox.a $(wildcard */*.orig */*/*.orig)
 
 
 
