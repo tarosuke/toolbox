@@ -1,5 +1,5 @@
 /** 設定管理
- * 設定を与えてstaticなインスタンスを作っておくと登録した変数を設定値として管理してくれる便利クラス
+ * 設定を与えてstaticなインスタンスを作っておくと変数を設定値として管理してくれる便利クラス
  */
 
 #include <unistd.h>
@@ -101,6 +101,5 @@ namespace TB{
 		datum content = { (char*)body, length };
 		gdbm_store(db, k, content, GDBM_REPLACE);
 	}
-
 
 }

@@ -1,5 +1,5 @@
 /** 設定管理
- * 設定を与えてstaticなインスタンスを作っておくと登録した変数を設定値として管理してくれる便利クラス
+ * 設定を与えてstaticなインスタンスを作っておくと変数を設定値として管理してくれる便利クラス
  *
  * 設定はKeeperを作ると読み込まれ、Keeperが消滅すると保存される。
  *
@@ -38,7 +38,9 @@ namespace TB{
 			};
 		};
 
-		//設定を辿るための反復子
+		/**設定を辿るための反復子
+		 * NOTE:初期化時点で先頭を指しているのでC++式反復子形式(処理後インクリメント)で使う
+		 */
 		class Itor{
 			Itor(const Itor&);
 			void operator=(const Itor&);
@@ -56,6 +58,8 @@ namespace TB{
 	protected:
 		CommonPrefs(const char* key, void* body, unsigned length);
 		~CommonPrefs(){};
+
+		virtual void operator=(const char*)=0;
 
 	private:
 		static TB::String path;
@@ -93,7 +97,8 @@ namespace TB{
 		~Prefs(){};
 
 		operator const T&(){ return body; };
-		void operator =(const T& v){ body = v; };
+		void operator=(const T& v){ body = v; };
+		void operator=(const char* v) override;
 
 	protected:
 		const char* key;
@@ -114,7 +119,7 @@ namespace TB{
 		};
 		~Prefs(){};
 		operator char*(){ return body; };
-		void operator =(const char* v){
+		void operator=(const char* v) override{
 			strncpy(body, v, maxLen);
 			body[maxLen - 1] = 0;
 		};
