@@ -4,6 +4,7 @@
 
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <gdbm.h>
 
 #include <toolbox/prefs.h>
@@ -104,6 +105,12 @@ namespace TB{
 	}
 
 	void CommonPrefs::Set(const char* key, const char* value){
+		for(CommonPrefs* i(q); i; i = (*i).next){
+			if(!strcmp(key, (*i).key)){
+				//キー一致
+				*i = value;
+			}
+		}
 	}
 
 
