@@ -103,6 +103,9 @@ namespace TB{
 		gdbm_store(db, k, content, GDBM_REPLACE);
 	}
 
+	void CommonPrefs::Set(const char* key, const char* value){
+	}
+
 
 
 	template<> void Prefs<VECTOR<3> >::operator=(const char* v){
@@ -115,6 +118,20 @@ namespace TB{
 		body = strtoul(v, 0, 10);
 	}
 
+	template<> void Prefs<bool>::operator=(const char* v){
+		switch(*v){
+		case 't':
+		case 'T':
+		case '1':
+			body = true;
+			break;
+		case 'f':
+		case 'F':
+		case '0':
+			body = false;
+			break;
+		}
+	}
 
 
 }

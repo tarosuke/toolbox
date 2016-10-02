@@ -52,8 +52,11 @@ namespace TB{
 			CommonPrefs* node;
 		};
 
-		// 拡張用ハンドラ
+		//拡張用ハンドラ
 		virtual void ExtendedHandler(void* =0){};
+
+		//文字列による値設定(要するにコマンドラインオプション用)
+		static void Set(const char* key, const char* value);
 
 	protected:
 		CommonPrefs(const char* key, void* body, unsigned length);
