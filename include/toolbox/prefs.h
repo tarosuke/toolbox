@@ -56,7 +56,7 @@ namespace TB{
 		virtual void ExtendedHandler(void* =0){};
 
 		//文字列による値設定(要するにコマンドラインオプション用)
-		static void Set(const char* key, const char* value);
+		static bool Set(const char* arg);
 
 	protected:
 		CommonPrefs(const char* key, void* body, unsigned length);

@@ -104,27 +104,66 @@ namespace TB{
 		gdbm_store(db, k, content, GDBM_REPLACE);
 	}
 
-	void CommonPrefs::Set(const char* key, const char* value){
-		for(CommonPrefs* i(q); i; i = (*i).next){
-			if(!strcmp(key, (*i).key)){
-				//キー一致
-				*i = value;
+	bool CommonPrefs::Set(const char* arg){
+		if(!arg || !*arg){ return false; }
+
+		//トークンを切るために複製
+		char* a(strdup(arg));
+		if(!a){ return false; }
+
+		//キーと中身に分割
+		const char* key(strtok(a, "="));
+		const char* val(strtok(NULL, ""));
+
+		//キー存在チェック
+		if(!key){ free(a); return false; };
+
+		//スイッチタイプの場合key、valを修正する
+		switch(a[0]){
+		case '-' :
+			if(a[1] != '-'){
+				val = "f";
+				a[0] = '+';
+			}
+			break;
+		case '+' :
+			val = "t";
+			break;
+		}
+
+		//キー探索
+		for(Itor i; i; ++i){
+			if(!strcmp((*i).key, key)){
+				//一致
+				if(val){
+					*i = val;
+				}else{
+					//TODO:キーに対応するレコード削除
+				}
+
+				//正常終了
+				free(a);
+				return true;
 			}
 		}
+
+		//キーに一致するエントリなし
+		free(a);
+		return false;
 	}
 
 
 
+	/** 型ごとの=演算子
+	 */
 	template<> void Prefs<VECTOR<3> >::operator=(const char* v){
 		for(unsigned n(0); n < 3; ++n){
 			body[n] = strtod(v, const_cast<char**>(&v));
 		}
 	}
-
 	template<> void Prefs<unsigned>::operator=(const char* v){
 		body = strtoul(v, 0, 10);
 	}
-
 	template<> void Prefs<bool>::operator=(const char* v){
 		switch(*v){
 		case 't':
