@@ -63,6 +63,9 @@ namespace TB{
 		~CommonPrefs(){};
 
 		virtual void operator=(const char*)=0;
+		void Delete(){ deleted = true; }
+		void Undelete(){ deleted = false; }
+		bool IsDeleted(){ return deleted; }
 
 	private:
 		static TB::String path;
@@ -74,6 +77,7 @@ namespace TB{
 		const int keyLen;
 		void* const body;
 		const int length;
+		bool deleted;
 
 		static bool Open();
 		static void Load(const char*);
@@ -96,16 +100,18 @@ namespace TB{
 	public:
 		Prefs(const char* key) : CommonPrefs(key, (void*)&body, sizeof(T)){};
 		Prefs(const char* key, const T& defaultValue) :
-			CommonPrefs(key, (void*)&body, sizeof(T)), body(defaultValue){};
+			CommonPrefs(key, (void*)&body, sizeof(T)),
+			body(defaultValue), defaultValue(defaultValue){};
 		~Prefs(){};
 
-		operator const T&(){ return body; };
-		void operator=(const T& v){ body = v; };
+		operator const T&(){ return IsDeleted() ? defaultValue : body; };
+		void operator=(const T& v){ body = v; Undelete(); };
 		void operator=(const char* v) override;
 
 	protected:
 		const char* key;
 		T body;
+		const T& defaultValue;
 	};
 
 	template<unsigned maxLen> class Prefs<char*, maxLen> : public CommonPrefs{
@@ -113,23 +119,26 @@ namespace TB{
 		Prefs(const Prefs&);
 		void operator=(const Prefs&);
 	public:
-		Prefs(const char* key) : CommonPrefs(key, (void*)body, maxLen){
+		Prefs(const char* key) : CommonPrefs(key, (void*)body, maxLen),
+			defaultValue(0){
 			body[0] = 0;
 		};
 		Prefs(const char* key, const char* defaultValue) :
-			CommonPrefs(key, (void*)body, maxLen){
+			CommonPrefs(key, (void*)body, maxLen), defaultValue(defaultValue){
 			*this = defaultValue;
 		};
 		~Prefs(){};
-		operator char*(){ return body; };
+		operator const char*(){ return IsDeleted() ? defaultValue : body; };
 		void operator=(const char* v) override{
 			strncpy(body, v, maxLen);
 			body[maxLen - 1] = 0;
+			Undelete();
 		};
 
 	protected:
 		const char* key;
 		char body[maxLen];
+		const char* const defaultValue;
 	};
 
 

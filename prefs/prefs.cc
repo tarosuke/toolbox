@@ -84,7 +84,8 @@ namespace TB{
 	}
 
 	CommonPrefs::CommonPrefs(const char* key, void* body, unsigned length) :
-		key(key), keyLen(strlen(key) + 1), body(body), length((int)length){
+		key(key), keyLen(strlen(key) + 1), body(body), length((int)length),
+		deleted(false){
 		//スタックに自身を追加
 		next = q;
 		q = this;
@@ -100,8 +101,12 @@ namespace TB{
 	}
 	void CommonPrefs::Write(){
 		datum k = { const_cast<char*>(key), keyLen };
-		datum content = { (char*)body, length };
-		gdbm_store(db, k, content, GDBM_REPLACE);
+		if(!deleted){
+			datum content = { (char*)body, length };
+			gdbm_store(db, k, content, GDBM_REPLACE);
+		}else{
+			gdbm_delete(db, k);
+		}
 	}
 
 	bool CommonPrefs::Set(const char* arg){
@@ -136,9 +141,10 @@ namespace TB{
 			if(!strcmp((*i).key, key)){
 				//一致
 				if(val){
+					//値を設定
 					*i = val;
 				}else{
-					//TODO:キーに対応するレコード削除
+					(*i).Delete();;
 				}
 
 				//正常終了
@@ -160,9 +166,11 @@ namespace TB{
 		for(unsigned n(0); n < 3; ++n){
 			body[n] = strtod(v, const_cast<char**>(&v));
 		}
+		Undelete();
 	}
 	template<> void Prefs<unsigned>::operator=(const char* v){
 		body = strtoul(v, 0, 10);
+		Undelete();
 	}
 	template<> void Prefs<bool>::operator=(const char* v){
 		switch(*v){
@@ -177,6 +185,7 @@ namespace TB{
 			body = false;
 			break;
 		}
+		Undelete();
 	}
 
 
