@@ -24,6 +24,12 @@ namespace TB{
 		CommonPrefs(const CommonPrefs&);
 		void operator=(const CommonPrefs&);
 	public:
+		//属性値
+		enum Attribute{
+			save,
+			nosave,
+		};
+
 		//設定の読み込みと保存キー
 		class Keeper{
 			Keeper();
@@ -59,7 +65,11 @@ namespace TB{
 		static bool Set(const char* arg);
 
 	protected:
-		CommonPrefs(const char* key, void* body, unsigned length);
+		CommonPrefs(
+			const char* key,
+			void* body,
+			unsigned length,
+			Attribute attr);
 		~CommonPrefs(){};
 
 		virtual void operator=(const char*)=0;
@@ -77,6 +87,7 @@ namespace TB{
 		const int keyLen;
 		void* const body;
 		const int length;
+		const Attribute attr;
 		bool deleted;
 
 		static bool Open();
@@ -92,15 +103,17 @@ namespace TB{
 	 * NOTE:keyは文字列リテラルである必要がある
 	 * NOTE:「=」で代入できる必要がある
 	 * NOTE:operatorによる変換は用意してはあるが、代入以外はキャストする必要がある
+	 * NOTE:処理がmainに入るまでは機能しない
 	 */
 	template<typename T, unsigned maxLen=256> class Prefs : public CommonPrefs{
 		Prefs();
 		Prefs(const Prefs&);
 		void operator=(const Prefs&);
 	public:
-		Prefs(const char* key) : CommonPrefs(key, (void*)&body, sizeof(T)){};
-		Prefs(const char* key, const T& defaultValue) :
-			CommonPrefs(key, (void*)&body, sizeof(T)),
+		Prefs(const char* key, Attribute attr=save) :
+			CommonPrefs(key, (void*)&body, sizeof(T), attr){};
+		Prefs(const char* key, const T& defaultValue, Attribute attr=save) :
+			CommonPrefs(key, (void*)&body, sizeof(T), attr),
 			body(defaultValue), defaultValue(defaultValue){};
 		~Prefs(){};
 
@@ -119,12 +132,14 @@ namespace TB{
 		Prefs(const Prefs&);
 		void operator=(const Prefs&);
 	public:
-		Prefs(const char* key) : CommonPrefs(key, (void*)body, maxLen),
+		Prefs(const char* key, Attribute attr=save) :
+			CommonPrefs(key, (void*)body, maxLen, attr),
 			defaultValue(0){
 			body[0] = 0;
 		};
-		Prefs(const char* key, const char* defaultValue) :
-			CommonPrefs(key, (void*)body, maxLen), defaultValue(defaultValue){
+		Prefs(const char* key, const char* defaultValue, Attribute attr=save) :
+			CommonPrefs(key, (void*)body, maxLen, attr),
+			defaultValue(defaultValue){
 			*this = defaultValue;
 		};
 		~Prefs(){};

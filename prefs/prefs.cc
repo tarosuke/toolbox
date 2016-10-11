@@ -83,9 +83,10 @@ namespace TB{
 		db = 0;
 	}
 
-	CommonPrefs::CommonPrefs(const char* key, void* body, unsigned length) :
+	CommonPrefs::CommonPrefs(
+		const char* key, void* body, unsigned length, Attribute attr) :
 		key(key), keyLen(strlen(key) + 1), body(body), length((int)length),
-		deleted(false){
+		attr(attr), deleted(false){
 		//スタックに自身を追加
 		next = q;
 		q = this;
