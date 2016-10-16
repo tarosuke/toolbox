@@ -93,6 +93,7 @@ namespace TB{
 	}
 
 	void CommonPrefs::Read(){
+		if(attr == nosave){ return; }
 		datum k{ const_cast<char*>(key), keyLen };
 		datum content(gdbm_fetch(db, k));
 		if(content.dptr){
@@ -101,6 +102,7 @@ namespace TB{
 		}
 	}
 	void CommonPrefs::Write(){
+		if(attr == nosave){ return; }
 		datum k = { const_cast<char*>(key), keyLen };
 		if(!deleted){
 			datum content = { (char*)body, length };
