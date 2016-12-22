@@ -54,6 +54,7 @@ namespace GL{
 
 	protected:
 		static const PARAMS defaultParams;
+		unsigned TextureID(){ return tid; }
 
 	private:
 		const unsigned tid;
