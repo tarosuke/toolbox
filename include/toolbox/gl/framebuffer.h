@@ -47,7 +47,7 @@ namespace GL{
 		};
 
 
-		Framebuffer(unsigned width, unsigned height, TEXTURE::Format);
+		Framebuffer(unsigned width, unsigned height, TEXTURE::Format=RGB);
 		~Framebuffer();
 
 

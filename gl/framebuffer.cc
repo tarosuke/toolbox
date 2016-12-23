@@ -30,7 +30,7 @@ namespace GL{
 	Framebuffer::Framebuffer(
 		unsigned width,
 		unsigned height,
-		TEXTURE::Format format=RGB) :
+		TEXTURE::Format format) :
 		TEXTURE(width, height, format),
 		fbID(NewID()){
 		Key k(*this);
@@ -38,12 +38,16 @@ namespace GL{
 			GL_FRAMEBUFFER_EXT,
 			GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, TextureID(), 0);
-	};
+	}
 
 	unsigned Framebuffer::NewID(){
 		unsigned id;
 		glGenRenderbuffersEXT(1, &id);
 		return id;
+	}
+
+	Framebuffer::~Framebuffer(){
+		glDeleteRenderbuffersEXT(1, &fbID);
 	}
 
 
