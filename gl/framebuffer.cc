@@ -32,22 +32,50 @@ namespace GL{
 		unsigned height,
 		TEXTURE::Format format) :
 		TEXTURE(width, height, format),
-		fbID(NewID()){
+		fbID(NewID()),
+		dbID(NewDB()){
 		Key k(*this);
-		glFramebufferTexture2DEXT(
-			GL_FRAMEBUFFER_EXT,
-			GL_COLOR_ATTACHMENT0_EXT,
+
+		//デプスバッファ確保
+		glBindRenderbuffer(
+			GL_RENDERBUFFER,
+			dbID);
+		glRenderbufferStorage(
+			GL_RENDERBUFFER,
+			GL_DEPTH_COMPONENT,
+			width,
+			height);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+		//カラーバッファ割り当て
+		glFramebufferTexture2D(
+			GL_FRAMEBUFFER,
+			GL_COLOR_ATTACHMENT0,
 			GL_TEXTURE_2D, TextureID(), 0);
+
+		//デプスバッファ割り当て
+		glFramebufferRenderbuffer(
+			GL_FRAMEBUFFER,
+			GL_DEPTH_ATTACHMENT,
+			GL_RENDERBUFFER, dbID);
 	}
 
 	unsigned Framebuffer::NewID(){
-		unsigned id;
-		glGenRenderbuffersEXT(1, &id);
+		unsigned id(0);
+		glGenFramebuffers(1, &id);
+		return id;
+	}
+	unsigned Framebuffer::NewDB(){
+		unsigned id(0);
+		glGenRenderbuffers(1, &id);
 		return id;
 	}
 
+
+
 	Framebuffer::~Framebuffer(){
-		glDeleteRenderbuffersEXT(1, &fbID);
+		glDeleteFramebuffers(1, &fbID);
+		glDeleteRenderbuffers(1, &dbID);
 	}
 
 
@@ -59,10 +87,11 @@ namespace GL{
 	Framebuffer::Key::Key(Framebuffer& fb){
 		assert(!activeID);
 		activeID = fb.fbID;
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb.fbID);
+		glBindFramebuffer(GL_FRAMEBUFFER, fb.fbID);
 	}
 	Framebuffer::Key::~Key(){
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+		assert(activeID);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		activeID = 0;
 	}
 

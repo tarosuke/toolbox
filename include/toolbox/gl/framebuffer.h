@@ -53,7 +53,9 @@ namespace GL{
 
 	private:
 		const unsigned fbID;
+		const unsigned dbID;
 		static unsigned NewID();
+		static unsigned NewDB();
 	};
 
 
