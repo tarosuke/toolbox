@@ -1,5 +1,20 @@
 /************************************************************************ List
+ * Copyright (C) 2016 tarosuke<webmaster@tarosuke.net>
  *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 #pragma once
@@ -10,15 +25,27 @@
 
 namespace TB{
 
-	template<class T, int index = 0, class L=Lock::NullLock> class List : public L{
+	template<
+		class T,
+		int index = 0,
+		class L=Lock::NullLock> class List : public L{
+		List(const List&);
+		void operator=(const List&);
 	public:
 		//このリストのためのKey(このリストを初期値にして作る)
 		typedef Lock::Key<L> Key;
-		//ノード：これを継承して使う。複数のListを使うときは多重継承
-		//List自体がdeleteするとNotifyListDeletedが呼ばれる
+
+		/**ノード：リストのノードはこれを継承しておく必要がある
+		 * 複数のリストを使うときはindexを指定した上で多重継承する
+		 *
+		 * ノードがdeleteされると自動的にリストから外れる
+		 * List自体がdeleteされると要素が切り離された上でNotifyListDeletedが呼ばれる
+		 * NotifyListDeletedのデフォルトは「何もしない」なので、
+		 * Listが唯一の参照であるならNotifyListDeletedで自身をdeleteする必要がある
+		 */
 		class Node{
 			friend class List;
-			friend class ITOR;
+			friend class I;
 			Node(const Node&);
 			void operator=(const Node&);
 		public:
@@ -57,85 +84,92 @@ namespace TB{
 				return origin;
 			};
 		};
-		//STLよりJavaのそれに近い反復子
-		class ITOR{
+
+		/** 反復子
+		 * Javaスタイルの反復子。
+		 * 順、逆順共通で以下のように使う。
+		 * 正：for(I i(list); ++i;) hoge;
+		 * 逆：for(I i(list); --i;) huga;
+		 * 初期化時は無効要素を指す。
+		 * Listは環状なので初期状態から++すれば最初の要素、
+		 * --すれば最後の要素を指すようになる。
+		 *
+		 * 反復子が指している要素をリストから外しても正常動作するようになっている。
+		 * NOTE:反復子が有効な状態でノードを追加しないこと
+		 */
+		class I{
 		public:
-			ITOR(List& l) : key(l), node(&l.anchor){};
+			I(List& l) :
+				key(l),
+				node(&l.anchor),
+				prev((*node).prev),
+				next((*node).next){};
 			operator T*(){
 				return *node;
 			};
 			T* operator++(){
-				node = (*node).next;
+				node = next;
+				Prepare();
 				return *node;
-			};
-			T* operator++(int){
-				T* const p(*node);
-				node = (*node).next;
-				return p;
 			};
 			T* operator--(){
-				node = (*node).prev;
+				node = prev;
+				Prepare();
 				return *node;
-			};
-			T* operator--(int){
-				T* const p(*node);
-				node = (*node).prev;
-				return p;
 			};
 		private:
 			Key key;
 			Node* node;
+			Node* prev;
+			Node* next;
+
+			void Prepare(){
+				prev = (*node).prev;
+				next = (*node).next;
+			};
+
 		};
+		/** コールバックによる反復
+		 */
 		template<typename U> T* Foreach(bool (T::*handler)(U&), U& param){
-			ITOR i(*this);
-			for(++i; i;){
-				T* const p(i++);
-				if(((*p).*handler)(param)){
-					return p;
+			for(I i(*this); ++i;){
+				if(((*i).*handler)(param)){
+					return i;
 				}
 			}
 			return 0;
 		};
 		template<typename U> void Foreach(void (T::*handler)(U&), U& param){
-			ITOR i(*this);
-			for(++i; i;){
-				T* const p(i++);
-				((*p).*handler)(param);
+			for(I i(*this); ++i;){
+				((*i).*handler)(param);
 			}
 		};
 		void Foreach(void (T::*handler)()){
-			ITOR i(*this);
-			for(++i; i;){
-				T* const p(i++);
-				((*p).*handler)();
+			for(I i(*this); ++i;){
+				((*i).*handler)();
 			}
 		}
 		template<typename U> T* Reveach(bool (T::*handler)(U&), U& param){
-			ITOR i(*this);
-			for(--i; i;){
-				T* const p(i--);
-				if(((*p).*handler)(param)){
-					return p;
+			for(I i(*this); --i;){
+				if(((*i).*handler)(param)){
+					return i;
 				}
 			}
 			return 0;
 		};
 		template<typename U> void Reveach(void (T::*handler)(U&), U& param){
-			ITOR i(*this);
-			for(--i; i;){
-				T* const p(i--);
-				((*p).*handler)(param);
+			for(I i(*this); --i;){
+				((*i).*handler)(param);
 			}
 		};
 		void Reveach(void (T::*handler)()){
-			ITOR i(*this);
-			for(--i; i;){
-				T* const p(i--);
-				((*p).*handler)();
+			for(I i(*this); --i;){
+				((*i).*handler)();
 			}
 		};
 
-		//普通に操作するメソッド
+		/**要素の操作
+		 */
 		void Add(Key&, Node& n){
 			n.Insert(anchor);
 		};
@@ -171,6 +205,7 @@ namespace TB{
 		};
 
 		//コンストラクタ／デストラクタ
+		List(){};
 		~List(){
 			while(anchor.next != &anchor){
 				Node* const n(anchor.next);
