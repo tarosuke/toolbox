@@ -51,13 +51,11 @@ namespace TB{
 		public:
 			virtual ~Node(){ Detach(); };
 		protected:
-			Node(T& org) : prev(this), next(this), origin(&org){};
+			Node() : prev(this), next(this){};
 			virtual void NotifyListDeleted(){};
 		private:
 			Node* prev;
 			Node* next;
-			T* const origin;
-			Node() : prev(this), next(this), origin(0){}; //anchor用
 		protected:
 			void Insert(Node& n){
 				if(prev != this){
@@ -81,7 +79,7 @@ namespace TB{
 				prev = next = this;
 			};
 			operator T*(){
-				return origin;
+				return dynamic_cast<T*>(this);
 			};
 		};
 
@@ -185,17 +183,17 @@ namespace TB{
 			Insert(k, n);
 		};
 		T* Top(Key&){
-			return (*anchor.next).origin;
+			return dynamic_cast<T*>(anchor.next);
 		};
 		T* Bottom(Key&){
-			return (*anchor.prev).origin;
+			return dynamic_cast<T*>(anchor.prev);
 		};
 
 		T* Get(Key&){
 			Node* const tn(anchor.next);
 			if(tn != &anchor){
 				(*tn).Detach();
-				return (*tn).origin;
+				return dynamic_cast<T*>(tn);
 			}
 			return 0;
 		};
