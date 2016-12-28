@@ -79,10 +79,10 @@ namespace GL{
 	}
 
 
-	/** Key
+	/** Key/CanKey
 	 * RAIIによるアクティベート管理
 	 */
-	int Framebuffer::Key::activeID(0);
+	int Framebuffer::activeID(0);
 
 	Framebuffer::Key::Key(Framebuffer& fb){
 		assert(!activeID);
@@ -94,7 +94,11 @@ namespace GL{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		activeID = 0;
 	}
-
-
+	Framebuffer::CanKey::CanKey(){
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+	Framebuffer::CanKey::~CanKey(){
+		glBindFramebuffer(GL_FRAMEBUFFER, activeID);
+	}
 
 }

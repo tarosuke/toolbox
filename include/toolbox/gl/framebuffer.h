@@ -41,9 +41,16 @@ namespace GL{
 		public:
 			Key(Framebuffer&);
 			~Key();
-
 		private:
-			static int activeID;
+		};
+
+		/** CancelKey
+		 * RAIIによる一時的な解除
+		 */
+		class CanKey{
+		public:
+			CanKey();
+			~CanKey();
 		};
 
 
@@ -56,6 +63,7 @@ namespace GL{
 		const unsigned dbID;
 		static unsigned NewID();
 		static unsigned NewDB();
+		static int activeID;
 	};
 
 
