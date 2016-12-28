@@ -11,7 +11,6 @@ namespace TB{
 	Thread::Keeper Thread::keeper;
 
 	Thread::Thread(bool qwd) :
-		TB::List<Thread>::Node(*this),
 		quitWithDelete(qwd),
 		alive(true){
 		Keeper::Born(*this);
