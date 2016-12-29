@@ -33,15 +33,15 @@ namespace TB{
 		void operator=(const List&);
 	public:
 		//このリストのためのKey(このリストを初期値にして作る)
-		typedef Lock::Key<L> Key;
+		using Key = Lock::Key<L>;
 
-		/**ノード：リストのノードはこれを継承しておく必要がある
+		/**ノード：リストのノードはこれをpublicで継承しておく必要がある
 		 * 複数のリストを使うときはindexを指定した上で多重継承する
 		 *
 		 * ノードがdeleteされると自動的にリストから外れる
 		 * List自体がdeleteされると要素が切り離された上でNotifyListDeletedが呼ばれる
 		 * NotifyListDeletedのデフォルトは「何もしない」なので、
-		 * Listが唯一の参照であるならNotifyListDeletedで自身をdeleteする必要がある
+		 * Listが主参照であるならNotifyListDeletedで自身をdeleteする必要がある
 		 */
 		class Node{
 			friend class List;
