@@ -53,18 +53,16 @@ namespace TB{
 			virtual ~Node(){ Detach(); };
 
 		protected:
-			Node() : parent(0), left({0,0}), right({0,0}){};
+			Node() : parent(0), nodes(0), left(0), right(0){};
 			virtual void NotifyMapDeleted(){};
-
 
 		private:
 			K key;
-			struct Branch{
-				unsigned nodes;
-				Node* link;
-			};
-			Branch* parent;
-			Branch left, right;
+			Node* parent;
+			bool righted; //parentの右に接続されている(parentが0なら無意味)
+			unsigned nodes; //以下に接続されているノード数
+			Node* left;
+			Node* right;
 
 			//左右のバランス調整
 			void Balance(){
@@ -81,23 +79,79 @@ namespace TB{
 // 				}
 			};
 			Node& LeftEdge(){
-				return left.link ? (*left.link).LeftEdge() : *this;
+				return left ? (*left).LeftEdge() : *this;
 			};
 			Node& RightEdge(){
-				return right.link ? (*right.link).RightEdge() : *this;
+				return right ? (*right).RightEdge() : *this;
 			};
 
 
 
 
-
+			Node* Find(const K& k){
+				if(key == k){
+					return this;
+				}
+				return (*(k < key ? left : right)).Find(k);
+			};
+			void Add(const K& k, Node& n){
+				++nodes;
+				auto b(key < k ? right : left);
+				if(b){
+					(*b).Add(k, n);
+				}else{
+					b = &n;
+					n.parent = this;
+				}
+			};
 			void Detach(){
+				//本ノードの「身代わり」を決めて外す
+				Node* r;
+				Node* p;
+
+				Node** pp(!parent ? 0 : (*parent).left == this ?
+					&(*parent).left : &(*parent).right);
+
+
+				if(left && right){
+					//両側あり
+					if((*left).nodes < (*right).nodes){
+						r = (*right).LeftEdge();
+					}else{
+						r = (*left).RightEdge();
+					}
+					(*r).Detach();
+
+					//身代わりをはめ込む
+					(*r).left = left;
+					(*r).right = right;
+
+					p = (*r).parent;
+
+				}else{
+					if(!left){
+						r = right;
+					}else if(!right){
+						r = left;
+					}else{
+						r = 0;
+					}
+					p = parent;
+				}
+
+				//nodes調整
+				for(; p; p = (*p).parent){
+					--(*p).nodes;
+				}
+
+				//親ノードリンク調整
+				if(pp){ *pp = r; }
+				if(r){ (*r).parent = parent; }
+
+				//外す
+				left = right = parent = 0;
+				nodes = 0;
 			};
-
-
-
-			operator T*(){ return dynamic_cast<T*>(this); };
-
 
 		};
 
@@ -114,27 +168,46 @@ namespace TB{
 			Ref* operator*();
 			Ref& operator&();
 		public:
-			operator T*(){ return target; };
+			operator T*(){ return dynamic_cast<T*>(target); };
 			void operator=(T& t){
 				//要素の追加あるいは置き換え
+				if(head){
+					(*head).Add(t);
+				}else{
+					head = t;
+				}
 			};
 		private:
 			Ref(const K& k, T* t) : key(k), target(t){};
 			K key;
-			T* const target;
+			Node* const target;
 		};
+
+
+		Map() : head(0){}
+		~Map(){
+			if(!head){ return; }
+			while(Node* n((*head).LeftEdge())){
+				(*n).Detach();
+				(*n).NotifyMapDeleted();
+			}
+			while(Node* n((*head).RightEdge())){
+				(*n).Detach();
+				(*n).NotifyMapDeleted();
+			}
+			(*head).NotifyMapDeleted();
+		};
+
 
 		/** Mapのアクセスは[]演算子を通して行われる
 		 */
 		Ref operator[](const K& key){
-			Ref ref(key, Find(key));
+			Ref ref(key, head ? (*head).Find(key) : 0);
 			return ref;
 		};
 
 	private:
-		T* Find(const K& key){
-			return 0;
-		};
+		Node* head;
 	};
 
 }
