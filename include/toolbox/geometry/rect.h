@@ -1,8 +1,26 @@
+/* Rect
+ * Copyright (C) 2016 tarosuke<webmaster@tarosuke.net>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 #pragma once
 
 #include "vector.h"
 
-namespace wO{
+namespace TB{
 
 	template<typename T, unsigned dimensions = 2> class Rect{
 	public:
@@ -44,8 +62,8 @@ namespace wO{
 			return r;
 		};
 		T operator&&(const Rect& t){
-			const wO::Vector<T, dimensions> lt(More(points[0], t.points[0]));
-			const wO::Vector<T, dimensions> rb(Less(points[1], t.points[1]));
+			const Vector<T, dimensions> lt(More(points[0], t.points[0]));
+			const Vector<T, dimensions> rb(Less(points[1], t.points[1]));
 			T v(0);
 			for(unsigned n(0); n < dimensions; ++n){
 				const T a(lt[n]);
