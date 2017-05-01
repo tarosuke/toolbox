@@ -1,5 +1,7 @@
 #pragma once
 
+#include <jpeglib.h>
+
 #include "image.h"
 
 
@@ -9,7 +11,8 @@ class JPEG : public IMAGE{
 	JPEG(const JPEG&);
 	void operator=(const JPEG&);
 public:
+	static IMAGE* New(int, J_COLOR_SPACE); //IMAGE::fdをチェックしJPEGファイルなら読み込む
 private:
-	static IMAGE* New(int); //IMAGE::fdをチェックしJPEGファイルなら読み込む
+	static IMAGE* New(int fd){ return New(fd, JCS_EXT_BGR); };
 };
 

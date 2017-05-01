@@ -6,7 +6,6 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <jpeglib.h>
 
 #include <toolbox/image/jpeg.h>
 
@@ -18,7 +17,7 @@ static void HandleError(j_common_ptr cinfo){
 }
 
 
-IMAGE* JPEG::New(int fd){
+IMAGE* JPEG::New(int fd, J_COLOR_SPACE colorSpace){
 	//ファイルをまるごとメモリへマップ
 	struct stat stat;
 	fstat(fd, &stat);
@@ -60,7 +59,7 @@ IMAGE* JPEG::New(int fd){
 
 		//ヘッダ取得
 		jpeg_read_header(&ci, TRUE);
-		ci.out_color_space = JCS_EXT_BGR; //そして色空間設定
+		ci.out_color_space = colorSpace; //そして色空間設定
 
 		//画像確保
 		image = new IMAGE(ci.image_width, ci.image_height, 3);
