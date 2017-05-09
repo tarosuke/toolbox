@@ -27,7 +27,8 @@ namespace GL{
 	void TEXTURE::BINDER::Set(TEXTURE* t){
 		glBindTexture(GL_TEXTURE_2D, t ? (*t).tid : 0);
 		glBlendFunc(
-			t && (*t).cairoTransparent ? GL_SRC_COLOR : GL_SRC_ALPHA ,
+			t && (*t).cairoTransparent ?
+				GL_SRC_COLOR : GL_SRC_ALPHA ,
 			GL_ONE_MINUS_SRC_ALPHA);
 	}
 
@@ -49,7 +50,10 @@ namespace GL{
 		unsigned w,
 		unsigned h,
 		Format f,
-		const PARAMS& p) : tid(GetNewTID()), empty(true), cairoTransparent(f == cairoRGBA){
+		const PARAMS& p) :
+			tid(GetNewTID()),
+			empty(true),
+			cairoTransparent(f == cairoRGBA || f == compressedCairoRGBA){
 		BINDER b(*this);
 
 		glTexImage2D(
@@ -73,13 +77,15 @@ namespace GL{
 		glDeleteTextures(1, &tid);
 	}
 
-	void TEXTURE::Assign(const IMAGE& image, const PARAMS& p){
+	void TEXTURE::Assign(const IMAGE& image, const PARAMS& p, bool comp){
 		BINDER b(*this);
 
 		const unsigned d(image.Depth());
 		glTexImage2D(
 			GL_TEXTURE_2D, 0,
-			d <= 3 ? GL_RGB : GL_RGBA,
+			d <= 3 ?
+				( comp ? GL_COMPRESSED_RGB : GL_RGB) :
+				( comp ? GL_COMPRESSED_RGBA : GL_RGBA),
 			image.Width(), image.Height(), 0,
 			d <= 3 ? GL_BGR : GL_BGRA,
 			GL_UNSIGNED_BYTE, image.Buffer());
@@ -153,6 +159,10 @@ namespace GL{
 			return GL_RGBA;
 		case GRAYSCALE:
 			return GL_LUMINANCE8;
+		case compressedCairoRGB:
+			return GL_COMPRESSED_RGB;
+		case compressedCairoRGBA:
+			return GL_COMPRESSED_RGBA;
 		}
 		return GL_LUMINANCE8;
 	}
@@ -167,6 +177,8 @@ namespace GL{
 		case cairoRGB:
 		case cairoRGBA:
 		case BGRA:
+		case compressedCairoRGB:
+		case compressedCairoRGBA:
 			return GL_BGRA;
 		case GRAYSCALE:
 			return GL_LUMINANCE;

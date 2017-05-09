@@ -34,9 +34,11 @@ namespace GL{
 			RGB,
 			BGR,
 			cairoRGB,
+			compressedCairoRGB,
 			RGBA,
 			BGRA,
 			cairoRGBA,
+			compressedCairoRGBA,
 			GRAYSCALE,
 		};
 
@@ -48,9 +50,17 @@ namespace GL{
 		TEXTURE(const IMAGE&, const PARAMS& p=defaultParams);
 		~TEXTURE();
 
-		void Assign(const IMAGE&, const PARAMS& p=defaultParams);
+		void Assign(
+			const IMAGE&,
+			const PARAMS& p=defaultParams,
+			bool compress=false);
 		void Update(const IMAGE&, int x, int y);
-		void Update(const void*, Format format, int x, int y, unsigned width, unsigned height);
+		void Update(
+			const void*,
+			Format format,
+			int x, int y,
+			unsigned width,
+			unsigned height);
 
 	protected:
 		static const PARAMS defaultParams;
