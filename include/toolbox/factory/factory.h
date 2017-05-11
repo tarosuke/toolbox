@@ -1,7 +1,7 @@
 /*** 自動登録ファクトリ
- * 親クラスにstaticなFACTORY<親クラス>* FACTORY<親クラス>::start(0)を定義
- * 子クラスにstaticなFACTORY<親クラス> 子クラス::factory(New)を定義
- * 子クラスにstaticな親クラス* New()を定義
+ * 親クラスにstaticな「FACTORY<親クラス>* FACTORY<親クラス>::start(0)」を定義
+ * 子クラスにstaticな「FACTORY<親クラス> 子クラス::factory(New)」を定義
+ * 子クラスにstaticな「親クラス* New()」を定義
  * 親クラスからFACTORY<親クラス>::Newを呼び出すと子クラスのNewを順に呼んで
  * 値が入ってたらそれを返してくれる
  * Newにはパラメタなしのものと、参照パラメタ一つのものがある。

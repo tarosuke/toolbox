@@ -166,6 +166,21 @@ namespace TB{
 			}
 		};
 
+		/** 検索
+		 * ありがちな[]演算子による検索
+		 * T*を返す。なければ0
+		 * Tにはキーに対応した型の==演算子が必要
+		 * なお、シリアルサーチなのでO(n)、つまり遅い
+		 */
+		template<typename K> T* operator[](K& key){
+			for(I i(*this); ++i;){
+				if((*i) == key){
+					return i;
+				}
+			}
+			return 0;
+		};
+
 		/**要素の操作
 		 */
 		void Add(Key&, Node& n){
