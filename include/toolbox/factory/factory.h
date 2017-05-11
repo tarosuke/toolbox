@@ -4,13 +4,12 @@
  * 子クラスにstaticな親クラス* New()を定義
  * 親クラスからFACTORY<親クラス>::Newを呼び出すと子クラスのNewを順に呼んで
  * 値が入ってたらそれを返してくれる
+ * Newにはパラメタなしのものと、参照パラメタ一つのものがある。
  *
  * NOTE:一般的にFACTORY<親クラス>::Newを呼ぶのはmainに入った後にすること
  * 登録がグローバルコンストラクタなのでグローバルコンストラクタでNewするには
  * 呼び出し順を調整する必要がある
  */
-
-
 #pragma once
 
 
@@ -27,6 +26,15 @@ public:
 	static T* New(){
 		for(FACTORY* f(start); f; f = (*f).next){
 			T* const t(((*f).factory)());
+			if(t){
+				return t;
+			}
+		}
+		return 0;
+	};
+	template<typename P> static T* New(P& p){
+		for(FACTORY* f(start); f; f = (*f).next){
+			T* const t(((*f).factory)(p));
 			if(t){
 				return t;
 			}
