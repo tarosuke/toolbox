@@ -51,11 +51,14 @@ namespace TB{
 		public:
 			virtual ~Node(){ Detach(); };
 		protected:
-			Node() : prev(this), next(this){};
-			virtual void NotifyListDeleted(){};
+			Node(bool deleteWithList=false) :
+				prev(this), next(this), deleteWithList(deleteWithList){};
+			virtual void NotifyListDeleted(){
+				if(deleteWithList){ delete this; } };
 		private:
 			Node* prev;
 			Node* next;
+			const bool deleteWithList;
 		protected:
 			void Insert(Node& n){
 				if(prev != this){
