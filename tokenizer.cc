@@ -19,7 +19,7 @@ namespace TB{
 
 	const char* Tokenizer::GetToken(){
 		//エラーかEOFでなければトークンを返す
-		return (!file || !*tokenBuffer) ? 0 : tokenBuffer;
+		return (!file || !*tokenBuffer) ? GetNextToken() : tokenBuffer;
 	}
 
 	const char* Tokenizer::GetNextToken(){
@@ -66,6 +66,11 @@ namespace TB{
 		//ターミネーターを書き込んでトークンを返す
 		*wp++ = 0;
 		return GetToken();
+	}
+
+	void Tokenizer::Rewind(){
+		rewind(file);
+		GetNextToken();
 	}
 
 }

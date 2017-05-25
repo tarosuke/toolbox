@@ -33,6 +33,10 @@ namespace TB{
 		 */
 		bool IsNumeric(){ return isNumeric; };
 
+		/** 巻き戻し
+		 */
+		void Rewind();
+
 	private:
 
 		static const char commentChar = '#';
