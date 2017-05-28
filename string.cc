@@ -57,6 +57,11 @@ namespace TB{
 		(*this)[length] = 0;
 		return *this;
 	}
+	String& String::operator+=(char c){
+		char s[2] = { c, 0 };
+		*this += s;
+		return *this;
+	}
 	String String::operator+(const String& t)const{
 		String newString(*this);
 		newString += t;

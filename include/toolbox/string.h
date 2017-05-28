@@ -21,6 +21,7 @@ namespace TB{
 		};
 		String& operator +=(const String&);
 		String& operator +=(const char*);
+		String& operator +=(char);
 		String operator +(const String&) const;
 		String operator +(const char*) const;
 
