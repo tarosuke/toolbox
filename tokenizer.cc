@@ -40,22 +40,11 @@ namespace TB{
 				break;
 			}
 
-			//記号類
-			if(ispunct(c)){
-				if(c == commentChar){
-					//コメントなので行末まで読み飛ばす
-					while(0 <= (c = fgetc(file)) && (c == '\r' || c == '\n'));
-					continue;
-				}
-
-				if(wp == tokenBuffer){
-					//先頭なら現文字をトークンに
-					*wp++ = c;
-				}else{
-					//先頭でなければ既に蓄積された分をトークンにして読んだ文字を戻す
-					ungetc(c, file);
-				}
-				break;
+			//コメント
+			if(c == commentChar){
+				//行末まで読み飛ばす
+				while(0 <= (c = fgetc(file)) && (c == '\r' || c == '\n'));
+				continue;
 			}
 
 			//普通のトークンなのでトークンに追加

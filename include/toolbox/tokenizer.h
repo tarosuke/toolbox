@@ -13,6 +13,8 @@
 
 namespace TB{
 
+	class String;
+
 	class Tokenizer{
 		Tokenizer();
 		Tokenizer(const Tokenizer&);
@@ -22,20 +24,23 @@ namespace TB{
 		Tokenizer(const char*);
 		~Tokenizer();
 
-		/** トークンの取得
-		 * トークンを取得する。ファイルが開いていない、ファイルが終端に達したなどで
-		 * 取得できなかった場合は0を返す
+		/** ワードの取得
 		 */
-		const char* GetToken(); //トークンバッファに入っている内容を取得
-		const char* GetNextToken(); //次のトークンを取得して取得
-
-		/** トークンの種類チェック
-		 */
-		bool IsNumeric(){ return isNumeric; };
+		bool Get(unsigned&);
+		bool Get(int&);
+		bool Get(float&);
+		bool GetSubToken(String&);
+		bool Get(String&);
 
 		/** 巻き戻し
 		 */
 		void Rewind();
+
+
+		//廃止
+		const char* GetToken();
+		const char* GetNextToken();
+
 
 	private:
 
