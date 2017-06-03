@@ -6,72 +6,75 @@
 #pragma once
 
 #include <syslog.h>
-
-#include <toolbox/container/array.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 
 namespace TB{
 
-
-	template<typename T, unsigned offset = 0>class IDArray{
-		IDArray(const IDArray&);
-		void operator=(const IDArray&);
+	template<typename T> class IDArray{
 	public:
-		IDArray() : used(0), pool(0){};
+		class Node{
+			Node();
+			Node(const Node&);
+			void operator=(const Node&);
+		public:
+			Node(IDArray& arr) : id(GetID(arr)), array(arr){
+				//配列の準備
+				if(!arr.elements){
+					//未確保
+					arr.size = 16;
+					arr.elements = (Element*)malloc(sizeof(Element) * arr.size);
+				}else if(arr.size < id){
+					//拡大
+					arr.size *= 2;
+					arr.elements = (Element*)realloc(
+						arr.elements, sizeof(Element*) * arr.size);
+				}
 
-		//IDを新規に確保して引数のT*の値を格納する
-		unsigned GetID(T* content){
-			unsigned id;
-			if(pool){
-				//スタックから再利用
-				id = pool;
-				pool = array[id].next;
-syslog(LOG_INFO, "TB::recycle ID:%u", id);
-			}else{
-				//新規割当
-				id = used++;
-syslog(LOG_INFO, "TB::new ID:%u", id);
-			}
-
-			//値を格納して終了
-			array[id] = (E){ content, 0 };
-			return id + offset;
+				//設定
+				arr.elements[id].node = this;
+			};
+			virtual ~Node(){
+				//返却
+				array.elements[id].pool = array.pool;
+				array.pool = id;
+			};
+		protected:
+			unsigned const id;
+		private:
+			IDArray& array;
+			unsigned GetID(IDArray& arr){
+				if(!arr.elements){
+ 					//初期値は静的に0なので使われていないことを明示的に示しておく
+ 					arr.pool = ~0U;
+				};
+				if(~arr.pool){
+					//poolに値が入っている
+					const unsigned id(arr.pool);
+					arr.pool = arr.elements[id].pool;
+					return id;
+				}
+				//再利用できないので新規に割当
+				return arr.used++;
+			};
 		};
 
-		//IDを返却する
-		void ReleaseID(unsigned id){
-			id -= offset;
-			E& e(array[id]);
-			e.content = 0;
-			e.next = pool;
-			pool = id;
-		};
-
-
-		//値の設定
-		void SetContent(unsigned id, T* content){
-			array[id - offset] = (E){ content, 0 };
-		};
-
-		//値の取得
 		T* operator[](unsigned id){
-			id -= offset;
-			if(used <= id){ return 0; }
-			E& e(array[id]);
-			return e.next ? 0 : e.content;
+			return (elements && id < size) ?
+				dynamic_cast<T*>(elements[id].node) : 0;
 		};
-
 	private:
-		//管理領域(unionだと使用中判定しにくいのでstructにした)
-		struct E{
-			T* content;
-			unsigned next;
+		union Element{
+			Node* node;
+			unsigned pool;
 		};
-		unsigned used; //すでに払いだされた値
-		unsigned pool; //返却されたIDのスタック
-		Array<E> array;
-	};
 
+		unsigned used;
+		unsigned size;
+		Element* elements;
+		unsigned pool;
+	};
 
 }
