@@ -5,6 +5,8 @@
  */
 #pragma once
 
+#include <syslog.h>
+
 #include <toolbox/container/array.h>
 
 
@@ -25,9 +27,11 @@ namespace TB{
 				//スタックから再利用
 				id = pool;
 				pool = array[id].next;
+syslog(LOG_INFO, "TB::recycle ID:%u", id);
 			}else{
 				//新規割当
 				id = used++;
+syslog(LOG_INFO, "TB::new ID:%u", id);
 			}
 
 			//値を格納して終了
