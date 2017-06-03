@@ -20,6 +20,20 @@ namespace TB{
 			Node(const Node&);
 			void operator=(const Node&);
 		public:
+
+			/** Initializer for dynamic allocation
+			 * NOTE:If you use IDArray as static, You don't have to call this.
+			 */
+			void Init(){
+				elements = 0;
+				used = 0;
+				pool = ~0U;
+				size = 0;
+			};
+
+			/** IDArray node
+			 * Inherit this to user of IDArray
+			 */
 			Node(IDArray& arr) : id(GetID(arr)), array(arr){
 				//配列の準備
 				if(!arr.elements){
