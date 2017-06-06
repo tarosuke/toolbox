@@ -34,7 +34,7 @@ namespace TB{
 		bool IsThreadAlive(){ return alive; };
 
 	protected:
-		Thread(bool qwd = false); //スレッドを起こして起動予約。
+		Thread(bool deleteAtQuit = false); //スレッドを起こして起動予約。
 		virtual ~Thread();
 		virtual void ThreadBody()=0; //本処理:終了するとスレッドは終了する
 
