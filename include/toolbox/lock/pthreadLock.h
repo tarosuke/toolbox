@@ -29,8 +29,11 @@ namespace Lock{
 		PThreadLock(const PThreadLock&);
 		void operator=(const PThreadLock&);
 	public:
-		PThreadLock(){
+		PThreadLock(bool lockedAtInit=false){
 			pthread_mutex_init(&mutex, 0);
+			if(lockedAtInit){
+				Lock();
+			}
 		};
 		~PThreadLock(){
 			pthread_mutex_destroy(&mutex);
