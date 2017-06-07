@@ -16,14 +16,8 @@ namespace TB{
 		if(file){ fclose(file); }
 	}
 
-	const char* Tokenizer::GetToken(){
-		//エラーかEOFでなければトークンを返す
-//		return (!file || !*tokenBuffer) ? GetNextToken() : tokenBuffer;
-		return 0;
-	}
-
-	const char* Tokenizer::GetNextToken(){
-		if(!file){ return 0; }
+	void Tokenizer::GetNextToken(){
+		if(!file){ return; }
 
 		//トークンの読み込み
 		for(int c; 0 <= (c = fgetc(file));){
@@ -47,12 +41,11 @@ namespace TB{
 			//トークンなので蓄積
 			token += c;
 		}
-
-		return 0;
 	}
 
 
 	bool Tokenizer::Get(unsigned& v){
+		if(!file){ return false; }
 		char* np;
 		const long long value(strtoll(token, &np, 0));
 
@@ -65,6 +58,7 @@ namespace TB{
 	}
 
 	bool Tokenizer::Get(int& v){
+		if(!file){ return false; }
 		char* np;
 		const int value(strtol(token, &np, 0));
 
@@ -77,6 +71,7 @@ namespace TB{
 	}
 
 	bool Tokenizer::Get(double& v){
+		if(!file){ return false; }
 		char* np;
 		const double value(strtod(token, &np));
 
@@ -88,8 +83,10 @@ namespace TB{
 		return false;
 	}
 
-	const String& Tokenizer::Get(){
-		return token;
+	bool Tokenizer::Get(String& v){
+		if(!file){ return false; }
+		v = token;
+		return true;
 	}
 
 	void Tokenizer::Rewind(){

@@ -30,17 +30,11 @@ namespace TB{
 		bool Get(unsigned&);
 		bool Get(int&);
 		bool Get(double&);
-		const String& Get();
+		bool Get(String&);
 
 		/** 巻き戻し
 		 */
 		void Rewind();
-
-
-		//廃止
-		const char* GetToken();
-		const char* GetNextToken();
-
 
 	private:
 
@@ -48,6 +42,8 @@ namespace TB{
 
 		FILE* const file;
 		String token;
+
+		void GetNextToken();
 	};
 
 }

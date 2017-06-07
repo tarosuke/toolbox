@@ -73,6 +73,10 @@ namespace TB{
 		return newString;
 	}
 
+	bool String::operator==(const char* t)const{
+		return !strcmp(GetRawBody(), t);
+	}
+
 	String String::SubStr(unsigned b, unsigned l)const{
 		String newString;
 

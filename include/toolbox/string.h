@@ -25,6 +25,8 @@ namespace TB{
 		String operator +(const String&) const;
 		String operator +(const char*) const;
 
+		bool operator==(const char*) const;
+
 		bool IsEmpty()const{ return !length; };
 		String SubStr(unsigned start, unsigned length)const;
 		void Clear(){ (*this)[0] = 0; length = 0; };
