@@ -8,8 +8,7 @@
 
 namespace TB{
 
-	Tokenizer::Tokenizer(const char* path) :
-		file(fopen(path, "r")), isNumeric(false){
+	Tokenizer::Tokenizer(const char* path) : file(fopen(path, "r")){
 		GetNextToken();
 	}
 
@@ -19,24 +18,22 @@ namespace TB{
 
 	const char* Tokenizer::GetToken(){
 		//エラーかEOFでなければトークンを返す
-		return (!file || !*tokenBuffer) ? GetNextToken() : tokenBuffer;
+//		return (!file || !*tokenBuffer) ? GetNextToken() : tokenBuffer;
+		return 0;
 	}
 
 	const char* Tokenizer::GetNextToken(){
 		if(!file){ return 0; }
 
-		//書き込み位置を初期化
-		char* wp(tokenBuffer);
-
 		//トークンの読み込み
-		for(int c, isNumeric = true; 0 <= (c = fgetc(file));){
+		for(int c; 0 <= (c = fgetc(file));){
 			//ホワイトスペース
 			if(isspace(c)){
-				if(wp == tokenBuffer){
-					//まだトークンが読まれてなければ読み飛ばす
+				if(token.IsEmpty()){
+					//トークン蓄積中でなければ読み飛ばす
 					continue;
 				}
-				//現時点までをトークンとする
+				//トークン蓄積中ならトークンが終了したので終了
 				break;
 			}
 
@@ -47,18 +44,57 @@ namespace TB{
 				continue;
 			}
 
-			//普通のトークンなのでトークンに追加
-			isNumeric &= !!isdigit(c); //数値チェック
-			*wp++ = c;
+			//トークンなので蓄積
+			token += c;
 		}
 
-		//ターミネーターを書き込んでトークンを返す
-		*wp++ = 0;
-		return GetToken();
+		return 0;
+	}
+
+
+	bool Tokenizer::Get(unsigned& v){
+		char* np;
+		const long long value(strtoll(token, &np, 0));
+
+		if(!*np && 0 <= value){
+			v = value;
+			GetNextToken();
+			return true;
+		}
+		return false;
+	}
+
+	bool Tokenizer::Get(int& v){
+		char* np;
+		const int value(strtol(token, &np, 0));
+
+		if(!*np){
+			v = value;
+			GetNextToken();
+			return true;
+		}
+		return false;
+	}
+
+	bool Tokenizer::Get(double& v){
+		char* np;
+		const double value(strtod(token, &np));
+
+		if(!*np){
+			v = value;
+			GetNextToken();
+			return true;
+		}
+		return false;
+	}
+
+	const String& Tokenizer::Get(){
+		return token;
 	}
 
 	void Tokenizer::Rewind(){
 		rewind(file);
+		token.Clear();
 		GetNextToken();
 	}
 

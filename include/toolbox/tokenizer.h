@@ -10,10 +10,10 @@
 
 #include <stdio.h>
 
+#include "string.h"
+
 
 namespace TB{
-
-	class String;
 
 	class Tokenizer{
 		Tokenizer();
@@ -25,12 +25,12 @@ namespace TB{
 		~Tokenizer();
 
 		/** ワードの取得
+		 * トークンがそれぞれの型に適合するか調べて適合していれば値を取得してtrueを返す
 		 */
 		bool Get(unsigned&);
 		bool Get(int&);
-		bool Get(float&);
-		bool GetSubToken(String&);
-		bool Get(String&);
+		bool Get(double&);
+		const String& Get();
 
 		/** 巻き戻し
 		 */
@@ -47,9 +47,7 @@ namespace TB{
 		static const char commentChar = '#';
 
 		FILE* const file;
-		static const unsigned maxTokenLength = 256;
-		char tokenBuffer[maxTokenLength];
-		bool isNumeric;
+		String token;
 	};
 
 }
