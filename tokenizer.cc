@@ -51,7 +51,6 @@ namespace TB{
 
 		if(!*np && 0 <= value){
 			v = value;
-			GetNextToken();
 			return true;
 		}
 		return false;
@@ -64,7 +63,6 @@ namespace TB{
 
 		if(!*np){
 			v = value;
-			GetNextToken();
 			return true;
 		}
 		return false;
@@ -77,7 +75,6 @@ namespace TB{
 
 		if(!*np){
 			v = value;
-			GetNextToken();
 			return true;
 		}
 		return false;
