@@ -8,7 +8,7 @@
 
 namespace TB{
 
-	Tokenizer::Tokenizer(const char* path) : file(fopen(path, "r")){
+	Tokenizer::Tokenizer(const char* path) : file(fopen(path, "r")), line(1){
 		GetNextToken();
 	}
 
@@ -21,6 +21,10 @@ namespace TB{
 
 		//トークンの読み込み
 		for(int c; 0 <= (c = fgetc(file));){
+			if(c == '\n'){
+				++line;
+			}
+
 			//ホワイトスペース
 			if(isspace(c)){
 				if(token.IsEmpty()){
@@ -34,7 +38,7 @@ namespace TB{
 			//コメント
 			if(c == commentChar){
 				//行末まで読み飛ばす
-				while(0 <= (c = fgetc(file)) && (c == '\r' || c == '\n'));
+				while(0 <= (c = fgetc(file)) && c == '\n');
 				continue;
 			}
 
@@ -89,6 +93,7 @@ namespace TB{
 	void Tokenizer::Rewind(){
 		rewind(file);
 		token.Clear();
+		line = 1;
 		GetNextToken();
 	}
 

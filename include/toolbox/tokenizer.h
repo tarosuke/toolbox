@@ -40,12 +40,17 @@ namespace TB{
 		 */
 		void Rewind();
 
+		/** 行番号取得
+		 */
+		unsigned GetLineNumber(){ return line; };
+
 	private:
 
 		static const char commentChar = '#';
 
 		FILE* const file;
 		String token;
+		unsigned line;
 	};
 
 }
