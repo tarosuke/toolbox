@@ -24,10 +24,6 @@ namespace TB{
 		Tokenizer(const char*);
 		~Tokenizer();
 
-		/** 次のトークンを取得
-		 */
-		void GetNextToken();
-
 		/** ワードの取得
 		 * トークンがそれぞれの型に適合するか調べて適合していれば値を取得してtrueを返す
 		 */
@@ -51,6 +47,10 @@ namespace TB{
 		FILE* const file;
 		String token;
 		unsigned line;
+
+		/** 次のトークンを取得
+		 */
+		bool GetNextToken();
 	};
 
 }

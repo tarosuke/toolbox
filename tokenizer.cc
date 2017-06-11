@@ -16,8 +16,8 @@ namespace TB{
 		if(file){ fclose(file); }
 	}
 
-	void Tokenizer::GetNextToken(){
-		if(!file){ return; }
+	bool Tokenizer::GetNextToken(){
+		if(!file){ return false; }
 
 		//トークンの読み込み
 		for(int c; 0 <= (c = fgetc(file));){
@@ -45,6 +45,7 @@ namespace TB{
 			//トークンなので蓄積
 			token += c;
 		}
+		return !token.IsEmpty();
 	}
 
 
@@ -55,6 +56,7 @@ namespace TB{
 
 		if(!*np && 0 <= value){
 			v = value;
+			GetNextToken();
 			return true;
 		}
 		return false;
@@ -67,6 +69,7 @@ namespace TB{
 
 		if(!*np){
 			v = value;
+			GetNextToken();
 			return true;
 		}
 		return false;
@@ -79,6 +82,7 @@ namespace TB{
 
 		if(!*np){
 			v = value;
+			GetNextToken();
 			return true;
 		}
 		return false;
@@ -87,6 +91,7 @@ namespace TB{
 	bool Tokenizer::Get(String& v){
 		if(!file){ return false; }
 		v = token;
+		GetNextToken();
 		return true;
 	}
 
