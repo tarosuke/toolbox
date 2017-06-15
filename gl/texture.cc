@@ -1,3 +1,6 @@
+/********************************************************************* TEXTURE
+ * Copyright (C) 2017 tarosuke<webmaster@tarosuke.net>
+ */
 
 #include <GL/glew.h>
 #include <GL/gl.h>

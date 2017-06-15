@@ -1,3 +1,6 @@
+/********************************************************************* TEXTURE
+ * Copyright (C) 2017 tarosuke<webmaster@tarosuke.net>
+ */
 #pragma once
 
 
