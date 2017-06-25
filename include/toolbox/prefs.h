@@ -126,7 +126,7 @@ namespace TB{
 	protected:
 		const char* key;
 		T body;
-		const T& defaultValue;
+		T defaultValue;
 	};
 
 	template<unsigned maxLen> class Prefs<char*, maxLen> : public CommonPrefs{
