@@ -86,7 +86,7 @@ namespace TB{
 	CommonPrefs::CommonPrefs(
 		const char* key, void* body, unsigned length, Attribute attr) :
 		key(key), keyLen(strlen(key) + 1), body(body), length((int)length),
-		attr(attr), deleted(false){
+		attr(attr), deleted(false), dirty(false){
 		//スタックに自身を追加
 		next = q;
 		q = this;
@@ -99,14 +99,17 @@ namespace TB{
 		if(content.dptr){
 			memcpy(body, content.dptr,  length < content.dsize ? length : content.dsize);
 			free(content.dptr);
+			dirty = false;
 		}
 	}
 	void CommonPrefs::Write(){
 		if(attr == nosave){ return; }
 		datum k = { const_cast<char*>(key), keyLen };
 		if(!deleted){
-			datum content = { (char*)body, length };
-			gdbm_store(db, k, content, GDBM_REPLACE);
+			if(dirty){
+				datum content = { (char*)body, length };
+				gdbm_store(db, k, content, GDBM_REPLACE);
+			}
 		}else{
 			gdbm_delete(db, k);
 		}

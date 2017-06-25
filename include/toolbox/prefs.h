@@ -76,6 +76,7 @@ namespace TB{
 		void Delete(){ deleted = true; }
 		void Undelete(){ deleted = false; }
 		bool IsDeleted(){ return deleted; }
+		void Waste(){ dirty = true; };
 
 	private:
 		static TB::String path;
@@ -89,6 +90,7 @@ namespace TB{
 		const int length;
 		const Attribute attr;
 		bool deleted;
+		bool dirty;
 
 		static bool Open();
 		static void Load(const char*);
@@ -118,7 +120,7 @@ namespace TB{
 		~Prefs(){};
 
 		operator const T&(){ return IsDeleted() ? defaultValue : body; };
-		void operator=(const T& v){ body = v; Undelete(); };
+		void operator=(const T& v){ body = v; Undelete(); Waste(); };
 		void operator=(const char* v) override;
 
 	protected:
@@ -148,6 +150,7 @@ namespace TB{
 			strncpy(body, v, maxLen);
 			body[maxLen - 1] = 0;
 			Undelete();
+			Waste();
 		};
 
 	protected:
