@@ -23,6 +23,7 @@ namespace TB{
 			const char* Name();
 			bool IsDir();
 			bool IsReg();
+			bool IsFile();
 		private:
 			int index;
 			Directory& dir;

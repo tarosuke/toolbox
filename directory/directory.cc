@@ -38,5 +38,8 @@ namespace TB{
 	bool Directory::ITOR::IsReg(){
 		return !IsEnd() && !!((*dir.entries[index]).d_type & DT_REG);
 	}
+	bool Directory::ITOR::IsFile(){
+		return !IsEnd() && !!((*dir.entries[index]).d_type & (DT_REG | DT_LNK));
+	}
 
 }
