@@ -22,6 +22,7 @@ namespace TB{
 			operator bool(){ return !IsEnd(); };
 			const char* Name();
 			bool IsDir();
+			bool IsReg();
 		private:
 			int index;
 			Directory& dir;
