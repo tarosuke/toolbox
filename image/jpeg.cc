@@ -70,7 +70,7 @@ IMAGE* JPEG::New(int fd, J_COLOR_SPACE colorSpace){
 		const unsigned bpl(ci.image_width * 3);
 
 		//行配列割り当て
-		jarr = new JSAMPROW[ci.image_width];
+		jarr = new JSAMPROW[ci.image_height];
 		if(!jarr){
 			throw 0;
 		}
