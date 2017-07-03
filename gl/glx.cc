@@ -25,6 +25,8 @@
 
 namespace TB{
 
+	/** デフォルトのビジュアルフォーマット
+	 */
 	int GLX::defaultAttributes[] = {
 		GLX_USE_GL,
 		GLX_LEVEL, 0,

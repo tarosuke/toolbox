@@ -35,12 +35,12 @@ namespace TB{
 		/** 通常構築子
 		 * 何も指定しなければ根窓とデフォルトビジュアルで生成
 		 */
-		GLX(Drawable drawable = 0, int attributes[] = defaultAttributes) :
-			display(glXGetCurrentDisplay()),
-			drawable(drawable ? drawable : DefaultRootWindow(display)),
-			visual(glXChooseVisual(
-				display, DefaultScreen(display), attributes)),
-			context(glXCreateContext(display, visual, NULL, True)){
+		GLX(Display* display, Drawable drawable = 0, int attributes[] = defaultAttributes) :
+			display(display),
+			drawable(drawable ? drawable : DefaultRootWindow(display)){
+			visual = glXChooseVisual(
+				display, DefaultScreen(display), attributes);
+			context = glXCreateContext(display, visual, NULL, True);
 		};
 
 		/* 子コンテキスト構築子
@@ -71,6 +71,8 @@ namespace TB{
 		void MakeCurrent(){
 			glXMakeCurrent(display, drawable, context);
 		};
+
+		Display* GetDisplay(){ return display; };
 
 	private:
 		static int defaultAttributes[];
