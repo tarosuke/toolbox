@@ -46,6 +46,8 @@ namespace TB{
 		/* 子コンテキスト構築子
 		 * 親コンテキストとリソースを共有する場合に使う
 		 * drawableを指定しなければ親コンテキストと同じdrawableが使われる
+		 *
+		 * なお、Threadと併用するときはThreadより前に初期化すること！
 		 */
 		GLX(const GLX& parent, Drawable drawable = 0) :
 			display(parent.display),
