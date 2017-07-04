@@ -10,9 +10,10 @@ namespace TB{
 
 	Thread::Keeper Thread::keeper;
 
-	Thread::Thread(bool qwd) :
+	Thread::Thread(bool qwd, int sp) :
 		quitWithDelete(qwd),
-		alive(true){
+		alive(true),
+		sched_policy(sp){
 		Keeper::Born(*this);
 	}
 	Thread::~Thread(){
@@ -72,7 +73,7 @@ namespace TB{
 				//スレッド起動
 				pthread_attr_t attr;
 				pthread_attr_init(&attr);
-				pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
+				pthread_attr_setschedpolicy(&attr, (*t).sched_policy);
 				pthread_create(
 					&(*t).thread,
 					&attr,
@@ -83,8 +84,6 @@ namespace TB{
 			//bodyのdelete
 			while(Thread* const t = bodies){
 				bodies = (*t).next;
-
-
 				delete t;
 			}
 

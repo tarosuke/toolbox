@@ -34,7 +34,14 @@ namespace TB{
 		bool IsThreadAlive(){ return alive; };
 
 	protected:
-		Thread(bool deleteAtQuit = false); //スレッドを起こして起動予約。
+		 /** スレッド生成
+		  * deleteAtQuitがtrueのとき、スレッドが終了するとともにdeleteされる。
+		  * 正確には削除キューに登録され、あとで削除される。
+		  *
+		  * schedPolicyにはSCHED_FIFO、SCHED_RR、SCHED_OTHERのどれかを指定できる。
+		  * 概ねリアルタイム性はこの順になる。詳細はsched(7)を参照。
+		  */
+		Thread(bool deleteAtQuit = false, int schedPolicy = SCHED_OTHER);
 		virtual ~Thread();
 		virtual void ThreadBody()=0; //本処理:終了するとスレッドは終了する
 
@@ -44,6 +51,7 @@ namespace TB{
 		Thread* next; //起動、終了スタック用。
 
 		pthread_t thread;
+		int sched_policy;
 		static void* Entry(void*); //スレッドの出入り口
 
 		//墓場
