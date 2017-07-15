@@ -66,8 +66,8 @@ namespace TB{
 		};
 
 		/** Initializer for dynamic allocation
-			* NOTE:If you use IDArray as static, You don't have to call this.
-			*/
+		* NOTE:If you use IDArray as static, You don't have to call this.
+		*/
 		void Init(){
 			elements = 0;
 			used = 0;
