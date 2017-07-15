@@ -21,16 +21,6 @@ namespace TB{
 			void operator=(const Node&);
 		public:
 
-			/** Initializer for dynamic allocation
-			 * NOTE:If you use IDArray as static, You don't have to call this.
-			 */
-			void Init(){
-				elements = 0;
-				used = 0;
-				pool = ~0U;
-				size = 0;
-			};
-
 			/** IDArray node
 			 * Inherit this to user of IDArray
 			 */
@@ -75,6 +65,19 @@ namespace TB{
 			};
 		};
 
+		/** Initializer for dynamic allocation
+			* NOTE:If you use IDArray as static, You don't have to call this.
+			*/
+		void Init(){
+			elements = 0;
+			used = 0;
+			pool = ~0U;
+			size = 0;
+		};
+
+
+		/** accessing node
+		 */
 		T* operator[](unsigned id){
 			return (elements && id < size) ?
 				dynamic_cast<T*>(elements[id].node) : 0;
