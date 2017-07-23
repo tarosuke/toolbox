@@ -7,10 +7,9 @@
 
 namespace TB{
 
-	CYCLIC::CYCLIC(long ct, long pm) :
+	CYCLIC::CYCLIC(long ct) :
 		prevTime(GetNanoStamp()),
-		cycleTime(ct),
-		preMargin(pm){
+		cycleTime(ct){
 	}
 
 	long CYCLIC::GetNanoStamp(){
@@ -19,7 +18,7 @@ namespace TB{
 		return ts.tv_nsec;
 	}
 
-	void CYCLIC::Sleep(){
+	void CYCLIC::SleepTo(float ratio){
 		struct timespec ts;
 		clock_gettime(CLOCK_MONOTONIC, &ts);
 	}

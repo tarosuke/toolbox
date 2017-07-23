@@ -9,13 +9,26 @@ namespace TB{
 	class CYCLIC{
 		CYCLIC();
 	public:
-		CYCLIC(long cycleTime, long preMargin = 0);
-		void Sleep();
+		/** CYCLE Key
+		 * サイクルを測定するためのクラス
+		 * RAIIを使うので図りたい期間Keyのインスタンスを存在させておく
+		 */
+		class Key{
+		public:
+			Key(CYCLIC& c) : cyclic(c){ cyclic.Start(); };
+			~Key(){ cyclic.End(); }
+		private:
+			CYCLIC& cyclic;
+		};
+
+		CYCLIC(long cycleTime);
+		void SleepTo(float ratio); //サイクルタイムのratio分までnanosleepする
 	private:
 		long prevTime; //前回のタイムスタンプ
 		long cycleTime; //設定されたサイクルタイム
-		long preMargin; //次のサイクルよりちょっと前に起きるための保険
 		long GetNanoStamp();
+		void Start(); //サイクル開始
+		void End(); //サイクル終了
 	};
 
 	class DURATION{
