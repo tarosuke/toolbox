@@ -37,7 +37,8 @@ namespace TB{
 		 */
 		GLX(Display* display, Drawable drawable = 0, int attributes[] = defaultAttributes) :
 			display(display),
-			drawable(drawable ? drawable : DefaultRootWindow(display)){
+			drawable(drawable ? drawable : DefaultRootWindow(display)),
+			child(false){
 			visual = glXChooseVisual(
 				display, DefaultScreen(display), attributes);
 			context = glXCreateContext(display, visual, NULL, True);
@@ -52,15 +53,16 @@ namespace TB{
 		GLX(const GLX& parent, Drawable drawable = 0) :
 			display(parent.display),
 			drawable(drawable ? drawable : parent.drawable),
-			visual(0),
+			visual(parent.visual),
 			context(glXCreateContext(
-				display, parent.visual, parent.context, True)){
+				display, visual, parent.context, True)),
+			child(true){
 		};
 
 		/** デストラクタ
 		 */
 		~GLX(){
-			if(visual){
+			if(!child){
 				XFree(visual);
 			}
 			glXMakeCurrent(display, None, NULL); //コンテキスト解除
@@ -83,6 +85,7 @@ namespace TB{
 		Drawable drawable;
 		XVisualInfo* visual;
 		GLXContext context;
+		const bool child;
 
 	};
 
