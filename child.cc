@@ -37,6 +37,7 @@ namespace TB{
 		//子プロセスなので指定されたものをexec
 		execvp(t[0], const_cast<char* const*>(t));
 		syslog(LOG_CRIT, "failed to start process:%s.", t[0]);
+		_exit(-1);
 	}
 
 	Child::~Child(){
