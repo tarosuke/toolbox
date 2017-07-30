@@ -63,7 +63,7 @@ namespace TB{
 		//スレッド起動
 		pthread_attr_t attr;
 		pthread_attr_init(&attr);
-		pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
+		pthread_attr_setschedpolicy(&attr, SCHED_IDLE);
 		pthread_create(&thread, &attr, Body, 0);
 	}
 
