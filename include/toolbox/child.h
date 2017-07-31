@@ -29,8 +29,6 @@ namespace TB{
 		Child(const char* targets[]);
 		~Child();
 
-	protected:
-
 		const long pid;
 	};
 
