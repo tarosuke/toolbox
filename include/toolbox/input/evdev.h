@@ -8,13 +8,13 @@
 
 #include <linux/input.h>
 
-#include "../thread/thread.h"
+#include "../thread/pthread.h"
 #include "../container/ring.h"
 
 
 namespace TB{
 
-	class Evdev : public Thread{
+	class Evdev : public PThread{
 		Evdev();
 		Evdev(const Evdev&);
 		void operator=(const Evdev&);

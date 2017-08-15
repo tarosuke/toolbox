@@ -27,28 +27,31 @@
 
 namespace TB{
 
-	class Thread : public List<Thread>::Node{
-		Thread(const Thread&);
-		void operator=(const Thread&);
+	class PThread : public List<PThread>::Node{
+		PThread(const PThread&);
+		void operator=(const PThread&);
 	public:
 		bool IsThreadAlive(){ return alive; };
 
 	protected:
-		 /** スレッド生成
-		  * deleteAtQuitがtrueのとき、スレッドが終了するとともにdeleteされる。
-		  * 正確には削除キューに登録され、あとで削除される。
-		  *
-		  * schedPolicyにはSCHED_FIFO、SCHED_RR、SCHED_OTHERのどれかを指定できる。
-		  * 概ねリアルタイム性はこの順になる。詳細はsched(7)を参照。
-		  */
-		Thread(bool deleteAtQuit = false, int schedPolicy = SCHED_OTHER);
-		virtual ~Thread();
+		/** スレッド生成
+		 * NOTE:生成しただけではスレッドは起動しない。Raiseを呼んだ時に起動する。
+		 *
+		 * deleteAtQuitがtrueのとき、スレッドが終了するとともにdeleteされる。
+		 * 正確には削除キューに登録され、あとで削除される。
+		 *
+		 * schedPolicyにはSCHED_FIFO、SCHED_RR、SCHED_OTHERのどれかを指定できる。
+		 * 概ねリアルタイム性はこの順になる。詳細はsched(7)を参照。
+		 */
+		PThread(bool deleteAtQuit = false, int schedPolicy = SCHED_OTHER);
+		virtual ~PThread();
 		virtual void ThreadBody()=0; //本処理:終了するとスレッドは終了する
+		void RaiseThread();
 
 	private:
 		const bool quitWithDelete;
 		bool alive;
-		Thread* next; //起動、終了スタック用。
+		PThread* next; //起動、終了スタック用。
 
 		pthread_t thread;
 		int sched_policy;
@@ -58,14 +61,11 @@ namespace TB{
 		static class Keeper{
 		public:
 			Keeper();
-			static void Born(Thread&);
-			static void Bury(Thread&);
+			static void Bury(PThread&);
 		private:
 			static pthread_t thread;
 			static pthread_mutex_t igniter; //これが非0になったら処理
-
-			static Thread* babies;
-			static Thread* bodies;
+			static PThread* bodies;
 			static void* Body(void*);
 		}keeper;
 	};

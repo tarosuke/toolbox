@@ -23,6 +23,7 @@ namespace TB{
 	Evdev::Evdev(const char* dirName, const char* pattern, bool grab) : keep(false){
 		const char* patterns[] = { pattern, 0 };
 		Open(dirName, patterns, grab);
+		RaiseThread();
 	}
 	Evdev::Evdev(const char* dirName, const char** patterns, bool grab) : keep(false){
 		Open(dirName, patterns, grab);

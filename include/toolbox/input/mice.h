@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../thread/thread.h"
+#include "../thread/pthread.h"
 
-class MICE : public TB::Thread{
+class MICE : public TB::PThread{
 	MICE();
 	MICE(const MICE&);
 	void operator=(const MICE&);
@@ -12,7 +12,9 @@ public:
 		int axis[2];
 	};
 
-	MICE(void (*reporter)(const Report&)) : enable(true),file(OpenFile()), reporter(reporter){}
+	MICE(void (*reporter)(const Report&)) : enable(true),file(OpenFile()), reporter(reporter){
+		RaiseThread();
+	}
 	void Quit(){ enable = false; };
 private:
 	bool enable;
