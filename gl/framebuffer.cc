@@ -27,11 +27,20 @@
 
 namespace GL{
 
+	const TEXTURE::PARAMS Framebuffer::defaultParams = {
+		wrap_s : GL_CLAMP,
+		wrap_t : GL_CLAMP,
+		filter_mag : GL_LINEAR,
+		filter_min : GL_LINEAR,
+		texture_mode : GL_REPLACE,
+		pointSprite : false,
+	};
+
 	Framebuffer::Framebuffer(
 		unsigned width,
 		unsigned height,
 		TEXTURE::Format format) :
-		TEXTURE(width, height, format),
+		TEXTURE(width, height, format, defaultParams),
 		fbID(NewID()),
 		dbID(NewDB()){
 		Key k(*this);

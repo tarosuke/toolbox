@@ -64,6 +64,7 @@ namespace GL{
 		static unsigned NewID();
 		static unsigned NewDB();
 		static int activeID;
+		static const TEXTURE::PARAMS defaultParams;
 	};
 
 
