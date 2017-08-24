@@ -42,6 +42,7 @@ namespace TB{
 		if(n.quitWithDelete){
 			keeper.Bury(n);
 		}
+		pthread_cancel(n.thread);
 		return 0;
 	}
 	void PThread::RaiseThread(){
@@ -96,4 +97,3 @@ namespace TB{
 	}
 
 }
-
