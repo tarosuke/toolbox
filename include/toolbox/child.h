@@ -28,7 +28,7 @@ namespace TB{
 	public:
 		const long pid;
 
-		Child(const char* args[]);
+		Child(const char* const args[]);
 		~Child();
 	};
 
@@ -41,7 +41,7 @@ namespace TB{
 		const int& writeFd; //子プロセスのstdinへのパイプ
 		const int& readFd; //子プロセスのstdoutが読めるパイプ
 
-		PipedChild(const char* args[]);
+		PipedChild(const char* const args[]);
 		~PipedChild();
 	private:
 		struct Pipes{

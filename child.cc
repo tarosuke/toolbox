@@ -29,7 +29,7 @@ namespace TB{
 
 	/** 子プロセス
 	 */
-	Child::Child(const char* t[]) : pid(fork()){
+	Child::Child(const char* const t[]) : pid(fork()){
 		if(pid < 0){
 			syslog(LOG_ERR, "Faild to fork(" __FILE__ ":%d)", __LINE__);
 			return;
@@ -49,7 +49,7 @@ namespace TB{
 
 	/** パイプ付き子プロセス
 	 */
-	PipedChild::PipedChild(const char* t[]) :
+	PipedChild::PipedChild(const char* const t[]) :
 		pid(fork()),
 		writeFd(pipes.p2c[1]),
 		readFd(pipes.c2p[0]),
