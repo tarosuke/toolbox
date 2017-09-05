@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <gdbm.h>
+#include <syslog.h>
 
 #include <toolbox/prefs.h>
 #include <toolbox/complex/complex.h>
@@ -31,6 +32,7 @@ namespace TB{
 				return true;
 			}
 		}
+		syslog(LOG_ERR, "Pref:failed to pen:%s", (const char*)path);
 		return false;
 	}
 
@@ -93,7 +95,6 @@ namespace TB{
 	}
 
 	void CommonPrefs::Read(){
-		if(attr == nosave){ return; }
 		datum k{ const_cast<char*>(key), keyLen };
 		datum content(gdbm_fetch(db, k));
 		if(content.dptr){
@@ -154,6 +155,7 @@ namespace TB{
 				}
 
 				//正常終了
+				(*i).Waste();
 				free(a);
 				return true;
 			}
@@ -173,10 +175,12 @@ namespace TB{
 			body[n] = strtod(v, const_cast<char**>(&v));
 		}
 		Undelete();
+		Waste();
 	}
 	template<> void Prefs<unsigned>::operator=(const char* v){
 		body = strtoul(v, 0, 10);
 		Undelete();
+		Waste();
 	}
 	template<> void Prefs<bool>::operator=(const char* v){
 		switch(*v){
@@ -192,6 +196,7 @@ namespace TB{
 			break;
 		}
 		Undelete();
+		Waste();
 	}
 
 
