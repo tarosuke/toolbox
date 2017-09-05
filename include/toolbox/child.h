@@ -26,11 +26,29 @@ namespace TB{
 		Child(const Child&);
 		void operator=(const Child&);
 	public:
-		Child(const char* targets[]);
-		~Child();
-
 		const long pid;
+
+		Child(const char* args[]);
+		~Child();
+	};
+
+	class PipedChild{
+		PipedChild();
+		PipedChild(const PipedChild&);
+		void operator=(const PipedChild&);
+	public:
+		const long pid;
+		const int& writeFd; //子プロセスのstdinへのパイプ
+		const int& readFd; //子プロセスのstdoutが読めるパイプ
+
+		PipedChild(const char* args[]);
+		~PipedChild();
+	private:
+		struct Pipes{
+			int p2c[2];
+			int c2p[2];
+		}pipes;
+		static Pipes Pipe();
 	};
 
 }
-
