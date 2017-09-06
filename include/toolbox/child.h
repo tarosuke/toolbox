@@ -37,18 +37,19 @@ namespace TB{
 		PipedChild(const PipedChild&);
 		void operator=(const PipedChild&);
 	public:
-		const long pid;
-		const int& writeFd; //子プロセスのstdinへのパイプ
-		const int& readFd; //子プロセスのstdoutが読めるパイプ
-
 		PipedChild(const char* const args[]);
 		~PipedChild();
+
+		int ReadFd(){ return pipes.read; };
+		int WriteFd(){ return pipes.write; };
 	private:
 		struct Pipes{
-			int p2c[2];
-			int c2p[2];
-		}pipes;
-		static Pipes Pipe();
+			int pid;
+			int read;
+			int write;
+		};
+		const Pipes pipes;
+		static Pipes Pipe(const char[], const char* const*);
 	};
 
 }

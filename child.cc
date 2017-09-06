@@ -49,68 +49,73 @@ namespace TB{
 
 	/** パイプ付き子プロセス
 	 */
-	PipedChild::PipedChild(const char* const t[]) :
-		pid(fork()),
-		writeFd(pipes.p2c[1]),
-		readFd(pipes.c2p[0]),
-		pipes(Pipe()){
-		if(pid < 0){
-			syslog(LOG_ERR, "Faild to fork(" __FILE__ ":%d)", __LINE__);
-			return;
-		}else if(pid){
-			//親プロセスなので余計なハンドルを閉じて終了
-			close(pipes.p2c[0]);
-			close(pipes.c2p[1]);
-			return;
-		}
-
-		//ハンドルをstdin/outへ複製
-		if(dup2(pipes.p2c[0], 0 < 0 || dup2(pipes.c2p[1], 1) < 0)){
-			syslog(
-				LOG_ERR,
-				"failed to duplicate handles of pipe(" __FILE__ ":%d).",
-				__LINE__);
-			_exit(-1);
-		}
-
-		//余計なハンドルを閉じる
-		close(pipes.p2c[1]);
-		close(pipes.c2p[0]);
-
-		//子プロセスなので指定されたものをexec
-		execvp(t[0], const_cast<char* const*>(t));
-		syslog(LOG_CRIT, "failed to start process:%s.", t[0]);
-		_exit(-1);
-	}
-
+	PipedChild::PipedChild(const char* const t[]) : pipes(Pipe(*t, t)){}
 	PipedChild::~PipedChild(){
-		waitpid(pid, 0, 0);
-		close(writeFd);
-		close(readFd);
+		close(pipes.read);
+		close(pipes.write);
+		waitpid(pipes.pid, 0, 0);
 	}
 
 	/** 双方向通信のためにパイプを二つ作って返す
 	 */
-	PipedChild::Pipes PipedChild::Pipe(){
-		Pipes p = { { -1, -1 }, { -1, -1 } };
-		if(pipe(p.p2c)){
-			syslog(
-				LOG_ERR,
-				"failed to create send pipe(" __FILE__ ":%d).",
-				__LINE__);
-			return p;
+	PipedChild::Pipes PipedChild::Pipe(
+		const char t[],
+		const char* const* params){
+		//戻り値(の入れ物)
+		Pipes r = { -1, -1, -1 };
+
+		/** 親→子のパイプ生成
+		 * p2cHandles[0] ： 親では使わない／子で0番に複製
+		 * p2cHandles[1] ： 親で書き込む／子では使わない
+		 */
+		int p2cHandles[2];
+		if(pipe(p2cHandles)){
+			syslog(LOG_ERR, "failed to create send pipe.");
+			return r;
 		}
-		if(pipe(p.c2p)){
-			syslog(
-				LOG_ERR,
-				"failed to create send pipe(" __FILE__ ":%d).",
-				__LINE__);
-			close(p.p2c[0]);
-			close(p.p2c[1]);
-			return p;
+		/** 子→親のパイプ生成
+		 * c2pHandles[0] ： 親では読みだす／子では使わない
+		 * c2pHandles[1] ： 親では使わない／子で1番に複製
+		 */
+		int c2pHandles[2];
+		if(pipe(c2pHandles)){
+			syslog(LOG_ERR, "failed to create receive pipe");
+			close(p2cHandles[0]);
+			close(p2cHandles[1]);
+			return r;
 		}
 
-		return p;
+		//子プロセス起動
+		const pid_t pid(fork());
+		if(!pid){
+			//子プロセスなので相手方パイプをハンドル番号0へ
+			if(dup2(p2cHandles[0], 0) < 0 || dup2(c2pHandles[1], 1) < 0){
+				syslog(LOG_CRIT, "failed to duplicate handles of pipe.");
+				_exit(-1);
+			}
+			//不要ハンドルを閉じる
+			close(p2cHandles[1]);
+			close(c2pHandles[0]);
+
+			//対象起動
+			execvp(t, const_cast<char* const*>(params));
+
+			//起動失敗
+			syslog(LOG_CRIT, "failed to start process:%s.", t);
+			_exit(-1);
+		}else if(pid < 0){
+			syslog(LOG_CRIT, "failed to fork.");
+			return r;
+		}
+
+		//不要ハンドルを閉じる
+		close(p2cHandles[0]);
+		close(c2pHandles[1]);
+
+		r.pid = pid;
+		r.read = c2pHandles[0];
+		r.write = p2cHandles[1];
+		return r;
 	}
 
 }
