@@ -81,12 +81,6 @@ namespace GL{
 	}
 
 
-	void TEXTURE::TexCoord(float u, float v){
-		glTexCoord2f(u, v);
-	}
-
-
-
 	void TEXTURE::Assign(const IMAGE& image, const PARAMS& p, bool comp){
 		BINDER b(*this);
 
@@ -194,6 +188,27 @@ namespace GL{
 			return GL_LUMINANCE;
 		}
 		return GL_RGB;
+	}
+
+
+	Texture::Texture(
+		unsigned w,
+		unsigned h,
+		Format format,
+		const PARAMS& p) :
+		TEXTURE(Pow2(w), Pow2(h), format, p),
+		hRatio((float)w / Pow2(w)),
+		vRatio((float)h / Pow2(h)){}
+
+	void Texture::TexCoord(float u, float v){
+		glTexCoord2f(u * hRatio, v * vRatio);
+	}
+
+	unsigned Texture::Pow2(unsigned v){
+		for(unsigned n(0); n < sizeof(v) * 8 - 1; ++n){
+			v |= v >> 1;
+		}
+		return v + 1;
 	}
 
 }

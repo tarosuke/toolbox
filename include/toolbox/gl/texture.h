@@ -53,8 +53,6 @@ namespace GL{
 		TEXTURE(const IMAGE&, const PARAMS& p=defaultParams);
 		~TEXTURE();
 
-		void TexCoord(float u, float v);
-
 		void Assign(
 			const IMAGE&,
 			const PARAMS& p=defaultParams,
@@ -80,5 +78,24 @@ namespace GL{
 		static unsigned GetNewTID();
 		static int GLTexFormat(Format);
 		static int GLImageFormat(Format);
+	};
+
+	class Texture : public TEXTURE{
+		Texture();
+		Texture(const Texture&);
+		void operator=(const Texture&);
+	public:
+		Texture(
+			unsigned w,
+			unsigned h,
+			Format format=RGB,
+			const PARAMS& p=defaultParams);
+
+		void TexCoord(float u, float v);
+
+	private:
+		const float hRatio;
+		const float vRatio;
+		unsigned Pow2(unsigned);
 	};
 }
