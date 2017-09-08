@@ -53,6 +53,8 @@ namespace GL{
 		TEXTURE(const IMAGE&, const PARAMS& p=defaultParams);
 		~TEXTURE();
 
+		void TexCoord(float u, float v);
+
 		void Assign(
 			const IMAGE&,
 			const PARAMS& p=defaultParams,
@@ -80,4 +82,3 @@ namespace GL{
 		static int GLImageFormat(Format);
 	};
 }
-

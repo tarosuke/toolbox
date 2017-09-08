@@ -80,6 +80,13 @@ namespace GL{
 		glDeleteTextures(1, &tid);
 	}
 
+
+	void TEXTURE::TexCoord(float u, float v){
+		glTexCoord2f(u, v);
+	}
+
+
+
 	void TEXTURE::Assign(const IMAGE& image, const PARAMS& p, bool comp){
 		BINDER b(*this);
 
