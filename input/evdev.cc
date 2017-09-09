@@ -1,8 +1,20 @@
 /** evdevクラス
- * スレッドを起こして/dev/input/event*を全部開いて入力を待つ
- * グラブするかはコンストラクタ引数次第
- * 入力があったら種別ごとのハンドラ処理させ、後で読めるようにしておく
- * またハンドラは仮想関数なので継承すると即時イベントを取得できる
+ * Copyright (C) 2017 tarosuke<webmaster@tarosuke.net>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <toolbox/input/evdev.h>
 
@@ -27,6 +39,7 @@ namespace TB{
 	}
 	Evdev::Evdev(const char* dirName, const char** patterns, bool grab) : keep(false){
 		Open(dirName, patterns, grab);
+		RaiseThread();
 	}
 	void Evdev::Open(const char* dirName, const char** patterns, bool grab){
 		buttons.Reset();
@@ -61,6 +74,9 @@ namespace TB{
 					continue;
 				}
 
+				//使用するデバイス
+				syslog(LOG_DEBUG, "Evdev:%s", path);
+
 				//rdfsの設定
 				FD_SET(fd, &rfds);
 				if(maxfd < fd){
@@ -85,6 +101,7 @@ namespace TB{
 
 			for(int n(0); n <= maxfd; ++n){
 				if(FD_ISSET(n, &fds)){
+					//evdevとして開いたものであることを確認
 					input_event ev;
 					if(read(n, &ev, sizeof(ev)) < 0){
 						//読み込みエラーなのでそのevdevは閉じる
