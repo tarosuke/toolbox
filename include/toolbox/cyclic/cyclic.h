@@ -21,38 +21,15 @@
 
 namespace TB{
 
-	class CYCLIC{
-		CYCLIC();
-	public:
-		/** CYCLE Key
-		 * サイクルを測定するためのクラス
-		 * RAIIを使うので図りたい期間Keyのインスタンスを存在させておく
-		 */
-		class Key{
-		public:
-			Key(CYCLIC& c) : cyclic(c){ cyclic.Start(); };
-			~Key(){ cyclic.End(); }
-		private:
-			CYCLIC& cyclic;
-		};
-
-		CYCLIC(long cycleTime);
-		void SleepTo(float ratio); //サイクルタイムのratio分までnanosleepする
-	private:
-		long prevTime; //前回のタイムスタンプ
-		long cycleTime; //設定されたサイクルタイム
-		long GetNanoStamp();
-		void Start(); //サイクル開始
-		void End(); //サイクル終了
-	};
-
 	class DURATION{
 	public:
-		DURATION();
-		double GetDuration();
+		DURATION() : start(Now()){};
+		operator unsigned long long(){
+			return Now() - start;
+		}
 	private:
-		double prevTime;
-		double Now();
+		const unsigned long long start;
+		unsigned long long Now();
 	};
 
 }
