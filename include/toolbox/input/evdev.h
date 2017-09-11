@@ -93,7 +93,7 @@ namespace TB{
 
 		/** 各種バッファ
 		 */
-		wO::Ring<unsigned short, int> keyBuff; //上位がbreak、下位がmark
+		wO::Ring<unsigned short, int, 0> keyBuff; //上位がbreak、下位がmark
 		ButtonState buttons;
 		int rel[REL_CNT];
 		int abs[ABS_CNT];
