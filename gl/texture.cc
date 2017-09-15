@@ -145,6 +145,10 @@ namespace GL{
 			buffer);
 	}
 
+	void TEXTURE::TexCoord(float u, float v){
+		glTexCoord2f(u, v);
+	}
+
 	unsigned TEXTURE::GetNewTID(){
 		unsigned id;
 		glGenTextures(1, &id);

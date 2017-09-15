@@ -65,6 +65,8 @@ namespace GL{
 			unsigned width,
 			unsigned height);
 
+		void TexCoord(float u, float v);
+
 	protected:
 		static const PARAMS defaultParams;
 		unsigned TextureID(){ return tid; }
