@@ -6,6 +6,11 @@
  * 値が入ってたらそれを返してくれる
  * Newにはパラメタなしのものと、参照パラメタ一つのものがある。
  *
+ * また、scoreに スコア用メソッドを設定すると全てをスキャンして最もスコアが高かった
+ * もののNewが呼ばれる。同一スコアの場合は先着順(どちらが先かは規定しない)
+ * なお、scoreを設定されていないものがある場合の挙動はscoreなしのものとなるので
+ * スコアによる選択を使うときは全てにscoreを設定すること。
+ *
  * NOTE:一般的にFACTORY<親クラス>::Newを呼ぶのはmainに入った後にすること
  * 登録がグローバルコンストラクタなのでグローバルコンストラクタでNewするには
  * 呼び出し順を調整する必要がある
@@ -26,20 +31,30 @@ public:
 		score(s){
 		start = this;
 	};
-	static T* New(P p){
+	static T* New(P& p){
+		FACTORY* matched(0);
+		unsigned maxScore(0);
 		for(FACTORY* f(start); f; f = (*f).next){
-			T* const t(((*f).factory)(p));
-			if(t){
-				return t;
+			if((*f).score){
+				const unsigned s((*f).score(p));
+				if(maxScore < s){
+					matched = f;
+					maxScore = s;
+				}
+			}else{
+				T* const t(((*f).factory)(p));
+				if(t){
+					return t;
+				}
 			}
 		}
-		return 0;
+		return (matched && maxScore) ? (*matched).factory(p) : 0;
 	}
 private:
 	static FACTORY* start;
 	FACTORY* const next;
-	T* (*const factory)(P);
-	unsigned (*const score)(P);
+	T* (*const factory)(P&);
+	unsigned (*const score)(P&);
 };
 
 //引数なしの場合
@@ -52,16 +67,26 @@ public:
 		next(start),
 		factory(f),
 		score(s){
-			start = this;
-		};
+		start = this;
+	};
 	static T* New(){
+		FACTORY* matched(0);
+		unsigned maxScore(0);
 		for(FACTORY* f(start); f; f = (*f).next){
-			T* const t(((*f).factory)());
-			if(t){
-				return t;
+			if((*f).score){
+				const unsigned s((*f).score());
+				if(maxScore < s){
+					matched = f;
+					maxScore = s;
+				}
+			}else{
+				T* const t(((*f).factory)());
+				if(t){
+					return t;
+				}
 			}
 		}
-		return 0;
+		return (matched && maxScore) ? (*matched).factory() : 0;
 	};
 private:
 	static FACTORY* start;
