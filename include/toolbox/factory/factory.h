@@ -13,14 +13,45 @@
 #pragma once
 
 
-template<typename T> class FACTORY{
+
+//基本形
+template<class T, typename P=void> class FACTORY{
 	FACTORY();
 	FACTORY(const FACTORY&);
 	void operator=(const FACTORY&);
 public:
-	FACTORY(T* (*f)()) :
+	FACTORY(T* (*f)(), unsigned (*s)() = 0) :
 		next(start),
-		factory(f){
+		factory(f),
+		score(s){
+		start = this;
+	};
+	static T* New(P p){
+		for(FACTORY* f(start); f; f = (*f).next){
+			T* const t(((*f).factory)(p));
+			if(t){
+				return t;
+			}
+		}
+		return 0;
+	}
+private:
+	static FACTORY* start;
+	FACTORY* const next;
+	T* (*const factory)(P);
+	unsigned (*const score)(P);
+};
+
+//引数なしの場合
+template<class T> class FACTORY<T, void>{
+	FACTORY();
+	FACTORY(const FACTORY&);
+	void operator=(const FACTORY&);
+public:
+	FACTORY(T* (*f)(), unsigned (*s)() = 0) :
+		next(start),
+		factory(f),
+		score(s){
 			start = this;
 		};
 	static T* New(){
@@ -32,18 +63,9 @@ public:
 		}
 		return 0;
 	};
-	template<typename P> static T* New(P& p){
-		for(FACTORY* f(start); f; f = (*f).next){
-			T* const t(((*f).factory)(p));
-			if(t){
-				return t;
-			}
-		}
-		return 0;
-	};
 private:
 	static FACTORY* start;
 	FACTORY* const next;
-	T* (*const factory)();;
+	T* (*const factory)();
+	unsigned (*const score)();
 };
-
