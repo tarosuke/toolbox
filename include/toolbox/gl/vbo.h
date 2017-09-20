@@ -57,7 +57,7 @@ namespace TB{
 
 		virtual void Draw();
 
-		~VBO();
+		virtual ~VBO();
 
 	protected:
 		const unsigned indexBuffer;
