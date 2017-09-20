@@ -46,7 +46,7 @@ namespace TB{
 			V3 normal;
 		}__attribute__((packed));
 
-		template<typename T> VBO* New(
+		template<typename T> static VBO* New(
 			unsigned noi,
 			unsigned* index,
 			unsigned nov,
@@ -72,7 +72,7 @@ namespace TB{
 		VBO(const Init&);
 
 	private:
-		bool SetupBuffer(
+		static bool SetupBuffer(
 			Init& i,
 			unsigned numOfIndex,
 			unsigned* index,
