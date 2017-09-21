@@ -25,7 +25,7 @@ template<class T, typename P=void> class FACTORY{
 	FACTORY(const FACTORY&);
 	void operator=(const FACTORY&);
 public:
-	FACTORY(T* (*f)(), unsigned (*s)() = 0) :
+	FACTORY(T* (*f)(P&), unsigned (*s)(P&) = 0) :
 		next(start),
 		factory(f),
 		score(s){
