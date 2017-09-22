@@ -16,6 +16,8 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#include <assert.h>
+
 #include <toolbox/gl/gl.h>
 #include <toolbox/gl/vbo.h>
 
@@ -38,32 +40,30 @@ namespace TB{
 			size * nov,
 			vertex,
 			GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		//インデックスバッファ確保と読み込み
 		unsigned iBuff;
 		glGenBuffers(1, &iBuff);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iBuff);
 		glBufferData(
-			GL_ARRAY_BUFFER,
+			GL_ELEMENT_ARRAY_BUFFER,
 			sizeof(int) * noi,
 			index,
 			GL_STATIC_DRAW);
-
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		i.indexBuffer = iBuff;
 		i.vertexBuffer = vBuff;
 		i.numOfVertex = noi;
 
-		return true;
+		return glGetError() == GL_NO_ERROR;
 	}
 
 	VBO::VBO(const Init& i) :
 		indexBuffer(i.indexBuffer),
 		vertexBuffer(i.vertexBuffer),
-		numOfVertex(i.numOfVertex * 3){
-	}
+		numOfVertex(i.numOfVertex * 3){}
 
 	VBO::~VBO(){
 		glDeleteBuffers(1, &indexBuffer);
@@ -81,11 +81,11 @@ namespace TB{
 		//頂点バッファをセットアップ
 		const unsigned stride(sizeof(V_UV));
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-		glVertexPointer(3, GL_FLOAT, stride, NULL);
+		glVertexPointer(3, GL_FLOAT, stride, 0);
 		glTexCoordPointer(2, GL_FLOAT, stride, &(*(V_UV*)0).texture);
 
 		//描画
-		glDrawElements(GL_TRIANGLES, numOfVertex, GL_UNSIGNED_INT,(void*)0);
+		glDrawElements(GL_TRIANGLES, numOfVertex, GL_UNSIGNED_INT, 0);
 
 		//後始末
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

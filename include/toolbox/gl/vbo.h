@@ -51,6 +51,7 @@ namespace TB{
 			unsigned* index,
 			unsigned nov,
 			T* vertex){
+//			syslog(LOG_INFO, "New VBO");
 			Init i;
 			return SetupBuffer(i, noi, index, nov, vertex, sizeof(T)) ? new VBO(i) : 0;
 		}
