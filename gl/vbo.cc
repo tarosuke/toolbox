@@ -16,6 +16,7 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+ #include <assert.h>
 #include <syslog.h>
 
 #include <toolbox/gl/gl.h>
@@ -72,7 +73,7 @@ namespace TB{
 	VBO::VBO(const Init& i) :
 		indexBuffer(i.indexBuffer),
 		vertexBuffer(i.vertexBuffer),
-		numOfVertex(i.numOfVertex * 3){}
+		numOfVertex(i.numOfVertex){}
 
 	VBO::~VBO(){
 		glDeleteBuffers(1, &indexBuffer);
