@@ -1,4 +1,6 @@
-all: libtoolbox.a
+target=libtoolbox.a
+
+all: $(target)
 
 .PHONY : clean test watch uninstall
 .DELETE_ON_ERROR : $(wildcard objs/*)
@@ -76,5 +78,3 @@ objs/%.d : %.c
 	@echo " CPP $@"
 	@echo -n objs/ > $@
 	@$(CPP) $(COPTS) -MM $< >> $@
-
-
