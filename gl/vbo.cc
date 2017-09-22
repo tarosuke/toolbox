@@ -16,7 +16,7 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <assert.h>
+#include <syslog.h>
 
 #include <toolbox/gl/gl.h>
 #include <toolbox/gl/vbo.h>
@@ -32,7 +32,7 @@ namespace TB{
 		void* vertex,
 		unsigned size){
 		//頂点バッファ確保と読み込み
-		unsigned vBuff;
+		unsigned vBuff(0);
 		glGenBuffers(1, &vBuff);
 		glBindBuffer(GL_ARRAY_BUFFER, vBuff);
 		glBufferData(
@@ -43,7 +43,7 @@ namespace TB{
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		//インデックスバッファ確保と読み込み
-		unsigned iBuff;
+		unsigned iBuff(0);
 		glGenBuffers(1, &iBuff);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iBuff);
 		glBufferData(
@@ -57,7 +57,16 @@ namespace TB{
 		i.vertexBuffer = vBuff;
 		i.numOfVertex = noi;
 
-		return glGetError() == GL_NO_ERROR;
+		if(glGetError() == GL_NO_ERROR){
+			return true;
+		}
+
+		//確保失敗
+		syslog(LOG_ERR, "failed to assign VBO");
+		if(iBuff){ glDeleteBuffers(1, &iBuff); }
+		if(vBuff){ glDeleteBuffers(1, &vBuff); }
+
+		return false;
 	}
 
 	VBO::VBO(const Init& i) :
