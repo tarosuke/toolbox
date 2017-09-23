@@ -48,16 +48,14 @@ IMAGE::IMAGE() :
 	constBuffer(0),
 	width(0),
 	height(0),
-	depth(0),
-	doNotFreeBuffer(false){}
+	depth(0){}
 
 IMAGE::IMAGE(const IMAGE& org) :
 	buffer(malloc(org.Size())),
 	constBuffer(0),
 	width(org.Width()),
 	height(org.Height()),
-	depth(org.Depth()),
-	doNotFreeBuffer(false){
+	depth(org.Depth()){
 	memcpy(buffer, org.buffer ? org.buffer : org.constBuffer, Size());
 }
 
@@ -66,8 +64,7 @@ IMAGE::IMAGE(const IMAGE& org, int x, int y, unsigned w, unsigned h) :
 	constBuffer(0),
 	width(w),
 	height(h),
-	depth(org.Depth()),
-	doNotFreeBuffer(false){
+	depth(org.Depth()){
 
 	for(unsigned yd(0); yd < h; ++yd){
 		void* const d(GetPoint(0, yd));
@@ -87,27 +84,17 @@ IMAGE::IMAGE(const void* org, unsigned w, unsigned h, unsigned d) :
 	constBuffer(org),
 	width(w),
 	height(h),
-	depth(d),
-	doNotFreeBuffer(false){}
-
-IMAGE::IMAGE(void* org, unsigned w, unsigned h, unsigned d) :
-	buffer(org),
-	constBuffer(org),
-	width(w),
-	height(h),
-	depth(d),
-	doNotFreeBuffer(true){}
+	depth(d){}
 
 IMAGE::IMAGE(unsigned w, unsigned h, unsigned d) :
 	buffer(malloc(w * h * d)),
 	constBuffer(0),
 	width(w),
 	height(h),
-	depth(d),
-	doNotFreeBuffer(false){}
+	depth(d){}
 
 IMAGE::~IMAGE(){
-	if(buffer && !doNotFreeBuffer){
+	if(buffer){
 		free(buffer);
 	}
 }
