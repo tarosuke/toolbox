@@ -69,17 +69,14 @@ IMAGE::IMAGE(const IMAGE& org, int x, int y, unsigned w, unsigned h) :
 	depth(org.Depth()),
 	doNotFreeBuffer(false){
 
-	//TODO:もうちょっとマシなアルゴリズムに書き換える
 	for(unsigned yd(0); yd < h; ++yd){
-		for(unsigned xd(0); xd < w; ++xd){
-			void* const d(GetPoint(xd, yd));
-			const void* const s(org.GetConstPoint(x + xd, y + yd));
-			if(d){
-				if(s){
-					memcpy(d, s, depth);
-				}else{
-					memset(d, 0, depth);
-				}
+		void* const d(GetPoint(0, yd));
+		const void* const s(org.GetConstPoint(x, y + yd));
+		if(d){
+			if(s){
+				memcpy(d, s, depth * width);
+			}else{
+				memset(d, 0, depth * width);
 			}
 		}
 	}
@@ -95,7 +92,7 @@ IMAGE::IMAGE(const void* org, unsigned w, unsigned h, unsigned d) :
 
 IMAGE::IMAGE(void* org, unsigned w, unsigned h, unsigned d) :
 	buffer(org),
-	constBuffer(0),
+	constBuffer(org),
 	width(w),
 	height(h),
 	depth(d),
