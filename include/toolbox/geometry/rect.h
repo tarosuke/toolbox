@@ -27,6 +27,10 @@ namespace TB{
 		Rect(){};
 		Rect(const Vector<T, dimensions>& a, const Vector<T, dimensions>& b) :
 			points((const Vector<T, dimensions>[]){ Less(a, b), More(a, b) }){};
+		void Clear(){
+			points[0].Clear();
+			points[1].Clear();
+		};
 		void operator|=(const Rect& t){
 			//check volume
 			if(!t.HaveVolume()){
@@ -47,10 +51,6 @@ namespace TB{
 			Rect r(*this);
 			r |= t;
 			return r;
-		};
-		void Clear(){
-			points[0].Clear();
-			points[1].Clear();
 		};
 		void operator&=(const Rect& t){
 			points[0] =  More(points[0], t.points[0]);
