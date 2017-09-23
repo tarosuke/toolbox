@@ -7,6 +7,7 @@ public:
 	IMAGE(const IMAGE&);
 	IMAGE(const IMAGE&, int x, int y, unsigned w, unsigned h);
 	IMAGE(const void*, unsigned w, unsigned h, unsigned bytesDepth);
+	IMAGE(void*, unsigned w, unsigned h, unsigned bytesDepth);
 	IMAGE(unsigned w, unsigned h, unsigned bytesDepth);
 
 	static IMAGE* New(const char*); //ファイル読み込み
@@ -44,6 +45,7 @@ private:
 	unsigned width;
 	unsigned height;
 	unsigned depth;
+	const bool doNotFreeBuffer;
 
 	class Pixel{
 	public:

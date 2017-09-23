@@ -48,14 +48,16 @@ IMAGE::IMAGE() :
 	constBuffer(0),
 	width(0),
 	height(0),
-	depth(0){}
+	depth(0),
+	doNotFreeBuffer(false){}
 
 IMAGE::IMAGE(const IMAGE& org) :
 	buffer(malloc(org.Size())),
 	constBuffer(0),
 	width(org.Width()),
 	height(org.Height()),
-	depth(org.Depth()){
+	depth(org.Depth()),
+	doNotFreeBuffer(false){
 	memcpy(buffer, org.buffer ? org.buffer : org.constBuffer, Size());
 }
 
@@ -64,7 +66,8 @@ IMAGE::IMAGE(const IMAGE& org, int x, int y, unsigned w, unsigned h) :
 	constBuffer(0),
 	width(w),
 	height(h),
-	depth(org.Depth()){
+	depth(org.Depth()),
+	doNotFreeBuffer(false){
 
 	//TODO:もうちょっとマシなアルゴリズムに書き換える
 	for(unsigned yd(0); yd < h; ++yd){
@@ -87,17 +90,27 @@ IMAGE::IMAGE(const void* org, unsigned w, unsigned h, unsigned d) :
 	constBuffer(org),
 	width(w),
 	height(h),
-	depth(d){}
+	depth(d),
+	doNotFreeBuffer(false){}
+
+IMAGE::IMAGE(void* org, unsigned w, unsigned h, unsigned d) :
+	buffer(org),
+	constBuffer(0),
+	width(w),
+	height(h),
+	depth(d),
+	doNotFreeBuffer(true){}
 
 IMAGE::IMAGE(unsigned w, unsigned h, unsigned d) :
 	buffer(malloc(w * h * d)),
 	constBuffer(0),
 	width(w),
 	height(h),
-	depth(d){}
+	depth(d),
+	doNotFreeBuffer(false){}
 
 IMAGE::~IMAGE(){
-	if(buffer){
+	if(buffer && !doNotFreeBuffer){
 		free(buffer);
 	}
 }
@@ -292,7 +305,3 @@ void IMAGE::Rotate270(){
 	height = newImage.height;
 	newImage.buffer = 0;
 }
-
-
-
-
