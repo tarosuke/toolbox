@@ -29,12 +29,18 @@ namespace TB{
 	class Image{
 		Image();
 	public:
-		struct Raw{
+		using Color = unsigned;
+
+		class Raw{
+		public:
 			unsigned char* data;
 			bool transparent;
 			unsigned stride;
 			unsigned width;
 			unsigned height;
+			Color Get(float x, float y); //補間付きで画素を読む(はみ出たら端の色)
+			Color Get(int x, int y); //保管なしで画素を読む(はみ出たら端の色)
+			bool Set(int x, int y, Color color); //書き込むl(はみ出てたら偽が返る)
 		};
 
 		Image(unsigned width, unsigned height, bool transparent);
@@ -43,7 +49,17 @@ namespace TB{
 		~Image();
 
 		operator Raw() const;
+		Image& operator=(const Image&);
 
+		/** 画像操作
+		 */
+		Image& Update(const Image&, int x, int y); //x,yの位置からImageを書き込む
+		Image& FlipVertical();
+		Image& FlipHorizontal();
+		Image& Rotate180();
+		Image& Rotate90();
+		Image& Rotate270();
+		Image& Rotate(float angle, unsigned backColor); //回転して空きをbackColorで
 
 		/** いわゆるGC
 		 */
@@ -79,7 +95,6 @@ namespace TB{
 		private:
 			Image& canvas;
 			cairo_t* const gc;
-
 
 			void Update(const double[4]);
 		};

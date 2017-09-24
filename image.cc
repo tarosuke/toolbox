@@ -32,10 +32,10 @@ namespace TB{
 		surface(NewSurface(width, height, o.IsTransparent())){
 		//oの中身を転送
 		const Raw raw(o);
-		unsigned char* s(raw.data + raw.stride*y + x*4);
+		const unsigned char* s(raw.data + raw.stride*y + x*4);
 		unsigned char* d(cairo_image_surface_get_data(surface));
-		unsigned stride((unsigned)cairo_image_surface_get_stride(surface));
-		for(unsigned n(0); n < raw.height; ++n, s += raw.stride, d += stride){
+		const unsigned stride((unsigned)cairo_image_surface_get_stride(surface));
+		for(unsigned n(0); n < height; ++n, s += raw.stride, d += stride){
 			memcpy(d, s, stride);
 		}
 	}
@@ -70,6 +70,13 @@ namespace TB{
 			stride : (unsigned)cairo_image_surface_get_stride(surface),
 			width : (unsigned)cairo_image_surface_get_width(surface),
 			height : (unsigned)cairo_image_surface_get_height(surface)};
+	}
+	Image& Image::operator=(const Image& o){
+		if(surface){
+			cairo_surface_destroy(surface);
+		}
+		surface = o.CopySurface();
+		return *this;
 	}
 
 }
