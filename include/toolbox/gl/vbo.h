@@ -50,8 +50,7 @@ namespace TB{
 			unsigned noi,
 			unsigned* index,
 			unsigned nov,
-			T* vertex){
-//			syslog(LOG_INFO, "New VBO");
+			T* vertex){ //NOTE:vertex に多次元配列を与えないこと
 			Init i;
 			return SetupBuffer(i, noi, index, nov, vertex, sizeof(T)) ? new VBO(i) : 0;
 		}
