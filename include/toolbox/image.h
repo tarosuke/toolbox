@@ -15,6 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * protectedかpublicで継承してOnUpdatedをオーバーライドして使う。
+ * Penを作って描画してPenが消滅する時にOnUpdatedが呼ばれる。
  */
 #pragma once
 #include <toolbox/geometry/rect.h>
@@ -22,6 +25,7 @@
 
 
 extern "C"{
+	typedef struct _cairo cairo_t;
 	typedef struct _cairo_surface cairo_surface_t;
 }
 
@@ -52,6 +56,7 @@ namespace TB{
 		Image& operator=(const Image&);
 
 		/** 画像操作
+		 * NOTE:Penが存在するときは使わないこと
 		 */
 		Image& Update(const Image&, int x, int y); //x,yの位置からImageを書き込む
 		Image& FlipVertical();
@@ -70,41 +75,97 @@ namespace TB{
 			Pen(Image&);
 			~Pen();
 
+
+			/** 設定用定義
+			 * Penのインスタンスに代入すると設定される
+			 */
+			enum Cap{ //線端
+				buttCap, //そのまま終端
+				roundCap, //円
+				squareCap //四角
+			};
+			enum Join{
+				miterJoin, //角
+				miterRound, //円
+				bevelJoin //面取り
+			};
+			//色指定
+			class Color{
+			public:
+				bool Setup(Pen&); //enableを返す
+				bool enable;
+			protected:
+				Color() : enable(false){};
+				Color(::TB::Image::Color);
+				Color(double r, double g, double b);
+				Color(double r, double g, double b, double alpha);
+				bool transparent;
+				double r, g, b, a;
+			};
+			class StrokeColor : public Color{
+			public:
+				StrokeColor(){};
+				StrokeColor(::TB::Image::Color c) : Color(c){};
+				StrokeColor(double r, double g, double b) : Color(r,g,b){};
+				StrokeColor(double r, double g, double b, double a) : Color(r,g,b,a){};
+			};
+			class FillColor : public Color{
+			public:
+				FillColor(){};
+				FillColor(::TB::Image::Color c) : Color(c){};
+				FillColor(double r, double g, double b) : Color(r,g,b){};
+				FillColor(double r, double g, double b, double a) : Color(r,g,b,a){};
+			};
+			//フォント指定
+			class Font{
+				Font();
+			public:
+				Font(const char*); //フォント
+				Font(const char*, double); //フォントとサイズ
+				Font(double); //サイズ
+				Font& Slant(double=0.0);
+				Font& Weight(double=1.0);
+			};
+
+
 			/** 描画メソッド
 			 */
-			void Stroke();
-			void Fill();
-			void Clear();
-			void Paint(){ Clear(); };
+			void Draw();
+			void Clear(Color&);
 			// 属性設定
-			void SetColor(unsigned c);
-			void SetColor(double r, double g, double b);
-			void SetColor(double r, double g, double b, double alpha);
-			void SetLineWidth(double);
+			Pen& operator=(StrokeColor& c){ sColor = c; return *this; };
+			Pen& operator=(FillColor& c){ fColor = c; return *this; };
+			Pen& operator=(double); //線幅設定
+			Pen& operator=(Cap);
+			Pen& operator=(Join);
 			// パス設定
 			void MoveTo(double x, double y);
 			void LineTo(double x, double y);
 			void Rectangle(double x, double y, double width, double height);
 			void Arc(double x, double y, double r, double a1, double a2);
 			void CurveTo(double x1, double y1, double x2, double y2, double nx, double ny);
-			//文字設定、描画
-			void SelectFont(const char*); //TODO：weightやslantも設定できるようにする
-			void SetFontSize(double);
+			//文字描画
 			void Puts(const char*); //エンコードはUTF8
+
+			/** 生cairo_t取得
+			 * NOTE:Penが消滅したあとは無効になる
+			 */
+			operator cairo_t*(){ return gc; };
 
 		private:
 			Image& canvas;
 			cairo_t* const gc;
-
+			Rect<unsigned> updated;
+			StrokeColor sColor;
+			FillColor fColor;
 			void Update(const double[4]);
 		};
 
 	protected:
-		virtual void OnUpdated(Raw, Rect<double>&);
+		virtual void OnImageUpdated(const Raw&, const Rect<unsigned>&){};
 
 	private:
 		cairo_surface_t* surface;
-		Rect<double> updateRect;
 		cairo_surface_t* CopySurface() const;
 		static cairo_surface_t* NewSurface(
 			unsigned width,
