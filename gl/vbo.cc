@@ -32,6 +32,7 @@ namespace TB{
 		unsigned nov,
 		void* vertex,
 		unsigned size){
+		syslog(LOG_DEBUG, "VBO: i:%u/%p v:%u/%p size:%u", noi, index, nov, vertex, size);
 		//頂点バッファ確保と読み込み
 		unsigned vBuff(0);
 		glGenBuffers(1, &vBuff);
