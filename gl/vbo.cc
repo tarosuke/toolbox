@@ -33,6 +33,10 @@ namespace TB{
 		void* vertex,
 		unsigned size){
 		syslog(LOG_DEBUG, "VBO: i:%u/%p v:%u/%p size:%u", noi, index, nov, vertex, size);
+		if(64 < size){
+			syslog(LOG_WARNING, "VBO: size of vertex element(%u) over 64bytes", size);
+		}
+
 		//頂点バッファ確保と読み込み
 		unsigned vBuff(0);
 		glGenBuffers(1, &vBuff);
