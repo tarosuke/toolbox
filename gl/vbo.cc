@@ -31,7 +31,8 @@ namespace TB{
 		unsigned* index,
 		unsigned nov,
 		void* vertex,
-		unsigned size){
+		unsigned size,
+		bool quad){
 		syslog(LOG_DEBUG, "VBO: i:%u/%p v:%u/%p size:%u", noi, index, nov, vertex, size);
 		if(64 < size){
 			syslog(LOG_WARNING, "VBO: size of vertex element(%u) over 64bytes", size);
@@ -62,6 +63,7 @@ namespace TB{
 		i.indexBuffer = iBuff;
 		i.vertexBuffer = vBuff;
 		i.numOfVertex = noi;
+		i.drawType = quad ? GL_QUADS : GL_TRIANGLES;
 
 		if(glGetError() == GL_NO_ERROR){
 			return true;
@@ -78,7 +80,8 @@ namespace TB{
 	VBO::VBO(const Init& i) :
 		indexBuffer(i.indexBuffer),
 		vertexBuffer(i.vertexBuffer),
-		numOfVertex(i.numOfVertex){}
+		numOfVertex(i.numOfVertex),
+		drawType(i.drawType){}
 
 	VBO::~VBO(){
 		glDeleteBuffers(1, &indexBuffer);
@@ -100,7 +103,7 @@ namespace TB{
 		glTexCoordPointer(2, GL_FLOAT, stride, &(*(V_UV*)0).texture);
 
 		//描画
-		glDrawElements(GL_TRIANGLES, numOfVertex, GL_UNSIGNED_INT, 0);
+		glDrawElements(drawType, numOfVertex, GL_UNSIGNED_INT, 0);
 
 		//後始末
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -130,7 +133,7 @@ namespace TB{
 			glNormalPointer(GL_FLOAT, stride, &(*(V_UV_NORMAL*)0).normal);
 
 			//描画
-			glDrawElements(GL_TRIANGLES, numOfVertex, GL_UNSIGNED_INT, (void*)0);
+			glDrawElements(drawType, numOfVertex, GL_UNSIGNED_INT, (void*)0);
 
 			//後始末
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

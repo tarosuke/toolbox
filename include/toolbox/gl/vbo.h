@@ -50,9 +50,10 @@ namespace TB{
 			unsigned noi,
 			unsigned* index,
 			unsigned nov,
-			T* vertex){ //NOTE:vertex に多次元配列を与えないこと
+			T* vertex,
+			bool quad=false){ //NOTE:vertex に多次元配列を与えないこと
 			Init i;
-			return SetupBuffer(i, noi, index, nov, vertex, sizeof(T)) ? new VBO(i) : 0;
+			return SetupBuffer(i, noi, index, nov, vertex, sizeof(T), quad) ? new VBO(i) : 0;
 		}
 
 		virtual void Draw();
@@ -63,11 +64,13 @@ namespace TB{
 		const unsigned indexBuffer;
 		const unsigned vertexBuffer;
 		const unsigned numOfVertex;
+		const int drawType;
 
 		struct Init{
 			unsigned indexBuffer;
 			unsigned vertexBuffer;
 			unsigned numOfVertex;
+			int drawType;
 		};
 		VBO(const Init&);
 
@@ -78,7 +81,8 @@ namespace TB{
 			unsigned* index,
 			unsigned unmOfVertex,
 			void* vertex,
-			unsigned size);
+			unsigned size,
+			bool quad);
 	};
 
 }
