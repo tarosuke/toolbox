@@ -75,8 +75,8 @@ namespace TB{
 			}
 			return v;
 		};
-		const T* Left(){ return points[0]; };
-		const T* Right(){ return points[1]; };
+		const T* Left() const { return points[0]; };
+		const T* Right() const { return points[1]; };
 		Rect operator+(const Vector<T, dimensions>& t){
 			return Rect(points[0] + t, points[1] + t);
 		};

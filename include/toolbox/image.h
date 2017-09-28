@@ -42,18 +42,33 @@ namespace TB{
 			unsigned stride;
 			unsigned width;
 			unsigned height;
-			Color Get(float x, float y); //補間付きで画素を読む(はみ出たら端の色)
-			Color Get(int x, int y); //保管なしで画素を読む(はみ出たら端の色)
+			unsigned bpp;
+			Color Get(float x, float y) const; //補間付きで画素を読む(はみ出たら端の色)
+			Color Get(int x, int y) const; //保管なしで画素を読む(はみ出たら端の色)
 			bool Set(int x, int y, Color color); //書き込むl(はみ出てたら偽が返る)
+			unsigned* operator[](unsigned y) const{ //配列形式でアクセス
+				return (unsigned*)&data[y * stride];
+			};
 		};
 
 		Image(unsigned width, unsigned height, bool transparent);
 		Image(const Image&);
 		Image(const Image&, int x, int y, unsigned width, unsigned height);
+		Image(const char* path);
 		~Image();
 
 		operator Raw() const;
 		Image& operator=(const Image&);
+
+		unsigned GetWidth() const;
+		unsigned GetHeight() const;
+		unsigned GetBPP() const;
+		operator Rect<unsigned>() const{
+			return Rect<unsigned>(
+				Vector<unsigned, 2>( 0, 0 ),
+				Vector<unsigned, 2>( GetWidth(), GetHeight() )
+			);
+		};
 
 		/** 画像操作
 		 * NOTE:Penが存在するときは使わないこと
@@ -92,13 +107,14 @@ namespace TB{
 			//色指定
 			class Color{
 			public:
-				bool Setup(Pen&); //enableを返す
+				bool Setup(Pen&) const; //enableを返す
 				bool enable;
-			protected:
-				Color() : enable(false){};
+			public:
 				Color(::TB::Image::Color);
 				Color(double r, double g, double b);
 				Color(double r, double g, double b, double alpha);
+			protected:
+				Color() : enable(false){};
 				bool transparent;
 				double r, g, b, a;
 			};
@@ -116,28 +132,56 @@ namespace TB{
 				FillColor(double r, double g, double b) : Color(r,g,b){};
 				FillColor(double r, double g, double b, double a) : Color(r,g,b,a){};
 			};
-			//フォント指定
-			class Font{
-				Font();
-			public:
-				Font(const char*); //フォント
-				Font(const char*, double); //フォントとサイズ
-				Font(double); //サイズ
-				Font& Slant(double=0.0);
-				Font& Weight(double=1.0);
-			};
 
 
 			/** 描画メソッド
 			 */
 			void Draw();
-			void Clear(Color&);
+			void Clear(const FillColor&);
 			// 属性設定
-			Pen& operator=(StrokeColor& c){ sColor = c; return *this; };
-			Pen& operator=(FillColor& c){ fColor = c; return *this; };
+			Pen& operator=(const StrokeColor& c){ sColor = c; return *this; };
+			Pen& operator=(const FillColor& c){ fColor = c; return *this; };
 			Pen& operator=(double); //線幅設定
 			Pen& operator=(Cap);
 			Pen& operator=(Join);
+			Pen& SetStrokeColor(){
+				*this = StrokeColor();
+				return *this;
+			}
+			Pen& SetStrokeColor(::TB::Image::Color c){
+				*this = StrokeColor(c);
+				return *this;
+			};
+			Pen& SetStrokeColor(double r, double g, double b){
+				*this = StrokeColor(r, g, b);
+				return *this;
+			};
+			Pen& SetStrokeColor(double r, double g, double b, double a){
+				*this = StrokeColor(r, g, b, a);
+				return *this;
+			};
+			Pen& SetFillColor(){
+				*this = FillColor();
+				return *this;
+			}
+			Pen& SetFillColor(::TB::Image::Color c){
+				*this = FillColor(c);
+				return *this;
+			};
+			Pen& SetFillColor(double r, double g, double b){
+				*this = FillColor(r, g, b);
+				return *this;
+			};
+			Pen& SetFillColor(double r, double g, double b, double a){
+				*this = FillColor(r, g, b, a);
+				return *this;
+			};
+			Pen& SetFont(
+				const char* name,
+				double size,
+				double slant = 0,
+				double weight = 0);
+
 			// パス設定
 			void MoveTo(double x, double y);
 			void LineTo(double x, double y);
@@ -145,7 +189,7 @@ namespace TB{
 			void Arc(double x, double y, double r, double a1, double a2);
 			void CurveTo(double x1, double y1, double x2, double y2, double nx, double ny);
 			//文字描画
-			void Puts(const char*); //エンコードはUTF8
+			Pen& Puts(const char*); //エンコードはUTF8
 
 			/** 生cairo_t取得
 			 * NOTE:Penが消滅したあとは無効になる
@@ -163,6 +207,7 @@ namespace TB{
 
 	protected:
 		virtual void OnImageUpdated(const Raw&, const Rect<unsigned>&){};
+		bool IsTransparent() const;
 
 	private:
 		cairo_surface_t* surface;
@@ -172,6 +217,7 @@ namespace TB{
 			unsigned height,
 			bool transparent);
 
-		bool IsTransparent() const;
+		void LoadJPEG(const char* path);
+
 	};
 }
