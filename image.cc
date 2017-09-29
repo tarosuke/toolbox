@@ -331,19 +331,19 @@ namespace TB{
 	void Image::Pen::Draw(){
 		if(fColor.Setup(*this)){
 			double p[4];
-	 		cairo_stroke_extents(gc, &p[0], &p[1], &p[2], &p[3]);
+	 		cairo_fill_extents(gc, &p[0], &p[1], &p[2], &p[3]);
 			Update(p);
-	 		if(sColor.enable){
-				cairo_stroke_preserve(gc);
+			if(sColor.enable){
+				cairo_fill_preserve(gc);
 			}else{
-				cairo_stroke(gc);
+				cairo_fill(gc);
 			}
 		}
 		if(sColor.Setup(*this)){
 			double p[4];
-	 		cairo_fill_extents(gc, &p[0], &p[1], &p[2], &p[3]);
+	 		cairo_stroke_extents(gc, &p[0], &p[1], &p[2], &p[3]);
 			Update(p);
-			cairo_fill(gc);
+			cairo_stroke(gc);
 		}
 	}
 	//指定色でcanvasを塗る
