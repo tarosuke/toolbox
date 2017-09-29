@@ -43,9 +43,6 @@ namespace TB{
 			unsigned width;
 			unsigned height;
 			unsigned bpp;
-			Color Get(float x, float y) const; //補間付きで画素を読む(はみ出たら端の色)
-			Color Get(int x, int y) const; //保管なしで画素を読む(はみ出たら端の色)
-			bool Set(int x, int y, Color color); //書き込むl(はみ出てたら偽が返る)
 			unsigned* operator[](unsigned y) const{ //配列形式でアクセス
 				return (unsigned*)&data[y * stride];
 			};
@@ -218,6 +215,5 @@ namespace TB{
 			bool transparent);
 
 		void LoadJPEG(const char* path);
-
 	};
 }

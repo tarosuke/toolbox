@@ -48,7 +48,7 @@ namespace TB{
 			memcpy(d, s, stride);
 		}
 	}
-	Image::Image(const char* fileName) : surface(0){
+	Image::Image(const char* fileName){
 		//PNGとして読んでみる
 		surface = cairo_image_surface_create_from_png(fileName);
 		if(surface && cairo_surface_status(surface) == CAIRO_STATUS_SUCCESS){
@@ -87,10 +87,6 @@ namespace TB{
 		return cairo_image_surface_create(format, w, h);
 	}
 
-	bool Image::IsTransparent() const{
-		return cairo_image_surface_get_format(surface) == CAIRO_FORMAT_ARGB32;
-//			CAIRO_CONTENT_COLOR_ALPHA;
-	}
 	Image::operator Raw() const{
 		return (Raw){
 			data : cairo_image_surface_get_data(surface),
@@ -131,6 +127,10 @@ namespace TB{
 			break;
 		}
 		return 0;
+	}
+	bool Image::IsTransparent() const{
+		return cairo_image_surface_get_format(surface) ==
+			CAIRO_FORMAT_ARGB32;
 	}
 
 	/** 画像加工
@@ -257,7 +257,7 @@ namespace TB{
 	/** 色の定義
 	 */
 	Image::Pen::Color::Color(Image::Color c) : enable(true){
-			transparent = (c & 0xff000000) == 0xff000000;
+			transparent = !(c & 0xff000000);
 			r = ((double)((c >> 16) & 0xff)) / 255.0;
 			g = ((double)((c >> 8) & 0xff)) / 255.0;
 			b = ((double)(c & 0xff)) / 255.0;
@@ -350,10 +350,10 @@ namespace TB{
 	void Image::Pen::Clear(const FillColor& c){
 		c.Setup(*this);
 		cairo_paint(gc);
-		double p[4];
-		cairo_fill_extents(gc, &p[0], &p[1], &p[2], &p[3]);
-		cairo_fill(gc);
-		Update(p);
+		const double r[4] = {
+			0.0, 0.0,
+			(const double)canvas.GetWidth(), (const double)canvas.GetHeight() };
+		Update(r);
 	}
 
 	/** JPEG対応
