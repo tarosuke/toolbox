@@ -257,7 +257,7 @@ namespace TB{
 	/** 色の定義
 	 */
 	Image::Pen::Color::Color(Image::Color c) : enable(true){
-			transparent = !(c & 0xff000000);
+			transparent = (c & 0xff000000) != 0xff000000;
 			r = ((double)((c >> 16) & 0xff)) / 255.0;
 			g = ((double)((c >> 8) & 0xff)) / 255.0;
 			b = ((double)(c & 0xff)) / 255.0;
