@@ -29,10 +29,15 @@ namespace GL{
 
 	void TEXTURE::BINDER::Set(TEXTURE* t){
 		glBindTexture(GL_TEXTURE_2D, t ? (*t).tid : 0);
+#if 1
+		glBlendFunc(GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA);
+#else
+		/***** choose this if you use old cairo *****/
 		glBlendFunc(
 			t && (*t).cairoTransparent ?
 				GL_SRC_COLOR : GL_SRC_ALPHA ,
 			GL_ONE_MINUS_SRC_ALPHA);
+#endif
 	}
 
 
