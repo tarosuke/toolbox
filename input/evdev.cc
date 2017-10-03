@@ -64,18 +64,22 @@ namespace TB{
 				const int fd(open(path, O_RDWR));
 				if(fd < 0){
 					//開けなかった
+					syslog(LOG_ERR, "Evdev: failed to open %s", path);
 					continue;
 				}
 
+#if 0
 				//ロック
 				if(!grab && flock(fd, LOCK_EX | LOCK_NB) < 0){
 					//使用中
+					syslog(LOG_ERR, "Evdev: failed to lock %s", path);
 					close(fd);
 					continue;
 				}
+#endif
 
 				//使用するデバイス
-				syslog(LOG_DEBUG, "Evdev:%s", path);
+				syslog(LOG_INFO, "Evdev:%s", path);
 
 				//rdfsの設定
 				FD_SET(fd, &rfds);
