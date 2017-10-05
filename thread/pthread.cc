@@ -32,7 +32,6 @@ namespace TB{
 		sched_policy(sp){}
 	PThread::~PThread(){
 		pthread_cancel(thread);
-		pthread_join(thread, 0);
 	}
 	void* PThread::Entry(void* p){
 		PThread& n(*(PThread*)p);
