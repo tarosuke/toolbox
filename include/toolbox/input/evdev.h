@@ -101,7 +101,7 @@ namespace TB{
 		/** 実行管理
 		 */
 		bool keep;
-		 int maxfd;
+		int maxfd;
 		fd_set rfds;
 		void ThreadBody() final;
 

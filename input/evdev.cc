@@ -68,7 +68,6 @@ namespace TB{
 					continue;
 				}
 
-#if 0
 				//ロック
 				if(!grab && flock(fd, LOCK_EX | LOCK_NB) < 0){
 					//使用中
@@ -76,7 +75,6 @@ namespace TB{
 					close(fd);
 					continue;
 				}
-#endif
 
 				//使用するデバイス
 				syslog(LOG_INFO, "Evdev:%s", path);
