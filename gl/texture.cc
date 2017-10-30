@@ -28,6 +28,10 @@ namespace GL{
 	}
 
 	void TEXTURE::BINDER::Set(TEXTURE* t){
+#if 1
+		//必要性チェック
+		if(lastBinded == t){ return; }
+#endif
 		glBindTexture(GL_TEXTURE_2D, t ? (*t).tid : 0);
 #if 1
 		glBlendFunc(GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA);
