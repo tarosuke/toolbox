@@ -23,45 +23,55 @@ extern "C"{
 	struct dirent;
 }
 
+
+#include <toolbox/container/list.h>
+#include <toolbox/string.h>
+
+
 namespace TB{
 
 	class Directory{
 		Directory(const Directory&);
 		void operator=(const Directory&);
 	public:
-		class ITOR{
-			ITOR();
-			ITOR(const ITOR&);
-			void operator=(const ITOR&);
+		//各ファイルエントリ
+		class Node : public List<Node>::Node{
+			Node();
+			Node(const Node&);
+			void operator=(const Node&);
 		public:
-			ITOR(Directory&);
-			ITOR& operator++();
-			bool IsEnd(){ return index < 0 ||  dir.numOfEntries <= index; };
-			operator bool(){ return !IsEnd(); };
-			const char* Name();
-			bool IsDir();
-			bool IsReg();
-			bool IsFile();
+			Node(Directory&, const dirent&);
+
+			bool IsDir() const;
+			bool IsRegular(bool includeSymLinks = true) const;
+			bool IsBlock() const; //block device
+			bool IsChar() const; // char device
+			bool IsFifo() const; // named pipe
+			bool IsLink() const; //symbolic link
+			bool IsSocket() const; //UNIX domain socket
+
+			operator const char*() const { return (const char*)name; };
+
 		private:
-			int index;
-			Directory& dir;
+			 String name; //ファイル名
+			const unsigned char type; //direntのd_typeと同じ
 		};
 
-		using Comp=int(*)(const dirent**, const dirent**);
-		static int ByNameUp(const dirent**, const dirent**);
-		static int ByNameDown(const dirent**, const dirent**);
-		static int ByMTimeUp(const dirent**, const dirent**);
-		static int ByMTimeDown(const dirent**, const dirent**);
+		//反復子
+		class Itor : public List<Node>::I{
+			Itor();
+			Itor(const Itor&);
+			void operator=(const Itor&);
+		public:
+			Itor(Directory& d) : List<Node>::I(d.entries){};
+		};
 
-		Directory(const char* path="./", Comp=0);
+		//エントリの読み込み
+		Directory(const char* path="./");
 		~Directory();
 
 	private:
-		dirent** entries;
-		int numOfEntries;
-
-		static int DefaultFilter(const dirent*);
-		static long long GetMTime(const dirent**);
+		List<Node> entries;
 	};
 
 }

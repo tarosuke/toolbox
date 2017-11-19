@@ -50,17 +50,16 @@ namespace TB{
 
 		//ファイルを開いていく
 		Directory dir(dirName);
-		for(Directory::ITOR i(dir); i; ++i){
-			if(i.IsDir()){ continue; } //ディレクトリは対象外だし追いかけない
-
+		for(Directory::Itor i(dir); ++i;){
+			if((*i).IsDir()){ continue; } //ディレクトリは対象外だし追いかけない
 			for(const char** p(patterns); *p; ++p){
 				const char* pattern(*p);
 
-				if(!strstr(i.Name(), pattern)){ continue; } //ファイル名がマッチしなかった
+				if(!strstr(*i, pattern)){ continue; } //ファイル名がマッチしなかった
 
 				//パターンがマッチしたので開く
 				char path[256];
-				snprintf(path, sizeof(path) , "%s/%s", dirName, i.Name());
+				snprintf(path, sizeof(path) , "%s/%s", dirName, (const char*)*i);
 				const int fd(open(path, O_RDWR));
 				if(fd < 0){
 					//開けなかった

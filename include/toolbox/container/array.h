@@ -42,7 +42,7 @@ namespace TB{
 			assert(body); //TODO:継続動作するための方法を考えておく
 			memset(&body[oldElements], 0, elements - oldElements);
 		};
-		const T* GetRawBody()const{
+		T* GetRawBody()const{
 			assert(body);
 			return body;
 		};

@@ -17,7 +17,10 @@ namespace TB{
 		String& operator=(const String&);
 		String& operator=(const char*);
 		operator char*(){
-			return &(*this)[0];
+			return GetRawBody();
+		};
+		operator const char*() const {
+			return GetRawBody();
 		};
 		String& operator +=(const String&);
 		String& operator +=(const char*);
