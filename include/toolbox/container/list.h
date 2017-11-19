@@ -81,7 +81,7 @@ namespace TB{
 		 * --すれば最後の要素を指すようになる。
 		 *
 		 * 反復子が指している要素をリストから外しても正常動作するようになっている。
-		 * NOTE:反復子が有効な状態でノードを追加しないこと
+		 * NOTE:反復子が有効な状態で要素を追加するときは反復子のInsert、Addを使うこと
 		 */
 		class I{
 		public:
@@ -102,6 +102,14 @@ namespace TB{
 				node = prev;
 				Prepare();
 				return *node;
+			};
+			void Insert(Node& n){
+				n.Attach(*node); //NOTE:逆っぽく見えるがNode::Attachはキューに対する操作
+				Prepare();
+			};
+			void Add(Node& n){
+				n.Insert(*node); //NOTE:逆っぽく見えるがNode::Insertはキューに対する操作
+				Prepare();
 			};
 		private:
 			Key key;
@@ -223,4 +231,3 @@ namespace TB{
 	};
 
 }
-

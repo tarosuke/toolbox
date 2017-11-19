@@ -40,7 +40,7 @@ namespace TB{
 			Node(const Node&);
 			void operator=(const Node&);
 		public:
-			Node(Directory&, const dirent&);
+			Node(const dirent&);
 
 			bool IsDir() const;
 			bool IsRegular(bool includeSymLinks = true) const;
@@ -66,8 +66,24 @@ namespace TB{
 			Itor(Directory& d) : List<Node>::I(d.entries){};
 		};
 
+		//フィルタ件ソータのインターフェイス
+		class Filter{
+			Filter(const Filter&);
+			void operator=(const Filter&);
+		public:
+			/** Filter
+			 * return true if the node is valid
+			 */
+			virtual bool IsValid(const dirent&) const { return true; };
+
+			/** compare two nodes
+			 * return true if first parametor is previous than second one.
+			 */
+			virtual bool IsPrevious(const Node&, const Node&) const { return true; };
+		};
+
 		//エントリの読み込み
-		Directory(const char* path="./");
+		Directory(const char* path="./", Filter* =0);
 		~Directory();
 
 	private:

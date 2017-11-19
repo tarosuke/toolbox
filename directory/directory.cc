@@ -34,13 +34,10 @@ namespace TB{
 	/** ディレクトリ内の各ファイル
 	 */
 
-	Directory::Node::Node(Directory& dir, const dirent& ent) :
+	Directory::Node::Node(const dirent& ent) :
 		List<Node>::Node(true),
 		name(ent.d_name),
-		type(ent.d_type){
-//		strcpy(name, ent.d_name);
-		dir.entries.Add(*this);
-	}
+		type(ent.d_type){}
 
 	bool Directory::Node::IsDir() const { return type ==  DT_DIR; }
 	bool Directory::Node::IsRegular(bool isl) const {
@@ -55,14 +52,28 @@ namespace TB{
 
 	/** ディレクトリの読み込み
 	 */
-	Directory::Directory(const char* path){
+	Directory::Directory(const char* path, Filter* f){
 		DIR* d(opendir(path));
 		if(!d){
 			syslog(LOG_ERR,"could not open dir:%s", path);
 		}
 		while(dirent* ent = readdir(d)){
-			if((*ent).d_type != DT_UNKNOWN){
-				new Node(*this, *ent);
+			if((*ent).d_type != DT_UNKNOWN && (!f || (*f).IsValid(*ent))){
+				if(auto* n = new Node(*ent)){
+					if(!f){
+						//フィルタが設定されていないのでそのまま追加
+						entries.Add(*n);
+					}else{
+						//フィルタが設定されているので挿入ソート
+						for(List<Node>::I i(entries); ++i;){
+							if((*f).IsPrevious(*n, *i)){
+								//ここに挿入
+								i.Insert(*n);
+								break;
+							}
+						}
+					}
+				}
 			}
 		}
 		closedir(d);
