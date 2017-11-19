@@ -69,9 +69,11 @@ namespace TB{
 							if((*f).IsPrevious(*n, *i)){
 								//ここに挿入
 								i.Insert(*n);
-								break;
+								goto Inserted;
 							}
 						}
+						entries.Insert(*n);
+Inserted:;
 					}
 				}
 			}

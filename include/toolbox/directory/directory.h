@@ -71,6 +71,8 @@ namespace TB{
 			Filter(const Filter&);
 			void operator=(const Filter&);
 		public:
+			Filter(){};
+			virtual ~Filter(){};
 			/** Filter
 			 * return true if the node is valid
 			 */
