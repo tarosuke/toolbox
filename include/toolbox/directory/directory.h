@@ -50,11 +50,18 @@ namespace TB{
 			bool IsLink() const; //symbolic link
 			bool IsSocket() const; //UNIX domain socket
 
+			unsigned GetATime() const { return atime; };
+			unsigned GetMTime() const { return mtime; };
+			unsigned GetCTime() const { return ctime; };
+
 			operator const char*() const { return (const char*)name; };
 
 		private:
-			 String name; //ファイル名
+			String name; //ファイル名
 			const unsigned char type; //direntのd_typeと同じ
+			unsigned atime;
+			unsigned mtime;
+			unsigned ctime;
 		};
 
 		//反復子
@@ -81,7 +88,7 @@ namespace TB{
 			/** compare two nodes
 			 * return true if first parametor is previous than second one.
 			 */
-			virtual bool IsPrevious(const Node&, const Node&) const { return true; };
+			virtual bool IsPrevious(const Node&, const Node&) const { return false; };
 		};
 
 		//エントリの読み込み

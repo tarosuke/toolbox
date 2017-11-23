@@ -37,7 +37,17 @@ namespace TB{
 	Directory::Node::Node(const dirent& ent) :
 		List<Node>::Node(true),
 		name(ent.d_name),
-		type(ent.d_type){}
+		type(ent.d_type),
+		atime(0), mtime(0), ctime(0){
+		struct stat fileStat;
+		if(!stat(ent.d_name, &fileStat)){
+			atime = fileStat.st_atim.tv_sec;
+			mtime = fileStat.st_mtim.tv_sec;
+			ctime = fileStat.st_ctim.tv_sec;
+		}else{
+			syslog(LOG_ERR,"could not stat file:%s", ent.d_name);
+		}
+	}
 
 	bool Directory::Node::IsDir() const { return type ==  DT_DIR; }
 	bool Directory::Node::IsRegular(bool isl) const {
@@ -72,7 +82,7 @@ namespace TB{
 								goto Inserted;
 							}
 						}
-						entries.Insert(*n);
+						entries.Add(*n);
 Inserted:;
 					}
 				}

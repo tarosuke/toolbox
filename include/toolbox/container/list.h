@@ -104,11 +104,11 @@ namespace TB{
 				return *node;
 			};
 			void Insert(Node& n){
-				n.Attach(*node); //NOTE:逆っぽく見えるがNode::Attachはキューに対する操作
+				n.Insert(*node);
 				Prepare();
 			};
 			void Add(Node& n){
-				n.Insert(*node); //NOTE:逆っぽく見えるがNode::Insertはキューに対する操作
+				n.Attach(*node);
 				Prepare();
 			};
 		private:
