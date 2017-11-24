@@ -15,6 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * NOTE:ディレクトリを開けなかった場合intをthrowする
  */
  #pragma once
 
@@ -73,30 +75,47 @@ namespace TB{
 			Itor(Directory& d) : List<Node>::I(d.entries){};
 		};
 
-		//フィルタ件ソータのインターフェイス
-		class Filter{
-			Filter(const Filter&);
-			void operator=(const Filter&);
+		//ソート用ウエイト
+		class Weight{
 		public:
-			Filter(){};
-			virtual ~Filter(){};
-			/** Filter
-			 * return true if the node is valid
-			 */
-			virtual bool IsValid(const dirent&) const { return true; };
-
-			/** compare two nodes
-			 * return true if first parametor is previous than second one.
-			 */
-			virtual bool IsPrevious(const Node&, const Node&) const { return false; };
+			Weight() :
+				originOrder(0),
+				random(0),
+				name(0),
+				ctime(0),
+				mtime(0),
+				atime(0),
+				extra(0){};
+			float originOrder;
+			float random;
+			float name;
+			float ctime;
+			float mtime;
+			float atime;
+			float extra;
 		};
 
 		//エントリの読み込み
-		Directory(const char* path="./", Filter* =0);
+		Directory(const char* path="./", const Weight* =0);
 		~Directory();
+
+	protected:
+
+		/** Filter
+		 * return true if the node is valid
+		 */
+		virtual bool IsValid(const dirent&) const { return true; };
+
+		/** scorer of sorter
+		 */
+		virtual float ScoreExtra(const Node&){ return 0; };
 
 	private:
 		List<Node> entries;
+		Weight weight;
+
+		static int Sign(int v){ return !v ? 0.0f : v < 0 ? -1.0 : 1.0; };
+
 	};
 
 }

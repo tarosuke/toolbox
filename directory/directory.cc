@@ -62,29 +62,39 @@ namespace TB{
 
 	/** ディレクトリの読み込み
 	 */
-	Directory::Directory(const char* path, Filter* f){
+	Directory::Directory(const char* path, const Weight* w){
+		if(w){ weight = *w; }
+
 		DIR* d(opendir(path));
 		if(!d){
 			syslog(LOG_ERR,"could not open dir:%s", path);
+			throw 0;
 		}
 		while(dirent* ent = readdir(d)){
-			if((*ent).d_type != DT_UNKNOWN && (!f || (*f).IsValid(*ent))){
+			if((*ent).d_type != DT_UNKNOWN && IsValid(*ent)){
 				if(auto* n = new Node(*ent)){
-					if(!f){
-						//フィルタが設定されていないのでそのまま追加
-						entries.Add(*n);
-					}else{
-						//フィルタが設定されているので挿入ソート
-						for(List<Node>::I i(entries); ++i;){
-							if((*f).IsPrevious(*n, *i)){
-								//ここに挿入
-								i.Insert(*n);
-								goto Inserted;
-							}
+					const float extraScore(ScoreExtra(*n));
+
+					//挿入ソート
+					for(List<Node>::I i(entries); ++i;){
+						//スコア算出
+						const float score =
+							weight.name * strcmp(*n, *i) +
+							weight.ctime * Sign((*n).GetCTime() - (*i).GetCTime()) +
+							weight.mtime * Sign((*n).GetMTime() - (*i).GetMTime()) +
+							weight.atime * Sign((*n).GetATime() - (*i).GetATime()) +
+							weight.extra * Sign(extraScore - ScoreExtra(*i)) +
+							weight.random * Sign(random() - (RAND_MAX / 2)) +
+							-weight.originOrder;
+
+						if(0.0 < score){
+							//ここに挿入
+							i.Insert(*n);
+							goto Inserted;
 						}
-						entries.Add(*n);
-Inserted:;
 					}
+					entries.Add(*n);
+Inserted:;
 				}
 			}
 		}

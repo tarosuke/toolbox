@@ -49,18 +49,20 @@ namespace TB{
 		}
 	}
 	Image::Image(const char* fileName){
-		//PNGとして読んでみる
-		surface = cairo_image_surface_create_from_png(fileName);
-		if(surface && cairo_surface_status(surface) == CAIRO_STATUS_SUCCESS){
-			//PNG読み込み成功
-			return;
-		}
+		if(fileName && *fileName){
+			//PNGとして読んでみる
+			surface = cairo_image_surface_create_from_png(fileName);
+			if(surface && cairo_surface_status(surface) == CAIRO_STATUS_SUCCESS){
+				//成功
+				return;
+			}
 
-		//JPEGとして読み込んでみる
-		LoadJPEG(fileName);
-		if(surface){
-			//成功
-			return;
+			//JPEGとして読んでみる
+			LoadJPEG(fileName);
+			if(surface){
+				//成功
+				return;
+			}
 		}
 
 		//失敗したのでダミーのコンテンツ割り当てておく
