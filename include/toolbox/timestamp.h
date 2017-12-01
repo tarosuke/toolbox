@@ -18,7 +18,6 @@
  */
 #pragma once
 
-#include <toolbox/basetype.h>
 
 namespace TB{
 
@@ -32,6 +31,10 @@ namespace TB{
 			time& operator-=(const time& t){ value -= t.value; return *this; };
 			time& operator*=(long long t){ value *= t; return *this; };
 			time& operator/=(long long t){ value = t; return *this; };
+			time operator+(const time& t){ time r(*this); r+= t; return r; };
+			time operator-(const time& t){ time r(*this); r-= t; return r; };
+			time operator*(long long t){ time r(*this); r*= t; return r; };
+			time operator/(long long t){ time r(*this); r/= t; return r; };
 			operator long long(){ return value; };
 		private:
 			long long value;
