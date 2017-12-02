@@ -27,6 +27,7 @@ namespace TB{
 		public:
 			time(){};
 			time(const Timestamp& t) : value(t.sec * s + t.nsec / ns){};
+			void operator=(const time& t){ value = t.value; };
 			void operator=(const Timestamp& t){ value = t.sec * s + t.nsec / ns; };
 			time& operator+=(const time& t){ value += t.value; return *this; };
 			time& operator-=(const time& t){ value -= t.value; return *this; };
@@ -36,7 +37,7 @@ namespace TB{
 			time operator-(const time& t) const { time r(*this); r-= t; return r; };
 			time operator*(long long t) const { time r(*this); r*= t; return r; };
 			time operator/(long long t) const { time r(*this); r/= t; return r; };
-			operator long long(){ return value; };
+			operator long long() const { return value; };
 		private:
 			long long value;
 		};
