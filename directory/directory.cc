@@ -40,12 +40,10 @@ namespace TB{
 		type(ent.d_type),
 		atime(0), mtime(0), ctime(0){
 		struct stat fileStat;
-		if(!stat(ent.d_name, &fileStat)){
+		if(IsRegular() && !stat(ent.d_name, &fileStat)){
 			atime = fileStat.st_atim.tv_sec;
 			mtime = fileStat.st_mtim.tv_sec;
 			ctime = fileStat.st_ctim.tv_sec;
-		}else{
-			syslog(LOG_ERR,"could not stat file:%s", ent.d_name);
 		}
 	}
 
