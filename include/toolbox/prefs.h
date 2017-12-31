@@ -177,23 +177,18 @@ namespace TB{
 		Prefs();
 		Prefs(const Prefs&);
 		void operator=(const Prefs&);
-		static const unsigned maxLen = 256;
 	public:
 		Prefs(const char* key, Attribute attr=save) :
 			CommonPrefs(key, attr),
-			defaultValue(0){
-			body[0] = 0;
-		};
+			defaultValue(0){};
 		Prefs(const char* key, const char* defaultValue, Attribute attr=save) :
 			CommonPrefs(key, attr),
-			defaultValue(defaultValue){
-			*this = defaultValue;
-		};
+			body(defaultValue),
+			defaultValue(defaultValue){};
 		~Prefs(){};
 		operator const char*(){ return IsDeleted() ? defaultValue : (const char*)body; };
 		void operator=(const char* v) override{
-			strncpy(body, v, maxLen);
-			body[maxLen - 1] = 0;
+			body = v;
 			Undelete();
 			Waste();
 		};
