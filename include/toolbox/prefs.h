@@ -44,6 +44,28 @@ namespace TB{
 			};
 		};
 
+		//文字列による値設定(要するにコマンドラインオプション用)
+		static bool Set(const char* arg);
+
+	protected:
+		CommonPrefs(
+			const char* key,
+			Attribute attr);
+		~CommonPrefs(){};
+
+		virtual void operator=(const char*)=0;
+		void Delete(){ deleted = true; }
+		void Undelete(){ deleted = false; }
+		bool IsDeleted(){ return deleted; }
+		void Waste(){ dirty = true; };
+
+		virtual void AfterRead(const void*, unsigned)=0;
+		void WriteRecord(const void*, unsigned);
+
+		//拡張用ハンドラ
+		virtual void ExtendedHandler(void* =0){};
+
+	private:
 		/**設定を辿るための反復子
 		 * NOTE:初期化時点で先頭を指しているのでC++式反復子形式(処理後インクリメント)で使う
 		 */
@@ -58,27 +80,6 @@ namespace TB{
 			CommonPrefs* node;
 		};
 
-		//拡張用ハンドラ
-		virtual void ExtendedHandler(void* =0){};
-
-		//文字列による値設定(要するにコマンドラインオプション用)
-		static bool Set(const char* arg);
-
-	protected:
-		CommonPrefs(
-			const char* key,
-			void* body,
-			unsigned length,
-			Attribute attr);
-		~CommonPrefs(){};
-
-		virtual void operator=(const char*)=0;
-		void Delete(){ deleted = true; }
-		void Undelete(){ deleted = false; }
-		bool IsDeleted(){ return deleted; }
-		void Waste(){ dirty = true; };
-
-	private:
 		static TB::String path;
 
 		static CommonPrefs* q;
@@ -86,8 +87,6 @@ namespace TB{
 
 		const char* const key;
 		const int keyLen;
-		void* const body;
-		const int length;
 		const Attribute attr;
 		bool deleted;
 		bool dirty;
@@ -97,7 +96,7 @@ namespace TB{
 		static void Store();
 
 		void Read();
-		void Write();
+		virtual void Write()=0;
 	};
 
 	/**
@@ -107,15 +106,15 @@ namespace TB{
 	 * NOTE:operatorによる変換は用意してはあるが、代入以外はキャストする必要がある
 	 * NOTE:処理がmainに入るまでは機能しない
 	 */
-	template<typename T, unsigned maxLen=256> class Prefs : public CommonPrefs{
+	template<typename T> class Prefs : public CommonPrefs{
 		Prefs();
 		Prefs(const Prefs&);
 		void operator=(const Prefs&);
 	public:
 		Prefs(const char* key, Attribute attr=save) :
-			CommonPrefs(key, (void*)&body, sizeof(T), attr){};
+			CommonPrefs(key, attr){};
 		Prefs(const char* key, const T& defaultValue, Attribute attr=save) :
-			CommonPrefs(key, (void*)&body, sizeof(T), attr),
+			CommonPrefs(key, attr),
 			body(defaultValue), defaultValue(defaultValue){};
 		~Prefs(){};
 
@@ -124,23 +123,31 @@ namespace TB{
 		void operator=(const char* v) override;
 
 	protected:
-		const char* key;
 		T body;
 		T defaultValue;
+
+	private:
+		void AfterRead(const void* d, unsigned l) final{
+			memcpy(&body, d, l);
+		};
+		void Write() final{
+			WriteRecord(&body, sizeof(body));
+		};
 	};
 
-	template<unsigned maxLen> class Prefs<char*, maxLen> : public CommonPrefs{
+	template<> class Prefs<char*> : public CommonPrefs{
 		Prefs();
 		Prefs(const Prefs&);
 		void operator=(const Prefs&);
+		static const unsigned maxLen = 256;
 	public:
 		Prefs(const char* key, Attribute attr=save) :
-			CommonPrefs(key, (void*)body, maxLen, attr),
+			CommonPrefs(key, attr),
 			defaultValue(0){
 			body[0] = 0;
 		};
 		Prefs(const char* key, const char* defaultValue, Attribute attr=save) :
-			CommonPrefs(key, (void*)body, maxLen, attr),
+			CommonPrefs(key, attr),
 			defaultValue(defaultValue){
 			*this = defaultValue;
 		};
@@ -154,10 +161,54 @@ namespace TB{
 		};
 
 	protected:
-		const char* key;
 		char body[maxLen];
 		const char* const defaultValue;
+
+	private:
+		void AfterRead(const void* d, unsigned l) final{
+			strcpy(body, (const char*)d);
+		};
+		void Write() final{
+			WriteRecord(body, strlen((const char*)body));
+		};
 	};
 
+	template<> class Prefs<String> : public CommonPrefs{
+		Prefs();
+		Prefs(const Prefs&);
+		void operator=(const Prefs&);
+		static const unsigned maxLen = 256;
+	public:
+		Prefs(const char* key, Attribute attr=save) :
+			CommonPrefs(key, attr),
+			defaultValue(0){
+			body[0] = 0;
+		};
+		Prefs(const char* key, const char* defaultValue, Attribute attr=save) :
+			CommonPrefs(key, attr),
+			defaultValue(defaultValue){
+			*this = defaultValue;
+		};
+		~Prefs(){};
+		operator const char*(){ return IsDeleted() ? defaultValue : (const char*)body; };
+		void operator=(const char* v) override{
+			strncpy(body, v, maxLen);
+			body[maxLen - 1] = 0;
+			Undelete();
+			Waste();
+		};
+
+	protected:
+		String body;
+		const char* const defaultValue;
+
+	private:
+		void AfterRead(const void* d, unsigned l) final{
+			body = (const char*)d;
+		};
+		void Write() final{
+			WriteRecord((const void*)(const char*)body, body.Length());
+		};
+	};
 
 }

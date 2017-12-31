@@ -24,10 +24,9 @@ namespace TB{
 	TB::String CommonPrefs::path;
 
 	bool CommonPrefs::Open(){
-		//開けなかったら待ってリトライ。何度かやってみてダメなら諦めて戻る
-		for(unsigned r(0); r < 5; ++r, sleep(r + 1)){
-			if(!!(db = gdbm_open(
-				path, 512, GDBM_WRCREAT, 0600, 0))){
+		//排他で開く。開けなかったら待ってリトライ。何度かやってみてダメなら諦めて戻る
+		for(unsigned r(0); r < 10; ++r, sleep(r/2 + 1)){
+			if(!!(db = gdbm_open(path, 512, GDBM_WRCREAT, 0600, 0))){
 				//開けたので戻る
 				return true;
 			}
@@ -85,10 +84,8 @@ namespace TB{
 		db = 0;
 	}
 
-	CommonPrefs::CommonPrefs(
-		const char* key, void* body, unsigned length, Attribute attr) :
-		key(key), keyLen(strlen(key) + 1), body(body), length((int)length),
-		attr(attr), deleted(false), dirty(false){
+	CommonPrefs::CommonPrefs(const char* key, Attribute attr) :
+		key(key), keyLen(strlen(key) + 1),attr(attr), deleted(false), dirty(false){
 		//スタックに自身を追加
 		next = q;
 		q = this;
@@ -98,17 +95,17 @@ namespace TB{
 		datum k{ const_cast<char*>(key), keyLen };
 		datum content(gdbm_fetch(db, k));
 		if(content.dptr){
-			memcpy(body, content.dptr,  length < content.dsize ? length : content.dsize);
+			AfterRead(content.dptr, content.dsize);
 			free(content.dptr);
 			dirty = false;
 		}
 	}
-	void CommonPrefs::Write(){
+	void CommonPrefs::WriteRecord(const void* d, unsigned l){
 		if(attr == nosave){ return; }
 		datum k = { const_cast<char*>(key), keyLen };
 		if(!deleted){
 			if(dirty){
-				datum content = { (char*)body, length };
+				datum content = { (char*)d, (int)l };
 				gdbm_store(db, k, content, GDBM_REPLACE);
 			}
 		}else{
@@ -170,7 +167,7 @@ namespace TB{
 
 	/** 型ごとの=演算子
 	 */
-	template<> void Prefs<VECTOR<3> >::operator=(const char* v){
+	template<> void Prefs<VECTOR<3> >::operator=(const char* v){ //TODO:VECTORへ移動
 		for(unsigned n(0); n < 3; ++n){
 			body[n] = strtod(v, const_cast<char**>(&v));
 		}
