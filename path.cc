@@ -45,9 +45,10 @@ namespace TB{
 		}
 
 		//resPathを追加して確認
-		if(Is(resPath + path)){
+		String p(resPath + path);
+		if(Is(p)){
 			//resPath以下にあったのでそのパスを返す
-			return path;
+			return p;
 		}
 
 		//ファイルがなかったのでpathをそのまま返す(帰った先でエラーになる)
