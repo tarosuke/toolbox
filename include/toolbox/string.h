@@ -30,8 +30,8 @@ namespace TB{
 
 		bool operator==(const char*) const;
 
-		bool IsEmpty()const{ return !length; };
-		unsigned Length(){ return length; };
+		bool IsEmpty() const { return !length; };
+		unsigned Length() const { return length; };
 
 		String SubStr(unsigned start, unsigned length)const;
 		void Clear(){ (*this)[0] = 0; length = 0; };
