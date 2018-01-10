@@ -39,14 +39,13 @@ namespace TB{
 		}
 
 		//カレントディレクトリを確認
-		struct stat statBuff;
-		if(!stat(path, &statBuff)){
+		if(Is(path)){
 			//カレントディレクトリにあったのでpathをそのまま返す
 			return path;
 		}
 
 		//resPathを追加して確認
-		if(!stat(resPath + path, &statBuff)){
+		if(Is(resPath + path)){
 			//resPath以下にあったのでそのパスを返す
 			return path;
 		}
@@ -54,6 +53,18 @@ namespace TB{
 		//ファイルがなかったのでpathをそのまま返す(帰った先でエラーになる)
 		return path;
 	}
+
+	/** 与えられたパスにファイルが存在するかどうかチェック
+	 * 通常ファイルかシンボリックリンクの先が通常ファイルである場合に真を返す
+	 */
+	bool Path::Is(const String& p){
+		struct stat statBuff;
+		if(!stat(p, &statBuff)){
+			return S_ISREG(statBuff.st_mode);
+		}
+		return false;
+	}
+
 
 	/*** 構築子
 	 */

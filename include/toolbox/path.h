@@ -33,6 +33,7 @@ namespace TB{
 
 	private:
 		static String StatPath(const String&, const String&);
+		static bool Is(const String&);
 	};
 
 }
