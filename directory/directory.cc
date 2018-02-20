@@ -58,9 +58,13 @@ namespace TB{
 	bool Directory::Node::IsSocket() const { return type ==  DT_SOCK; }
 
 
+	Directory::Directory(const char* path, const Weight* w){
+		Load(path, w);
+	}
+
 	/** ディレクトリの読み込み
 	 */
-	Directory::Directory(const char* path, const Weight* w){
+	void Directory::Load(const char* path, const Weight* w){
 		if(w){ weight = *w; }
 
 		DIR* d(opendir(path));

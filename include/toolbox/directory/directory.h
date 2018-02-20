@@ -96,10 +96,13 @@ namespace TB{
 		};
 
 		//エントリの読み込み
-		Directory(const char* path="./", const Weight* =0);
+		Directory(const char* path, const Weight* =0);
 		~Directory();
 
 	protected:
+
+		Directory(){};
+		void Load(const char* path, const Weight*);
 
 		/** Filter
 		 * return true if the node is valid
