@@ -11,37 +11,13 @@
 
 namespace GL{
 
-	TEXTURE* TEXTURE::BINDER::lastBinded(0);
-	TEXTURE::BINDER::BINDER(TEXTURE& t) : prevBinded(lastBinded){
-		Set(&t);
-		lastBinded = &t;
-	}
-	TEXTURE::BINDER::BINDER(TEXTURE* t) : prevBinded(lastBinded){
-		Set(t);
-		lastBinded = t;
-	}
 	TEXTURE::BINDER::~BINDER(){
-		if(prevBinded != lastBinded){
-			Set(prevBinded);
-			lastBinded = prevBinded;
-		}
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void TEXTURE::BINDER::Set(TEXTURE* t){
-#if 1
-		//必要性チェック
-		if(lastBinded == t){ return; }
-#endif
 		glBindTexture(GL_TEXTURE_2D, t ? (*t).tid : 0);
-#if 1
 		glBlendFunc(GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA);
-#else
-		/***** choose this if you use old cairo *****/
-		glBlendFunc(
-			t && (*t).cairoTransparent ?
-				GL_SRC_COLOR : GL_SRC_ALPHA ,
-			GL_ONE_MINUS_SRC_ALPHA);
-#endif
 	}
 
 

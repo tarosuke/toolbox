@@ -16,12 +16,10 @@ namespace GL{
 			BINDER(const BINDER&);
 			void operator=(const BINDER&);
 		public:
-			BINDER(TEXTURE&);
-			BINDER(TEXTURE*);
+			BINDER(TEXTURE& t){ Set(&t); };
+			BINDER(TEXTURE* t){ Set(t); };
 			~BINDER();
 		private:
-			static TEXTURE* lastBinded;
-			TEXTURE* const  prevBinded;
 			static void Set(TEXTURE*);
 		};
 		struct PARAMS{
