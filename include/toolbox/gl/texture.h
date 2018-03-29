@@ -3,6 +3,9 @@
  */
 #pragma once
 
+#include "../lock/key.h"
+
+
 
 class IMAGE;
 namespace GL{
@@ -98,4 +101,24 @@ namespace GL{
 		const float vRatio;
 		unsigned Pow2(unsigned);
 	};
+}
+
+
+namespace TB{
+
+	template<class LOCK=Lock::NullLock> class Texture : public GL::TEXTURE{
+	public:
+		class Binder : Lock::Key<LOCK>, GL::TEXTURE::BINDER{
+			Binder();
+			Binder(const Binder&);
+			void operator=(const Binder&);
+		public:
+			Binder(Texture& instance) :
+				Lock::Key<LOCK>(instance.lock),
+				BINDER(instance){};
+		};
+	private:
+		LOCK lock;
+	};
+
 }
