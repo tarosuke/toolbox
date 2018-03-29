@@ -108,15 +108,25 @@ namespace TB{
 
 	template<class LOCK=Lock::NullLock> class Texture : public GL::TEXTURE{
 	public:
-		class Binder : Lock::Key<LOCK>, GL::TEXTURE::BINDER{
-			Binder();
-			Binder(const Binder&);
-			void operator=(const Binder&);
+		class BINDER : Lock::Key<LOCK>, GL::TEXTURE::BINDER{
+			BINDER();
+			BINDER(const BINDER&);
+			void operator=(const BINDER&);
 		public:
-			Binder(Texture& instance) :
+			BINDER(Texture& instance) :
 				Lock::Key<LOCK>(instance.lock),
-				BINDER(instance){};
+				GL::TEXTURE::BINDER(instance){};
 		};
+
+		Texture(const PARAMS& p=defaultParams) : TEXTURE(p){};
+		Texture(unsigned w,
+			unsigned h,
+			Format format=RGB,
+			const PARAMS& p=defaultParams) : TEXTURE(w, h, format, p){};
+		Texture(
+			const IMAGE& i,
+			const PARAMS& p=defaultParams) : TEXTURE(i, p){};
+
 	private:
 		LOCK lock;
 	};
