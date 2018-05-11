@@ -56,12 +56,12 @@ namespace TB{
 			points[0] =  More(points[0], t.points[0]);
 			points[1] =  Less(points[1], t.points[1]);
 		};
-		Rect operator&(const Rect& t){
+		Rect operator&(const Rect& t) const{
 			Rect r(*this);
 			r &= t;
 			return r;
 		};
-		T operator&&(const Rect& t){
+		T operator&&(const Rect& t) const{
 			const Vector<T, dimensions> lt(More(points[0], t.points[0]));
 			const Vector<T, dimensions> rb(Less(points[1], t.points[1]));
 			T v(0);
@@ -77,19 +77,26 @@ namespace TB{
 		};
 		const T* Left() const { return points[0]; };
 		const T* Right() const { return points[1]; };
-		Rect operator+(const Vector<T, dimensions>& t){
+		Rect operator+(const Vector<T, dimensions>& t) const{
 			return Rect(points[0] + t, points[1] + t);
 		};
-		Rect operator-(const Vector<T, dimensions>& t){
+		Rect operator-(const Vector<T, dimensions>& t) const{
 			return Rect(points[0] - t, points[1] - t);
 		};
-		operator bool(){
+		operator bool() const{
 			for(unsigned n(0); n < dimensions; ++n){
 				if(points[0][n] == points[1][n]){
 					return false;
 				}
 			}
 			return true;
+		};
+		operator T() const{
+			T v(1);
+			for(unsigned n(0); n < dimensions; ++n){
+				v *= points[1][n] - points[0][n];
+			}
+			return v;
 		};
 	private:
 		Vector<T, dimensions> points[2]; //keep points[0] lesser value
