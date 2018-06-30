@@ -119,6 +119,11 @@ public:
 		}
 		return *this;
 	};
+	COMPLEX operator*(double t) const{
+		COMPLEX o(*this);
+		o *= t;
+		return o;
+	};
 
 	//軸消去(axisBitsのビットが1のところだけ残す)
 	void FilterAxis(unsigned axisBits){
