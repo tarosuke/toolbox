@@ -136,8 +136,14 @@ namespace TB{
 			void Draw();
 			void Clear(const FillColor&);
 			// 属性設定
-			Pen& operator=(const StrokeColor& c){ sColor = c; return *this; };
-			Pen& operator=(const FillColor& c){ fColor = c; return *this; };
+			Pen& operator=(const StrokeColor& c){
+				Draw();
+				sColor = c;
+				return *this; };
+			Pen& operator=(const FillColor& c){
+				Draw();
+				fColor = c;
+				return *this; };
 			Pen& operator=(double); //線幅設定
 			Pen& operator=(Cap);
 			Pen& operator=(Join);
@@ -199,6 +205,7 @@ namespace TB{
 			Rect<unsigned> updated;
 			StrokeColor sColor;
 			FillColor fColor;
+			bool drawn;
 			void Update(const double[4]);
 		};
 

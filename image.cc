@@ -230,11 +230,13 @@ namespace TB{
 	//生成と削除
 	Image::Pen::Pen(Image& c) :
 		canvas(c),
-		gc(cairo_create(c.surface)){
+		gc(cairo_create(c.surface)),
+		drawn(false){
 		cairo_set_antialias(gc, CAIRO_ANTIALIAS_GRAY);
 		cairo_set_operator(gc, CAIRO_OPERATOR_OVER);
 	}
 	Image::Pen::~Pen(){
+		Draw();
 		cairo_surface_flush(canvas.surface);
 		Raw raw(canvas);
 		Rect<unsigned> cr(
@@ -299,6 +301,7 @@ namespace TB{
 		}else{
 			cairo_text_path(gc, str);
 		}
+		drawn = true;
 		return *this;
 	 }
 
@@ -317,20 +320,24 @@ namespace TB{
 	 void Image::Pen::MoveTo(double x, double y){
  		cairo_move_to(gc, x, y); };
  	void Image::Pen::LineTo(double x, double y){
- 		cairo_line_to(gc, x, y); };
+ 		cairo_line_to(gc, x, y); drawn = true; };
  	void Image::Pen::Rectangle(double x, double y, double w, double h) {
- 		cairo_rectangle(gc, x, y, w, h); };
+ 		cairo_rectangle(gc, x, y, w, h); drawn = true; };
  	void Image::Pen::Arc(double x, double y, double r, double a1, double a2) {
- 		cairo_arc(gc, x, y, r, a1, a2); };
+ 		cairo_arc(gc, x, y, r, a1, a2); drawn = true; };
  	void Image::Pen::CurveTo(
 		double x1, double y1, double x2, double y2, double nx, double ny){
- 		cairo_curve_to(gc, x1, y1, x2, y2, nx, ny); };
+ 		cairo_curve_to(gc, x1, y1, x2, y2, nx, ny); drawn = true; };
 
 	/** 描画
 	 * ストローク、フィルとして設定された色で描画する
 	 * ただし「色」に描画なしが指定されていた場合、塗らない
 	 */
 	void Image::Pen::Draw(){
+		if(!drawn){
+			//何も描かれていないので終了
+			return;
+		}
 		if(fColor.Setup(*this)){
 			double p[4];
 	 		cairo_fill_extents(gc, &p[0], &p[1], &p[2], &p[3]);
@@ -347,9 +354,11 @@ namespace TB{
 			Update(p);
 			cairo_stroke(gc);
 		}
+		drawn = false;
 	}
 	//指定色でcanvasを塗る
 	void Image::Pen::Clear(const FillColor& c){
+		Draw();
 		c.Setup(*this);
 		cairo_paint(gc);
 		const double r[4] = {
