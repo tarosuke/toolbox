@@ -52,7 +52,7 @@ namespace TB{
 		Image(const Image&);
 		Image(const Image&, int x, int y, unsigned width, unsigned height);
 		Image(const char* path);
-		~Image();
+		virtual ~Image();
 
 		operator Raw() const;
 		Image& operator=(const Image&);
