@@ -18,6 +18,9 @@
  */
 #pragma once
 
+#include <math.h>
+
+
 
 namespace TB{
 
@@ -113,7 +116,21 @@ namespace TB{
 		T X() const { return value[0]; };
 		T Y() const { return value[1]; };
 		T Z() const { return value[2]; };
+
+		T Length() const {
+			T l2(0);
+			for(unsigned n(0); n < dimension; ++n){
+				l2 += value[n] * value[n];
+			}
+			return sqrt(l2);
+		};
+
+		void Normalize(){
+			*this /= Length();
+		};
+
 	private:
+
 		T value[dimension];
 	};
 
