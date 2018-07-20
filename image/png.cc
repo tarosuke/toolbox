@@ -25,7 +25,10 @@ static void PNGRead(png_structp png_ptr,png_bytep data,png_size_t length){
 IMAGE* PNG::New(int fd){
 	//シグネチャチェック
 	unsigned char head[8];
-	read(fd, head, 8);
+	if(8 != read(fd, head, 8)){
+		//読めない
+		return 0;
+	}
 	if(png_sig_cmp(head, 0, 8)){
 		return 0;
 	}
@@ -125,4 +128,3 @@ IMAGE* PNG::New(int fd){
 	}
 	return image;
 }
-
