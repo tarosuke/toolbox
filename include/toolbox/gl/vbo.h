@@ -50,9 +50,9 @@ namespace TB{
 
 		template<typename T> static VBO* New(
 			unsigned noi,
-			unsigned* index,
+			const unsigned* index,
 			unsigned nov,
-			T* vertex,
+			const T* vertex,
 			bool quad=false){ //NOTE:vertex に多次元配列を与えないこと
 			Init i;
 			return SetupBuffer(i, noi, index, nov, vertex, sizeof(T), quad) ? new VBO(i) : 0;
@@ -80,9 +80,9 @@ namespace TB{
 		static bool SetupBuffer(
 			Init& i,
 			unsigned numOfIndex,
-			unsigned* index,
+			const unsigned* index,
 			unsigned unmOfVertex,
-			void* vertex,
+			const void* vertex,
 			unsigned size,
 			bool quad);
 	};

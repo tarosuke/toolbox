@@ -28,9 +28,9 @@ namespace TB{
 	bool VBO::SetupBuffer(
 		Init& i,
 		unsigned noi,
-		unsigned* index,
+		const unsigned* index,
 		unsigned nov,
-		void* vertex,
+		const void* vertex,
 		unsigned size,
 		bool quad){
 		syslog(LOG_DEBUG, "VBO: i:%u/%p v:%u/%p size:%u", noi, index, nov, vertex, size);

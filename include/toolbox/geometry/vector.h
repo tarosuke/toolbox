@@ -34,6 +34,12 @@ namespace TB{
 		};
 		Vector(T x, T y){ value[0] = x; value[1] = y; };
 		Vector(T x, T y, T z){ value[0] = x; value[1] = y; value[2] = z; };
+		Vector& operator=(const Vector& t){
+			for(unsigned n(0); n < dimension; ++n){
+				value[n] = t[n];
+			}
+			return *this;
+		};
 		template<typename U> void operator=(const U t[]){
 			for(unsigned n(0); n < dimension; ++n){
 				value[n] = (T)t[n];
@@ -92,6 +98,11 @@ namespace TB{
 			for(unsigned n(0); n < dimension; ++n){
 				value[n] *= t;
 			}
+		};
+		Vector operator*(T t){
+			Vector v(*this);
+			v *= t;
+			return v;
 		};
 		void operator/=(T t){
 			for(unsigned n(0); n < dimension; ++n){
