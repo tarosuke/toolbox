@@ -30,7 +30,7 @@ namespace TB{
 					//未確保
 					arr.size = 16;
 					arr.elements = (Element*)malloc(sizeof(Element) * arr.size);
-				}else if(arr.size < id){
+				}else if(arr.size <= id){
 					//拡大
 					arr.size *= 2;
 					arr.elements = (Element*)realloc(
