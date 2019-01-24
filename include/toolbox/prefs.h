@@ -37,6 +37,7 @@ namespace TB{
 			void operator=(const Keeper&);
 		public:
 			Keeper(const char* name){
+				CommonPrefs::inited = true;
 				Load(name);
 			};
 			~Keeper(){
@@ -83,6 +84,7 @@ namespace TB{
 		static TB::String path;
 
 		static CommonPrefs* q;
+		static bool inited;
 		CommonPrefs* next;
 
 		const char* const key;

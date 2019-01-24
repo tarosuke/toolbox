@@ -21,6 +21,7 @@ namespace{
 namespace TB{
 
 	CommonPrefs* CommonPrefs::q(0);
+	bool CommonPrefs::inited(false);
 	TB::String CommonPrefs::path;
 
 	bool CommonPrefs::Open(){
@@ -86,9 +87,11 @@ namespace TB{
 
 	CommonPrefs::CommonPrefs(const char* key, Attribute attr) :
 		key(key), keyLen(strlen(key) + 1),attr(attr), deleted(false), dirty(false){
-		//スタックに自身を追加
-		next = q;
-		q = this;
+		//読み込み前ならスタックに自身を追加
+		if(!inited){
+			next = q;
+			q = this;
+		}
 	}
 
 	void CommonPrefs::Read(){
