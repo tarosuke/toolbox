@@ -18,3 +18,60 @@
  */
 
 #pragma once
+
+#include <openssl/ssl.h>
+
+#include <toolbox/thread/pthread.h>
+
+
+
+namespace TB{
+
+	class Socket{
+		Socket();
+		Socket(const Socket&);
+		void operator=(const Socket&);
+	public:
+		Socket(int);
+		virtual ~Socket();
+
+	protected:
+		virtual int Read(void*, int);
+		virtual int Write(const void*, int);
+
+		const int fd;
+	};
+
+
+	class SSLSocket : public Socket{
+		SSLSocket();
+		SSLSocket(const SSLSocket&);
+		void operator=(const SSLSocket&);
+	public:
+		SSLSocket(int, SSL_CTX*);
+		~SSLSocket();
+
+	protected:
+		int Read(void*, int) final;
+		int Write(const void*, int) final;
+
+	private:
+		SSL* ssl;
+	};
+
+
+
+
+
+
+
+
+	class SSLServer{
+		SSLServer();
+		SSLServer(const SSLServer&);
+		void operator=(const SSLServer&);
+	public:
+
+
+	};
+}
