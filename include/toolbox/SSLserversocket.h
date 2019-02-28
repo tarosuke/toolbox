@@ -64,14 +64,26 @@ namespace TB{
 
 
 
+	class TCPServer{
+		TCPServer();
+		TCPServer(const TCPServer&);
+		void operator=(const TCPServer&);
+	public:
+		TCPServer(unsigned port);
+		virtual int Accept();
+
+	private:
+		int sock;
+	};
 
 
-	class SSLServer{
+
+	class SSLServer : private TCPServer{
 		SSLServer();
 		SSLServer(const SSLServer&);
 		void operator=(const SSLServer&);
 	public:
-
-
+		SSLServer(unsigned port);
+		int Accept() override;
 	};
 }

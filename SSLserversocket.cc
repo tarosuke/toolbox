@@ -19,7 +19,6 @@
 
 #include <toolbox/SSLserversocket.h>
 
-
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -71,6 +70,44 @@ namespace TB{
 
 
 
+
+
+	TCPServer::TCPServer(unsigned port){
+		struct sockaddr_in addr;
+
+		addr.sin_family = AF_INET;
+		addr.sin_port = htons(port);
+		addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+		if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+			throw "Failed to create server socket.";
+		}
+
+		if(bind(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0){
+			throw "Failed to bind server socket.";
+		}
+
+		if(listen(sock, 3) < 0){
+			throw "Failed to listen server socket.";
+		}
+	}
+
+	int TCPServer::Accept(){
+		struct sockaddr_in addr;
+		uint len(sizeof(addr));
+
+		int client = accept(sock, (struct sockaddr*)&addr, &len);
+        if (client < 0) {
+			throw "Failed to accept server socket";
+        }
+		return client;
+	}
+
+
+
+	SSLServer::SSLServer(unsigned port) : TCPServer(port){
+
+	}
 }
 
 
