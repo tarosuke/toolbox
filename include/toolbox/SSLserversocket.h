@@ -70,7 +70,11 @@ namespace TB{
 		void operator=(const TCPServer&);
 	public:
 		TCPServer(unsigned port);
-		virtual int Accept();
+		~TCPServer();
+		Socket* Accept();
+
+	protected:
+		int RawAccept();
 
 	private:
 		int sock;
@@ -84,6 +88,12 @@ namespace TB{
 		void operator=(const SSLServer&);
 	public:
 		SSLServer(unsigned port);
-		int Accept() override;
+		~SSLServer();
+		Socket* Accept();
+
+	private:
+		SSL_CTX* ctx;
+
+		static SSL_CTX* CreateContext();
 	};
 }

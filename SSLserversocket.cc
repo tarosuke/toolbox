@@ -92,22 +92,61 @@ namespace TB{
 		}
 	}
 
-	int TCPServer::Accept(){
+	int TCPServer::RawAccept(){
 		struct sockaddr_in addr;
 		uint len(sizeof(addr));
 
-		int client = accept(sock, (struct sockaddr*)&addr, &len);
-        if (client < 0) {
+		const int fd(accept(sock, (struct sockaddr*)&addr, &len));
+        if(fd < 0){
 			throw "Failed to accept server socket";
         }
-		return client;
+		return fd;
+	}
+
+	TCPServer::~TCPServer(){
+		close(sock);
 	}
 
 
 
-	SSLServer::SSLServer(unsigned port) : TCPServer(port){
+	SSLServer::SSLServer(unsigned port) :
+		TCPServer(port),
+		ctx(CreateContext()){
+		//SSLコンテキストの設定
+		SSL_CTX_set_ecdh_auto(ctx, 1);
 
+	    /* Set the key and cert */
+	    if (SSL_CTX_use_certificate_file(ctx, "cert.pem", SSL_FILETYPE_PEM) <= 0) {
+			ERR_print_errors_fp(stderr);
+			throw "";
+	    }
+
+	    if (SSL_CTX_use_PrivateKey_file(ctx, "key.pem", SSL_FILETYPE_PEM) <= 0 ) {
+			ERR_print_errors_fp(stderr);
+			throw "";
+	    }
 	}
+
+	SSL_CTX* SSLServer::CreateContext(){
+	    const SSL_METHOD *m(SSLv23_server_method());
+	    SSL_CTX *ctx;
+
+	    if(!(ctx = SSL_CTX_new(m))){
+			throw "Failed to create SSL context.";
+		}
+
+	    return ctx;
+	}
+
+	Socket* SSLServer::Accept(){
+		return new SSLSocket(TCPServer::RawAccept(), ctx);
+	}
+
+	SSLServer::~SSLServer(){
+	    SSL_CTX_free(ctx);
+		EVP_cleanup();
+	}
+
 }
 
 
@@ -118,8 +157,7 @@ namespace TB{
 
 
 
-
-
+#if 0
 
 
 int create_socket(int port)
@@ -237,3 +275,5 @@ int main(int argc, char **argv)
     SSL_CTX_free(ctx);
     cleanup_openssl();
 }
+
+#endif
