@@ -41,7 +41,10 @@ namespace TB{
 				Load(name);
 			};
 			~Keeper(){
-				Store();
+				CommonPrefs::Store();
+			};
+			void Store(){
+				CommonPrefs::Store();
 			};
 		};
 
