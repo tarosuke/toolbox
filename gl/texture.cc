@@ -141,8 +141,8 @@ namespace TB{
 	}
 
 	const Texture::Style Texture::defaultStyle={
-		wrap_s : GL_REPEAT,
-		wrap_t : GL_REPEAT,
+		wrap_s : GL_MIRRORED_REPEAT,
+		wrap_t : GL_MIRRORED_REPEAT,
 		filter_mag : GL_LINEAR,
 		filter_min : GL_LINEAR,
 		texture_mode : GL_REPLACE,

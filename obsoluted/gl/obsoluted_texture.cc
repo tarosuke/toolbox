@@ -5,9 +5,8 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 
-#include <toolbox/gl/texture.h>
+#include "../../obsoluted/include/gl/texture.h"
 #include <toolbox/image/image.h>
-
 
 namespace GL{
 

@@ -16,31 +16,21 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
+#include <toolbox/gl/framebuffer.h>
 
 #include <assert.h>
 
 #include <toolbox/gl/gl.h>
-#include <toolbox/gl/framebuffer.h>
 
 
 
-namespace GL{
-
-	const TEXTURE::PARAMS Framebuffer::defaultParams = {
-		wrap_s : GL_CLAMP,
-		wrap_t : GL_CLAMP,
-		filter_mag : GL_LINEAR,
-		filter_min : GL_LINEAR,
-		texture_mode : GL_REPLACE,
-		pointSprite : false,
-	};
+namespace TB{
 
 	Framebuffer::Framebuffer(
 		unsigned width,
 		unsigned height,
-		TEXTURE::Format format) :
-		TEXTURE(width, height, format, defaultParams),
+		Texture::Format format) :
+		Texture(width, height, format),
 		fbID(NewID()),
 		dbID(NewDB()){
 		Key k(*this);

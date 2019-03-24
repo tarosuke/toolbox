@@ -23,9 +23,9 @@
 
 
 
-namespace GL{
+namespace TB{
 
-	class Framebuffer : public TEXTURE{
+	class Framebuffer : public Texture{
 		Framebuffer();
 		Framebuffer(const Framebuffer&);
 		void operator=(const Framebuffer&);
@@ -54,7 +54,10 @@ namespace GL{
 		};
 
 
-		Framebuffer(unsigned width, unsigned height, TEXTURE::Format=RGB);
+		Framebuffer(
+			unsigned width,
+			unsigned height,
+			Texture::Format=Texture::RGB);
 		~Framebuffer();
 
 
@@ -64,7 +67,6 @@ namespace GL{
 		static unsigned NewID();
 		static unsigned NewDB();
 		static int activeID;
-		static const TEXTURE::PARAMS defaultParams;
 	};
 
 
