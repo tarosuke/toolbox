@@ -1,4 +1,5 @@
 .directory
+.vscode
 *.o
 *.so
 *.a
