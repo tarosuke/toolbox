@@ -1,5 +1,5 @@
 /*** 自動登録ファクトリ
- * 親クラスにstaticな「FACTORY<親クラス>* FACTORY<親クラス>::start(0)」を定義
+ * 親クラスに「template<>「FACTORY<親クラス>* FACTORY<親クラス>::start(0)」と、
  * 子クラスにstaticな「FACTORY<親クラス> 子クラス::factory(New)」を定義
  * 子クラスにstaticな「親クラス* New()」を定義
  * 親クラスからFACTORY<親クラス>::Newを呼び出すと子クラスのNewを順に呼んで
