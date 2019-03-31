@@ -76,7 +76,7 @@ namespace TB{
 				}
 
 				//使用するデバイス
-				syslog(LOG_INFO, "Evdev:%s", path);
+				syslog(LOG_DEBUG, "Evdev:%s", path);
 
 				//rdfsの設定
 				FD_SET(fd, &rfds);
