@@ -31,7 +31,7 @@ namespace TB{
 		Format format,
 		const Style& style) :
 		tid(NewID()){
-		Binder(*this);
+		Binder b(*this);
 
 		glTexImage2D(
 			GL_TEXTURE_2D,
@@ -54,7 +54,7 @@ namespace TB{
 		Format format,
 		const Style& style) :
 		tid(NewID()){
-		Binder(*this);
+		Binder b(*this);
 
 		glTexImage2D(
 			GL_TEXTURE_2D,
@@ -151,13 +151,13 @@ namespace TB{
 
 
 
-	Texture::Binder::Binder(const Texture& t) : tid(t.tid){
-		glBindTexture(GL_TEXTURE_2D, tid);
-		glBlendFunc(GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA);
-	}
-
 	Texture::Binder::~Binder(){
 		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	Texture::Binder::Binder(const Texture& t){
+		glBindTexture(GL_TEXTURE_2D, t.tid);
+		glBlendFunc(GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 }

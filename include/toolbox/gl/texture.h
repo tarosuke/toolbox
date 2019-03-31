@@ -51,9 +51,7 @@ namespace TB{
 		public:
 			Binder(const Texture&);
 			~Binder();
-
 		private:
-			const int tid;
 		};
 
 		Texture(
