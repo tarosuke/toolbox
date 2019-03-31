@@ -52,7 +52,8 @@ namespace TB{
 		if(fileName && *fileName){
 			//PNGとして読んでみる
 			surface = cairo_image_surface_create_from_png(fileName);
-			if(surface && cairo_surface_status(surface) == CAIRO_STATUS_SUCCESS){
+			if(surface &&
+				cairo_surface_status(surface) == CAIRO_STATUS_SUCCESS){
 				//成功
 				return;
 			}
@@ -65,8 +66,7 @@ namespace TB{
 			}
 		}
 
-		//失敗したのでダミーのコンテンツ割り当てておく
-		surface = cairo_image_surface_create( CAIRO_FORMAT_RGB24, 8, 8);
+		throw "faled to load";
 	}
 
 	Image::~Image(){
