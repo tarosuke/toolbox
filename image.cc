@@ -86,6 +86,7 @@ namespace TB{
 			}
 		}
 
+		syslog(LOG_ERR, "failed to load: %s", fileName);
 		throw "faled to load TB::Image";
 	}
 
@@ -112,6 +113,7 @@ namespace TB{
 
 	Image::operator Raw() const{
 		//TODO:!surfaceなら例外
+		cairo_surface_flush(surface);
 		return (Raw){
 			data : cairo_image_surface_get_data(surface),
 			transparent : IsTransparent(),
