@@ -35,15 +35,35 @@ namespace TB{
 	/** コンストラクタとデストラクタ
 	 */
 	Image::Image(unsigned width, unsigned height, bool transparent) :
-		surface(NewSurface(width, height, transparent)){};
-	Image::Image(const Image& o) : surface(o.CopySurface()){}
-	Image::Image(const Image& o, int x, int y, unsigned width, unsigned height) :
+		surface(NewSurface(width, height, transparent)){
+		if(!surface){
+			//TODO:他のthrowも含めてassertのように場所と条件がわかるようにする
+			//TODO:例外の形式を決めて修正
+			throw "Failed: " __FILE__;
+		}
+	}
+	Image::Image(const Image& o) : surface(o.CopySurface()){
+		if(!surface){
+			throw "Failed: " __FILE__;
+		}
+	}
+	Image::Image(
+		const Image& o,
+		int x,
+		int y,
+		unsigned width,
+		unsigned height) :
 		surface(NewSurface(width, height, o.IsTransparent())){
+		if(!surface){
+			throw "Failed: " __FILE__;
+		}
+
 		//oの中身を転送
 		const Raw raw(o);
 		const unsigned char* s(raw.data + raw.stride*y + x*4);
 		unsigned char* d(cairo_image_surface_get_data(surface));
-		const unsigned stride((unsigned)cairo_image_surface_get_stride(surface));
+		const unsigned stride(
+			(unsigned)cairo_image_surface_get_stride(surface));
 		for(unsigned n(0); n < height; ++n, s += raw.stride, d += stride){
 			memcpy(d, s, stride);
 		}
@@ -66,7 +86,7 @@ namespace TB{
 			}
 		}
 
-		throw "faled to load";
+		throw "faled to load TB::Image";
 	}
 
 	Image::~Image(){
@@ -81,7 +101,8 @@ namespace TB{
 		cairo_format_t format(cairo_image_surface_get_format(surface));
 		const unsigned width((unsigned)cairo_image_surface_get_width(surface));
 		const unsigned height((unsigned)cairo_image_surface_get_width(surface));
-		return cairo_surface_create_similar_image(surface, format, width, height);
+		return cairo_surface_create_similar_image(
+			surface, format, width, height);
 	}
 	cairo_surface_t* Image::NewSurface(unsigned w, unsigned h, bool t){
 		const cairo_format_t format(
@@ -90,6 +111,7 @@ namespace TB{
 	}
 
 	Image::operator Raw() const{
+		//TODO:!surfaceなら例外
 		return (Raw){
 			data : cairo_image_surface_get_data(surface),
 			transparent : IsTransparent(),
