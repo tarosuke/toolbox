@@ -94,7 +94,6 @@ namespace TB{
 		static const Style defaultStyle;
 
 		const unsigned tid;
-
 	};
 
 }

@@ -82,6 +82,7 @@ namespace TB{
 		unsigned width,
 		unsigned height,
 		Format format){
+		Binder b(*this);
 		glTexSubImage2D(
 			GL_TEXTURE_2D,
 			0,
@@ -151,13 +152,13 @@ namespace TB{
 
 
 
-	Texture::Binder::~Binder(){
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-
 	Texture::Binder::Binder(const Texture& t){
 		glBindTexture(GL_TEXTURE_2D, t.tid);
 		glBlendFunc(GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA);
+	}
+
+	Texture::Binder::~Binder(){
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 }
