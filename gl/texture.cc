@@ -59,11 +59,11 @@ namespace TB{
 		glTexImage2D(
 			GL_TEXTURE_2D,
 			0,
-			ToGLFormat(format),
+			IsTransparent(format) ? GL_RGBA : GL_RGB,
 			width,
 			height,
 			0,
-			ToGLFormat(format),
+			GL_BGRA,
 			GL_UNSIGNED_BYTE,
 			buffer);
 
