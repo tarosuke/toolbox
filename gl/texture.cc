@@ -70,6 +70,21 @@ namespace TB{
 		SetupAttributes(style);
 	}
 
+	Texture::Texture(const Image& image) : tid(NewID()){
+		Binder(*this);
+		Image::Raw raw(image);
+		glTexImage2D(
+			GL_TEXTURE_2D,
+			0,
+			raw.bpp == 4 ? GL_RGBA : GL_RGB,
+			raw.width,
+			raw.height,
+			0,
+			GL_BGRA,
+			GL_UNSIGNED_BYTE,
+			raw.data);
+	}
+
 	Texture::~Texture(){
 		glDeleteTextures(1, &tid);
 	}

@@ -18,6 +18,8 @@
  */
  #pragma once
 
+#include "toolbox/image.h"
+
 
 
 namespace TB{
@@ -65,6 +67,8 @@ namespace TB{
 			unsigned height,
 			Format = RGB,
 			const Style& = defaultStyle);
+
+		Texture(const Image&);
 
 		~Texture();
 
