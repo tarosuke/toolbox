@@ -68,7 +68,7 @@ namespace TB{
 			Format = RGB,
 			const Style& = defaultStyle);
 
-		Texture(const Image&);
+		Texture(const Image&, const Style& = defaultStyle);
 
 		~Texture();
 

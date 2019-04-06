@@ -70,7 +70,7 @@ namespace TB{
 		SetupAttributes(style);
 	}
 
-	Texture::Texture(const Image& image) : tid(NewID()){
+	Texture::Texture(const Image& image, const Style& style) : tid(NewID()){
 		Binder(*this);
 		Image::Raw raw(image);
 		glTexImage2D(
@@ -83,6 +83,8 @@ namespace TB{
 			GL_BGRA,
 			GL_UNSIGNED_BYTE,
 			raw.data);
+
+		SetupAttributes(style);
 	}
 
 	Texture::~Texture(){
