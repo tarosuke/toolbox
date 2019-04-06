@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2017 tarosuke<webmaster@tarosuke.net>
+/** 頂点/インデクスバッファオブジェクト
+ * Copyright (C) 2017,2019 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,6 +23,7 @@
 #include <toolbox/gl/vbo.h>
 
 
+
 namespace TB{
 
 	bool VBO::SetupBuffer(
@@ -32,10 +33,12 @@ namespace TB{
 		unsigned nov,
 		const void* vertex,
 		unsigned size,
-		bool quad){
-		syslog(LOG_DEBUG, "VBO: i:%u/%p v:%u/%p size:%u", noi, index, nov, vertex, size);
+		DrawType type){
+		syslog(LOG_DEBUG,
+			"VBO: i:%u/%p v:%u/%p size:%u",noi, index, nov, vertex, size);
 		if(64 < size){
-			syslog(LOG_WARNING, "VBO: size of vertex element(%u) over 64bytes", size);
+			syslog(LOG_WARNING,
+				"VBO: size of vertex element(%u) over 64bytes", size);
 		}
 
 		//頂点バッファ確保と読み込み
@@ -63,7 +66,7 @@ namespace TB{
 		i.indexBuffer = iBuff;
 		i.vertexBuffer = vBuff;
 		i.numOfVertex = noi;
-		i.drawType = quad ? GL_QUADS : GL_TRIANGLES;
+		i.drawType = type;
 
 		if(glGetError() == GL_NO_ERROR){
 			return true;

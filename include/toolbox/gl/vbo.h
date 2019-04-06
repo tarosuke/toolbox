@@ -1,5 +1,5 @@
 /** 頂点バッファオブジェクトとインデクスバッファオブジェクト
- * Copyright (C) 2017 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2017,2019 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,6 +21,7 @@
 #pragma once
 
 
+
 namespace TB{
 
 	class VBO{
@@ -28,6 +29,14 @@ namespace TB{
 		VBO(const VBO&);
 		void operator=(const VBO&);
 	public:
+		enum DrawType{
+			triangles,
+			quads,
+			points,
+			triangleStrip,
+			triangleFan
+		};
+
 		struct V2{
 			float u;
 			float v;
@@ -52,10 +61,10 @@ namespace TB{
 			unsigned noi,
 			const unsigned* index,
 			unsigned nov,
-			const T* vertex,
-			bool quad=false){ //NOTE:vertex に多次元配列を与えないこと
+			const T* vertex, //NOTE:vertex に多次元配列を与えないこと
+			DrawType type = triangles){
 			Init i;
-			return SetupBuffer(i, noi, index, nov, vertex, sizeof(T), quad) ? new VBO(i) : 0;
+			return SetupBuffer(i, noi, index, nov, vertex, sizeof(T), type) ? new VBO(i) : 0;
 		}
 
 		virtual void Draw();
@@ -84,7 +93,7 @@ namespace TB{
 			unsigned unmOfVertex,
 			const void* vertex,
 			unsigned size,
-			bool quad);
+			DrawType type);
 	};
 
 }
