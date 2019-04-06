@@ -41,6 +41,29 @@ namespace TB{
 				"VBO: size of vertex element(%u) over 64bytes", size);
 		}
 
+		//何も確保していないうちにエラーチェックを兼ねて設定
+		i.numOfVertex = noi;
+		switch(type){
+		case triangles:
+			i.drawType = GL_TRIANGLES;
+			break;
+		case quads:
+			i.drawType = GL_QUADS;
+			break;
+		case points:
+			i.drawType = GL_POINTS;
+			break;
+		case triangleStrip:
+			i.drawType = GL_TRIANGLE_STRIP;
+			break;
+		case triangleFan:
+			i.drawType = GL_TRIANGLE_FAN;
+			break;
+		default:
+			syslog(LOG_ERR, "VBO: no matching type: %d", type);
+			return false;
+		}
+
 		//頂点バッファ確保と読み込み
 		unsigned vBuff(0);
 		glGenBuffers(1, &vBuff);
@@ -63,12 +86,10 @@ namespace TB{
 			GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		i.indexBuffer = iBuff;
-		i.vertexBuffer = vBuff;
-		i.numOfVertex = noi;
-		i.drawType = type;
-
 		if(glGetError() == GL_NO_ERROR){
+			//残りを設定
+			i.indexBuffer = iBuff;
+			i.vertexBuffer = vBuff;
 			return true;
 		}
 
