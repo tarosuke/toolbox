@@ -47,12 +47,12 @@ namespace TB{
 			void operator=(const Server&);
 		public:
 			Server(const char* service);
-			Stream* Listen();
+			Stream* Accept();
 
 		protected:
 			int fd;
 
-			int JustListen(); // just listen on fd
+			int JustAccept(); //just accept and retcun socket
 		};
 
 	protected:

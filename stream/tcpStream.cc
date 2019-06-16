@@ -37,7 +37,9 @@ namespace TB{
 		// resolv hostname & service
 		memset(&hints, 0, sizeof(hints));
 		hints.ai_socktype = SOCK_STREAM;
-		getaddrinfo(host, service, &hints, &targets);
+		if(!!getaddrinfo(host, service, &hints, &targets)){
+			throw Exception();
+		}
 
 		// scan addresses
 		for(addrinfo* t(targets); t; t = (*t).ai_next){
@@ -90,9 +92,43 @@ namespace TB{
 	}
 
 	TCPStream::Server::Server(const char* service){
+		// prepare bind
+		addrinfo hints;
+		addrinfo* t;
+		memset(&hints, 0, sizeof(hints));
+		hints.ai_family = AF_INET6;
+		hints.ai_flags = AI_PASSIVE;
+		hints.ai_socktype = SOCK_STREAM;
+		if(!!getaddrinfo(NULL, service, &hints, &t)){
+			throw PosixException();
+		}
+
+		// create socket
+		if((fd = socket((*t).ai_family, (*t).ai_socktype, 0)) < 0){
+			throw PosixException();
+		}
+
+		// bind
+		if(!!bind(fd, (*t).ai_addr, (*t).ai_addrlen)){
+			throw PosixException();
+		}
+		freeaddrinfo(t);
+
+		// listen
+		listen(fd, 5);
 	}
 
-	Stream* TCPStream::Server::Listen(){
-		return new TCPStream(JustListen());
+	Stream* TCPStream::Server::Accept(){
+		return new TCPStream(JustAccept());
+	}
+
+	int TCPStream::Server::JustAccept(){
+		struct sockaddr_in client;
+		socklen_t len(sizeof(client));
+		const int sock(accept(fd, (struct sockaddr *)&client, &len));
+		if(sock < 0){
+			throw PosixException();
+		}
+		return sock;
 	}
 }

@@ -61,11 +61,27 @@ namespace TB{
 		}
 	}
 
+	unsigned SSLStream::Read(void* b, unsigned len){
+		const int r(SSL_read(ssl, b, len));
+		if(r < 0){
+			throw Exception();
+		}
+		return static_cast<unsigned>(r);
+	}
+
+	unsigned SSLStream::Write(const void* b, unsigned len){
+		const int r(SSL_write(ssl, b, len));
+		if(r < 0){
+			throw Exception();
+		}
+		return static_cast<unsigned>(r);
+	}
+
 	SSLStream::Server::Server(const char* service) :
 		TCPStream::Server(service){}
 
-	Stream* SSLStream::Server::Listen(){
-		return new SSLStream(JustListen());
+	Stream* SSLStream::Server::Accept(){
+		return new SSLStream(JustAccept());
 	}
 
 	SSLStream::Exception::operator const char*(){

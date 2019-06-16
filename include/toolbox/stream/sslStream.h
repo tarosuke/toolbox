@@ -46,7 +46,7 @@ namespace TB{
 		class Server : public TCPStream::Server{
 		public:
 			Server(const char* service);
-			Stream* Listen();
+			Stream* Accept();
 		};
 
 	protected:
