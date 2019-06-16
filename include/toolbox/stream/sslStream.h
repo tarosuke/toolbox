@@ -16,6 +16,18 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+
+/** Usage for client socket
+ * 1. Make an instance of SSLStream and wait
+ * 2. The instance is the stream
+ * 2a. It throws Exception when failed
+ *
+ ** Usage for server socket
+ * 1. Make an instace of SSLStream::Server
+ * 2. Listen the instance
+ * 3. It returns the stream when it was connected
+ * 3a. It throws Exception when it gets some failure
+ */
 #pragma once
 
 #include <openssl/ssl.h>
@@ -27,13 +39,15 @@
 namespace TB{
 	class SSLStream : public TCPStream{
 	public:
-		SSLStream(const char* target, unsigned port);
+		SSLStream(const char* target, const char* service);
 		~SSLStream();
 
-		/** Listen the port
-		 * NOTE: DO NOT FORGET THIS IS BLOCKING INTERFACE
-		 */
-		static Stream* Listen(unsigned port);
+		// server socket
+		class Server : public TCPStream::Server{
+		public:
+			Server(const char* service);
+			Stream* Listen();
+		};
 
 	protected:
 		unsigned Read(void*, unsigned) override;
@@ -52,7 +66,10 @@ namespace TB{
 		SSL* ssl;
 		static SSL_CTX* ctx;
 
+		void Attach();
 		void ShutDown();
 		void Quit();
+
+		SSLStream(int fd);
 	};
 }

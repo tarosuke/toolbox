@@ -29,16 +29,24 @@
 namespace TB{
 	SSL_CTX* SSLStream::ctx(0);
 
-	SSLStream::SSLStream(const char* host, unsigned port) :
-			TCPStream(host, port),
+	SSLStream::SSLStream(const char* host, const char* service) :
+			TCPStream(host, service),
 			ssl(0){
-		assert(ssl = SSL_new(ctx));
-    	assert(SSL_set_fd(ssl, fd) == 1);
-		assert(SSL_connect(ssl)  == 1);
+		Attach();
+	}
+
+	SSLStream::SSLStream(int fd) : TCPStream(fd){
+		Attach();
 	}
 
 	SSLStream::~SSLStream(){
 		Quit();
+	}
+
+	void SSLStream::Attach(){
+		assert(ssl = SSL_new(ctx));
+    	assert(SSL_set_fd(ssl, fd) == 1);
+		assert(SSL_connect(ssl)  == 1);
 	}
 
 	void SSLStream::ShutDown(){
@@ -51,6 +59,13 @@ namespace TB{
 			SSL_free(ssl);
 			ssl = 0;
 		}
+	}
+
+	SSLStream::Server::Server(const char* service) :
+		TCPStream::Server(service){}
+
+	Stream* SSLStream::Server::Listen(){
+		return new SSLStream(JustListen());
 	}
 
 	SSLStream::Exception::operator const char*(){

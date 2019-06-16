@@ -1,4 +1,4 @@
-/** Stream
+/** PosixException
  * Copyright (C) 2019 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
@@ -18,34 +18,18 @@
  */
 #pragma once
 
-#include <toolbox/exception/exception.h>
+#include "exception.h"
 
 
 
 namespace TB{
-	/** Stream
-	 * Interface of Stream series
-	 */
-	class Stream{
-		Stream(const Stream&);
-		void operator=(const Stream&);
+	class PosixException : Exception{
 	public:
-		virtual ~Stream(){};
+		PosixException();
+		PosixException(int e) : err(e){};
+		operator const char*() final;
 
-		/** Read & Write
-		 * NOTE: They throws exception
-		 */
-		virtual unsigned Read(void*, unsigned maxSize) = 0;
-		virtual unsigned Write(const void*, unsigned size) = 0;
-
-		template<typename T> unsigned Read(T& b){
-			return Read(&b, sizeof(T)) / sizeof(T);
-		};
-		template<typename T> unsigned Write(const T& b){
-			return Write(&b, sizeof(T)) / sizeof(T);
-		};
-
-	protected:
-		Stream(){};
+	private:
+		const int err;
 	};
 }

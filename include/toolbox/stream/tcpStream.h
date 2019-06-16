@@ -16,6 +16,18 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+
+/** Usage for client socket
+ * 1. Make an instance of TCPStream and wait
+ * 2. The instance is the stream
+ * 2a. It throws Exception when failed
+ *
+ ** Usage for server socket
+ * 1. Make an instace of TCPStream::Server
+ * 2. Listen the instance
+ * 3. It returns the stream when it was connected
+ * 3a. It throws Exception when it gets some failure
+ */
 #pragma once
 
 #include "stream.h"
@@ -25,19 +37,22 @@
 namespace TB{
 	class TCPStream : public Stream{
 	public:
-		TCPStream(const char* host, unsigned port);
+		TCPStream(const char* host, const char* service);
 		~TCPStream();
 
+		// server socket
 		class Server{
 			Server();
 			Server(const Server&);
 			void operator=(const Server&);
 		public:
-			Server(unsigned pert);
+			Server(const char* service);
 			Stream* Listen();
 
 		protected:
 			int fd;
+
+			int JustListen(); // just listen on fd
 		};
 
 	protected:
@@ -45,7 +60,6 @@ namespace TB{
 		unsigned Read(void*, unsigned) override;
 		unsigned Write(const void*, unsigned) override;
 
-	private:
-		TCPStream(int fd); // for listen only
+		TCPStream(int fd);
 	};
 }

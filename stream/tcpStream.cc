@@ -18,13 +18,52 @@
  */
 #include <toolbox/stream/tcpStream.h>
 
-#include <sys/socket.h>
+#include <toolbox/exception/posixException.h>
+
 #include <unistd.h>
+#include <memory.h>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
 
 
 
 namespace TB{
-	TCPStream::TCPStream(const char* host, unsigned port) : fd(-1){
+	TCPStream::TCPStream(const char* host, const char* service) : fd(-1){
+		addrinfo* targets;
+		addrinfo hints;
+
+		// resolv hostname & service
+		memset(&hints, 0, sizeof(hints));
+		hints.ai_socktype = SOCK_STREAM;
+		getaddrinfo(host, service, &hints, &targets);
+
+		// scan addresses
+		for(addrinfo* t(targets); t; t = (*t).ai_next){
+			if((fd = socket(
+				(*t).ai_family,
+				(*t).ai_socktype,
+				(*t).ai_protocol)) < 0){
+				// failed to create socket
+				continue;
+			}
+
+			if(!!connect(fd, (*t).ai_addr, (*t).ai_addrlen)){
+				// failed to connect
+				close(fd);
+				continue;
+			}
+
+			// connected
+			freeaddrinfo(targets);
+			return;
+		}
+
+		// failed to connect
+		fd = -1;
+		freeaddrinfo(targets);
+		throw Exception();
 	}
 	TCPStream::TCPStream(int fd) : fd(fd){}
 
@@ -34,4 +73,26 @@ namespace TB{
 		}
 	}
 
+	unsigned TCPStream::Read(void* b, unsigned len){
+		ssize_t r(recv(fd, b, len, 0));
+		if(r < 0){
+			throw PosixException();
+		}
+		return static_cast<unsigned>(r);
+	}
+
+	unsigned TCPStream::Write(const void* b, unsigned len){
+		ssize_t r(send(fd, b, len, 0));
+		if(r < 0){
+			throw PosixException();
+		}
+		return static_cast<unsigned>(r);
+	}
+
+	TCPStream::Server::Server(const char* service){
+	}
+
+	Stream* TCPStream::Server::Listen(){
+		return new TCPStream(JustListen());
+	}
 }

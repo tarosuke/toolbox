@@ -1,4 +1,4 @@
-/** Stream
+/** Exception
  * Copyright (C) 2019 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
