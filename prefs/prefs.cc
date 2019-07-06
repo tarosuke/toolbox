@@ -166,6 +166,17 @@ namespace TB{
 		return false;
 	}
 
+	/** 引数全部を設定
+	 */
+	bool CommonPrefs::SetAll(int argc, const char* argv[]){
+		for(int n; n < argc; ++n){
+			if(!Set(argv[n])){
+				return false;
+			}
+		}
+		return true;
+	}
+
 
 
 	/** 型ごとの=演算子

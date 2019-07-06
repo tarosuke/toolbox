@@ -50,6 +50,7 @@ namespace TB{
 
 		//文字列による値設定(要するにコマンドラインオプション用)
 		static bool Set(const char* arg);
+		static bool SetAll(int argc, const char* argv[]);
 
 	protected:
 		CommonPrefs(
