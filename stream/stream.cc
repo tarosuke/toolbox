@@ -16,37 +16,28 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#pragma once
-
-#include <toolbox/exception/exception.h>
-#include <toolbox/string.h>
+#include <toolbox/stream/stream.h>
+#include <toolbox/exception/posixException.h>
 
 
 
 namespace TB{
-	/** Stream
-	 * Interface of Stream series
-	 */
-	class Stream{
-		Stream(const Stream&);
-		void operator=(const Stream&);
-	public:
-		virtual ~Stream(){};
 
-		/** Read & Write
-		 * NOTE: They throws exception
-		 */
-		virtual unsigned Read(void*, unsigned maxSize) = 0;
-		virtual unsigned Write(const void*, unsigned size) = 0;
+	template<> Stream& Stream::operator>>(String& s){
+		// 行をStringに読む
+		for(char b('\n'); Read(&b, 1) && b != '\n';){
+			// append the charactor to string
+			s += b;
+		}
 
-		template<typename T> Stream& operator>>(T& b){
-			return Read(&b, sizeof(T)) / sizeof(T);
-		};
-		template<typename T> Stream& operator<<(const T& b){
-			return Write(&b, sizeof(T)) / sizeof(T);
-		};
+		return *this;
+	}
 
-	protected:
-		Stream(){};
-	};
+	template<> Stream& Stream::operator<<(const String& s){
+		if(!s.IsEmpty()){
+			Write((const char*)s, s.Length());
+		}
+		return *this;
+	}
+
 }
