@@ -1,4 +1,4 @@
-/** ChildStream
+/** StdStream
  * Copyright (C) 2019 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
@@ -16,29 +16,19 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <unistd.h>
+#pragma once
 
-#include <toolbox/stream/childStream.h>
-#include <toolbox/exception/posixException.h>
+#include "stream.h"
 
 
 
 namespace TB{
+	class StdStream : public Stream{
+	public:
+		StdStream(){};
 
-	unsigned ChildStream::Read(void* b, unsigned maxSize){
-		const int r(read(ReadFd(), b, maxSize));
-		if(r < 0){
-			throw PosixException();
-		}
-		return static_cast<unsigned>(r);
-	}
-
-	unsigned ChildStream::Write(const void* b, unsigned size){
-		const int r(write(WriteFd(), b, size));
-		if(r < 0){
-			throw PosixException();
-		}
-		return static_cast<unsigned>(r);
-	}
-
+	protected:
+		unsigned Read(void*, unsigned maxSize) override;
+		unsigned Write(const void*, unsigned size) override;
+	};
 }
