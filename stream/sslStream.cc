@@ -24,7 +24,7 @@
 
 
 
-#define assert(c) { if(!(c)){ ShutDown(); } }
+#define ASSERT_SSL(c) { if(!(c)){ ShutDown(); } }
 
 namespace TB{
 	SSL_CTX* SSLStream::ctx(0);
@@ -44,9 +44,9 @@ namespace TB{
 	}
 
 	void SSLStream::Attach(){
-		assert(ssl = SSL_new(ctx));
-    	assert(SSL_set_fd(ssl, fd) == 1);
-		assert(SSL_connect(ssl)  == 1);
+		ASSERT_SSL(ssl = SSL_new(ctx));
+    	ASSERT_SSL(SSL_set_fd(ssl, fd) == 1);
+		ASSERT_SSL(SSL_connect(ssl)  == 1);
 	}
 
 	void SSLStream::ShutDown(){
