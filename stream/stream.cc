@@ -23,8 +23,8 @@
 
 namespace TB{
 
-	template<> Stream& Stream::operator>>(String& s){
-		// 行をStringに読む
+	// read a line to String
+	Stream& Stream::operator>>(String& s){
 		for(char b('\n'); Read(&b, 1) && b != '\n';){
 			// append the charactor to string
 			s += b;
@@ -33,11 +33,30 @@ namespace TB{
 		return *this;
 	}
 
-	template<> Stream& Stream::operator<<(const String& s){
-		if(!s.IsEmpty()){
-			Write((const char*)s, s.Length());
-		}
+	// write String
+	Stream& Stream::operator<<(const String& s){
+		*this += s;
 		return *this;
+	}
+
+	// write null-terminated string
+	Stream& Stream::operator<<(const char* s){
+		*this += s;
+		return *this;
+	}
+
+	Stream& Stream::operator<<(const endl&){
+		*this << "\n";
+		Flush();
+		return * this;
+	}
+
+	// flush writebuffer
+	void Stream::Flush(){
+		if(Length()){
+			Write(static_cast<const char*>(*this), Length());
+			Clear();
+		}
 	}
 
 }

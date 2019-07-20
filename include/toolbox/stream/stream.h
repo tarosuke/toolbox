@@ -27,10 +27,14 @@ namespace TB{
 	/** Stream
 	 * Interface of Stream series
 	 */
-	class Stream{
+	class Stream : public String{
 		Stream(const Stream&);
 		void operator=(const Stream&);
 	public:
+		// manipulators
+		class endl;
+		class end;
+
 		virtual ~Stream(){};
 
 		/** Read & Write
@@ -39,12 +43,15 @@ namespace TB{
 		virtual unsigned Read(void*, unsigned maxSize) = 0;
 		virtual unsigned Write(const void*, unsigned size) = 0;
 
-		template<typename T> Stream& operator>>(T& b){
-			return Read(&b, sizeof(T)) / sizeof(T);
-		};
-		template<typename T> Stream& operator<<(const T& b){
-			return Write(&b, sizeof(T)) / sizeof(T);
-		};
+		/** << and >> operator, flush
+		 * NOTE: specialize template if you want to use your type
+		 */
+		Stream& operator>>(String&);
+		Stream& operator<<(const String&);
+		Stream& operator<<(const char*);
+		Stream& operator<<(const end&){ Flush(); return *this; };
+		Stream& operator<<(const endl&);
+		void Flush();
 
 	protected:
 		Stream(){};
