@@ -1,4 +1,4 @@
-/************************************************************************* 文字列
+/********************************************************************** 文字列
  */
 
 #include "include/toolbox/string.h"
@@ -95,6 +95,22 @@ namespace TB{
 		memcpy(&newString[0], GetRawBody() + b, l);
 		newString[l] = 0;
 		return newString;
+	}
+
+	String& String::operator<<(unsigned n){
+		char b[16];
+		char* t(&b[14]);
+		for(b[15] = 0, *t = '0'; n; *t-- = (n % 10) + '0', n /= 10);
+		*this += t;
+		return *this;
+	}
+
+	String& String::operator<<(int i){
+		if(i < 0){
+			*this += '-';
+			i = -i;
+		}
+		return *this << static_cast<unsigned>(i);
 	}
 
 }

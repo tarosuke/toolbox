@@ -1,4 +1,4 @@
-/************************************************************************* 文字列
+/********************************************************************** 文字列
 * Copyright (C) 2017 tarosuke<webmaster@tarosuke.net>
 *
 * This program is free software; you can redistribute it and/or
@@ -44,11 +44,17 @@ namespace TB{
 		String operator +(const String&) const;
 		String operator +(const char*) const;
 
+		// convert from
+		String& operator <<(int);
+		String& operator <<(unsigned);
+		String& Format(const char*, ...);
+
 		bool operator==(const char*) const;
 
 		bool IsEmpty() const { return !length; };
 		unsigned Length() const { return length; };
 
+		// string manipulators
 		String SubStr(unsigned start, unsigned length)const;
 		void Clear(){ (*this)[0] = 0; length = 0; };
 

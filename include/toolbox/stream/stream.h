@@ -26,24 +26,24 @@
 namespace TB{
 	/** Stream
 	 * Interface of Stream series
+	 * NOTE: It throws exception
 	 */
 	class Stream : public String{
 		Stream(const Stream&);
 		void operator=(const Stream&);
 	public:
+		virtual ~Stream(){};
+
 		// manipulators
 		class endl;
 		class end;
 
-		virtual ~Stream(){};
-
-		/** Read & Write
-		 * NOTE: They throws exception
+		/** direct Read & Write
 		 */
-		virtual unsigned Read(void*, unsigned maxSize) = 0;
+		virtual unsigned Read(void*, unsigned size) = 0;
 		virtual unsigned Write(const void*, unsigned size) = 0;
 
-		/** << and >> operator, flush
+		/** << and >> operator
 		 * NOTE: specialize template if you want to use your type
 		 */
 		Stream& operator>>(String&);
@@ -51,6 +51,10 @@ namespace TB{
 		Stream& operator<<(const char*);
 		Stream& operator<<(const end&){ Flush(); return *this; };
 		Stream& operator<<(const endl&);
+
+		/** Flush
+		 * NOTE: Flush before Write when using <<
+		 */
 		void Flush();
 
 	protected:

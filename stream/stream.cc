@@ -46,7 +46,7 @@ namespace TB{
 	}
 
 	Stream& Stream::operator<<(const endl&){
-		*this << "\n";
+		*this += '\n';
 		Flush();
 		return * this;
 	}
