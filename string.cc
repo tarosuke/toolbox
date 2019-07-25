@@ -8,6 +8,9 @@
 
 namespace TB{
 
+	unsigned String::radix(10);
+
+
 	String::String(const String& t){
 		*this = t;
 	}
@@ -98,10 +101,12 @@ namespace TB{
 	}
 
 	String& String::operator<<(unsigned n){
+		static const char* const num("0123456789abcdef");
 		char b[16];
 		char* t(&b[14]);
-		for(b[15] = 0, *t = '0'; n; *t-- = (n % 10) + '0', n /= 10);
+		for(b[15] = 0, *t = '0'; n; *t-- = num[n % radix], n /= radix);
 		*this += t;
+		radix = 10;
 		return *this;
 	}
 

@@ -34,10 +34,6 @@ namespace TB{
 	public:
 		virtual ~Stream(){};
 
-		// manipulators
-		class endl;
-		class end;
-
 		/** direct Read & Write
 		 */
 		virtual unsigned Read(void*, unsigned size) = 0;

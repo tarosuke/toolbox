@@ -26,9 +26,23 @@ namespace TB{
 
 	class String : public Array<char>{
 	public:
+		// manipulators
+		class endl;
+		class end;
+		class hex;
+
+		// constructors
 		String() : length(0){ (*this)[0] = 0; };
 		String(const String&);
 		String(const char*);
+		String(
+			long long,
+			unsigned length = 0,
+			char padding=' ');
+		String(
+			unsigned long long,
+			unsigned length = 0,
+			char padding=' ');
 
 		String& operator=(const String&);
 		String& operator=(const char*);
@@ -44,10 +58,10 @@ namespace TB{
 		String operator +(const String&) const;
 		String operator +(const char*) const;
 
-		// convert from
+		// << operator
 		String& operator <<(int);
 		String& operator <<(unsigned);
-		String& Format(const char*, ...);
+		String& operator <<(const String&);
 
 		bool operator==(const char*) const;
 
@@ -59,6 +73,7 @@ namespace TB{
 		void Clear(){ (*this)[0] = 0; length = 0; };
 
 	private:
+		static unsigned radix;
 		unsigned length;
 	};
 
