@@ -24,9 +24,6 @@
 
 namespace TB{
 
-	unsigned String::radix(10);
-
-
 	String::String(const String& t){
 		*this = t;
 	}

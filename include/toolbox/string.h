@@ -73,7 +73,7 @@ namespace TB{
 		void Clear(){ (*this)[0] = 0; length = 0; };
 
 	private:
-		static unsigned radix;
+		unsigned radix;
 		unsigned length;
 	};
 
