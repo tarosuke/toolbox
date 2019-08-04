@@ -38,14 +38,15 @@ namespace TB{
 		String(
 			long long,
 			unsigned length = 0,
-			char padding=' ');
+			char padding = ' ');
 		String(
 			unsigned long long,
 			unsigned length = 0,
-			char padding=' ');
+			char padding = ' ');
 
 		String& operator=(const String&);
 		String& operator=(const char*);
+
 		operator char*(){
 			return GetRawBody();
 		};
@@ -59,8 +60,8 @@ namespace TB{
 		String operator +(const char*) const;
 
 		// << operator
-		String& operator <<(int);
-		String& operator <<(unsigned);
+		String& operator <<(long long);
+		String& operator <<(long long unsigned);
 		String& operator <<(const String&);
 
 		bool operator==(const char*) const;
@@ -75,6 +76,12 @@ namespace TB{
 	private:
 		unsigned radix;
 		unsigned length;
+
+		void FromNumeric(
+			long long unsigned,
+			unsigned length,
+			char padding,
+			unsigned radix = 10);
 	};
 
 }

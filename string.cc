@@ -17,7 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "include/toolbox/string.h"
+#include <toolbox/string.h>
+#include <toolbox/exception/exception.h>
 #include <string.h>
 
 
@@ -31,6 +32,57 @@ namespace TB{
 
 	String::String(const char* t){
 		*this = t;
+	}
+
+	String::String(
+			long long value,
+			unsigned length,
+			char padding) : length(0){
+		if(value < 0){
+			*this += '-';
+			value = -value;
+		}
+		FromNumeric(static_cast<unsigned long long>(value), length, padding);
+	}
+	String::String(
+			unsigned long long value,
+			unsigned length,
+			char padding) : length(0){
+		FromNumeric(value, length, padding);
+	}
+
+	void String::FromNumeric(
+			long long unsigned value,
+			unsigned length,
+			char padding,
+			unsigned radix){
+		// parametor check
+		if(radix < 2 || 16 < radix){
+			throw Exception();
+		}
+
+		static const unsigned blen(64);
+
+		// pad if length is too long
+		for(; blen - 1 < length; --length){
+			*this += padding;
+		}
+
+		// build buffer
+		char b[blen];
+		char* p(&b[blen - 1]);
+		*p-- = 0;
+		char* p0(&p[-length]);
+		if(length){
+			memset(p0, padding, length);
+		}
+		*p = '0';
+
+		// convert from value
+		static const char* const numeric = "0123456789abcdef";
+		for(; value; *p-- = numeric[value % radix], value /= radix);
+
+		*this += p < p0 ? p : p0;
 	}
 
 
@@ -113,22 +165,18 @@ namespace TB{
 		return newString;
 	}
 
-	String& String::operator<<(unsigned n){
-		static const char* const num("0123456789abcdef");
-		char b[16];
-		char* t(&b[14]);
-		for(b[15] = 0, *t = '0'; n; *t-- = num[n % radix], n /= radix);
-		*this += t;
-		radix = 10;
+	String& String::operator<<(long long unsigned n){
+		FromNumeric(n, 0, ' ', 10);
 		return *this;
 	}
 
-	String& String::operator<<(int i){
+	String& String::operator<<(long long i){
 		if(i < 0){
 			*this += '-';
 			i = -i;
 		}
-		return *this << static_cast<unsigned>(i);
+		FromNumeric(static_cast<unsigned>(i), 0, ' ', 10);
+		return *this;
 	}
 
 }
