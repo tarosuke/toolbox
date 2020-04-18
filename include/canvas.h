@@ -59,12 +59,18 @@ namespace TB{
 			static unsigned GetBPP(cairo_surface_t*);
 		};
 
+		Canvas(unsigned width, unsigned height);
+		Canvas(const char* path);
 
 	protected:
 		cairo_surface_t* const surface;
 
 		virtual void OnUpdated(const Rect<unsigned>&){};
 
+	private:
+		static cairo_surface_t* Load(const char*);
+		static const char* GetExt(const char*);
+		static cairo_surface_t* PNG_Loader(const char*);
 
 	};
 

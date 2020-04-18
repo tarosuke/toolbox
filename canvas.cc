@@ -21,6 +21,8 @@
 
 #include <cairo/cairo.h>
 
+#include <string.h>
+
 
 
 namespace TB{
@@ -61,6 +63,48 @@ namespace TB{
 			break;
 		}
 		return 0;
+	}
+
+
+	Canvas::Canvas(unsigned width, unsigned height) :
+			surface(cairo_image_surface_create(
+				CAIRO_FORMAT_ARGB32,
+				width,
+				height)){}
+
+	Canvas::Canvas(const char* path) : surface(Load(path)){}
+
+	cairo_surface_t* Canvas::Load(const char* path){
+		static const struct EXTHandler{
+			const char* const ext;
+			cairo_surface_t* (* const loader)(const char*);
+		}exts[] = {
+			{ "png", PNG_Loader },
+			{ "ping", PNG_Loader },
+			{}
+		};
+
+		auto const ext(GetExt(path));
+		for(const EXTHandler* l(exts) ; (*l).ext;  ++l){
+			if(!strcmp((*l).ext, ext)){
+				return (*l).loader(path);
+			}
+		}
+		return 0;
+	}
+
+	const char* Canvas::GetExt(const char* p){
+		const char* e(0);
+		while(*p){
+			if(*p++ == '.'){
+				e = p;
+			}
+		}
+		return e;
+	}
+
+	cairo_surface_t* Canvas::PNG_Loader(const char* path){
+		return cairo_image_surface_create_from_png(path);
 	}
 
 
