@@ -37,6 +37,11 @@ namespace TB{
 
 	Canvas::Color::Color(float r, float g, float b, float a) :
 			r(r), g(g), b(b), a(a){}
+	Canvas::Color::Color(unsigned c) :
+			r((double)((c >> 16) & 255) / 255.0),
+			g((double)((c >> 8) & 255) / 255.0),
+			b((double)(c & 255) / 255.0),
+			a((double)((c >> 24) & 255) / 255.0){}
 
 
 	Canvas::Raw::Raw(Canvas& canvas) :
