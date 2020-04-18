@@ -169,7 +169,7 @@ namespace TB{
 	/** 引数全部を設定
 	 */
 	bool CommonPrefs::SetAll(int argc, const char* argv[]){
-		for(int n; n < argc; ++n){
+		for(int n(0); n < argc; ++n){
 			if(!Set(argv[n])){
 				return false;
 			}
