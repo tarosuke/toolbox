@@ -18,7 +18,7 @@
  */
 #pragma once
 
-#include <toolbox/geometry/rect.h>
+#include "geometry/rect.h"
 
 
 
@@ -31,19 +31,30 @@ extern "C"{
 namespace TB{
 
 	class Canvas{
+		Canvas();
+		Canvas(const Canvas&);
+		void operator=(const Canvas&);
 	public:
 		class Color{
 		public:
-			Color(unsigned webColor=0){ color = webColor; };
-			Color(float r=0.0, float g=0.0, float b=0.0, float a=1.0);
+			Color(unsigned webColor=0);
+			Color(float r, float g, float b, float a=1.0);
+
+			void SetColor(cairo_t*);
+
 		private:
-			unsigned color;
+			double r;
+			double g;
+			double b;
+			double a;
 		};
 
 		//直接アクセスするためのアクセサ
 		class Raw{
-			private:
-				cairo_surface_t* const surface;
+			Raw();
+		private:
+			cairo_surface_t* const surface;
+
 		public:
 			Raw(Canvas&);
 			~Raw();
@@ -55,17 +66,38 @@ namespace TB{
 			unsigned* operator[](unsigned y){
 				return &body[y * stride];
 			};
+
 		private:
 			static unsigned GetBPP(cairo_surface_t*);
 		};
 
+		//グラフィックコンテンツ
+		class GC{
+			GC();
+			GC(const GC&);
+			void operator=(const GC&);
+		public:
+			GC(Canvas&);
+			~GC();
+
+		private:
+			cairo_t* gc;
+			Canvas& canvas;
+			Color strokeColor;
+			Color fillColor;
+			Rect<double> extents;
+
+			void Flush();
+		};
+
 		Canvas(unsigned width, unsigned height);
 		Canvas(const char* path);
+		virtual ~Canvas();
 
 	protected:
 		cairo_surface_t* const surface;
 
-		virtual void OnUpdated(const Rect<unsigned>&){};
+		virtual void OnCanvasUpdated(const Rect<double>&){};
 
 	private:
 		static cairo_surface_t* Load(const char*);

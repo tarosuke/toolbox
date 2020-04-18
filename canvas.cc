@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "include/canvas.h"
+#include "include/toolbox/canvas.h"
 
 #include <cairo/cairo.h>
 
@@ -36,11 +36,7 @@
 namespace TB{
 
 	Canvas::Color::Color(float r, float g, float b, float a) :
-			color(
-				((static_cast<unsigned>(255.0 * r) & 255U) << 16) |
-				((static_cast<unsigned>(255.0 * g) & 255U) << 8) |
-				(static_cast<unsigned>(255.0 * b) & 255U) |
-				((static_cast<unsigned>(255.0 * a) & 255U) << 24)){}
+			r(r), g(g), b(b), a(a){}
 
 
 	Canvas::Raw::Raw(Canvas& canvas) :
@@ -74,6 +70,36 @@ namespace TB{
 	}
 
 
+	Canvas::GC::GC(Canvas& c) :
+			gc(cairo_create(canvas.surface)),
+			canvas(c){}
+
+	Canvas::GC::~GC(){
+		Flush();
+		cairo_destroy(gc);
+		canvas.OnCanvasUpdated(extents);
+	}
+
+	void Canvas::GC::Flush(){
+		//更新範囲を更新
+		double ex[4];
+		cairo_stroke_extents(gc, &ex[0], &ex[1], &ex[2], &ex[3]);
+		const Rect<double> e(
+			Vector<double>(ex[0], ex[1]),
+			Vector<double>(ex[2], ex[3]));
+
+		extents |= e;
+
+		//フィル描画
+		fillColor.SetColor(gc);
+		cairo_fill_preserve(gc);
+
+		//ストローク描画
+		strokeColor.SetColor(gc);
+		cairo_stroke(gc);
+	}
+
+
 	Canvas::Canvas(unsigned width, unsigned height) :
 			surface(cairo_image_surface_create(
 				CAIRO_FORMAT_ARGB32,
@@ -81,6 +107,10 @@ namespace TB{
 				height)){}
 
 	Canvas::Canvas(const char* path) : surface(Load(path)){}
+
+	Canvas::~Canvas(){
+		cairo_surface_destroy(surface);
+	}
 
 	cairo_surface_t* Canvas::Load(const char* path){
 		static const struct EXTHandler{
