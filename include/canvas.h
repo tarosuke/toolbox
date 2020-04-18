@@ -70,7 +70,8 @@ namespace TB{
 	private:
 		static cairo_surface_t* Load(const char*);
 		static const char* GetExt(const char*);
-		static cairo_surface_t* PNG_Loader(const char*);
+		static cairo_surface_t* LoadPNG(const char*);
+		static cairo_surface_t* LoadJPEG(const char*);
 
 	};
 
