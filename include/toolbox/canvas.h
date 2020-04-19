@@ -80,7 +80,8 @@ namespace TB{
 		public:
 			enum Slant{ slant_normal, slant_italic, slant_oblique };
 			enum Weight{ weight_normal, weight_bold };
-
+			enum Cap{ cap_butt, cap_round, cap_square };
+			enum Join{ join_miter, join_round, join_bevel };
 
 			GC(Canvas&);
 			~GC();
@@ -93,6 +94,9 @@ namespace TB{
 				const char* family,
 				Slant=slant_normal,
 				Weight=weight_normal);
+			void SetThickness(double);
+			void Set(Cap);
+			void Set(Join);
 
 			//描画
 			void MoveTo(double x, double y);
@@ -103,6 +107,9 @@ namespace TB{
 			Canvas& canvas;
 			Color strokeColor;
 			Color fillColor;
+			double thickness;
+			Cap cap;
+			Join join;
 			Rect<double> extents;
 
 			void Flush();

@@ -86,6 +86,17 @@ namespace TB{
 	}
 
 	void Canvas::GC::Flush(){
+		static const cairo_line_join_t joins[] = {
+			CAIRO_LINE_JOIN_MITER,
+			CAIRO_LINE_JOIN_ROUND,
+			CAIRO_LINE_JOIN_ROUND,
+		};
+		static const cairo_line_cap_t caps[] = {
+			CAIRO_LINE_CAP_BUTT,
+			CAIRO_LINE_CAP_ROUND,
+			CAIRO_LINE_CAP_SQUARE,
+		};
+
 		//更新範囲を更新
 		double ex[4];
 		cairo_stroke_extents(gc, &ex[0], &ex[1], &ex[2], &ex[3]);
@@ -101,6 +112,9 @@ namespace TB{
 
 		//ストローク描画
 		strokeColor.SetColor(gc);
+		cairo_set_line_width(gc, thickness);
+		cairo_set_line_cap(gc, caps[cap]);
+		cairo_set_line_join(gc, joins[join]);
 		cairo_stroke(gc);
 	}
 
@@ -133,6 +147,18 @@ namespace TB{
 		Flush();
 		cairo_select_font_face(gc, family, slants[slant], weights[weight]);
 	}
+	void Canvas::GC::SetThickness(double t){
+		Flush();
+		thickness = t;
+	}
+	void Canvas::GC::Set(Cap c){
+		Flush();
+		cap = c;
+	}
+	void Canvas::GC::Set(Join j){
+		Flush();
+		join = j;
+	}
 
 	void Canvas::GC::MoveTo(double x, double y){
 		cairo_move_to(gc, x, y);
@@ -140,9 +166,6 @@ namespace TB{
 	void Canvas::GC::LineTo(double x, double y){
 		cairo_line_to(gc, x, y);
 	}
-
-
-
 
 
 	Canvas::Canvas(unsigned width, unsigned height) :
