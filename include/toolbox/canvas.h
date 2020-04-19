@@ -35,6 +35,7 @@ namespace TB{
 		Canvas(const Canvas&);
 		void operator=(const Canvas&);
 	public:
+		//色
 		class Color{
 		public:
 			Color(unsigned webColor=0);
@@ -77,8 +78,25 @@ namespace TB{
 			GC(const GC&);
 			void operator=(const GC&);
 		public:
+			enum Slant{ slant_normal, slant_italic, slant_oblique };
+			enum Weight{ weight_normal, weight_bold };
+
+
 			GC(Canvas&);
 			~GC();
+
+			//設定
+			void SetStroke(const Color&);
+			void SetFill(const Color&);
+			void Set(const Color& strokeColor, const Color& fillColor);
+			void Set(
+				const char* family,
+				Slant=slant_normal,
+				Weight=weight_normal);
+
+			//描画
+			void MoveTo(double x, double y);
+			void LineTo(double x, double y);
 
 		private:
 			cairo_t* gc;

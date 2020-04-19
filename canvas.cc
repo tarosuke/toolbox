@@ -104,6 +104,46 @@ namespace TB{
 		cairo_stroke(gc);
 	}
 
+	void Canvas::GC::SetStroke(const Color& c){
+		Flush();
+		strokeColor = c;
+	}
+	void Canvas::GC::SetFill(const Color& c){
+		Flush();
+		fillColor = c;
+	}
+	void Canvas::GC::Set(const Color& sc, const Color& fc){
+		Flush();
+		strokeColor = sc;
+		fillColor = fc;
+	}
+	void Canvas::GC::Set(
+			const char* family,
+			Slant slant,
+			Weight weight){
+		static const cairo_font_slant_t slants[] = {
+			CAIRO_FONT_SLANT_NORMAL,
+			CAIRO_FONT_SLANT_ITALIC,
+			CAIRO_FONT_SLANT_OBLIQUE,
+		};
+		static const cairo_font_weight_t weights[] = {
+			CAIRO_FONT_WEIGHT_NORMAL,
+			CAIRO_FONT_WEIGHT_BOLD,
+		};
+		Flush();
+		cairo_select_font_face(gc, family, slants[slant], weights[weight]);
+	}
+
+	void Canvas::GC::MoveTo(double x, double y){
+		cairo_move_to(gc, x, y);
+	}
+	void Canvas::GC::LineTo(double x, double y){
+		cairo_line_to(gc, x, y);
+	}
+
+
+
+
 
 	Canvas::Canvas(unsigned width, unsigned height) :
 			surface(cairo_image_surface_create(
