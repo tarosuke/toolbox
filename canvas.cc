@@ -160,11 +160,29 @@ namespace TB{
 		join = j;
 	}
 
+
+	void Canvas::GC::Clear(const Color& c){
+		cairo_pattern_t* const p(cairo_get_source(gc));
+		c.SetColor(gc);
+		cairo_paint(gc);
+		cairo_set_source(gc, p);
+	}
 	void Canvas::GC::MoveTo(double x, double y){
 		cairo_move_to(gc, x, y);
 	}
 	void Canvas::GC::LineTo(double x, double y){
 		cairo_line_to(gc, x, y);
+	}
+
+
+
+	Canvas::GC::Path::Path(GC& gc) : gc(gc.gc){
+		gc.Flush();
+		cairo_new_path(gc.gc);
+	}
+
+	Canvas::GC::Path::~Path(){
+		cairo_close_path(gc);
 	}
 
 

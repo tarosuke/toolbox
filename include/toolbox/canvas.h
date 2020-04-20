@@ -30,18 +30,24 @@ extern "C"{
 
 namespace TB{
 
+	/** Canvas
+	 * @brief 描画先(いわゆるDrawable)
+	 */
 	class Canvas{
 		Canvas();
 		Canvas(const Canvas&);
 		void operator=(const Canvas&);
 	public:
-		//色
+		/** Color
+		 * @brief 色
+		 */
 		class Color{
 		public:
-			Color(unsigned webColor=0);
+			Color() : r(0), g(0),b(0), a(0){};
+			Color(unsigned webColor);
 			Color(float r, float g, float b, float a=1.0);
 
-			void SetColor(cairo_t*);
+			void SetColor(cairo_t*) const;
 
 		private:
 			double r;
@@ -50,7 +56,9 @@ namespace TB{
 			double a;
 		};
 
-		//直接アクセスするためのアクセサ
+		/** Raw
+		 * @brief イメージに直接アクセスするためのアクセサ
+		 */
 		class Raw{
 			Raw();
 		private:
@@ -72,12 +80,28 @@ namespace TB{
 			static unsigned GetBPP(cairo_surface_t*);
 		};
 
-		//グラフィックコンテンツ
+		/** GC
+		 * @brief グラフィックコンテキスト＆描画メソッド
+		 */
 		class GC{
 			GC();
 			GC(const GC&);
 			void operator=(const GC&);
 		public:
+			/** Path
+			 *  @brief 多角形などのような閉じたパスを作る時にRAIIする
+			 */
+			class Path{
+				Path(const Path&);
+				void operator=(const Path&);
+			public:
+				Path(GC&);
+				~Path();
+
+			private:
+				cairo_t* const gc;
+			};
+
 			enum Slant{ slant_normal, slant_italic, slant_oblique };
 			enum Weight{ weight_normal, weight_bold };
 			enum Cap{ cap_butt, cap_round, cap_square };
@@ -99,8 +123,23 @@ namespace TB{
 			void Set(Join);
 
 			//描画
+			void Clear(const Color&);
 			void MoveTo(double x, double y);
 			void LineTo(double x, double y);
+			void Arc(
+				double x,
+				double y,
+				double radius,
+				double startAngle,
+				double endAngle);
+			void CurveTo(
+				double x0, double y0,
+				double xc, double yc,
+				double x1, double y1);
+			void Rectandle(
+				double x0, double y0,
+				double x1, double y1);
+			void Puts(const char* utf8);
 
 		private:
 			cairo_t* gc;
