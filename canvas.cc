@@ -173,6 +173,28 @@ namespace TB{
 	void Canvas::GC::LineTo(double x, double y){
 		cairo_line_to(gc, x, y);
 	}
+	void Canvas::GC::Arc(
+			double x,
+			double y,
+			double radius,
+			double startAngle,
+			double endAngle){
+		cairo_arc(gc, x, y, radius, startAngle, endAngle);
+	}
+	void Canvas::GC::CurveTo(
+			double x0, double y0,
+			double xc, double yc,
+			double x1, double y1){
+		cairo_curve_to(gc, x0, y0, xc, yc, x1, y1);
+	}
+	void Canvas::GC::Rectandle(
+			double x0, double y0,
+			double x1, double y1){
+		cairo_rectangle(gc, x0, y0, x1, y1);
+	}
+	void Canvas::GC::Puts(const char* utf8){
+		cairo_show_text(gc, utf8);
+	}
 
 
 
