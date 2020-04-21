@@ -115,7 +115,7 @@ namespace TB{
 			T v[dimensions];
 			for(unsigned n(0); n < dimensions; ++n){
 				const T aa(a[n]);
-				const T  bb(b[n]);
+				const T bb(b[n]);
 				v[n] = aa < bb ? bb : aa;
 			}
 			return Vector<T, dimensions>(v);
