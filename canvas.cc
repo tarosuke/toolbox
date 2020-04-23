@@ -89,7 +89,7 @@ namespace TB{
 		static const cairo_line_join_t joins[] = {
 			CAIRO_LINE_JOIN_MITER,
 			CAIRO_LINE_JOIN_ROUND,
-			CAIRO_LINE_JOIN_ROUND,
+			CAIRO_LINE_JOIN_BEVEL,
 		};
 		static const cairo_line_cap_t caps[] = {
 			CAIRO_LINE_CAP_BUTT,
