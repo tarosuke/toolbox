@@ -42,6 +42,9 @@ namespace TB{
 			g((double)((c >> 8) & 255) / 255.0),
 			b((double)(c & 255) / 255.0),
 			a((double)((c >> 24) & 255) / 255.0){}
+	void Canvas::Color::SetColor(cairo_t* gc) const{
+		cairo_set_source_rgba(gc, r, g, b, a);
+	}
 
 
 	Canvas::Raw::Raw(Canvas& canvas) :
