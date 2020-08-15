@@ -61,7 +61,7 @@ namespace TB{
 		virtual void operator=(const char*)=0;
 		void Delete(){ deleted = true; }
 		void Undelete(){ deleted = false; }
-		bool IsDeleted(){ return deleted; }
+		bool IsDeleted() const { return deleted; }
 		void Waste(){ dirty = true; };
 
 		virtual void AfterRead(const void*, unsigned)=0;
@@ -124,7 +124,7 @@ namespace TB{
 			body(defaultValue), defaultValue(defaultValue){};
 		~Prefs(){};
 
-		operator const T&(){ return IsDeleted() ? defaultValue : body; };
+		operator const T&() const { return IsDeleted() ? defaultValue : body; };
 		void operator=(const T& v){ body = v; Undelete(); Waste(); };
 		void operator=(const char* v) override;
 
@@ -158,7 +158,7 @@ namespace TB{
 			*this = defaultValue;
 		};
 		~Prefs(){};
-		operator const char*(){ return IsDeleted() ? defaultValue : body; };
+		operator const char*() const { return IsDeleted() ? defaultValue : body; };
 		void operator=(const char* v) override{
 			strncpy(body, v, maxLen);
 			body[maxLen - 1] = 0;
@@ -192,7 +192,7 @@ namespace TB{
 			body(defaultValue),
 			defaultValue(defaultValue){};
 		~Prefs(){};
-		operator const char*(){ return IsDeleted() ? defaultValue : (const char*)body; };
+		operator const char*() const { return IsDeleted() ? defaultValue : (const char*)body; };
 		void operator=(const char* v) override{
 			body = v;
 			Undelete();
