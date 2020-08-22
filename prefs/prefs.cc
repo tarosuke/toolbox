@@ -193,6 +193,11 @@ namespace TB{
 		Undelete();
 		Waste();
 	}
+	template<> void Prefs<float>::operator=(const char* v){
+		body = atof(v);
+		Undelete();
+		Waste();
+	}
 	template<> void Prefs<bool>::operator=(const char* v){
 		switch(*v){
 		case 't':
