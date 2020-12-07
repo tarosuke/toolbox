@@ -78,8 +78,45 @@ namespace TB{
 	}
 
 
+	Canvas::Clip::Clip(
+			Canvas& c,
+			int x,
+			int y,
+			unsigned width,
+			unsigned height) :
+			Raw(c),
+			width(Range(x, width, Raw::width)),
+			height(Range(y, height, Raw::height)),
+			bpp(Raw::bpp),
+			stride(width * bpp),
+			body((!!width && !!height) ? malloc(bpp * stride * height) : 0){
+		if(body){
+			for(unsigned v(0); v < height; ++v){
+				memcpy(body, &(*this)[x][y + v], stride);
+			}
+		}
+	}
+
+	unsigned Canvas::Clip::Range(int p, unsigned width, unsigned orgWidth){
+		if(p < 0){
+			if(width <= (unsigned)-p){
+				return 0;
+			}
+			width += p;
+			p = 0;
+		}
+		if(orgWidth < p + width){
+			if(orgWidth <= (unsigned)p){
+				return 0;
+			}
+			width = orgWidth - p;
+		}
+		return width;
+	}
+
+
 	Canvas::GC::GC(Canvas& c) :
-			gc(cairo_create(canvas.surface)),
+			gc(cairo_create(c.surface)),
 			canvas(c){}
 
 	Canvas::GC::~GC(){

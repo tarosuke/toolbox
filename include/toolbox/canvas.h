@@ -80,6 +80,27 @@ namespace TB{
 			static unsigned GetBPP(cairo_surface_t*);
 		};
 
+		/** Clip
+		 * クリップ
+		 * NOTE:Canvasからはみ出た場合など、与えたサイズと取り出したサイズが異なる場合があるので与えたサイズではなく出てきたサイズを使うこと。
+		 */
+		class Clip : private Raw{
+			Clip();
+			Clip(Canvas&, int x, int y, unsigned width, unsigned height);
+			void operator=(const Clip&);
+		public:
+			const unsigned width; //幅
+			const unsigned height; //高さ
+			const unsigned bpp; //ピクセルのバイト数
+			const unsigned stride; //行のバイト数
+			void* const body; //画像イメージ
+			Clip(const Canvas&);
+			~Clip();
+
+		private:
+			static unsigned Range(int p, unsigned width, unsigned orgWidth);
+		};
+
 		/** GC
 		 * @brief グラフィックコンテキスト＆描画メソッド
 		 */
