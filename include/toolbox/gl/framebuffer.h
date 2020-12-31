@@ -31,6 +31,14 @@ namespace TB{
 		void operator=(const Framebuffer&);
 	public:
 
+		/** Size
+		 * サイズ
+		 */
+		struct Size{
+			unsigned width;
+			unsigned height;
+		};
+
 		/** Key
 		 * RAIIによるアクティベート管理
 		 */
@@ -57,7 +65,12 @@ namespace TB{
 		Framebuffer(
 			unsigned width,
 			unsigned height,
-			Texture::Format=Texture::RGB);
+			Format=Texture::RGB,
+			bool withDepth=true);
+		Framebuffer(
+			Size,
+			Format=Texture::RGB,
+			bool withDepth=true);
 		~Framebuffer();
 
 		unsigned GetFBID() const { return fbID; };
@@ -70,6 +83,12 @@ namespace TB{
 		static unsigned NewID();
 		static unsigned NewDB();
 		static int activeID;
+
+		void Assign(
+			unsigned width,
+			unsigned height,
+			Format,
+			bool withDepth);
 	};
 
 

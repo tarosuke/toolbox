@@ -27,24 +27,45 @@
 namespace TB{
 
 	Framebuffer::Framebuffer(
-		unsigned width,
-		unsigned height,
-		Texture::Format format) :
-		Texture(width, height, format),
-		fbID(NewID()),
-		dbID(NewDB()){
+			unsigned width,
+			unsigned height,
+			Format format,
+			bool withDepth) :
+			Texture(width, height, format),
+			fbID(NewID()),
+			dbID(NewDB()){
+		Assign(width, height, format, withDepth);
+	}
+
+	Framebuffer::Framebuffer(
+			Size size,
+			Format format,
+			bool withDepth) :
+			Texture(size.width, size.height, format),
+			fbID(NewID()),
+			dbID(NewDB()){
+		Assign(size.width, size.height, format, withDepth);
+	}
+
+	void Framebuffer::Assign(
+			unsigned width,
+			unsigned height,
+			Format format,
+			bool withDepth){
 		Key k(*this);
 
 		//デプスバッファ確保
-		glBindRenderbuffer(
-			GL_RENDERBUFFER,
-			dbID);
-		glRenderbufferStorage(
-			GL_RENDERBUFFER,
-			GL_DEPTH_COMPONENT,
-			width,
-			height);
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		if(withDepth){
+			glBindRenderbuffer(
+				GL_RENDERBUFFER,
+				dbID);
+			glRenderbufferStorage(
+				GL_RENDERBUFFER,
+				GL_DEPTH_COMPONENT,
+				width,
+				height);
+			glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		}
 
 		//カラーバッファ割り当て
 		glFramebufferTexture2D(
