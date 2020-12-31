@@ -60,6 +60,9 @@ namespace TB{
 			Texture::Format=Texture::RGB);
 		~Framebuffer();
 
+		unsigned GetFBID() const { return fbID; };
+		unsigned GetColorBufferID() const { return TextureID(); };
+		unsigned GetDepthBufferID() const { return dbID; };
 
 	private:
 		const unsigned fbID;

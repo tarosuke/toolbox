@@ -88,7 +88,7 @@ namespace TB{
 		//
 		// アクセサ
 		//
-		unsigned TextureID(){ return tid; };
+		unsigned TextureID() const{ return tid; };
 
 	private:
 		static unsigned NewID();
