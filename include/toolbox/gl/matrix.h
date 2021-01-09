@@ -8,23 +8,23 @@ namespace GL{
 
 	class Matrix{
 	public:
-		//MatrixのRAIIラッパ
-		class Zone{
-			Zone();
-		public:
-			enum FLAG{ load };
-			Zone(const Matrix& m);
-			Zone(const Matrix& m, FLAG);
-			~Zone();
-		};
+		Matrix(){};
+		Matrix(const float*);
 
-		Matrix(); //初期値は単位行列
-		Matrix(const float body[16]);
+		float* GetBody(){ return raw; };
+
+		void Identity();
+		void Transpose(const float[4][4]);
+		void TransposeAffine(const float[3][4]);
+
+		void Invert();
+		void InvertAffine(){ Invert(); };
+
 	private:
-		float matrix[16];
+		union{
+			float raw[16];
+			float m[4][4];
+		};
 	};
 
-
 }
-
-
