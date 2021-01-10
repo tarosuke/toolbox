@@ -14,7 +14,8 @@ namespace TB{
 		Matrix(){};
 		Matrix(const T*);
 
-		T* GetBody(){ return raw; };
+		operator T*(){ return raw; };
+		operator T const *() const { return raw; };
 
 		void Identity(){
 			for(unsigned n(0); n < ROW * COL; ++n){
