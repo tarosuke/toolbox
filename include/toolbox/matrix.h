@@ -47,6 +47,21 @@ namespace TB{
 		void Invert();
 		void InvertAffine(){ Invert(); };
 
+		template<unsigned C>
+			Matrix<C, ROW, T> operator *(const Matrix<C, COL, T>& o) const {
+			Matrix<C, ROW, T> rv{};
+
+			for(unsigned r(0); r < ROW; ++r){
+				for(unsigned c(0); c < C; ++c){
+					for(unsigned n(0); n < COL; ++n){
+						rv[r][c] += m[r][n] * o[n][r];
+					}
+				}
+			}
+
+			return rv;
+		};
+
 	private:
 		union{
 			T raw[COL * ROW];
