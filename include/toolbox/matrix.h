@@ -20,8 +20,8 @@ namespace TB{
 
 		operator T*(){ return raw; };
 		operator T const*() const { return raw; };
-		float* operator[](unsigned r){ return m[r]; };
-		const float* operator[](unsigned r) const { return m[r]; };
+		T* operator[](unsigned r){ return m[r]; };
+		const T* operator[](unsigned r) const { return m[r]; };
 
 		void Identity(){
 			for(unsigned n(0); n < ROW * COL; ++n){
