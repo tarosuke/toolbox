@@ -4,7 +4,7 @@
 #include <GL/gl.h>
 
 
-namespace GL{
+namespace TB{
 
 	class Matrix{
 	public:

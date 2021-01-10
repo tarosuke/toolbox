@@ -1,10 +1,10 @@
 #include <string.h>
 
-#include <toolbox/gl/matrix.h>
+#include <toolbox/matrix.h>
 
 
 
-namespace GL{
+namespace TB{
 
 	Matrix::Matrix(const float* o){
 		memcpy(m, o, sizeof(m));
