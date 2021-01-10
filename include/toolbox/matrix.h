@@ -23,6 +23,12 @@ namespace TB{
 		T* operator[](unsigned r){ return m[r]; };
 		const T* operator[](unsigned r) const { return m[r]; };
 
+		void operator=(const T* o){
+			for(unsigned n(0); n < COL * ROW; ++n){
+				raw[n] = *o++;
+			}
+		};
+
 		void Identity(){
 			for(unsigned n(0); n < ROW * COL; ++n){
 				raw[n] = 0;
