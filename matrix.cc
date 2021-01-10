@@ -6,38 +6,7 @@
 
 namespace TB{
 
-	Matrix::Matrix(const float* o){
-		memcpy(m, o, sizeof(m));
-	}
-
-	void Matrix::Identity(){
-		for(unsigned n(0); n < 16; ++n){
-			raw[n] = 0;
-		}
-		raw[0] = raw[5] = raw[10] = 1;
-	}
-
-	void Matrix::Transpose(const float o[4][4]){
-		float* d(raw);
-		for(unsigned x(0); x < 4; ++x){
-			for(unsigned y(0); y < 4; ++y){
-				*d++ = o[y][x];
-			}
-		}
-	}
-
-	void Matrix::TransposeAffine(const float o[3][4]){
-		float* d(raw);
-		for(unsigned x(0); x < 4; ++x){
-			for(unsigned y(0); y < 3; ++y){
-				*d++ = o[y][x];
-			}
-			*d++ = 0;
-		}
-		raw[15] = 1;
-	}
-
-	void Matrix::Invert(){
+	template<> void Matrix<4, 4, float>::Invert(){
 		const float r(1.0/(
 			m[0][3]*m[1][2]*m[2][1]*m[3][0] - m[0][2]*m[1][3]*m[2][1]*m[3][0] -
 			m[0][3]*m[1][1]*m[2][2]*m[3][0] + m[0][1]*m[1][3]*m[2][2]*m[3][0]+

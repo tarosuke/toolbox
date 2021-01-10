@@ -6,24 +6,50 @@
 
 namespace TB{
 
-	class Matrix{
+	template<
+		unsigned COL = 4,
+		unsigned ROW = 4,
+		typename T = float> class Matrix{
 	public:
 		Matrix(){};
-		Matrix(const float*);
+		Matrix(const T*);
 
-		float* GetBody(){ return raw; };
+		T* GetBody(){ return raw; };
 
-		void Identity();
-		void Transpose(const float[4][4]);
-		void TransposeAffine(const float[3][4]);
+		void Identity(){
+			for(unsigned n(0); n < ROW * COL; ++n){
+				raw[n] = 0;
+			}
+			for(unsigned n(0); n < ROW && n < COL; ++n){
+				m[n][n] = 1;
+			}
+		};
+		void Transpose(const T o[COL][ROW]){
+			float* d(raw);
+			for(unsigned x(0); x < COL; ++x){
+				for(unsigned y(0); y < ROW; ++y){
+					*d++ = o[y][x];
+				}
+			}
+		};
+		void TransposeAffine(const T o[COL - 1][ROW]){
+			float* d(raw);
+			for(unsigned x(0); x < ROW; ++x){
+				for(unsigned y(0); y < COL - 1; ++y){
+					*d++ = o[y][x];
+				}
+				*d++ = 0;
+			}
+			raw[COL * ROW - 1] = 1;
+		};
 
 		void Invert();
 		void InvertAffine(){ Invert(); };
 
 	private:
 		union{
-			float raw[16];
-			float m[4][4];
+			T raw[COL * ROW];
+			T m[ROW][COL];
 		};
 	};
 
