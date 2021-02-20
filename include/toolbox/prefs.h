@@ -1,10 +1,31 @@
-/** 設定管理
- * 設定を与えてstaticなインスタンスを作っておくと変数を設定値として管理してくれる便利クラス
+/*********************************************************************** prefs
+ * Copyright (C) 2015-2021 tarosuke<webmaster@tarosuke.net>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ ** 設定管理
+ * 設定を与えてstaticなインスタンスを作っておくと変数を設定値として管理して
+ * くれる便利クラス
+ *
  *
  * 設定はKeeperを作ると読み込まれ、Keeperが消滅すると保存される。
  *
- * 末端の設定に何かさせたい時はPrefsの子クラスを作ってExtendedHandlerをオーバーライドした上で
- * 呼び出す。また全ての設定を辿る時はItorを作って0になるまでループする。
+ * 末端の設定に何かさせたい時はPrefsの子クラスを作ってExtendedHandlerをオー
+ * バーライドした上で呼び出す。また全ての設定を辿る時はItorを作って0になるま
+ * でループする。
  */
 #pragma once
 
@@ -16,8 +37,8 @@
 namespace TB{
 
 	/**
-	 * テンプレートでstaticメンバを作っても型ごとにインスタンスができてしまうので
-	 * インスタンスを共通化するための親クラス
+	 * テンプレートでstaticメンバを作っても型ごとにインスタンスができてしまう
+	 * のでインスタンスを共通化するための親クラス
 	 */
 	class CommonPrefs{
 		CommonPrefs();
@@ -36,9 +57,10 @@ namespace TB{
 			Keeper(const Keeper&);
 			void operator=(const Keeper&);
 		public:
-			Keeper(const char* name){
+			Keeper(const char* name, int argc = 0, const char** argv = 0){
 				CommonPrefs::inited = true;
 				Load(name);
+				Parse(argc, argv);
 			};
 			~Keeper(){
 				CommonPrefs::Store();
@@ -47,10 +69,6 @@ namespace TB{
 				CommonPrefs::Store();
 			};
 		};
-
-		//文字列による値設定(要するにコマンドラインオプション用)
-		static bool Set(const char* arg);
-		static bool SetAll(int argc, const char* argv[]);
 
 	protected:
 		CommonPrefs(
@@ -71,8 +89,9 @@ namespace TB{
 		virtual void ExtendedHandler(void* =0){};
 
 	private:
-		/**設定を辿るための反復子
-		 * NOTE:初期化時点で先頭を指しているのでC++式反復子形式(処理後インクリメント)で使う
+		/** 設定を辿るための反復子
+		 * NOTE:初期化時点で先頭を指しているのでC++式反復子形式(処理後インク
+		 * リメント)で使う
 		 */
 		class Itor{
 			Itor(const Itor&);
@@ -101,15 +120,25 @@ namespace TB{
 		static void Load(const char*);
 		static void Store();
 
+		//コマンドラインオプションを解釈
+		static int Parse(int argc, const char** argv);
+
+		//文字列による値設定(要するにコマンドラインオプション用)
+		//負の値ならエラー、正の値ならそこから未処理、argc以上なら終了
+		static bool Set(const char* key, const char* value);
+
+
 		void Read();
 		virtual void Write()=0;
 	};
 
 	/**
-	 * 型とキー文字列を与えてインスタンスを作るだけで設定になる変数を作れるクラス
+	 * 型とキー文字列を与えてインスタンスを作るだけで設定になる変数を作れる
+	 * クラス
 	 * NOTE:keyは文字列リテラルである必要がある
 	 * NOTE:「=」で代入できる必要がある
-	 * NOTE:operatorによる変換は用意してはあるが、代入以外はキャストする必要がある
+	 * NOTE:operatorによる変換は用意してはあるが、代入以外はキャストする必要が
+	 * ある
 	 * NOTE:処理がmainに入るまでは機能しない
 	 */
 	template<typename T> class Prefs : public CommonPrefs{
