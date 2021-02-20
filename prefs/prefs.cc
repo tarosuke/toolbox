@@ -29,6 +29,7 @@
 
 #include <toolbox/prefs.h>
 #include <toolbox/complex/complex.h>
+#include <toolbox/string.h>
 
 
 
@@ -94,9 +95,35 @@ namespace TB{
 		for(int n(1); n < argc; ++n){
 			const char* const arg(argv[n]);
 
+			if(arg[0] != '-' && arg[1] != '+'){
+				//解釈できる形式は終了
+				return n;
+			}
+
+			//キーの取り出し
+			String key(arg);
+			String value;
+			if(arg[1] != '-'){
+				//スイッチオプション(-/+xxx)
+				key = "-";
+				key += &arg[1];
+				value = arg[0] == '+' ? "t" : "f";
+			}else{
+				//値オプション(--xxx yyy)
+				if(argc <= ++n){
+					syslog(LOG_CRIT, "option %s needs parametor", arg);
+					return -1;
+				}
+				value = argv[n];
+			}
+
 			//コマンドラインオプションの解釈
-			if(!TB::CommonPrefs::Set(arg)){
-				syslog(LOG_CRIT, "Unknown option: %s", arg);
+			if(!TB::CommonPrefs::Set(key, value)){
+				syslog(
+					LOG_CRIT,
+					"Unknown option: %s %s",
+					arg,
+					(const char*)value);
 				return -1;
 			}
 		}
@@ -153,38 +180,12 @@ namespace TB{
 		}
 	}
 
-	bool CommonPrefs::Set(const char* arg){
-		if(!arg || !*arg){ return false; }
-
-		//トークンを切るために複製
-		char* a(strdup(arg));
-		if(!a){ return false; }
-
-		//キーと中身に分割
-		const char* key(strtok(a, "="));
-		const char* val(strtok(NULL, ""));
-
-		//キー存在チェック
-		if(!key){ free(a); return false; };
-
-		//スイッチタイプの場合key、valを修正する
-		switch(a[0]){
-		case '-' :
-			if(a[1] != '-'){
-				val = "f";
-				a[0] = '+';
-			}
-			break;
-		case '+' :
-			val = "t";
-			break;
-		}
-
+	bool CommonPrefs::Set(const char* key, const char* val){
 		//キー探索
 		for(Itor i; i; ++i){
 			if(!strcmp((*i).key, key)){
 				//一致
-				if(val){
+				if(val && *val){
 					//値を設定
 					*i = val;
 				}else{
@@ -193,25 +194,12 @@ namespace TB{
 
 				//正常終了
 				(*i).Waste();
-				free(a);
 				return true;
 			}
 		}
 
 		//キーに一致するエントリなし
-		free(a);
 		return false;
-	}
-
-	/** 引数全部を設定
-	 */
-	bool CommonPrefs::SetAll(int argc, const char* argv[]){
-		for(int n(0); n < argc; ++n){
-			if(!Set(argv[n])){
-				return false;
-			}
-		}
-		return true;
 	}
 
 

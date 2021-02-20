@@ -70,10 +70,6 @@ namespace TB{
 			};
 		};
 
-		//文字列による値設定(要するにコマンドラインオプション用)
-		static bool Set(const char* arg);
-		static bool SetAll(int argc, const char* argv[]);
-
 	protected:
 		CommonPrefs(
 			const char* key,
@@ -122,8 +118,15 @@ namespace TB{
 
 		static bool Open();
 		static void Load(const char*);
-		static int Parse(int argc, const char** argv);
 		static void Store();
+
+		//コマンドラインオプションを解釈
+		static int Parse(int argc, const char** argv);
+
+		//文字列による値設定(要するにコマンドラインオプション用)
+		//負の値ならエラー、正の値ならそこから未処理、argc以上なら終了
+		static bool Set(const char* key, const char* value);
+
 
 		void Read();
 		virtual void Write()=0;
