@@ -1,5 +1,24 @@
-/** 設定管理
- * 設定を与えてstaticなインスタンスを作っておくと変数を設定値として管理してくれる便利クラス
+/*********************************************************************** prefs
+ * Copyright (C) 2015-2021 tarosuke<webmaster@tarosuke.net>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ ** 設定管理
+ * 設定を与えてstaticなインスタンスを作っておくと変数を設定値として管理して
+ * くれる便利クラス
  */
 
 #include <unistd.h>
@@ -65,6 +84,24 @@ namespace TB{
 		//閉じておく
 		gdbm_close(db);
 		db = 0;
+	}
+
+	int CommonPrefs::Parse(int argc, const char** argv){
+		if(!argc || !argv){
+			return 0;
+		}
+
+		for(int n(1); n < argc; ++n){
+			const char* const arg(argv[n]);
+
+			//コマンドラインオプションの解釈
+			if(!TB::CommonPrefs::Set(arg)){
+				syslog(LOG_CRIT, "Unknown option: %s", arg);
+				return -1;
+			}
+		}
+
+		return argc;
 	}
 
 	void CommonPrefs::Store(){
