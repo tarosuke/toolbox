@@ -76,7 +76,7 @@ namespace TB{
 
 	/** BasePath / Base
 	 */
-	const char* Base(const char* p){
+	const char* Path::Base(const char* p){
 		const char* b;
 		for(b = p; *p; ++p){
 			if(*p == '/'){

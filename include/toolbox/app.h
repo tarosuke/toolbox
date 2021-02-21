@@ -32,7 +32,7 @@ namespace TB{
 		void operator=(const App&);
 	public:
 		App();
-		virtual ~App();
+		virtual ~App(){};
 
 	protected:
 		virtual void Run()=0;
