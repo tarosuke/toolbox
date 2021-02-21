@@ -25,7 +25,15 @@
 namespace TB{
 
 	class Path : public String{
-		Path();
+	public:
+
+		Path() : String(){};
+		Path(const char* path) : String(path){};
+
+		const char* BaseName(){ return Base((const char*)*this); };
+		static const char* Base(const char*);
+
+
 	protected:
 		Path(const String&, const char*);
 		Path(const String&, const String&);

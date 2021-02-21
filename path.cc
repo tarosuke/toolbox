@@ -67,10 +67,24 @@ namespace TB{
 	}
 
 
-	/*** 構築子
+	/** 構築子
 	 */
 	Path::Path(const String& r, const char* p) : String(StatPath(r, p)){}
 	Path::Path(const String& r, const String& p) : String(StatPath(r, p)){}
 	Path::Path(const String& r, const Path& p) : String(StatPath(r, p)){}
+
+
+	/** BasePath / Base
+	 */
+	const char* Base(const char* p){
+		const char* b;
+		for(b = p; *p; ++p){
+			if(*p == '/'){
+				b = p + 1;
+			}
+		}
+		return b;
+	}
+
 
 }
