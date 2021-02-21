@@ -1,5 +1,5 @@
-/** Path search
- * Copyright (C) 2018 tarosuke<webmaster@tarosuke.net>
+/************************************************************************* App
+ * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,33 +15,33 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ ** アプリケーションのフレームワーク
+ * Appを導出してどこかstaticなところにインスタンスを作る
+ *   その時Run、必要があればFinallyをoverride
+ *     Ronは初期化後、Finallyはthrowで落ちようとも終了前に呼ばれる
+ * コンストラクタの段階では設定も引数も読み込まれていない
+ *   なので初期化処理はRunの冒頭で
  */
 #pragma once
 
-#include <toolbox/string.h>
-
-
-
 namespace TB{
 
-	class Path : public String{
+	class App{
+		App(const App&);
+		void operator=(const App&);
 	public:
-
-		Path() : String(){};
-		Path(const char* path) : String(path){};
-
-		const char* BaseName(){ return Base((const char*)*this); };
-		static const char* Base(const char*);
-
+		App();
+		virtual ~App();
 
 	protected:
-		Path(const String&, const char*);
-		Path(const String&, const String&);
-		Path(const String&, const Path&);
+		virtual void Run()=0;
+		virtual void Finally(){};
 
 	private:
-		static String StatPath(const String&, const String&);
-		static bool Is(const String&);
+		static App* instance;
+		static void CallRun();
+		static void CallFinally();
 	};
 
 }
