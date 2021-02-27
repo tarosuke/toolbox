@@ -33,6 +33,7 @@ namespace{
 	void (*initAll)();
 	bool (*runAll)();
 	void (*finallyAll)();
+	const char* projectName(0);
 }
 
 namespace TB{
@@ -68,10 +69,14 @@ namespace TB{
 		}
 	}
 
+	const char* App::GetName(){
+		return projectName;
+	}
 }
 
+
 int main(int argc, const char *argv[]){
-	TB::Path projectName(TB::Path::Base(argv[0]));
+	projectName = TB::Path::Base(argv[0]);
 
 	//syslogを準備する
 	static const int logLevels[] = { LOG_CRIT, LOG_INFO, LOG_DEBUG };

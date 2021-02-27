@@ -25,6 +25,8 @@
  */
 #pragma once
 
+#include <toolbox/path.h>
+
 
 
 namespace TB{
@@ -40,6 +42,8 @@ namespace TB{
 		virtual void Init(){};
 		virtual bool Run(){ return true; };
 		virtual void Finally(){};
+
+		static const char* GetName();
 
 	private:
 		static App* stack;
