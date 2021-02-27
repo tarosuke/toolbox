@@ -23,6 +23,7 @@
 #include <toolbox/prefs.h>
 #include <toolbox/path.h>
 
+#include <stdexcept>
 #include <syslog.h>
 #include <assert.h>
 
@@ -104,7 +105,12 @@ int main(int argc, const char *argv[]){
 	catch(int returnCode){
 		rc = returnCode;
 	}
-	catch(...){}
+	catch(std::exception& e){
+		syslog(LOG_CRIT, e.what());
+	}
+	catch(...){
+		syslog(LOG_CRIT, "Unknown exception.");
+	}
 
 	(*finallyAll)();
 
