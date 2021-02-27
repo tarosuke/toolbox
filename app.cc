@@ -30,29 +30,42 @@
 
 namespace{
 	TB::Prefs<unsigned> logLevel("--verbose", 1, TB::CommonPrefs::nosave);
-	void (*callRun)();
-	void (*callFinally)();
+	void (*initAll)();
+	bool (*runAll)();
+	void (*finallyAll)();
 }
 
 namespace TB{
 
-	App* App::instance(0);
+	App* App::stack(0);
 
-	App::App(){
-		assert(!instance);
-		instance = this;
-		callRun = &CallRun;
-		callFinally = &CallFinally;
+
+	App::App() : next(stack){
+		stack = this;
+		initAll = InitAll;
+		runAll = RunAll;
+		finallyAll = FinallyAll;
 	}
 
-	void App::CallRun(){
-		assert(instance);
-		(*instance).Run();
+	void App::InitAll(){
+		for(App* a(stack); a; a = (*a).next){
+			(*a).Init();
+		}
 	}
 
-	void App::CallFinally(){
-		assert(instance);
-		(*instance).Finally();
+	bool App::RunAll(){
+		for(App* a(stack); a; a = (*a).next){
+			if(!(*a).Run()){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	void App::FinallyAll(){
+		for(App* a(stack); a; a = (*a).next){
+			(*a).Finally();
+		}
 	}
 
 }
@@ -79,17 +92,16 @@ int main(int argc, const char *argv[]){
 
 	int rc(0);
 	try{
-		assert(callRun);
-		(*callRun)();
+		(*initAll)();
+
+		while((*runAll)());
 	}
 	catch(int returnCode){
 		rc = returnCode;
 	}
 	catch(...){}
 
-	if(callFinally){
-		(*callFinally)();
-	}
+	(*finallyAll)();
 
 	return rc;
 }

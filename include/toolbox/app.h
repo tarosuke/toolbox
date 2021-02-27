@@ -25,6 +25,8 @@
  */
 #pragma once
 
+
+
 namespace TB{
 
 	class App{
@@ -35,13 +37,17 @@ namespace TB{
 		virtual ~App(){};
 
 	protected:
-		virtual void Run()=0;
+		virtual void Init(){};
+		virtual bool Run(){ return true; };
 		virtual void Finally(){};
 
 	private:
-		static App* instance;
-		static void CallRun();
-		static void CallFinally();
+		static App* stack;
+		App* next;
+
+		static void InitAll();
+		static bool RunAll();
+		static void FinallyAll();
 	};
 
 }
