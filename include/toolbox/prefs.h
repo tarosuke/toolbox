@@ -189,8 +189,12 @@ namespace TB{
 		~Prefs(){};
 		operator const char*() const { return IsDeleted() ? defaultValue : body; };
 		void operator=(const char* v) override{
-			strncpy(body, v, maxLen);
-			body[maxLen - 1] = 0;
+			if(v){
+				strncpy(body, v, maxLen);
+				body[maxLen - 1] = 0;
+			}else{
+				body[0] = 0;
+			}
 			Undelete();
 			Waste();
 		};
