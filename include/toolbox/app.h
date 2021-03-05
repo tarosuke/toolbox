@@ -40,7 +40,7 @@ namespace TB{
 
 	protected:
 		virtual void Init(){};
-		virtual bool Run(){ return true; };
+		virtual bool Run(){ return false; };
 		virtual void Finally(){};
 
 		static const char* GetName();

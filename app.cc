@@ -77,6 +77,10 @@ namespace TB{
 
 
 int main(int argc, const char *argv[]){
+	if(!initAll || !runAll || !finallyAll){
+		return -1;
+	}
+
 	projectName = TB::Path::Base(argv[0]);
 
 	//syslogを準備する
