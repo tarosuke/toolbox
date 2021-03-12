@@ -5,7 +5,6 @@
 #include <ctype.h>
 
 #include <toolbox/type.h>
-#include <toolbox/string.h>
 
 
 
@@ -67,18 +66,22 @@ namespace TB{
 		if(text[0] == '0' && text[1] == 'x'){
 			//ビットイメージで読み込み
 			text += 2;
-			__uint128_t v(0);
+			u128 v(0);
 			for(; *text && isxdigit(*text); ++text){
 				v <<= 16;
 				v += isdigit(*text) ?
 					*text - '0' :
 					(*text & ~0x20) - 'A' + 10;
 			}
-			*(__uint128_t*)&body = v;
+			*(u128*)&body = v;
 		}else{
 			body = strtold(text, 0);
 		}
 		return body;
 	}
+
+	// template<> String Type<int>::Serialize() const {
+	// 	char b[32];
+	// }
 
 }
