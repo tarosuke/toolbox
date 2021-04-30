@@ -6,3 +6,5 @@
 
 *.kate-swp
 .hg
+/*.code-workspace
+/.vscode
