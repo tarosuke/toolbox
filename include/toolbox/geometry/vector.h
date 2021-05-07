@@ -1,5 +1,5 @@
 /** Vector
- * Copyright (C) 2016, 2017 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2016, 2017, 2021 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -109,7 +109,14 @@ namespace TB{
 				value[n] /= t;
 			}
 		};
-		void Min(const Vector& t){
+		T operator*(const Vector& t) const {
+			T v(0);
+			for (unsigned n(0); n < dimension; ++n) {
+				v += value[n] * t.value[n];
+			}
+			return v;
+		};
+		void Min(const Vector& t) {
 			for(unsigned n(0); n < dimension; ++n){
 				if(t.value[n] < value[n]){
 					value[n] = t.value[n];
@@ -124,26 +131,25 @@ namespace TB{
 			}
 		};
 
-		T X() const { return value[0]; };
-		T Y() const { return value[1]; };
-		T Z() const { return value[2]; };
-
-		T Length() const {
+		T Length2() const {
 			T l2(0);
-			for(unsigned n(0); n < dimension; ++n){
-				l2 += value[n] * value[n];
+			for (const T e : value) {
+				l2 += e;
 			}
-			return sqrt(l2);
+			return l2;
 		};
+		T Length() const { return sqrt(Length2()); };
 
 		void Normalize(){
 			*this /= Length();
 		};
 
-	private:
+		T Cross2(const Vector& t) const {
+			return value[0] * t.value[1] - value[1] * t.value[0];
+		};
+		Vector Cross(const Vector&) const;
 
+	private:
 		T value[dimension];
 	};
-
-
 };
