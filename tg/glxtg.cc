@@ -45,7 +45,6 @@ namespace TG {
 	}
 
 
-
 	/** デフォルトのビジュアルフォーマット
 	 */
 	int GLXScene::defaultAttributes[] = {

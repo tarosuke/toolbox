@@ -20,6 +20,7 @@
 
 #include <toolbox/container/list.h>
 #include <toolbox/geometry/vector.h>
+#include <toolbox/geometry/matrix.h>
 
 
 
@@ -32,6 +33,28 @@ namespace TG {
 
 	public:
 		virtual ~Object(){};
+		virtual void Draw(const TB::Matrix<4, 4>&);
+
+	protected:
+		bool visible;
+		Object() : visible(true){};
+	};
+
+	class Group : public Object {
+		Group(const Group&);
+		void operator=(const Group&);
+
+	public:
+		Group(){};
+		void AddChild(Object& o) { children.Add(o); };
+		void AddCHild(Group& g) { groups.Add(g); };
+
+	protected:
+		TB::List<Object> children;
+		TB::List<Object> groups;
+		TB::Matrix<4, 4> view;
+
+		void Draw(const TB::Matrix<4, 4>&);
 	};
 
 	//フレームバッファや画面などの描画先
@@ -47,8 +70,10 @@ namespace TG {
 		};
 		Scene(){};
 		virtual ~Scene(){};
+		void AddLayer(Object& o) { layers.Add(o); };
+		void Draw();
+
+	private:
+		TB::List<Object> layers;
 	};
-
-	class Texture {};
-
 }
