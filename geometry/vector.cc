@@ -21,22 +21,22 @@
 
 
 namespace {
-	template <typename T> TB::Vector<T, 3> Cross3(const T a[3], const T b[3]) {
+	template <typename T> TB::Vector<3, T> Cross3(const T a[3], const T b[3]) {
 		const double arr[3] = {
 			a[1] * b[2] - a[2] * b[1],
 			a[2] * b[0] - a[0] * b[2],
 			a[0] * b[1] - a[1] * b[0]};
-		return TB::Vector<T, 3>(arr);
+		return TB::Vector<3, T>(arr);
 	}
 }
 
 namespace TB {
 	template <>
-	Vector<float, 3> Vector<float, 3>::Cross(const Vector& t) const {
+	Vector<3, float> Vector<3, float>::Cross(const Vector& t) const {
 		return ::Cross3(value, t.value);
 	}
 	template <>
-	Vector<double, 3> Vector<double, 3>::Cross(const Vector& t) const {
+	Vector<3, double> Vector<3, double>::Cross(const Vector& t) const {
 		return ::Cross3(value, t.value);
 	}
 }

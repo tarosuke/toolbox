@@ -60,11 +60,10 @@ namespace TB{
 		unsigned GetWidth() const;
 		unsigned GetHeight() const;
 		unsigned GetBPP() const;
-		operator Rect<unsigned>() const{
-			return Rect<unsigned>(
-				Vector<unsigned, 2>( 0, 0 ),
-				Vector<unsigned, 2>( GetWidth(), GetHeight() )
-			);
+		operator Rect<2, unsigned>() const {
+			return Rect<2, unsigned>(
+				Vector<2, unsigned>(0, 0),
+				Vector<2, unsigned>(GetWidth(), GetHeight()));
 		};
 
 		/** 画像操作
@@ -202,7 +201,7 @@ namespace TB{
 		private:
 			Image& canvas;
 			cairo_t* const gc;
-			Rect<unsigned> updated;
+			Rect<2, unsigned> updated;
 			StrokeColor sColor;
 			FillColor fColor;
 			bool drawn;
@@ -210,7 +209,7 @@ namespace TB{
 		};
 
 	protected:
-		virtual void OnImageUpdated(const Raw&, const Rect<unsigned>&){};
+		virtual void OnImageUpdated(const Raw&, const Rect<2, unsigned>&){};
 		bool IsTransparent() const;
 
 	private:

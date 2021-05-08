@@ -22,11 +22,11 @@
 
 namespace TB{
 
-	template<typename T, unsigned dimensions = 2> class Rect{
+	template <unsigned dimensions = 2, typename T = float> class Rect {
 	public:
 		Rect(){};
-		Rect(const Vector<T, dimensions>& a, const Vector<T, dimensions>& b) :
-			points((const Vector<T, dimensions>[]){ Less(a, b), More(a, b) }){};
+		Rect(const Vector<dimensions, T>& a, const Vector<dimensions, T>& b)
+			: points((const Vector<dimensions, T>[]){Less(a, b), More(a, b)}){};
 		void Clear(){
 			points[0].Clear();
 			points[1].Clear();
@@ -62,8 +62,8 @@ namespace TB{
 			return r;
 		};
 		T operator&&(const Rect& t) const{
-			const Vector<T, dimensions> lt(More(points[0], t.points[0]));
-			const Vector<T, dimensions> rb(Less(points[1], t.points[1]));
+			const Vector<dimensions, T> lt(More(points[0], t.points[0]));
+			const Vector<dimensions, T> rb(Less(points[1], t.points[1]));
 			T v(0);
 			for(unsigned n(0); n < dimensions; ++n){
 				const T a(lt[n]);
@@ -77,10 +77,10 @@ namespace TB{
 		};
 		const T* Left() const { return points[0]; };
 		const T* Right() const { return points[1]; };
-		Rect operator+(const Vector<T, dimensions>& t) const{
+		Rect operator+(const Vector<dimensions, T>& t) const {
 			return Rect(points[0] + t, points[1] + t);
 		};
-		Rect operator-(const Vector<T, dimensions>& t) const{
+		Rect operator-(const Vector<dimensions, T>& t) const {
 			return Rect(points[0] - t, points[1] - t);
 		};
 		operator bool() const{
@@ -99,26 +99,26 @@ namespace TB{
 			return v;
 		};
 	private:
-		Vector<T, dimensions> points[2]; //keep points[0] lesser value
-		static Vector<T, dimensions> Less(
-			const Vector<T, dimensions>& a, const Vector<T, dimensions>& b){
+		Vector<dimensions, T> points[2]; // keep points[0] lesser value
+		static Vector<dimensions, T>
+		Less(const Vector<dimensions, T>& a, const Vector<dimensions, T>& b) {
 			T v[dimensions];
 			for(unsigned n(0); n < dimensions; ++n){
 				const T aa(a[n]);
 				const T bb(b[n]);
 				v[n] = aa < bb ? aa : bb;
 			}
-			return Vector<T, dimensions>(v);
+			return Vector<dimensions, T>(v);
 		};
-		static Vector<T, dimensions> More(
-			const Vector<T, dimensions>& a, const Vector<T, dimensions>& b){
+		static Vector<dimensions, T>
+		More(const Vector<dimensions, T>& a, const Vector<dimensions, T>& b) {
 			T v[dimensions];
 			for(unsigned n(0); n < dimensions; ++n){
 				const T aa(a[n]);
 				const T bb(b[n]);
 				v[n] = aa < bb ? bb : aa;
 			}
-			return Vector<T, dimensions>(v);
+			return Vector<dimensions, T>(v);
 		};
 		bool HaveVolume() const{
 			for(unsigned n(0); n < dimensions; ++n){
@@ -130,5 +130,4 @@ namespace TB{
 			return true;
 		};
 	};
-
 }

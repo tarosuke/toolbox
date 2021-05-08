@@ -140,9 +140,9 @@ namespace TB{
 		//更新範囲を更新
 		double ex[4];
 		cairo_stroke_extents(gc, &ex[0], &ex[1], &ex[2], &ex[3]);
-		const Rect<double> e(
-			Vector<double>(ex[0], ex[1]),
-			Vector<double>(ex[2], ex[3]));
+		const Rect<2, double> e(
+			Vector<2, double>(ex[0], ex[1]),
+			Vector<2, double>(ex[2], ex[3]));
 
 		extents |= e;
 

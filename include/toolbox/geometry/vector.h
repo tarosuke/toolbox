@@ -24,7 +24,7 @@
 
 namespace TB{
 
-	template<typename T, unsigned dimension = 2> class Vector{
+	template <unsigned dimension, typename T = float> class Vector {
 	public:
 		operator T*(){
 			return value;
@@ -45,7 +45,7 @@ namespace TB{
 				value[n] = (T)t[n];
 			}
 		};
-		template<typename U> Vector(const Vector<U, dimension>& iv){
+		template <typename U> Vector(const Vector<dimension, U>& iv) {
 			for(unsigned n(0); n < dimension; ++n){
 				value[n] = (T)iv[n];
 			}
