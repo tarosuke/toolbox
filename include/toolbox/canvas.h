@@ -170,7 +170,7 @@ namespace TB{
 			double thickness;
 			Cap cap;
 			Join join;
-			Rect<double> extents;
+			Rect<2, double> extents;
 
 			void Flush();
 		};
@@ -182,7 +182,7 @@ namespace TB{
 	protected:
 		cairo_surface_t* const surface;
 
-		virtual void OnCanvasUpdated(const Rect<double>&){};
+		virtual void OnCanvasUpdated(const Rect<2, double>&){};
 
 	private:
 		static cairo_surface_t* Load(const char*);

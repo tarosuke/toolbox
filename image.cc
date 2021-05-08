@@ -263,9 +263,9 @@ namespace TB{
 		Draw();
 		cairo_surface_flush(canvas.surface);
 		Raw raw(canvas);
-		Rect<unsigned> cr(
-			Vector<unsigned>(0, 0),
-			Vector<unsigned>(raw.width, raw.height));
+		Rect<2, unsigned> cr(
+			Vector<2, unsigned>(0, 0),
+			Vector<2, unsigned>(raw.width, raw.height));
 		updated &= cr;
 		canvas.OnImageUpdated(Raw(canvas), updated);
 		cairo_destroy(gc);
@@ -277,7 +277,9 @@ namespace TB{
 		unsigned t(0 < up[1] ? (int)floor(up[1]) : 0);
 		unsigned r(0 < up[2] ? (int)ceil(up[2]) : 0);
 		unsigned b(0 < up[3] ? (int)ceil(up[3]) : 0);
-		Rect<unsigned> u(Vector<unsigned>(l, t), Vector<unsigned>(r, b));
+		Rect<2, unsigned> u(
+			Vector<2, unsigned>(l, t),
+			Vector<2, unsigned>(r, b));
 		updated |= u;
 	}
 
