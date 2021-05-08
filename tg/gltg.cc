@@ -22,6 +22,18 @@
 
 namespace TG {
 
-	GLScene::GLScene(const Frustum& frustum) {}
-	GLScene::GLScene(const double projection[]) {}
+	void GLScene::SetFrustum(const Frustum& frustum) {
+		glFrustum(
+			frustum.left,
+			frustum.right,
+			frustum.bottom,
+			frustum.top,
+			frustum.near,
+			frustum.far);
+	}
+
+	void GLScene::SetProjectionMatrix(const double projectionMatrix[]) {
+		glMatrixMode(GL_PROJECTION);
+		glLoadMatrixd(projectionMatrix);
+	}
 }

@@ -16,51 +16,32 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#include <assert.h>
+
 #include <toolbox/tg/glxtg.h>
-#include <GL/gl.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <GL/glx.h>
-
-
-
-namespace {
-	class GLX {
-	public:
-		GLX() : display(XOpenDisplay(NULL)) {
-			if (!display) {
-				return;
-			}
-			root = DefaultRootWindow(display);
-		}
-		void SetVisual(int attributes[]) {
-			attributes = attributes;
-			visual = glXChooseVisual(display, root, attributes);
-			context = glXCreateContext(display, visual, NULL, True);
-		}
-		~GLX() {}
-
-	private:
-		Display* const display;
-		Drawable root;
-		int* attributes;
-		XVisualInfo* visual;
-		GLXContext context;
-	} glx;
-
-}
 
 
 
 namespace TG {
 
-	GLXScene::GLXScene(const Frustum& frustum, int attributes[])
-		: GLScene(frustum) {
-		glx.SetVisual(attributes);
+	GLXScene::GLXScene(
+		const Target& target, const Frustum& frustum, int attributes[])
+		: target(target) {
+		assert(target.display);
+		Init(attributes);
+		SetFrustum(frustum);
 	}
-	GLXScene::GLXScene(const double projectionMatrix[], int attributes[])
-		: GLScene(projectionMatrix) {
-		glx.SetVisual(attributes);
+	GLXScene::GLXScene(
+		const Target& target, const double projectionMatrix[], int attributes[])
+		: target(target) {
+		assert(target.display);
+		Init(attributes);
+		SetProjectionMatrix(projectionMatrix);
+	}
+
+	void GLXScene::Init(int* attributes) {
+		visual = glXChooseVisual(target.display, target.drawable, attributes);
+		context = glXCreateContext(target.display, visual, NULL, True);
 	}
 
 
@@ -94,5 +75,4 @@ namespace TG {
 		GLX_ACCUM_ALPHA_SIZE,
 		0,
 		None};
-
 }

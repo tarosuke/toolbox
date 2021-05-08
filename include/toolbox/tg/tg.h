@@ -45,6 +45,7 @@ namespace TG {
 			double near;
 			double far;
 		};
+		Scene(){};
 		virtual ~Scene(){};
 	};
 

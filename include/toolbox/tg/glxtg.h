@@ -20,6 +20,10 @@
 
 #include <toolbox/tg/gltg.h>
 
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <GL/glx.h>
+
 
 
 namespace TG {
@@ -29,12 +33,27 @@ namespace TG {
 		void operator=(const GLXScene&);
 
 	public:
-		GLXScene(const Frustum&, int attirbutes[] = defaultAttributes);
-		GLXScene(const double[], int attirbutes[] = defaultAttributes);
+		struct Target {
+			Display* display;
+			Drawable drawable;
+		};
 
-
+		GLXScene(
+			const Target&,
+			const Frustum&,
+			int attirbutes[] = defaultAttributes);
+		GLXScene(
+			const Target&,
+			const double[],
+			int attirbutes[] = defaultAttributes);
 
 	private:
 		static int defaultAttributes[];
+		const Target& target;
+		int* attributes;
+		XVisualInfo* visual;
+		GLXContext context;
+
+		void Init(int* attributes);
 	};
 }

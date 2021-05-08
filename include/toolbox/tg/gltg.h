@@ -19,18 +19,20 @@
 #pragma once
 
 #include <toolbox/tg/tg.h>
+#include <GL/glew.h>
+#include <GL/gl.h>
 
 
 
 namespace TG {
 
 	class GLScene : public Scene {
-		GLScene();
 		GLScene(const GLScene&);
 		void operator=(const GLScene&);
 
 	protected:
-		GLScene(const Frustum&); // Frustumで初期化
-		GLScene(const double[]); // 投影行列で初期化
+		GLScene(){};
+		void SetFrustum(const Frustum& frustum);
+		void SetProjectionMatrix(const double projectionMatrix[]);
 	};
 }
