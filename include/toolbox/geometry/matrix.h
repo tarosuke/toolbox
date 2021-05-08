@@ -36,15 +36,15 @@ namespace TB{
 			}
 		};
 		void Transpose(const T o[COL][ROW]){
-			float* d(raw);
+			T* d(raw);
 			for(unsigned x(0); x < COL; ++x){
 				for(unsigned y(0); y < ROW; ++y){
 					*d++ = o[y][x];
 				}
 			}
 		};
-		void TransposeAffine(const T o[COL - 1][ROW]){
-			float* d(raw);
+		void TransposeAffine(const T o[COL - 1][ROW]) {
+			T* d(raw);
 			for(unsigned x(0); x < ROW; ++x){
 				for(unsigned y(0); y < COL - 1; ++y){
 					*d++ = o[y][x];
