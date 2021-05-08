@@ -1,5 +1,5 @@
 /************************************************************************ List
- * Copyright (C) 2017 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2017, 2021 tarosuke<webmaster@tarosuke.net>
  */
 
 #pragma once
@@ -10,10 +10,7 @@
 
 namespace TB{
 
-	template<
-		class T,
-		int index = 0,
-		class L=Lock::NullLock> class List : public L{
+	template <class T, class L = Lock::NullLock> class List : public L {
 		List(const List&);
 		void operator=(const List&);
 	public:
@@ -21,7 +18,7 @@ namespace TB{
 		using Key = Lock::Key<L>;
 
 		/**ノード：リストのノードはこれをpublicで継承しておく必要がある
-		 * 複数のリストを使うときはindexを指定した上で多重継承する
+		 * 複数のリストを使うときはそれぞれ継承してxxLisuのようにして区別する
 		 *
 		 * ノードがdeleteされると自動的にリストから外れる
 		 * List自体がdeleteされると要素が切り離された上でNotifyListDeletedが呼ばれる
@@ -229,5 +226,4 @@ namespace TB{
 	private:
 		Node anchor;
 	};
-
 }
