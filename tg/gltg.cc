@@ -22,6 +22,6 @@
 
 namespace TG {
 
-	namespace GL {}
-
+	GLScene::GLScene(const Frustum& frustum) {}
+	GLScene::GLScene(const double projection[]) {}
 }

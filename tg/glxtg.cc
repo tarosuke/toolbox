@@ -55,11 +55,11 @@ namespace {
 namespace TG {
 
 	GLXScene::GLXScene(const Frustum& frustum, int attributes[])
-		: Scene(frustum) {
+		: GLScene(frustum) {
 		glx.SetVisual(attributes);
 	}
 	GLXScene::GLXScene(const double projectionMatrix[], int attributes[])
-		: Scene(projectionMatrix) {
+		: GLScene(projectionMatrix) {
 		glx.SetVisual(attributes);
 	}
 

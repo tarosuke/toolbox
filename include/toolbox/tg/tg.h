@@ -45,8 +45,6 @@ namespace TG {
 			double near;
 			double far;
 		};
-		Scene(const Frustum&); // Frustumで初期化
-		Scene(const double[]); // 投影行列で初期化
 		virtual ~Scene(){};
 	};
 

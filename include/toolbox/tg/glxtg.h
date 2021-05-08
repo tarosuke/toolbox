@@ -18,13 +18,13 @@
  */
 #pragma once
 
-#include <toolbox/tg/tg.h>
+#include <toolbox/tg/gltg.h>
 
 
 
 namespace TG {
 
-	class GLXScene : public Scene {
+	class GLXScene : public GLScene {
 		GLXScene(const GLXScene&);
 		void operator=(const GLXScene&);
 

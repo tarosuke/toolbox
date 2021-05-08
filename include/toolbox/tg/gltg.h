@@ -24,13 +24,13 @@
 
 namespace TG {
 
-	namespace GLX {
+	class GLScene : public Scene {
+		GLScene();
+		GLScene(const GLScene&);
+		void operator=(const GLScene&);
 
-		// X画面のフレームバッファ
-		class Canvas : public TG::Scene {};
-
-
-
-	}
-
+	protected:
+		GLScene(const Frustum&); // Frustumで初期化
+		GLScene(const double[]); // 投影行列で初期化
+	};
 }
