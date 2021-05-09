@@ -26,6 +26,9 @@ deps = $(addsuffix .d, $(dmds))
 exobjs =
 
 
+testFiles := $(shell find $(shell find . -type d -name test) -type f)
+
+
 
 ######################################################################## RULES
 
@@ -45,7 +48,8 @@ clean:
 	rm -f objs/* libtoolbox.a $(wildcard */*.orig */*/*.orig)
 
 test:
-	@echo $(objs)
+	@echo $(testFiles)
+
 
 ################################################################# COMMON RULES
 
