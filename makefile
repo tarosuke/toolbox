@@ -13,11 +13,9 @@ COPTS ?= -Iinclude -I/usr/include/gdbm
 COPTS += -Wall -Werror -g -IX11
 CCOPTS += $(COPTS) -std=c++11
 
-
-ssfc = .c .cc .glsl
-spth = * */* */*/*
-srcs = $(foreach p, $(spth), $(foreach s, $(ssfc), $(wildcard $(p)$(s))))
-hdrs = $(foreach p, * $(spth), $(foreach s, .h, $(wildcard $(p)$(s))))
+files := $(shell find . -type d -name test -prune -o -type f -print)
+srcs := $(filter %.c %.cc %.glsl, $(files))
+hdrs := $(filter %.h, $(files))
 
 dirs = $(sort $(dir $(srcs)))
 mods = $(basename $(notdir $(srcs)))
@@ -46,7 +44,8 @@ uninstall:
 clean:
 	rm -f objs/* libtoolbox.a $(wildcard */*.orig */*/*.orig)
 
-
+test:
+	@echo $(objs)
 
 ################################################################# COMMON RULES
 
