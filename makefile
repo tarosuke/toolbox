@@ -3,43 +3,67 @@ target=libtoolbox.a
 all: $(target)
 
 .PHONY : clean test watch uninstall
-.DELETE_ON_ERROR : $(wildcard objs/*)
+.DELETE_ON_ERROR : $(wildcard builds/*)
 
 
-####################################################################### VALUES
+############################################################ FILE RECOGNITIONS
 
 COPTS ?= -Iinclude -I/usr/include/gdbm
 
 COPTS += -Wall -Werror -g -IX11
 CCOPTS += $(COPTS) -std=c++11
 
-files := $(shell find . -type d -name test -prune -o -type f -print)
-srcs := $(filter-out test, $(filter %.c %.cc %.glsl, $(files)))
-hdrs := $(filter %.h, $(files))
-
-dirs = $(sort $(dir $(srcs)))
-mods = $(basename $(notdir $(srcs)))
-dmds= $(addprefix objs/, $(mods))
-objs = $(addsuffix .o, $(dmds)) $(exobjs)
-deps = $(addsuffix .d, $(dmds))
-
-exobjs =
-
-
-testFiles := $(shell find $(shell find . -type d -name test) -type f)
-testSrcs := $(filter %.c %.cc %.glsl, $(testFiles))
-testHdrs := $(filter %.h, $(testFiles))
-
-testMods := $(basename $(notdir $(testSrcs)))
-testDmds := $(addprefix objs/, $(testMods))
-testObjs := $(addsuffix .o, $(testDmds))
-testDeps := $(addsuffix .d, $(testDmds))
+files := $(subst sources/,, $(shell find sources -type f))
+srcs := $(filter %.c %.cc %.glsl, $(files))
+mods := $(basename $(srcs))
+objs := $(addprefix builds/, $(addsuffix .o, $(mods)))
+deps := $(addprefix builds/, $(addsuffix .dep, $(mods)))
 
 
 
-######################################################################## RULES
 
-libtoolbox.a: makefile $(objs)
+
+################################################################# COMMON RULES
+
+
+-include $(deps)
+
+vpath %.o builds
+vpath % $(dirs)
+
+
+builds/%.o : sources/%.cc makefile
+	@echo " CC $@"
+	@mkdir -p $(dir $@)
+	@$(CC) $(CCOPTS) -c -o $@ $<
+
+builds/%.o : sources/%.c makefile
+	@echo " CC $@"
+	@mkdir -p $(dir $@)
+	@${CC} $(COPTS) -c -o $@ $<
+
+builds/%.o : sources/%.glsl makefile
+	@echo " OBJCOPY $@"
+	@mkdir -p $(dir $@)
+	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
+
+builds/%.dep : sources/%.cc makefile
+	@echo " CPP $@"
+	@mkdir -p $(dir $@)
+	@echo -n builds/ > $@
+	@$(CPP) $(CCOPTS) -MM $< >> $@
+
+builds/%.d : sources/%.c makefile
+	@echo " CPP $@"
+	@echo -n builds/ > $@
+	@mkdir -p $(dir $@)
+	@$(CPP) $(COPTS) -MM $< >> $@
+
+
+
+############################################################### RULES & TARGET
+
+%.a: makefile $(objs)
 	@echo " AR $@"
 	@ar rc $@ $(objs)
 
@@ -52,39 +76,7 @@ uninstall:
 	@sudo rm -rf  /usr/local/include/toolbox
 
 clean:
-	rm -f objs/* libtoolbox.a $(wildcard */*.orig */*/*.orig)
+	rm -rf builds/* libtoolbox.a $(shell find . -name "*.orig")
 
 test: libtoolbox.a $(testObjs)
-	$(foreach m, $(testMods), $(shell echo "gcc -o $(m) objs/$(m).o"))
-
-
-################################################################# COMMON RULES
-
-
--include $(deps)
-
-vpath %.o objs
-vpath % $(dirs)
-
-
-objs/%.o : %.cc makefile
-	@echo " CC $@"
-	@$(CC) $(CCOPTS) -c -o $@ $<
-
-objs/%.o : %.c makefile
-	@echo " CC $@"
-	@${CC} $(COPTS) -c -o $@ $<
-
-objs/%.o : %.glsl makefile
-	@echo " OBJCOPY $@"
-	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
-
-objs/%.d : %.cc
-	@echo " CPP $@"
-	@echo -n objs/ > $@
-	@$(CPP) $(CCOPTS) -MM $< >> $@
-
-objs/%.d : %.c
-	@echo " CPP $@"
-	@echo -n objs/ > $@
-	@$(CPP) $(COPTS) -MM $< >> $@
+	$(foreach m, $(testMods), $(shell echo "gcc -o $(m) builds/$(m).o"))
