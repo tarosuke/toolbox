@@ -14,7 +14,7 @@ COPTS += -Wall -Werror -g -IX11
 CCOPTS += $(COPTS) -std=c++11
 
 files := $(shell find . -type d -name test -prune -o -type f -print)
-srcs := $(filter %.c %.cc %.glsl, $(files))
+srcs := $(filter-out test, $(filter %.c %.cc %.glsl, $(files)))
 hdrs := $(filter %.h, $(files))
 
 dirs = $(sort $(dir $(srcs)))
@@ -27,6 +27,13 @@ exobjs =
 
 
 testFiles := $(shell find $(shell find . -type d -name test) -type f)
+testSrcs := $(filter %.c %.cc %.glsl, $(testFiles))
+testHdrs := $(filter %.h, $(testFiles))
+
+testMods := $(basename $(notdir $(testSrcs)))
+testDmds := $(addprefix objs/, $(testMods))
+testObjs := $(addsuffix .o, $(testDmds))
+testDeps := $(addsuffix .d, $(testDmds))
 
 
 
@@ -47,8 +54,8 @@ uninstall:
 clean:
 	rm -f objs/* libtoolbox.a $(wildcard */*.orig */*/*.orig)
 
-test:
-	@echo $(testFiles)
+test: libtoolbox.a $(testObjs)
+	$(foreach m, $(testMods), $(shell echo "gcc -o $(m) objs/$(m).o"))
 
 
 ################################################################# COMMON RULES
