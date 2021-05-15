@@ -28,6 +28,7 @@ namespace TB{
 		class Node{
 			friend class List;
 			friend class I;
+			friend class itor;
 			Node(const Node&);
 			void operator=(const Node&);
 		public:
@@ -69,7 +70,7 @@ namespace TB{
 		};
 
 		/** 反復子
-		 * Javaスタイルの反復子。
+		 * Listを与えればJavaスタイルの反復子。
 		 * 順、逆順共通で以下のように使う。
 		 * 正：for(I i(list); ++i;) hoge;
 		 * 逆：for(I i(list); --i;) huga;
@@ -77,16 +78,24 @@ namespace TB{
 		 * Listは環状なので初期状態から++すれば最初の要素、
 		 * --すれば最後の要素を指すようになる。
 		 *
+		 * Nodeを与えるとその場を指すのでC++スタイルの反復子
+		 *
 		 * 反復子が指している要素をリストから外しても正常動作するようになっている。
 		 * NOTE:反復子が有効な状態で要素を追加するときは反復子のInsert、Addを使うこと
 		 */
 		class I{
 		public:
+			// Javaスタイル反復子
 			I(List& l) :
 				key(l),
 				node(&l.anchor),
 				prev((*node).prev),
 				next((*node).next){};
+			// C++スタイル反復子
+			I(Node& i)
+				: key(i.key), node(&i.node), prev((*node).prev),
+				  next((*node).next){};
+
 			operator T*(){
 				return *node;
 			};
@@ -120,6 +129,7 @@ namespace TB{
 			};
 
 		};
+
 		/** コールバックによる反復
 		 */
 		template<typename U> T* Foreach(bool (T::*handler)(U&), U& param){
@@ -222,6 +232,10 @@ namespace TB{
 				(*n).NotifyListDeleted();
 			}
 		};
+
+		// C++スタイル反復子生成
+		static I begin(List& list){return I(list.ancher.next)};
+		static I end(List& list){return I(list.ancher)};
 
 	private:
 		Node anchor;
