@@ -20,8 +20,6 @@
  */
 
 #include <toolbox/app.h>
-#include <toolbox/prefs.h>
-#include <toolbox/path.h>
 
 #include <stdexcept>
 #include <syslog.h>
@@ -29,94 +27,46 @@
 
 
 
-namespace{
-	TB::Prefs<unsigned> logLevel("--verbose", 1, TB::CommonPrefs::nosave);
-	void (*initAll)();
-	bool (*runAll)();
-	void (*finallyAll)();
-	const char* projectName(0);
-}
+namespace {}
 
 namespace TB{
 
-	App* App::stack(0);
+	const char* App::projectName(0);
+	TB::Prefs<unsigned> logLevel("--verbose", 1, TB::CommonPrefs::nosave);
 
+	int App::main(App& instance, int argc, const char* argv[]) {
+		projectName = TB::Path::Base(argv[0]);
 
-	App::App() : next(stack){
-		stack = this;
-		initAll = InitAll;
-		runAll = RunAll;
-		finallyAll = FinallyAll;
-	}
-
-	void App::InitAll(){
-		for(App* a(stack); a; a = (*a).next){
-			(*a).Init();
+		// syslogを準備する
+		static const int logLevels[] = {LOG_CRIT, LOG_INFO, LOG_DEBUG};
+		if (2 < logLevel) {
+			logLevel = 2;
 		}
+		openlog(0, LOG_CONS, LOG_SYSLOG);
+		syslog(LOG_INFO, projectName);
+
+		//設定ファイルのパスを作る
+		TB::String prefsPath(".");
+		prefsPath += projectName;
+
+		//設定ファイル読み込み／コマンドラインオプション取得
+		TB::CommonPrefs::Keeper prefs(prefsPath, argc, argv);
+
+		//コマンドラインオプションに従ってログレベルを設定
+		const unsigned logMask(LOG_UPTO(logLevels[logLevel]));
+		setlogmask(logMask);
+
+		int rc(0);
+		try {
+			rc = instance.Main();
+		} catch (int returnCode) {
+			rc = returnCode;
+		} catch (std::exception& e) {
+			syslog(LOG_CRIT, e.what());
+		} catch (...) { syslog(LOG_CRIT, "Unknown exception."); }
+
+		instance.Finally();
+
+		return rc;
 	}
-
-	bool App::RunAll(){
-		for(App* a(stack); a; a = (*a).next){
-			if(!(*a).Run()){
-				return false;
-			}
-		}
-		return true;
-	}
-
-	void App::FinallyAll(){
-		for(App* a(stack); a; a = (*a).next){
-			(*a).Finally();
-		}
-	}
-
-	const char* App::GetName(){
-		return projectName;
-	}
-}
-
-
-int main(int argc, const char *argv[]){
-	if(!initAll || !runAll || !finallyAll){
-		return -1;
-	}
-
-	projectName = TB::Path::Base(argv[0]);
-
-	//syslogを準備する
-	static const int logLevels[] = { LOG_CRIT, LOG_INFO, LOG_DEBUG };
-	if(2 < logLevel){ logLevel = 2; }
-	openlog(0, LOG_CONS, LOG_SYSLOG);
-	syslog(LOG_INFO, projectName);
-
-	//設定ファイルのパスを作る
-	TB::String prefsPath(".");
-	prefsPath += projectName;
-
-	//設定ファイル読み込み／コマンドラインオプション取得
-	TB::CommonPrefs::Keeper prefs(prefsPath, argc, argv);
-
-	//コマンドラインオプションに従ってログレベルを設定
-	const unsigned logMask(LOG_UPTO(logLevels[logLevel]));
-	setlogmask(logMask);
-
-	int rc(0);
-	try{
-		(*initAll)();
-
-		while((*runAll)());
-	}
-	catch(int returnCode){
-		rc = returnCode;
-	}
-	catch(std::exception& e){
-		syslog(LOG_CRIT, e.what());
-	}
-	catch(...){
-		syslog(LOG_CRIT, "Unknown exception.");
-	}
-
-	(*finallyAll)();
-
-	return rc;
 }

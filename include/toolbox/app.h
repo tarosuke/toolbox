@@ -17,15 +17,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  ** アプリケーションのフレームワーク
- * Appを導出してどこかstaticなところにインスタンスを作る
- *   その時Run、必要があればFinallyをoverride
- *     Ronは初期化後、Finallyはthrowで落ちようとも終了前に呼ばれる
- * コンストラクタの段階では設定も引数も読み込まれていない
- *   なので初期化処理はRunの冒頭で
+ * Appを導出してMain、必要があればFinallyをoverride
+ * 導出したクラスのインスタンスを作りApp::mainへmainの引数とともに与える
  */
 #pragma once
 
 #include <toolbox/path.h>
+#include <toolbox/prefs.h>
 
 
 
@@ -37,21 +35,15 @@ namespace TB{
 	public:
 		App();
 		virtual ~App(){};
+		static int main(App& instance, int argc, const char* argv[]);
 
 	protected:
-		virtual void Init(){};
-		virtual bool Run(){ return false; };
+		static const char* projectName;
+
+		virtual int Main() = 0;
 		virtual void Finally(){};
 
-		static const char* GetName();
-
 	private:
-		static App* stack;
-		App* next;
-
-		static void InitAll();
-		static bool RunAll();
-		static void FinallyAll();
+		static Prefs<unsigned> logLevel;
 	};
-
 }
