@@ -82,6 +82,6 @@ clean:
 	rm -rf .builds/* $(target) $(shell find . -name "*.orig")
 
 test: $(target) $(tobjs)
-	$(foreach m, $(tmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox)
-	$(foreach m, $(tmods), chmod +x .builds/$(m))
-	$(foreach m, $(tmods), .builds/$(m))
+	@$(foreach m, $(tmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox;)
+	@$(foreach m, $(tmods), chmod +x .builds/$(m);)
+	@.builds/tests/test $(addprefix .builds/$(m), $(tmods))
