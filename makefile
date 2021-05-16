@@ -57,19 +57,18 @@ vpath % $(dirs)
 	@echo -n .builds/ > $@
 	@$(CPP) $(CCOPTS) -MM $< >> $@
 
-.builds/%.d : sources/%.c makefile
+.builds/%.dep : sources/%.c makefile
 	@echo " CPP $@"
 	@echo -n .builds/ > $@
 	@mkdir -p $(dir $@)
 	@$(CPP) $(COPTS) -MM $< >> $@
 
-%.a: makefile $(objs)
-	@echo " AR $@"
-	@ar rc $@ $(objs)
-
-
 
 ############################################################### RULES & TARGET
+
+$(target): makefile $(objs)
+	@echo " AR $@"
+	@ar rc $@ $(objs)
 
 install: libtoolbox.a
 	@sudo cp libtoolbox.a /usr/local/lib
@@ -80,7 +79,7 @@ uninstall:
 	@sudo rm -rf  /usr/local/include/toolbox
 
 clean:
-	rm -rf .builds/* libtoolbox.a $(shell find . -name "*.orig")
+	rm -rf .builds/* $(target) $(shell find . -name "*.orig")
 
-test: libtoolbox.a $(tobjs)
+test: $(target) $(tobjs)
 	@echo $(tobjs)
