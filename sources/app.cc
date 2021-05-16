@@ -27,8 +27,6 @@
 
 
 
-namespace {}
-
 namespace TB{
 
 	const char* App::projectName(0);
