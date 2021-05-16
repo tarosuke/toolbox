@@ -3,7 +3,6 @@ target := libtoolbox.a
 all: $(target)
 
 .PHONY : clean test watch uninstall
-#.DELETE_ON_ERROR : $(wildcard .builds/*)
 
 
 ############################################################ FILE RECOGNITIONS
@@ -17,10 +16,13 @@ suffixes := %.c %.cc %.glsl
 
 files := $(subst sources/,, $(shell find sources -type f))
 srcs := $(filter $(suffixes), $(files))
-mods := $(basename $(srcs))
+mods := $(filter-out tests/%, $(basename $(srcs)))
 objs := $(addprefix .builds/, $(addsuffix .o, $(mods)))
 deps := $(addprefix .builds/, $(addsuffix .dep, $(mods)))
 
+tmods := $(filter tests/%, $(basename $(srcs)))
+tobjs := $(addprefix .builds/, $(addsuffix .o, $(tmods)))
+tdeps := $(addprefix .builds/, $(addsuffix .dep, $(tmods)))
 
 
 
@@ -28,7 +30,7 @@ deps := $(addprefix .builds/, $(addsuffix .dep, $(mods)))
 ################################################################# COMMON RULES
 
 
--include $(deps)
+-include $(deps) $(tdeps)
 
 vpath %.o .builds
 vpath % $(dirs)
@@ -80,5 +82,5 @@ uninstall:
 clean:
 	rm -rf .builds/* libtoolbox.a $(shell find . -name "*.orig")
 
-test: libtoolbox.a $(testObjs)
-	$(foreach m, $(testMods), $(shell echo "gcc -o $(m) .builds/$(m).o"))
+test: libtoolbox.a $(tobjs)
+	@echo $(tobjs)
