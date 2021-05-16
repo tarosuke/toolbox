@@ -13,8 +13,10 @@ COPTS ?= -Iinclude -I/usr/include/gdbm
 COPTS += -Wall -Werror -g -IX11
 CCOPTS += $(COPTS) -std=c++11
 
+suffixes := %.c %.cc %.glsl
+
 files := $(subst sources/,, $(shell find sources -type f))
-srcs := $(filter %.c %.cc %.glsl, $(files))
+srcs := $(filter $(suffixes), $(files))
 mods := $(basename $(srcs))
 objs := $(addprefix builds/, $(addsuffix .o, $(mods)))
 deps := $(addprefix builds/, $(addsuffix .dep, $(mods)))
