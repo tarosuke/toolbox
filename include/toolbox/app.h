@@ -33,7 +33,7 @@ namespace TB{
 		App(const App&);
 		void operator=(const App&);
 	public:
-		App();
+		App(){};
 		virtual ~App(){};
 		static int main(App& instance, int argc, const char* argv[]);
 
