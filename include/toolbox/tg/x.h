@@ -19,8 +19,10 @@
 #pragma once
 
 #include <toolbox/container/list.h>
+#include <toolbox/geometry/vector.h>
 
 #include <X11/Xlib.h>
+#include <assert.h>
 
 
 
@@ -31,7 +33,9 @@ namespace XTG {
 		friend class Window;
 
 	public:
-		Display(const char* target = NULL) : xdisplay(XOpenDisplay(target)) {}
+		Display(const char* target = NULL) : xdisplay(XOpenDisplay(target)) {
+			current = this;
+		}
 		virtual ~Display() {
 			if (xdisplay) {
 				XCloseDisplay(xdisplay);
@@ -52,21 +56,33 @@ namespace XTG {
 
 		operator bool() { return !!xdisplay; }
 
+		static Display& Current() {
+			assert(current);
+			return *current;
+		}
+
 	private:
 		::Display* const xdisplay;
+		static Display* current;
 	};
 
 
 	class Window : public TB::List<Window>::Node {
 	public:
-		Window(Display& d, unsigned width, unsigned height, Window* parent = 0);
+		Window(unsigned width, unsigned height, Window* parent = 0);
 		~Window() { XDestroyWindow(display.xdisplay, xdrawable); }
 
-		operator bool() { return 0 < xdrawable; }
+		TB::Vector<2, unsigned> Size() const { return size; };
+		bool IsReady() const { return 0 < xdrawable; };
+
+	protected:
+		::Display* XDisplay() const { return display.xdisplay; }
+		::Window XWindow() const { return xdrawable; }
 
 	private:
 		Display& display;
 		::Window const xdrawable;
+		TB::Vector<2, unsigned> size;
 
 		static const long defaultEventMask;
 	};

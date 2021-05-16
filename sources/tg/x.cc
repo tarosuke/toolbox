@@ -18,17 +18,21 @@
  */
 #include <toolbox/tg/x.h>
 
+#include <assert.h>
+
 
 
 namespace XTG {
+
+	Display* Display::current(0);
 
 	const long Window::defaultEventMask(
 		KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask);
 
 
 	Window::Window(
-		Display& display, unsigned width, unsigned height, Window* parent)
-		: display(display), xdrawable(XCreateSimpleWindow(
+		unsigned width, unsigned height, Window* parent)
+		: display(Display::Current()), xdrawable(XCreateSimpleWindow(
 								display.xdisplay,
 								parent ? (*parent).xdrawable
 									   : XDefaultRootWindow(display.xdisplay),
@@ -38,7 +42,8 @@ namespace XTG {
 								height,
 								0,
 								0,
-								0)) {
+								0)),
+		  size(width, height) {
 		if (xdrawable) {
 			XMapWindow(display.xdisplay, xdrawable);
 			display.Add(*this);
