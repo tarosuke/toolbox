@@ -18,27 +18,36 @@
  */
 #pragma once
 
+#include <toolbox/container/list.h>
+
 #include <X11/Xlib.h>
 
 
 
 namespace XTG {
-	class Display {
+	class Window;
+
+	class Display : public TB::List<Window> {
 		friend class Window;
 
 	public:
 		Display(const char* target = NULL) : xdisplay(XOpenDisplay(target)) {}
-		~Display() {
+		virtual ~Display() {
 			if (xdisplay) {
 				XCloseDisplay(xdisplay);
 			}
 		}
 
-		// NOTE:Xはイベントを取りに行かないと処理が進まない
-		XEvent NextEvent() {
-			XEvent ev;
-			::XNextEvent(xdisplay, &ev);
-			return ev;
+		//導出してこれを置き換えて使う
+		virtual void HandleEvent(const XEvent&) {}
+
+		// NOTE:Xはイベントを取りに行かないと処理が進まないので一度は呼ぶこと
+		void Run() {
+			if (xdisplay) {
+				XEvent ev;
+				::XNextEvent(xdisplay, &ev);
+				HandleEvent(ev);
+			}
 		};
 
 		operator bool() { return !!xdisplay; }
@@ -47,7 +56,8 @@ namespace XTG {
 		::Display* const xdisplay;
 	};
 
-	class Window {
+
+	class Window : public TB::List<Window>::Node {
 	public:
 		Window(Display& d, unsigned width, unsigned height, Window* parent = 0);
 		~Window() { XDestroyWindow(display.xdisplay, xdrawable); }
@@ -55,7 +65,9 @@ namespace XTG {
 		operator bool() { return 0 < xdrawable; }
 
 	private:
-		Display display;
+		Display& display;
 		::Window const xdrawable;
+
+		static const long defaultEventMask;
 	};
 }

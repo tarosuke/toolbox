@@ -22,6 +22,10 @@
 
 namespace XTG {
 
+	const long Window::defaultEventMask(
+		KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask);
+
+
 	Window::Window(
 		Display& display, unsigned width, unsigned height, Window* parent)
 		: display(display), xdrawable(XCreateSimpleWindow(
@@ -37,6 +41,8 @@ namespace XTG {
 								0)) {
 		if (xdrawable) {
 			XMapWindow(display.xdisplay, xdrawable);
+			display.Add(*this);
+			XSelectInput(display.xdisplay, xdrawable, defaultEventMask);
 		}
 	}
 }

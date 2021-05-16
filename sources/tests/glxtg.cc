@@ -11,7 +11,7 @@ int main() {
 	assert(display);
 	XTG::Window window(display, 640, 480);
 	assert(window);
-	display.NextEvent();
+	display.Run();
 	//失敗時assertするか非0で返る
 	// assert(false);
 	return 0;
