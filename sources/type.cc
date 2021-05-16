@@ -29,18 +29,17 @@ namespace{
 		*--p = '-';
 		return p;
 	}
-	char* Hex(u128 v, char b[64]){
-		char* p(&b[63]);
-		*p-- = 0;
-		do{
-			*p-- = num[v & 0xf];
-			v >>= 4;
-		}while(v);
-		*p = 'x';
-		*--p = '0';
-		return p;
-	}
-
+	// char* Hex(u128 v, char b[64]){
+	// 	char* p(&b[63]);
+	// 	*p-- = 0;
+	// 	do{
+	// 		*p-- = num[v & 0xf];
+	// 		v >>= 4;
+	// 	}while(v);
+	// 	*p = 'x';
+	// 	*--p = '0';
+	// 	return p;
+	// }
 }
 
 namespace TB{
@@ -81,8 +80,13 @@ namespace TB{
 	template<> const float& Type<float>::operator=(const char* text){
 		if(text[0] == '0' && text[1] == 'x'){
 			//ビットイメージで読み込み
-			*(u32*)&body = strtoul(text, 0, 0);
-		}else{
+			union {
+				u32 raw;
+				float val;
+			} u;
+			u.raw = strtoul(text, 0, 0);
+			body = u.val;
+		} else {
 			body = strtof(text, 0);
 		}
 		return body;
@@ -90,8 +94,13 @@ namespace TB{
 	template<> const double& Type<double>::operator=(const char* text){
 		if(text[0] == '0' && text[1] == 'x'){
 			//ビットイメージで読み込み
-			*(u64*)&body = strtoull(text, 0, 0);
-		}else{
+			union {
+				u64 raw;
+				float val;
+			} u;
+			u.raw = strtoull(text, 0, 0);
+			body = u.val;
+		} else {
 			body = strtod(text, 0);
 		}
 		return body;
@@ -108,7 +117,13 @@ namespace TB{
 					*text - '0' :
 					(*text & ~0x20) - 'A' + 10;
 			}
-			*(u128*)&body = v;
+
+			union {
+				u128 raw;
+				long double val;
+			} u;
+			u.raw = v;
+			body = u.val;
 		}else{
 			body = strtold(text, 0);
 		}
@@ -143,17 +158,16 @@ namespace TB{
 		char b[64];
 		return String(UDec(body, b));
 	}
-	template<> String Type<float>::Serialize() const {
-		char b[64];
-		return String(Hex(*(u32*)&body, b));
-	}
-	template<> String Type<double>::Serialize() const {
-		char b[64];
-		return String(Hex(*(u64*)&body, b));
-	}
-	template<> String Type<long double>::Serialize() const {
-		char b[64];
-		return String(Hex(*(u128*)&body, b));
-	}
-
+	// template<> String Type<float>::Serialize() const {
+	// 	char b[64];
+	// 	return String(Hex(*(u32*)&body, b));
+	// }
+	// template<> String Type<double>::Serialize() const {
+	// 	char b[64];
+	// 	return String(Hex(*(u64*)&body, b));
+	// }
+	// template<> String Type<long double>::Serialize() const {
+	// 	char b[64];
+	// 	return String(Hex(*(u128*)&body, b));
+	// }
 }

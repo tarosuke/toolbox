@@ -9,7 +9,7 @@ all: $(target)
 
 COPTS ?= -Iinclude -I/usr/include/gdbm
 
-COPTS += -Wall -Werror -g -IX11
+COPTS += -O2 -Wall -Werror -g -IX11
 CCOPTS += $(COPTS) -std=c++11
 
 suffixes := %.c %.cc %.glsl
@@ -24,6 +24,8 @@ tmods := $(filter tests/%, $(basename $(srcs)))
 tobjs := $(addprefix .builds/, $(addsuffix .o, $(tmods)))
 tdeps := $(addprefix .builds/, $(addsuffix .dep, $(tmods)))
 
+
+EXLIBS := -lstdc++ -lX11
 
 
 
@@ -82,6 +84,6 @@ clean:
 	rm -rf .builds/* $(target) $(shell find . -name "*.orig")
 
 test: $(target) $(tobjs)
-	@$(foreach m, $(tmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox;)
+	@$(foreach m, $(tmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox $(EXLIBS);)
 	@$(foreach m, $(tmods), chmod +x .builds/$(m);)
 	@.builds/tests/test $(addprefix .builds/$(m), $(tmods))
