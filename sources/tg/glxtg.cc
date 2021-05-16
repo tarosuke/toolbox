@@ -25,23 +25,23 @@
 namespace TG {
 
 	GLXScene::GLXScene(
-		const Target& target, const Frustum& frustum, int attributes[])
-		: target(target) {
-		assert(target.display);
+		unsigned width,
+		unsigned height,
+		XTG::Window* parent,
+		const Frustum& frustum,
+		int attributes[])
+		: XTG::Window(width, height) {
 		Init(attributes);
 		SetFrustum(frustum);
 	}
-	GLXScene::GLXScene(
-		const Target& target, const double projectionMatrix[], int attributes[])
-		: target(target) {
-		assert(target.display);
-		Init(attributes);
-		SetProjectionMatrix(projectionMatrix);
-	}
 
 	void GLXScene::Init(int* attributes) {
-		visual = glXChooseVisual(target.display, target.drawable, attributes);
-		context = glXCreateContext(target.display, visual, NULL, True);
+		assert(XDisplay());
+		assert(XWindow());
+		visual =
+			glXChooseVisual(XDisplay(), DefaultScreen(XDisplay()), attributes);
+		assert(visual);
+		context = glXCreateContext(XDisplay(), visual, NULL, True);
 	}
 
 
