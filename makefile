@@ -1,4 +1,4 @@
-target=libtoolbox.a
+target := libtoolbox.a
 
 all: $(target)
 
@@ -59,13 +59,13 @@ builds/%.d : sources/%.c makefile
 	@mkdir -p $(dir $@)
 	@$(CPP) $(COPTS) -MM $< >> $@
 
-
-
-############################################################### RULES & TARGET
-
 %.a: makefile $(objs)
 	@echo " AR $@"
 	@ar rc $@ $(objs)
+
+
+
+############################################################### RULES & TARGET
 
 install: libtoolbox.a
 	@sudo cp libtoolbox.a /usr/local/lib
