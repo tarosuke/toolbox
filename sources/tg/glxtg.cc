@@ -19,6 +19,7 @@
 #include <assert.h>
 
 #include <toolbox/tg/glxtg.h>
+#include <GL/glx.h>
 
 
 
@@ -42,6 +43,16 @@ namespace TG {
 			glXChooseVisual(XDisplay(), DefaultScreen(XDisplay()), attributes);
 		assert(visual);
 		context = glXCreateContext(XDisplay(), visual, NULL, True);
+	}
+
+
+	void GLXScene::Tick() {
+		GLScene::Tick(); //登録されている内容を修正
+	}
+
+	void GLXScene::Draw() {
+		GLScene::Draw(); //登録されている内容を修正
+		glXSwapBuffers(XDisplay(), XWindow()); //バッファを差し替えて表示
 	}
 
 

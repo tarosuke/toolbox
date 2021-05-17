@@ -18,7 +18,9 @@
  */
 #pragma once
 
+#include <toolbox/geometry/matrix.h>
 #include <toolbox/tg/tg.h>
+#include <toolbox/container/list.h>
 #include <GL/glew.h>
 #include <GL/gl.h>
 
@@ -26,13 +28,53 @@
 
 namespace TG {
 
+	class GLObject : public TB::List<GLObject>::Node {
+	public:
+		virtual void Draw(){};
+		virtual void Tick(){};
+	};
+
+	class GLGroup : public GLObject {
+	public:
+		void AddChild(GLObject& o) { children.Add(o); };
+		void AddCHild(GLGroup& g) { groups.Add(g); };
+
+	protected:
+		TB::List<GLObject> children;
+		TB::List<GLObject> groups;
+
+	private:
+		TB::Matrix<4, 4, float> matrix;
+		void SetMatrix(const TB::Matrix<4, 4, float>& m) { matrix = m; }
+		void MulMatrix(const TB::Matrix<4, 4, float>& m) {
+			matrix = matrix * m;
+		}
+		void Draw() final;
+		void Tick() final;
+	};
+
+
 	class GLScene : public Scene {
 		GLScene(const GLScene&);
 		void operator=(const GLScene&);
+
+		//オブジェクトの登録
+		// Facehagger：直前＆Viewに追従なし
+		// 無印：Viewに追従
+		// Scenery：遠景、Viewに追従なし
+		void RegisterFacehagger(GLObject& o) { objects[0].Add(o); };
+		void Register(GLObject& o) { objects[1].Add(o); };
+		void RegisterScenery(GLObject& o) { objects[2].Add(o); };
 
 	protected:
 		GLScene(){};
 		void SetFrustum(const Frustum& frustum);
 		void SetProjectionMatrix(const double projectionMatrix[]);
+
+		void Draw() override{};
+		void Tick() override;
+
+	private:
+		TB::List<GLObject> objects[3]; // 0:顔に張り付き-2:背景
 	};
 }

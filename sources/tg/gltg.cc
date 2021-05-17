@@ -22,6 +22,28 @@
 
 namespace TG {
 
+	void GLGroup::Draw() {
+		glPushMatrix();
+		glMultMatrixf(matrix);
+		for (TB::List<GLObject>::I i(children); ++i;) {
+			(*i).Draw();
+		}
+		for (TB::List<GLObject>::I i(groups); ++i;) {
+			(*i).Draw();
+		}
+		glPopMatrix();
+	}
+	void GLGroup::Tick() {
+		for (TB::List<GLObject>::I i(children); ++i;) {
+			(*i).Tick();
+		}
+		for (TB::List<GLObject>::I i(groups); ++i;) {
+			(*i).Tick();
+		}
+	}
+
+
+
 	void GLScene::SetFrustum(const Frustum& frustum) {
 		glFrustum(
 			frustum.left,
@@ -35,5 +57,15 @@ namespace TG {
 	void GLScene::SetProjectionMatrix(const double projectionMatrix[]) {
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrixd(projectionMatrix);
+	}
+
+
+
+	void GLScene::Tick() {
+		for (auto&& o : objects) {
+			for (TB::List<GLObject>::I i(o); ++i;) {
+				(*i).Tick();
+			}
+		}
 	}
 }

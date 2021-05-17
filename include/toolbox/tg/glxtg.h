@@ -23,6 +23,7 @@
 #include <GL/glx.h>
 
 
+
 namespace TG {
 
 	class GLXScene : public XTG::Window, public GLScene {
@@ -44,5 +45,8 @@ namespace TG {
 		GLXContext context;
 
 		void Init(int* attributes);
+
+		void Tick() final;
+		void Draw() final;
 	};
 }
