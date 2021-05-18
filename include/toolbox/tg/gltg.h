@@ -31,6 +31,7 @@ namespace TG {
 	class GLObject : public TB::List<GLObject>::Node {
 	public:
 		virtual void Draw(){};
+		virtual void DrawTransparenrt(){};
 		virtual void Tick(){};
 	};
 
@@ -50,6 +51,7 @@ namespace TG {
 			matrix = matrix * m;
 		}
 		void Draw() final;
+		void DrawTransparenrt() final;
 		void Tick() final;
 	};
 
@@ -58,23 +60,19 @@ namespace TG {
 		GLScene(const GLScene&);
 		void operator=(const GLScene&);
 
-		//オブジェクトの登録
-		// Facehagger：直前＆Viewに追従なし
-		// 無印：Viewに追従
-		// Scenery：遠景、Viewに追従なし
-		void RegisterFacehagger(GLObject& o) { objects[0].Add(o); };
-		void Register(GLObject& o) { objects[1].Add(o); };
-		void RegisterScenery(GLObject& o) { objects[2].Add(o); };
+		//レイヤーの登録
+		// Note:近いレイヤーから登録すること
+		void AddLayer(GLObject& layer) { layers.Add(layer); };
 
 	protected:
 		GLScene(){};
 		void SetFrustum(const Frustum& frustum);
 		void SetProjectionMatrix(const double projectionMatrix[]);
 
-		void Draw() override{};
+		void Draw() override;
 		void Tick() override;
 
 	private:
-		TB::List<GLObject> objects[3]; // 0:顔に張り付き-2:背景
+		TB::List<GLObject> layers;
 	};
 }

@@ -33,6 +33,17 @@ namespace TG {
 		}
 		glPopMatrix();
 	}
+	void GLGroup::DrawTransparenrt() {
+		glPushMatrix();
+		glMultMatrixf(matrix);
+		for (TB::List<GLObject>::I i(groups); --i;) {
+			(*i).DrawTransparenrt();
+		}
+		for (TB::List<GLObject>::I i(children); --i;) {
+			(*i).DrawTransparenrt();
+		}
+		glPopMatrix();
+	}
 	void GLGroup::Tick() {
 		for (TB::List<GLObject>::I i(children); ++i;) {
 			(*i).Tick();
@@ -61,11 +72,17 @@ namespace TG {
 
 
 
+	void GLScene::Draw() {
+		for (TB::List<GLObject>::I i(layers); ++i;) {
+			(*i).Draw();
+		}
+		for (TB::List<GLObject>::I i(layers); --i;) {
+			(*i).DrawTransparenrt();
+		}
+	}
 	void GLScene::Tick() {
-		for (auto&& o : objects) {
-			for (TB::List<GLObject>::I i(o); ++i;) {
-				(*i).Tick();
-			}
+		for (TB::List<GLObject>::I i(layers); ++i;) {
+			(*i).Tick();
 		}
 	}
 }
