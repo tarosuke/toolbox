@@ -14,7 +14,6 @@ int main() {
 	TG::GLXScene window(640, 480, 0, frustum);
 	assert(window.IsReady());
 	display.Run();
-	//失敗時assertするか非0で返る
-	// assert(false);
+	window.Draw();
 	return 0;
 }

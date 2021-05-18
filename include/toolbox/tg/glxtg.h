@@ -38,6 +38,9 @@ namespace TG {
 			const Frustum&,
 			int attirbutes[] = defaultAttributes);
 
+		void Tick() final;
+		void Draw() final;
+
 	private:
 		static int defaultAttributes[];
 		int* attributes;
@@ -45,8 +48,5 @@ namespace TG {
 		GLXContext context;
 
 		void Init(int* attributes);
-
-		void Tick() final;
-		void Draw() final;
 	};
 }

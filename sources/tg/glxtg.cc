@@ -46,6 +46,8 @@ namespace TG {
 			glXChooseVisual(XDisplay(), DefaultScreen(XDisplay()), attributes);
 		assert(visual);
 		context = glXCreateContext(XDisplay(), visual, NULL, True);
+		assert(context);
+		glXMakeCurrent(XDisplay(), XWindow(), context);
 	}
 
 
