@@ -33,7 +33,10 @@ namespace TG {
 		int attributes[])
 		: XTG::Window(width, height) {
 		Init(attributes);
+		glViewport(0, 0, width, height);
+		glMatrixMode(GL_PROJECTION);
 		SetFrustum(frustum);
+		glMatrixMode(GL_MODELVIEW);
 	}
 
 	void GLXScene::Init(int* attributes) {
@@ -51,8 +54,14 @@ namespace TG {
 	}
 
 	void GLXScene::Draw() {
-		GLScene::Draw(); //登録されている内容を修正
-		glXSwapBuffers(XDisplay(), XWindow()); //バッファを差し替えて表示
+		//カメラの反映
+		glLoadMatrixf(view);
+
+		//描画
+		GLScene::Draw();
+
+		// バッファを差し替えて表示
+		glXSwapBuffers(XDisplay(), XWindow());
 	}
 
 
