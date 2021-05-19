@@ -114,14 +114,14 @@ IMAGE* PNG::New(int fd){
 		png_read_image(png_ptr, (png_bytepp)rows);
 
 		//あとしまつ
-		free(rows);
+		delete rows;
 		png_read_end(png_ptr, info_ptr);
 		png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
 	}
 	catch(...){
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		if(rows){
-			free(rows);
+			delete rows;
 		}
 		//throw "PNG:読み込みに失敗";
 		return 0;
