@@ -40,22 +40,6 @@ namespace TG {
 		Object() : visible(true){};
 	};
 
-	class Group : public Object {
-		Group(const Group&);
-		void operator=(const Group&);
-
-	public:
-		Group(){};
-		void AddChild(Object& o) { children.Add(o); };
-		void AddCHild(Group& g) { groups.Add(g); };
-
-	protected:
-		TB::List<Object> children;
-		TB::List<Object> groups;
-		TB::Matrix<4, 4> view;
-
-		void Draw(const TB::Matrix<4, 4>&);
-	};
 
 	//フレームバッファや画面などの描画先
 	class Scene {
@@ -68,12 +52,21 @@ namespace TG {
 			double near;
 			double far;
 		};
+
 		Scene(){};
 		virtual ~Scene(){};
-		void AddLayer(Object& o) { layers.Add(o); };
-		void Draw();
+
+		//カメラ操作
+		void SetView(const TB::Matrix<4, 4, float>&);
+		void MulView(const TB::Matrix<4, 4, float>&);
+
+		//周期処理の入口
+		virtual void Draw() = 0;
+		virtual void Tick() = 0;
+
+	protected:
+		TB::Matrix<4, 4, float> view;
 
 	private:
-		TB::List<Object> layers;
 	};
 }

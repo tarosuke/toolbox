@@ -18,7 +18,9 @@
  */
 #pragma once
 
+#include <toolbox/geometry/matrix.h>
 #include <toolbox/tg/tg.h>
+#include <toolbox/container/list.h>
 #include <GL/glew.h>
 #include <GL/gl.h>
 
@@ -26,13 +28,51 @@
 
 namespace TG {
 
+	class GLObject : public TB::List<GLObject>::Node {
+	public:
+		virtual void Draw(){};
+		virtual void DrawTransparenrt(){};
+		virtual void Tick(){};
+	};
+
+	class GLGroup : public GLObject {
+	public:
+		void AddChild(GLObject& o) { children.Add(o); };
+		void AddCHild(GLGroup& g) { groups.Add(g); };
+
+	protected:
+		TB::List<GLObject> children;
+		TB::List<GLObject> groups;
+
+	private:
+		TB::Matrix<4, 4, float> matrix;
+		void SetMatrix(const TB::Matrix<4, 4, float>& m) { matrix = m; }
+		void MulMatrix(const TB::Matrix<4, 4, float>& m) {
+			matrix = matrix * m;
+		}
+		void Draw() final;
+		void DrawTransparenrt() final;
+		void Tick() final;
+	};
+
+
 	class GLScene : public Scene {
 		GLScene(const GLScene&);
 		void operator=(const GLScene&);
+
+		//レイヤーの登録
+		// Note:近いレイヤーから登録すること
+		void AddLayer(GLObject& layer) { layers.Add(layer); };
 
 	protected:
 		GLScene(){};
 		void SetFrustum(const Frustum& frustum);
 		void SetProjectionMatrix(const double projectionMatrix[]);
+
+		void Draw() override;
+		void Tick() override;
+
+	private:
+		TB::List<GLObject> layers;
 	};
 }

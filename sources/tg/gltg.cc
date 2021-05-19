@@ -22,6 +22,39 @@
 
 namespace TG {
 
+	void GLGroup::Draw() {
+		glPushMatrix();
+		glMultMatrixf(matrix);
+		for (TB::List<GLObject>::I i(children); ++i;) {
+			(*i).Draw();
+		}
+		for (TB::List<GLObject>::I i(groups); ++i;) {
+			(*i).Draw();
+		}
+		glPopMatrix();
+	}
+	void GLGroup::DrawTransparenrt() {
+		glPushMatrix();
+		glMultMatrixf(matrix);
+		for (TB::List<GLObject>::I i(groups); --i;) {
+			(*i).DrawTransparenrt();
+		}
+		for (TB::List<GLObject>::I i(children); --i;) {
+			(*i).DrawTransparenrt();
+		}
+		glPopMatrix();
+	}
+	void GLGroup::Tick() {
+		for (TB::List<GLObject>::I i(children); ++i;) {
+			(*i).Tick();
+		}
+		for (TB::List<GLObject>::I i(groups); ++i;) {
+			(*i).Tick();
+		}
+	}
+
+
+
 	void GLScene::SetFrustum(const Frustum& frustum) {
 		glFrustum(
 			frustum.left,
@@ -35,5 +68,24 @@ namespace TG {
 	void GLScene::SetProjectionMatrix(const double projectionMatrix[]) {
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrixd(projectionMatrix);
+	}
+
+
+
+	void GLScene::Draw() {
+		glClearColor(0, 0, 0.1, 1);
+		glClear(
+			GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		for (TB::List<GLObject>::I i(layers); ++i;) {
+			(*i).Draw();
+		}
+		for (TB::List<GLObject>::I i(layers); --i;) {
+			(*i).DrawTransparenrt();
+		}
+	}
+	void GLScene::Tick() {
+		for (TB::List<GLObject>::I i(layers); ++i;) {
+			(*i).Tick();
+		}
 	}
 }

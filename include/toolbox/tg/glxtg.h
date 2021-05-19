@@ -23,6 +23,7 @@
 #include <GL/glx.h>
 
 
+
 namespace TG {
 
 	class GLXScene : public XTG::Window, public GLScene {
@@ -36,6 +37,9 @@ namespace TG {
 			XTG::Window* parent,
 			const Frustum&,
 			int attirbutes[] = defaultAttributes);
+
+		void Tick() final;
+		void Draw() final;
 
 	private:
 		static int defaultAttributes[];

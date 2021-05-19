@@ -22,27 +22,5 @@
 
 namespace TG {
 
-	void Scene::Draw() {
-		TB::Matrix<4, 4> mat;
-		mat.Identity();
 
-		for (TB::List<Object>::I i(layers); ++i;) {
-			(*i).Draw(mat);
-		}
-	}
-
-	void Group::Draw(const TB::Matrix<4, 4>& mat) {
-		if (!visible) {
-			return;
-		}
-
-		TB::Matrix<4, 4> matrix(mat * view);
-
-		for (TB::List<Object>::I i(children); ++i;) {
-			(*i).Draw(matrix);
-		}
-		for (TB::List<Object>::I i(groups); ++i;) {
-			(*i).Draw(matrix);
-		}
-	}
 }

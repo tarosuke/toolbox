@@ -13,8 +13,7 @@ int main() {
 	const TG::Scene::Frustum frustum = {-1, 1, 1, -1, 0.01, 100000.0};
 	TG::GLXScene window(640, 480, 0, frustum);
 	assert(window.IsReady());
+	window.Draw();
 	display.Run();
-	//失敗時assertするか非0で返る
-	// assert(false);
 	return 0;
 }

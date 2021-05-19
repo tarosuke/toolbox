@@ -19,6 +19,7 @@
 #include <assert.h>
 
 #include <toolbox/tg/glxtg.h>
+#include <GL/glx.h>
 
 
 
@@ -32,7 +33,10 @@ namespace TG {
 		int attributes[])
 		: XTG::Window(width, height) {
 		Init(attributes);
+		glViewport(0, 0, width, height);
+		glMatrixMode(GL_PROJECTION);
 		SetFrustum(frustum);
+		glMatrixMode(GL_MODELVIEW);
 	}
 
 	void GLXScene::Init(int* attributes) {
@@ -42,6 +46,24 @@ namespace TG {
 			glXChooseVisual(XDisplay(), DefaultScreen(XDisplay()), attributes);
 		assert(visual);
 		context = glXCreateContext(XDisplay(), visual, NULL, True);
+		assert(context);
+		glXMakeCurrent(XDisplay(), XWindow(), context);
+	}
+
+
+	void GLXScene::Tick() {
+		GLScene::Tick(); //登録されている内容を修正
+	}
+
+	void GLXScene::Draw() {
+		//カメラの反映
+		glLoadMatrixf(view);
+
+		//描画
+		GLScene::Draw();
+
+		// バッファを差し替えて表示
+		glXSwapBuffers(XDisplay(), XWindow());
 	}
 
 
