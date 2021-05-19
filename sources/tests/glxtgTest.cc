@@ -10,8 +10,9 @@ int main() {
 	XTG::Display display;
 	assert(display);
 
-	const TG::Scene::Frustum frustum = {-1, 1, 1, -1, 0.01, 100000.0};
-	TG::GLXScene window(640, 480, 0, frustum);
+	const TG::Scene::Frustum frustum =
+		{-0.01, 0.01, 0.01, -0.01, 0.01, 100000.0};
+	TG::GLXScene window(640, 640, 0, frustum);
 	assert(window.IsReady());
 	window.Draw();
 	display.Run();
