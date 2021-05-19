@@ -26,21 +26,6 @@
 
 namespace TG {
 
-	//何らかの物体あるいは物体グループ
-	class Object : public TB::List<Object>::Node {
-		Object(const Object&);
-		void operator=(const Object&);
-
-	public:
-		virtual ~Object(){};
-		virtual void Draw(const TB::Matrix<4, 4>&);
-
-	protected:
-		bool visible;
-		Object() : visible(true){};
-	};
-
-
 	//フレームバッファや画面などの描画先
 	class Scene {
 	public:
