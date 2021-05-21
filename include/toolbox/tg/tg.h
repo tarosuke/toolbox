@@ -26,23 +26,13 @@
 
 namespace TG {
 
-	//何らかの物体あるいは物体グループ
-	class Object : public TB::List<Object>::Node {
-		Object(const Object&);
-		void operator=(const Object&);
-
-	public:
-		virtual ~Object(){};
-		virtual void Draw(const TB::Matrix<4, 4>&);
-
-	protected:
-		bool visible;
-		Object() : visible(true){};
-	};
-
+	class Object;
 
 	//フレームバッファや画面などの描画先
 	class Scene {
+		Scene(const Scene&);
+		void operator=(const Scene&);
+
 	public:
 		struct Frustum {
 			double left;
@@ -56,9 +46,16 @@ namespace TG {
 		Scene(){};
 		virtual ~Scene(){};
 
+		void SetFrustum(const Frustum& frustum);
+		void SetProjectionMatrix(const double projectionMatrix[]);
+
 		//カメラ操作
 		void SetView(const TB::Matrix<4, 4, float>&);
 		void MulView(const TB::Matrix<4, 4, float>&);
+
+		//レイヤーの登録
+		// Note:近いレイヤーから登録すること
+		void AddLayer(Object& layer);
 
 		//周期処理の入口
 		virtual void Draw() = 0;
@@ -68,5 +65,6 @@ namespace TG {
 		TB::Matrix<4, 4, float> view;
 
 	private:
+		TB::List<Object> layers;
 	};
 }

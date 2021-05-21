@@ -17,10 +17,46 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <toolbox/tg/tg.h>
+#include <toolbox/tg/object.h>
+#include <GL/glew.h>
+#include <GL/gl.h>
 
 
 
 namespace TG {
 
+	void Scene::SetFrustum(const Frustum& frustum) {
+		glFrustum(
+			frustum.left,
+			frustum.right,
+			frustum.bottom,
+			frustum.top,
+			frustum.near,
+			frustum.far);
+	}
 
+	void Scene::SetProjectionMatrix(const double projectionMatrix[]) {
+		glMatrixMode(GL_PROJECTION);
+		glLoadMatrixd(projectionMatrix);
+	}
+
+	void Scene::AddLayer(Object& layer) { layers.Add(layer); };
+
+
+	void Scene::Draw() {
+		glClearColor(0, 0, 0.1, 1);
+		glClear(
+			GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		for (TB::List<Object>::I i(layers); ++i;) {
+			(*i).Draw(); // draw opaque objects
+		}
+		for (TB::List<Object>::I i(layers); --i;) {
+			(*i).Traw(); // draw transparent objects
+		}
+	}
+	void Scene::Tick() {
+		for (TB::List<Object>::I i(layers); ++i;) {
+			(*i).Tick();
+		}
+	}
 }

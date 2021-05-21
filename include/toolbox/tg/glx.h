@@ -18,7 +18,7 @@
  */
 #pragma once
 
-#include <toolbox/tg/gltg.h>
+#include <toolbox/tg/tg.h>
 #include <toolbox/tg/x.h>
 #include <GL/glx.h>
 
@@ -26,7 +26,7 @@
 
 namespace TG {
 
-	class GLXScene : public XTG::Window, public GLScene {
+	class GLXScene : public XTG::Window, public Scene {
 		GLXScene(const GLXScene&);
 		void operator=(const GLXScene&);
 

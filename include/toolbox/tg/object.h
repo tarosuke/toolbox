@@ -21,58 +21,63 @@
 #include <toolbox/geometry/matrix.h>
 #include <toolbox/tg/tg.h>
 #include <toolbox/container/list.h>
-#include <GL/glew.h>
-#include <GL/gl.h>
+#include <toolbox/gl/vbo.h>
+#include <toolbox/gl/texture.h>
 
 
 
 namespace TG {
 
-	class GLObject : public TB::List<GLObject>::Node {
+	class Object : public TB::List<Object>::Node {
 	public:
 		virtual void Draw(){};
-		virtual void DrawTransparenrt(){};
+		virtual void Traw(){};
 		virtual void Tick(){};
+
+	private:
 	};
 
-	class GLGroup : public GLObject {
+
+	class Mesh : public Object {
+		Mesh();
+		Mesh(const Mesh&);
+		void operator=(const Mesh&);
+
 	public:
-		void AddChild(GLObject& o) { children.Add(o); };
-		void AddCHild(GLGroup& g) { groups.Add(g); };
+		static Mesh* New(TB::VBO*, TB::Texture*);
+		~Mesh() {
+			delete vbo;
+			delete texture;
+		}
 
 	protected:
-		TB::List<GLObject> children;
-		TB::List<GLObject> groups;
+		Mesh(TB::VBO*, TB::Texture*);
+		void DrawMesh();
+
+	private:
+		TB::VBO* const vbo;
+		TB::Texture* const texture;
+	};
+
+	class Group : public Object {
+	public:
+		void AddChild(Object& o) { children.Add(o); };
+		void AddCHild(Group& g) { groups.Add(g); };
+
+	protected:
+		TB::List<Object> children;
+		TB::List<Object> groups;
 
 	private:
 		TB::Matrix<4, 4, float> matrix;
+
 		void SetMatrix(const TB::Matrix<4, 4, float>& m) { matrix = m; }
 		void MulMatrix(const TB::Matrix<4, 4, float>& m) {
 			matrix = matrix * m;
 		}
 		void Draw() final;
-		void DrawTransparenrt() final;
+		void Traw() final;
 		void Tick() final;
 	};
 
-
-	class GLScene : public Scene {
-		GLScene(const GLScene&);
-		void operator=(const GLScene&);
-
-		//レイヤーの登録
-		// Note:近いレイヤーから登録すること
-		void AddLayer(GLObject& layer) { layers.Add(layer); };
-
-	protected:
-		GLScene(){};
-		void SetFrustum(const Frustum& frustum);
-		void SetProjectionMatrix(const double projectionMatrix[]);
-
-		void Draw() override;
-		void Tick() override;
-
-	private:
-		TB::List<GLObject> layers;
-	};
 }
