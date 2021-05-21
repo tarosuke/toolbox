@@ -26,11 +26,8 @@
 namespace TB{
 
 	Texture::Texture(
-		unsigned width,
-		unsigned height,
-		Format format,
-		const Style& style) :
-		tid(NewID()){
+		unsigned width, unsigned height, Format format, const Style& style)
+		: tid(NewID()), transparent(IsTransparent(format)) {
 		Binder b(*this);
 
 		glTexImage2D(
@@ -45,6 +42,7 @@ namespace TB{
 			0);
 
 		SetupAttributes(style);
+		transparent = IsTransparent(format);
 	}
 
 	Texture::Texture(
@@ -52,8 +50,8 @@ namespace TB{
 		unsigned width,
 		unsigned height,
 		Format format,
-		const Style& style) :
-		tid(NewID()){
+		const Style& style)
+		: tid(NewID()), transparent(IsTransparent(format)) {
 		Binder b(*this);
 
 		glTexImage2D(
@@ -68,6 +66,7 @@ namespace TB{
 			buffer);
 
 		SetupAttributes(style);
+		transparent =
 	}
 
 	Texture::Texture(const Image& image, const Style& style) : tid(NewID()){
@@ -85,6 +84,7 @@ namespace TB{
 			raw.data);
 
 		SetupAttributes(style);
+		transparent = raw.bpp == 4;
 	}
 
 	Texture::~Texture(){
