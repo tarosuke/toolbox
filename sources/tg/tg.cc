@@ -48,10 +48,10 @@ namespace TG {
 		glClear(
 			GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		for (TB::List<Object>::I i(layers); ++i;) {
-			(*i).Draw();
+			(*i).Draw(); // draw opaque objects
 		}
 		for (TB::List<Object>::I i(layers); --i;) {
-			(*i).DrawTransparenrt();
+			(*i).Traw(); // draw transparent objects
 		}
 	}
 	void Scene::Tick() {

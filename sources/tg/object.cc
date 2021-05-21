@@ -24,6 +24,35 @@
 
 namespace TG {
 
+	class OMesh : public Mesh {
+	public:
+		void Draw() override { DrawMesh(); };
+		OMesh(TB::VBO* vbo, TB::Texture* texture) : Mesh(vbo, texture){};
+	};
+
+	class TMesh : public Mesh {
+	public:
+		void Traw() override { DrawMesh(); };
+		TMesh(TB::VBO* vbo, TB::Texture* texture) : Mesh(vbo, texture){};
+	};
+
+	Mesh* Mesh::New(TB::VBO* vbo, TB::Texture* texture) {
+		if (!vbo || !texture) {
+			return 0;
+		}
+		return (*texture).IsTransparent() ? (Mesh*)new TMesh(vbo, texture)
+										  : (Mesh*)new OMesh(vbo, texture);
+	}
+
+	void Mesh::DrawMesh() {
+		//カラーバッファのセットアップ
+		TB::Texture::Binder b(*texture);
+
+		//描画
+		(*vbo).Draw();
+	}
+
+
 	void Group::Draw() {
 		glPushMatrix();
 		glMultMatrixf(matrix);
@@ -35,14 +64,14 @@ namespace TG {
 		}
 		glPopMatrix();
 	}
-	void Group::DrawTransparenrt() {
+	void Group::Traw() {
 		glPushMatrix();
 		glMultMatrixf(matrix);
 		for (TB::List<Object>::I i(groups); --i;) {
-			(*i).DrawTransparenrt();
+			(*i).Traw();
 		}
 		for (TB::List<Object>::I i(children); --i;) {
-			(*i).DrawTransparenrt();
+			(*i).Traw();
 		}
 		glPopMatrix();
 	}

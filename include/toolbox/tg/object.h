@@ -21,6 +21,8 @@
 #include <toolbox/geometry/matrix.h>
 #include <toolbox/tg/tg.h>
 #include <toolbox/container/list.h>
+#include <toolbox/gl/vbo.h>
+#include <toolbox/gl/texture.h>
 
 
 
@@ -29,8 +31,32 @@ namespace TG {
 	class Object : public TB::List<Object>::Node {
 	public:
 		virtual void Draw(){};
-		virtual void DrawTransparenrt(){};
+		virtual void Traw(){};
 		virtual void Tick(){};
+
+	private:
+	};
+
+
+	class Mesh : public Object {
+		Mesh();
+		Mesh(const Mesh&);
+		void operator=(const Mesh&);
+
+	public:
+		static Mesh* New(TB::VBO*, TB::Texture*);
+		~Mesh() {
+			delete vbo;
+			delete texture;
+		}
+
+	protected:
+		Mesh(TB::VBO*, TB::Texture*);
+		void DrawMesh();
+
+	private:
+		TB::VBO* const vbo;
+		TB::Texture* const texture;
 	};
 
 	class Group : public Object {
@@ -44,12 +70,13 @@ namespace TG {
 
 	private:
 		TB::Matrix<4, 4, float> matrix;
+
 		void SetMatrix(const TB::Matrix<4, 4, float>& m) { matrix = m; }
 		void MulMatrix(const TB::Matrix<4, 4, float>& m) {
 			matrix = matrix * m;
 		}
 		void Draw() final;
-		void DrawTransparenrt() final;
+		void Traw() final;
 		void Tick() final;
 	};
 
