@@ -16,37 +16,45 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#pragma once
-
-#include <toolbox/tg/gltg.h>
-#include <toolbox/tg/x.h>
-#include <GL/glx.h>
+#include <toolbox/tg/object.h>
+#include <GL/glew.h>
+#include <GL/gl.h>
 
 
 
 namespace TG {
 
-	class GLXScene : public XTG::Window, public GLScene {
-		GLXScene(const GLXScene&);
-		void operator=(const GLXScene&);
+	void Group::Draw() {
+		glPushMatrix();
+		glMultMatrixf(matrix);
+		for (TB::List<Object>::I i(children); ++i;) {
+			(*i).Draw();
+		}
+		for (TB::List<Object>::I i(groups); ++i;) {
+			(*i).Draw();
+		}
+		glPopMatrix();
+	}
+	void Group::DrawTransparenrt() {
+		glPushMatrix();
+		glMultMatrixf(matrix);
+		for (TB::List<Object>::I i(groups); --i;) {
+			(*i).DrawTransparenrt();
+		}
+		for (TB::List<Object>::I i(children); --i;) {
+			(*i).DrawTransparenrt();
+		}
+		glPopMatrix();
+	}
+	void Group::Tick() {
+		for (TB::List<Object>::I i(children); ++i;) {
+			(*i).Tick();
+		}
+		for (TB::List<Object>::I i(groups); ++i;) {
+			(*i).Tick();
+		}
+	}
 
-	public:
-		GLXScene(
-			unsigned width,
-			unsigned height,
-			XTG::Window* parent,
-			const Frustum&,
-			int attirbutes[] = defaultAttributes);
 
-		void Tick() final;
-		void Draw() final;
 
-	private:
-		static int defaultAttributes[];
-		int* attributes;
-		XVisualInfo* visual;
-		GLXContext context;
-
-		void Init(int* attributes);
-	};
 }

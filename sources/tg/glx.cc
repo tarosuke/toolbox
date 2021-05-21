@@ -18,7 +18,8 @@
  */
 #include <assert.h>
 
-#include <toolbox/tg/glxtg.h>
+#include <toolbox/tg/tg.h>
+#include <toolbox/tg/glx.h>
 #include <GL/glx.h>
 
 
@@ -52,7 +53,7 @@ namespace TG {
 
 
 	void GLXScene::Tick() {
-		GLScene::Tick(); //登録されている内容を修正
+		Scene::Tick(); //登録されている内容を修正
 	}
 
 	void GLXScene::Draw() {
@@ -60,7 +61,7 @@ namespace TG {
 		glLoadMatrixf(view);
 
 		//描画
-		GLScene::Draw();
+		Scene::Draw();
 
 		// バッファを差し替えて表示
 		glXSwapBuffers(XDisplay(), XWindow());

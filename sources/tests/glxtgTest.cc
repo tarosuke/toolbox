@@ -1,4 +1,4 @@
-#include <toolbox/tg/glxtg.h>
+#include <toolbox/tg/glx.h>
 #include <toolbox/tg/x.h>
 
 #include <assert.h>
