@@ -52,6 +52,11 @@ namespace TB{
 		Image(const Image&);
 		Image(const Image&, int x, int y, unsigned width, unsigned height);
 		Image(const char* path);
+		static Image* New(const char* path) {
+			try {
+				return new Image(path);
+			} catch (...) { return 0; }
+		};
 		virtual ~Image();
 
 		operator Raw() const;

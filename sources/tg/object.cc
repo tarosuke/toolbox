@@ -27,26 +27,26 @@ namespace TG {
 	class OMesh : public Mesh {
 	public:
 		void Draw() override { DrawMesh(); };
-		OMesh(TB::VBO* vbo, TB::Texture* texture) : Mesh(vbo, texture){};
+		OMesh(TB::VBO* vbo, TB::Image& image) : Mesh(vbo, image){};
 	};
 
 	class TMesh : public Mesh {
 	public:
 		void Traw() override { DrawMesh(); };
-		TMesh(TB::VBO* vbo, TB::Texture* texture) : Mesh(vbo, texture){};
+		TMesh(TB::VBO* vbo, TB::Image& image) : Mesh(vbo, image){};
 	};
 
-	Mesh* Mesh::New(TB::VBO* vbo, TB::Texture* texture) {
-		if (!vbo || !texture) {
+	Mesh* Mesh::New(TB::VBO* vbo, TB::Image& image) {
+		if (!vbo) {
 			return 0;
 		}
-		return (*texture).IsTransparent() ? (Mesh*)new TMesh(vbo, texture)
-										  : (Mesh*)new OMesh(vbo, texture);
+		return 4 <= image.GetBPP() ? (Mesh*)new TMesh(vbo, image)
+								   : (Mesh*)new OMesh(vbo, image);
 	}
 
 	void Mesh::DrawMesh() {
 		//カラーバッファのセットアップ
-		TB::Texture::Binder b(*texture);
+		TB::Texture::Binder b(texture);
 
 		//描画
 		(*vbo).Draw();

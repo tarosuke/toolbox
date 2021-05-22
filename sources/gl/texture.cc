@@ -42,7 +42,6 @@ namespace TB{
 			0);
 
 		SetupAttributes(style);
-		transparent = IsTransparent(format);
 	}
 
 	Texture::Texture(
@@ -66,7 +65,6 @@ namespace TB{
 			buffer);
 
 		SetupAttributes(style);
-		transparent =
 	}
 
 	Texture::Texture(const Image& image, const Style& style) : tid(NewID()){
