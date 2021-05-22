@@ -22,9 +22,12 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 
+#include <assert.h>
 
 
 namespace TG {
+
+	Scene::Scene() : scenery(0) {}
 
 	void Scene::SetFrustum(const Frustum& frustum) {
 		glFrustum(
@@ -44,10 +47,11 @@ namespace TG {
 	void Scene::AddLayer(Object& layer) { layers.Add(layer); }
 
 	void Scene::RegisterScenery(Scenery* ns) {
+		if (scenery) {
+			delete scenery;
+			scenery = 0;
+		}
 		if (ns) {
-			if (scenery) {
-				delete scenery;
-			}
 			scenery = ns;
 		}
 	}
@@ -80,4 +84,4 @@ namespace TG {
 			(*i).Tick();
 		}
 	}
-}
+	}

@@ -44,7 +44,8 @@ namespace TG {
 			double far;
 		};
 
-		Scene(){};
+		Scene();
+
 		virtual ~Scene(){};
 
 		void SetFrustum(const Frustum& frustum);

@@ -25,7 +25,7 @@ tobjs := $(addprefix .builds/, $(addsuffix .o, $(tmods)))
 tdeps := $(addprefix .builds/, $(addsuffix .dep, $(tmods)))
 
 
-EXLIBS := -lstdc++ -lX11 -lGL -lGLX
+EXLIBS := -lstdc++ -lX11 -lGL -lGLX -lcairo -ljpeg
 
 
 
@@ -86,4 +86,6 @@ clean:
 test: $(target) $(tobjs)
 	@$(foreach m, $(tmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox $(EXLIBS);)
 	@$(foreach m, $(tmods), chmod +x .builds/$(m);)
+
+runtest: test
 	@.builds/tests/test $(addprefix .builds/$(m), $(tmods))
