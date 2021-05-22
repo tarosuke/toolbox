@@ -20,7 +20,6 @@
 #include <assert.h>
 #include <syslog.h>
 
-#include <toolbox/gl/gl.h>
 #include <toolbox/tg/scenery.h>
 #include <toolbox/type.h>
 
@@ -28,6 +27,7 @@
 
 namespace TG {
 
+	unsigned skyboxMark;
 	class Skybox : public Scenery {
 	public:
 	private:

@@ -20,7 +20,6 @@
 
 #include <toolbox/tg/tg.h>
 #include <toolbox/tg/glx.h>
-#include <GL/glx.h>
 
 
 
@@ -49,6 +48,11 @@ namespace TG {
 		context = glXCreateContext(XDisplay(), visual, NULL, True);
 		assert(context);
 		glXMakeCurrent(XDisplay(), XWindow(), context);
+
+		// glew初期化
+		if (GLEW_OK != glewInit()) {
+			throw "GLEWが使えません";
+		}
 	}
 
 

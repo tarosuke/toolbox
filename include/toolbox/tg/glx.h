@@ -20,7 +20,7 @@
 
 #include <toolbox/tg/tg.h>
 #include <toolbox/tg/x.h>
-#include <GL/glx.h>
+#include <toolbox/gl/gl.h>
 
 
 

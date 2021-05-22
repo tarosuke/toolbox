@@ -25,7 +25,7 @@ tobjs := $(addprefix .builds/, $(addsuffix .o, $(tmods)))
 tdeps := $(addprefix .builds/, $(addsuffix .dep, $(tmods)))
 
 
-EXLIBS := -lstdc++ -lX11 -lGL -lGLX -lcairo -ljpeg
+EXLIBS := -lstdc++ -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm
 
 
 

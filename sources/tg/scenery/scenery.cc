@@ -25,9 +25,13 @@
 
 namespace TG {
 
+	extern unsigned skyboxMark;
+	extern unsigned sphereMark;
+
 	template <> Scenery::Factory* Scenery::Factory::start(0);
 
 	Scenery* Scenery::New(const char* path) {
+		skyboxMark = sphereMark = 0;
 		if (auto* const image = TB::Image::New(path)) {
 			// Imageに対応するSceteryをnewする
 			if (auto* const scenery = Factory::New(*image)) {

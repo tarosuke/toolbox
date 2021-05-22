@@ -27,6 +27,7 @@
 
 namespace TG {
 
+	unsigned sphereMark;
 	class SphereMap : public Scenery {
 	public:
 		SphereMap(TG::Mesh* mesh) : Scenery(mesh){};
