@@ -27,6 +27,7 @@
 namespace TG {
 
 	class Object;
+	class Scenery;
 
 	//フレームバッファや画面などの描画先
 	class Scene {
@@ -57,6 +58,9 @@ namespace TG {
 		// Note:近いレイヤーから登録すること
 		void AddLayer(Object& layer);
 
+		// Sceneryの登録(すでに登録されていたら削除される)
+		void RegisterScenery(Scenery*);
+
 		//周期処理の入口
 		virtual void Draw() = 0;
 		virtual void Tick() = 0;
@@ -66,5 +70,6 @@ namespace TG {
 
 	private:
 		TB::List<Object> layers;
+		Scenery* scenery;
 	};
 }

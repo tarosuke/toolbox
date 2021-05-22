@@ -56,6 +56,7 @@ namespace TB{
 			try {
 				return new Image(path);
 			} catch (...) { return 0; }
+			return 0;
 		};
 		virtual ~Image();
 

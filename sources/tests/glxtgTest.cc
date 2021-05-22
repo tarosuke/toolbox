@@ -1,5 +1,6 @@
 #include <toolbox/tg/glx.h>
 #include <toolbox/tg/x.h>
+#include <toolbox/tg/scenery.h>
 
 #include <assert.h>
 #include <unistd.h>

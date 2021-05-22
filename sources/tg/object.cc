@@ -27,16 +27,16 @@ namespace TG {
 	class OMesh : public Mesh {
 	public:
 		void Draw() override { DrawMesh(); };
-		OMesh(TB::VBO* vbo, TB::Image& image) : Mesh(vbo, image){};
+		OMesh(TB::VBO* vbo, const TB::Image& image) : Mesh(vbo, image){};
 	};
 
 	class TMesh : public Mesh {
 	public:
 		void Traw() override { DrawMesh(); };
-		TMesh(TB::VBO* vbo, TB::Image& image) : Mesh(vbo, image){};
+		TMesh(TB::VBO* vbo, const TB::Image& image) : Mesh(vbo, image){};
 	};
 
-	Mesh* Mesh::New(TB::VBO* vbo, TB::Image& image) {
+	Mesh* Mesh::New(TB::VBO* vbo, const TB::Image& image) {
 		if (!vbo) {
 			return 0;
 		}

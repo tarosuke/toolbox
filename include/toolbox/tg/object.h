@@ -35,6 +35,8 @@ namespace TG {
 		virtual void Traw(){};
 		virtual void Tick(){};
 
+		virtual ~Object(){};
+
 	protected:
 	private:
 	};
@@ -52,7 +54,7 @@ namespace TG {
 			unsigned nov,
 			const T vertex[],
 			const char* path) {
-			for (auto* const image = TB::Image::New(path)) {
+			if (auto* const image = TB::Image::New(path)) {
 				auto* const body(New(noi, index, nov, vertex, *image));
 				delete image;
 				return body;
@@ -63,17 +65,17 @@ namespace TG {
 			const unsigned index[],
 			unsigned nov,
 			const T vertex[],
-			TB::Image& image) {
+			const TB::Image& image) {
 			if (auto* const vbo = TB::VBO::New(noi, index, nov, vertex)) {
 				return New(vbo, image);
 			}
 			return 0;
 		};
-		static Mesh* New(TB::VBO*, TB::Image&);
+		static Mesh* New(TB::VBO*, const TB::Image&);
 		~Mesh() { delete vbo; }
 
 	protected:
-		Mesh(TB::VBO* vbo, TB::Image& image) : vbo(vbo), texture(image){};
+		Mesh(TB::VBO* vbo, const TB::Image& image) : vbo(vbo), texture(image){};
 		void DrawMesh();
 
 	private:

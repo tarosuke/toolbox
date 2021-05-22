@@ -18,6 +18,7 @@
  */
 #include <toolbox/tg/tg.h>
 #include <toolbox/tg/object.h>
+#include <toolbox/tg/scenery.h>
 #include <GL/glew.h>
 #include <GL/gl.h>
 
@@ -40,15 +41,35 @@ namespace TG {
 		glLoadMatrixd(projectionMatrix);
 	}
 
-	void Scene::AddLayer(Object& layer) { layers.Add(layer); };
+	void Scene::AddLayer(Object& layer) { layers.Add(layer); }
 
+	void Scene::RegisterScenery(Scenery* ns) {
+		if (ns) {
+			if (scenery) {
+				delete scenery;
+			}
+			scenery = ns;
+		}
+	}
 
 	void Scene::Draw() {
-		glClearColor(0, 0, 0.1, 1);
-		glClear(
+		static const unsigned clearAll(
 			GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		static const unsigned clear(
+			GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+		unsigned clearFlags(clearAll);
+
+		glClearColor(0, 0, 0.1, 1);
+		glClear(clearFlags);
 		for (TB::List<Object>::I i(layers); ++i;) {
 			(*i).Draw(); // draw opaque objects
+		}
+		if (scenery) {
+			(*scenery).Draw();
+			clearFlags = clear;
+		} else {
+			clearFlags = clearAll;
 		}
 		for (TB::List<Object>::I i(layers); --i;) {
 			(*i).Traw(); // draw transparent objects
