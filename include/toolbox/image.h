@@ -66,6 +66,7 @@ namespace TB{
 		unsigned GetWidth() const;
 		unsigned GetHeight() const;
 		unsigned GetBPP() const;
+		bool IsTransparent() const;
 		operator Rect<2, unsigned>() const {
 			return Rect<2, unsigned>(
 				Vector<2, unsigned>(0, 0),
@@ -216,7 +217,6 @@ namespace TB{
 
 	protected:
 		virtual void OnImageUpdated(const Raw&, const Rect<2, unsigned>&){};
-		bool IsTransparent() const;
 
 	private:
 		cairo_surface_t* surface;

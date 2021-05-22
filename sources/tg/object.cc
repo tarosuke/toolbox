@@ -40,8 +40,8 @@ namespace TG {
 		if (!vbo) {
 			return 0;
 		}
-		return 4 <= image.GetBPP() ? (Mesh*)new TMesh(vbo, image)
-								   : (Mesh*)new OMesh(vbo, image);
+		return image.IsTransparent() ? (Mesh*)new TMesh(vbo, image)
+									 : (Mesh*)new OMesh(vbo, image);
 	}
 
 	void Mesh::DrawMesh() {

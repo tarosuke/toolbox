@@ -61,9 +61,6 @@ namespace TG {
 	}
 
 	void GLXScene::Draw() {
-		//カメラの反映
-		glLoadMatrixf(view);
-
 		//描画
 		Scene::Draw();
 

@@ -27,7 +27,7 @@
 
 namespace TG {
 
-	Scene::Scene() : scenery(0) {}
+	Scene::Scene() : scenery(0) { view.Identity(); }
 
 	void Scene::SetFrustum(const Frustum& frustum) {
 		glFrustum(
@@ -63,6 +63,10 @@ namespace TG {
 			GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		unsigned clearFlags(clearAll);
+
+		//カメラの反映
+		glMatrixMode(GL_MODELVIEW_MATRIX);
+		glLoadMatrixf(view);
 
 		glClearColor(0, 0, 0.1, 1);
 		glClear(clearFlags);
