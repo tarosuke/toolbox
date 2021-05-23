@@ -73,6 +73,8 @@ namespace TG {
 		for (TB::List<Object>::I i(layers); ++i;) {
 			(*i).Draw(); // draw opaque objects
 		}
+		glColor3f(1, 1, 1);
+
 		if (scenery) {
 			(*scenery).Draw();
 			clearFlags = clear;
