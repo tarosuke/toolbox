@@ -66,6 +66,15 @@ namespace TG {
 
 		unsigned clearFlags(clearAll);
 
+		// TODO:ループに入る前に実行
+		glEnable(GL_POLYGON_SMOOTH);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_TEXTURE_2D);
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+
 		//カメラの反映
 		glLoadMatrixf(view);
 

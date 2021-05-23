@@ -34,9 +34,7 @@ namespace TG {
 		: XTG::Window(width, height) {
 		Init(attributes);
 		glViewport(0, 0, width, height);
-		glMatrixMode(GL_PROJECTION);
 		SetFrustum(frustum);
-		glMatrixMode(GL_MODELVIEW);
 	}
 
 	void GLXScene::Init(int* attributes) {
