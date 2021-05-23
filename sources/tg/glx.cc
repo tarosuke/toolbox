@@ -20,7 +20,6 @@
 
 #include <toolbox/tg/tg.h>
 #include <toolbox/tg/glx.h>
-#include <GL/glx.h>
 
 
 
@@ -35,9 +34,7 @@ namespace TG {
 		: XTG::Window(width, height) {
 		Init(attributes);
 		glViewport(0, 0, width, height);
-		glMatrixMode(GL_PROJECTION);
 		SetFrustum(frustum);
-		glMatrixMode(GL_MODELVIEW);
 	}
 
 	void GLXScene::Init(int* attributes) {
@@ -49,6 +46,11 @@ namespace TG {
 		context = glXCreateContext(XDisplay(), visual, NULL, True);
 		assert(context);
 		glXMakeCurrent(XDisplay(), XWindow(), context);
+
+		// glew初期化
+		if (GLEW_OK != glewInit()) {
+			throw "GLEWが使えません";
+		}
 	}
 
 
@@ -57,9 +59,6 @@ namespace TG {
 	}
 
 	void GLXScene::Draw() {
-		//カメラの反映
-		glLoadMatrixf(view);
-
 		//描画
 		Scene::Draw();
 

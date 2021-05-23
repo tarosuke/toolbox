@@ -1,4 +1,7 @@
+#include <syslog.h>
+
 #include <toolbox/gl/gl.h>
+
 
 
 namespace GL{

@@ -23,6 +23,7 @@
 #include <toolbox/container/list.h>
 #include <toolbox/gl/vbo.h>
 #include <toolbox/gl/texture.h>
+#include <toolbox/image.h>
 
 
 
@@ -34,6 +35,9 @@ namespace TG {
 		virtual void Traw(){};
 		virtual void Tick(){};
 
+		virtual ~Object(){};
+
+	protected:
 	private:
 	};
 
@@ -44,20 +48,41 @@ namespace TG {
 		void operator=(const Mesh&);
 
 	public:
-		static Mesh* New(TB::VBO*, TB::Texture*);
-		~Mesh() {
-			delete vbo;
-			delete texture;
+		template <typename T> static Mesh*
+		New(unsigned noi,
+			const unsigned index[],
+			unsigned nov,
+			const T vertex[],
+			const char* path) {
+			if (auto* const image = TB::Image::New(path)) {
+				auto* const body(New(noi, index, nov, vertex, *image));
+				delete image;
+				return body;
+			}
 		}
+		template <typename T> static Mesh*
+		New(unsigned noi,
+			const unsigned index[],
+			unsigned nov,
+			const T vertex[],
+			const TB::Image& image) {
+			if (auto* const vbo = TB::VBO::New(noi, index, nov, vertex)) {
+				return New(vbo, image);
+			}
+			return 0;
+		};
+		static Mesh* New(TB::VBO*, const TB::Image&);
+		~Mesh() { delete vbo; }
 
 	protected:
-		Mesh(TB::VBO*, TB::Texture*);
+		Mesh(TB::VBO* vbo, const TB::Image& image) : vbo(vbo), texture(image){};
 		void DrawMesh();
 
 	private:
 		TB::VBO* const vbo;
-		TB::Texture* const texture;
+		TB::Texture texture;
 	};
+
 
 	class Group : public Object {
 	public:

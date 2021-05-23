@@ -1,5 +1,5 @@
-/** glewを併用するためのヘッダ(順番とか面倒なので)
- * Copyright (C) 2017 tarosuke<webmaster@tarosuke.net>
+/** Scenery
+ * Copyright (C) 2017,2019,2021 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,36 +15,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * スカイスフィアやスカイボックスなどの抽象
  */
 #pragma once
 
-#include <GL/glew.h>
-#include <GL/gl.h>
-#include <GL/glx.h>
+#include <toolbox/factory/factory.h>
+#include <toolbox/tg/object.h>
 
 
 
-namespace GL{
+namespace TG {
 
-	/** ScopeEnabler
-	* RAIIでインスタンスが存在するスコープ内でのみ機能を有効にする
-	* NOTE:スコープから出ると以前の状態とは無関係にdisableされる
-	*/
-	class Enabler{
-		Enabler();
-		Enabler(const Enabler&);
-		void operator=(const Enabler&);
+	class Scenery {
+		Scenery();
+		Scenery(const Scenery&);
+		void operator=(const Scenery&);
+
 	public:
-		Enabler(int function) : function(function){
-			glEnable(function);
-		};
-		~Enabler(){
-			glDisable(function);
-		};
+		using Factory = FACTORY<Scenery, const TB::Image&>;
+		static Scenery* New(const char* path);
+		~Scenery() { delete mesh; };
+		void Draw() { (*mesh).Draw(); };
+
+	protected:
+		Scenery(TG::Mesh* mesh) : mesh(mesh){};
+
 	private:
-		const int function;
+		static FACTORY<Scenery> factory;
+
+		Mesh* const mesh;
 	};
-
-	bool ErrorCheck();
-
 }

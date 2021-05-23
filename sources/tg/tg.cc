@@ -18,14 +18,18 @@
  */
 #include <toolbox/tg/tg.h>
 #include <toolbox/tg/object.h>
-#include <GL/glew.h>
-#include <GL/gl.h>
+#include <toolbox/tg/scenery.h>
+#include <toolbox/gl/gl.h>
 
+#include <assert.h>
 
 
 namespace TG {
 
+	Scene::Scene() : scenery(0) { view.Identity(); }
+
 	void Scene::SetFrustum(const Frustum& frustum) {
+		glMatrixMode(GL_PROJECTION);
 		glFrustum(
 			frustum.left,
 			frustum.right,
@@ -33,22 +37,59 @@ namespace TG {
 			frustum.top,
 			frustum.near,
 			frustum.far);
+		glMatrixMode(GL_MODELVIEW);
 	}
 
 	void Scene::SetProjectionMatrix(const double projectionMatrix[]) {
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrixd(projectionMatrix);
+		glMatrixMode(GL_MODELVIEW);
 	}
 
-	void Scene::AddLayer(Object& layer) { layers.Add(layer); };
+	void Scene::AddLayer(Object& layer) { layers.Add(layer); }
 
+	void Scene::RegisterScenery(Scenery* ns) {
+		if (scenery) {
+			delete scenery;
+			scenery = 0;
+		}
+		if (ns) {
+			scenery = ns;
+		}
+	}
 
 	void Scene::Draw() {
-		glClearColor(0, 0, 0.1, 1);
-		glClear(
+		static const unsigned clearAll(
 			GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		static const unsigned clear(
+			GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+		unsigned clearFlags(clearAll);
+
+		// TODO:ループに入る前に実行
+		glEnable(GL_POLYGON_SMOOTH);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_TEXTURE_2D);
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+
+		//カメラの反映
+		glLoadMatrixf(view);
+
+		glClearColor(0, 0, 0.1, 1);
+		glClear(clearFlags);
+		glColor3f(1, 1, 1);
 		for (TB::List<Object>::I i(layers); ++i;) {
 			(*i).Draw(); // draw opaque objects
+		}
+
+		if (scenery) {
+			(*scenery).Draw();
+			clearFlags = clear;
+		} else {
+			clearFlags = clearAll;
 		}
 		for (TB::List<Object>::I i(layers); --i;) {
 			(*i).Traw(); // draw transparent objects
@@ -59,4 +100,4 @@ namespace TG {
 			(*i).Tick();
 		}
 	}
-}
+	}

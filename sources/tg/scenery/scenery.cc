@@ -1,5 +1,5 @@
-/** glewを併用するためのヘッダ(順番とか面倒なので)
- * Copyright (C) 2017 tarosuke<webmaster@tarosuke.net>
+/** Scenery
+ * Copyright (C) 2017,2019 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,35 +16,30 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#pragma once
 
-#include <GL/glew.h>
-#include <GL/gl.h>
-#include <GL/glx.h>
+#include <toolbox/tg/scenery.h>
 
+#include <syslog.h>
 
 
-namespace GL{
 
-	/** ScopeEnabler
-	* RAIIでインスタンスが存在するスコープ内でのみ機能を有効にする
-	* NOTE:スコープから出ると以前の状態とは無関係にdisableされる
-	*/
-	class Enabler{
-		Enabler();
-		Enabler(const Enabler&);
-		void operator=(const Enabler&);
-	public:
-		Enabler(int function) : function(function){
-			glEnable(function);
-		};
-		~Enabler(){
-			glDisable(function);
-		};
-	private:
-		const int function;
-	};
+namespace TG {
 
-	bool ErrorCheck();
+	extern unsigned skyboxMark;
+	extern unsigned sphereMark;
 
+	template <> Scenery::Factory* Scenery::Factory::start(0);
+
+	Scenery* Scenery::New(const char* path) {
+		skyboxMark = sphereMark = 0;
+		if (auto* const image = TB::Image::New(path)) {
+			// Imageに対応するSceteryをnewする
+			if (auto* const scenery = Factory::New(*image)) {
+				delete image;
+				return scenery;
+			}
+			delete image;
+		}
+		return 0;
+	}
 }

@@ -16,9 +16,7 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <GL/glew.h>
-#include <GL/gl.h>
-
+#include <toolbox/gl/gl.h>
 #include <toolbox/gl/texture.h>
 
 
@@ -42,7 +40,6 @@ namespace TB{
 			0);
 
 		SetupAttributes(style);
-		transparent = IsTransparent(format);
 	}
 
 	Texture::Texture(
@@ -66,16 +63,15 @@ namespace TB{
 			buffer);
 
 		SetupAttributes(style);
-		transparent =
 	}
 
 	Texture::Texture(const Image& image, const Style& style) : tid(NewID()){
-		Binder(*this);
+		Binder b(*this);
 		Image::Raw raw(image);
 		glTexImage2D(
 			GL_TEXTURE_2D,
 			0,
-			raw.bpp == 4 ? GL_RGBA : GL_RGB,
+			raw.transparent ? GL_RGBA : GL_RGB,
 			raw.width,
 			raw.height,
 			0,
@@ -84,7 +80,7 @@ namespace TB{
 			raw.data);
 
 		SetupAttributes(style);
-		transparent = raw.bpp == 4;
+		transparent = raw.transparent;
 	}
 
 	Texture::~Texture(){
@@ -171,7 +167,7 @@ namespace TB{
 
 	Texture::Binder::Binder(const Texture& t){
 		glBindTexture(GL_TEXTURE_2D, t.tid);
-		glBlendFunc(GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	Texture::Binder::~Binder(){

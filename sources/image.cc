@@ -477,8 +477,8 @@ namespace TB{
 
 			//終了
 			jpeg_finish_decompress(&ci);
-		}
-		catch(...){
+			cairo_surface_mark_dirty(surface);
+		} catch (...) {
 			if(surface){
 				cairo_surface_destroy(surface);
 				surface = 0;

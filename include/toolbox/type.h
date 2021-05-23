@@ -33,3 +33,6 @@ using u64 = __uint64_t;
 using i64 = __int64_t;
 using u128 = __uint128_t;
 using i128 = __int128_t;
+
+
+#define elementsOf(a) (sizeof(a) / sizeof(a[0]))
