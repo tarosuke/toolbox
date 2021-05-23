@@ -66,7 +66,7 @@ namespace TB{
 	}
 
 	Texture::Texture(const Image& image, const Style& style) : tid(NewID()){
-		Binder(*this);
+		Binder b(*this);
 		Image::Raw raw(image);
 		glTexImage2D(
 			GL_TEXTURE_2D,
