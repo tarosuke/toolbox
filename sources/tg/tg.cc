@@ -37,11 +37,13 @@ namespace TG {
 			frustum.top,
 			frustum.near,
 			frustum.far);
+		glMatrixMode(GL_MODELVIEW);
 	}
 
 	void Scene::SetProjectionMatrix(const double projectionMatrix[]) {
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrixd(projectionMatrix);
+		glMatrixMode(GL_MODELVIEW);
 	}
 
 	void Scene::AddLayer(Object& layer) { layers.Add(layer); }
@@ -65,7 +67,6 @@ namespace TG {
 		unsigned clearFlags(clearAll);
 
 		//カメラの反映
-		glMatrixMode(GL_MODELVIEW);
 		glLoadMatrixf(view);
 
 		glClearColor(0, 0, 0.1, 1);
