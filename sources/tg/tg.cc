@@ -19,8 +19,7 @@
 #include <toolbox/tg/tg.h>
 #include <toolbox/tg/object.h>
 #include <toolbox/tg/scenery.h>
-#include <GL/glew.h>
-#include <GL/gl.h>
+#include <toolbox/gl/gl.h>
 
 #include <assert.h>
 
@@ -30,6 +29,7 @@ namespace TG {
 	Scene::Scene() : scenery(0) { view.Identity(); }
 
 	void Scene::SetFrustum(const Frustum& frustum) {
+		glMatrixMode(GL_PROJECTION);
 		glFrustum(
 			frustum.left,
 			frustum.right,
@@ -65,15 +65,15 @@ namespace TG {
 		unsigned clearFlags(clearAll);
 
 		//カメラの反映
-		glMatrixMode(GL_MODELVIEW_MATRIX);
+		glMatrixMode(GL_MODELVIEW);
 		glLoadMatrixf(view);
 
 		glClearColor(0, 0, 0.1, 1);
 		glClear(clearFlags);
+		glColor3f(1, 1, 1);
 		for (TB::List<Object>::I i(layers); ++i;) {
 			(*i).Draw(); // draw opaque objects
 		}
-		glColor3f(1, 1, 1);
 
 		if (scenery) {
 			(*scenery).Draw();
