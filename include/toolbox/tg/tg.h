@@ -63,11 +63,12 @@ namespace TG {
 		void RegisterScenery(Scenery*);
 
 		//周期処理の入口
-		virtual void Draw() = 0;
-		virtual void Tick() = 0;
+		void Run();
 
 	protected:
 		TB::Matrix<4, 4, float> view;
+		virtual void Draw(const TB::Matrix<4, 4, float>&);
+		virtual bool Finish() = 0;
 
 	private:
 		TB::List<Object> layers;

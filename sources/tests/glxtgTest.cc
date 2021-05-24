@@ -24,7 +24,7 @@ int main() {
 		TG::Scenery::New("/home/tarosuke/Pictures/sceneries/Cubic30.png"));
 
 	assert(window.IsReady());
-	window.Draw();
+	window.Run();
 	display.Run();
 	return 0;
 }
