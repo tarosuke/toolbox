@@ -23,6 +23,10 @@
 #include <toolbox/gl/gl.h>
 
 
+namespace XTG {
+	class Display;
+}
+
 
 namespace TG {
 
@@ -32,6 +36,7 @@ namespace TG {
 
 	public:
 		GLXScene(
+			XTG::Display&,
 			unsigned width,
 			unsigned height,
 			XTG::Window* parent,

@@ -24,15 +24,13 @@
 
 namespace XTG {
 
-	Display* Display::current(0);
-
 	const long Window::defaultEventMask(
 		KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask);
 
 
 	Window::Window(
-		unsigned width, unsigned height, Window* parent)
-		: display(Display::Current()), xdrawable(XCreateSimpleWindow(
+		Display& display, unsigned width, unsigned height, Window* parent)
+		: display(display), xdrawable(XCreateSimpleWindow(
 								display.xdisplay,
 								parent ? (*parent).xdrawable
 									   : XDefaultRootWindow(display.xdisplay),

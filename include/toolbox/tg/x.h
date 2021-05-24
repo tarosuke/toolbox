@@ -33,9 +33,7 @@ namespace XTG {
 		friend class Window;
 
 	public:
-		Display(const char* target = NULL) : xdisplay(XOpenDisplay(target)) {
-			current = this;
-		}
+		Display(const char* target = NULL) : xdisplay(XOpenDisplay(target)) {}
 		virtual ~Display() {
 			if (xdisplay) {
 				XCloseDisplay(xdisplay);
@@ -56,20 +54,14 @@ namespace XTG {
 
 		operator bool() { return !!xdisplay; }
 
-		static Display& Current() {
-			assert(current);
-			return *current;
-		}
-
 	private:
 		::Display* const xdisplay;
-		static Display* current;
 	};
 
 
 	class Window : public TB::List<Window>::Node {
 	public:
-		Window(unsigned width, unsigned height, Window* parent = 0);
+		Window(Display&, unsigned width, unsigned height, Window* parent = 0);
 		~Window() { XDestroyWindow(display.xdisplay, xdrawable); }
 
 		TB::Vector<2, unsigned> Size() const { return size; };

@@ -26,12 +26,13 @@
 namespace TG {
 
 	GLXScene::GLXScene(
+		XTG::Display& display,
 		unsigned width,
 		unsigned height,
 		XTG::Window* parent,
 		const Frustum& frustum,
 		int attributes[])
-		: XTG::Window(width, height) {
+		: XTG::Window(display, width, height) {
 		Init(attributes);
 		glViewport(0, 0, width, height);
 		SetFrustum(frustum);
