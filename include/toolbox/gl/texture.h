@@ -84,6 +84,7 @@ namespace TB{
 		//フォーマットが透過ならtrue
 		//
 		static bool IsTransparent(Format);
+		bool IsTransparent() { return transparent; };
 
 		//
 		// アクセサ
@@ -98,6 +99,6 @@ namespace TB{
 		static const Style defaultStyle;
 
 		const unsigned tid;
+		bool transparent;
 	};
-
 }

@@ -26,39 +26,14 @@
 
 namespace TG {
 
-	//何らかの物体あるいは物体グループ
-	class Object : public TB::List<Object>::Node {
-		Object(const Object&);
-		void operator=(const Object&);
-
-	public:
-		virtual ~Object(){};
-		virtual void Draw(const TB::Matrix<4, 4>&);
-
-	protected:
-		bool visible;
-		Object() : visible(true){};
-	};
-
-	class Group : public Object {
-		Group(const Group&);
-		void operator=(const Group&);
-
-	public:
-		Group(){};
-		void AddChild(Object& o) { children.Add(o); };
-		void AddCHild(Group& g) { groups.Add(g); };
-
-	protected:
-		TB::List<Object> children;
-		TB::List<Object> groups;
-		TB::Matrix<4, 4> view;
-
-		void Draw(const TB::Matrix<4, 4>&);
-	};
+	class Object;
+	class Scenery;
 
 	//フレームバッファや画面などの描画先
 	class Scene {
+		Scene(const Scene&);
+		void operator=(const Scene&);
+
 	public:
 		struct Frustum {
 			double left;
@@ -68,12 +43,35 @@ namespace TG {
 			double near;
 			double far;
 		};
-		Scene(){};
+
+		Scene();
+
 		virtual ~Scene(){};
-		void AddLayer(Object& o) { layers.Add(o); };
-		void Draw();
+
+		void SetFrustum(const Frustum& frustum);
+		void SetProjectionMatrix(const double projectionMatrix[]);
+
+		//カメラ操作
+		void SetView(const TB::Matrix<4, 4, float>&);
+		void MulView(const TB::Matrix<4, 4, float>&);
+
+		//レイヤーの登録
+		// Note:近いレイヤーから登録すること
+		void AddLayer(Object& layer);
+
+		// Sceneryの登録(すでに登録されていたら削除される)
+		void RegisterScenery(Scenery*);
+
+		//周期処理の入口
+		void Run();
+
+	protected:
+		TB::Matrix<4, 4, float> view;
+		virtual void Draw(const TB::Matrix<4, 4, float>&);
+		virtual bool Finish() = 0;
 
 	private:
 		TB::List<Object> layers;
+		Scenery* scenery;
 	};
 }

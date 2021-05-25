@@ -18,30 +18,54 @@
  */
 #include <assert.h>
 
-#include <toolbox/tg/glxtg.h>
+#include <toolbox/tg/tg.h>
+#include <toolbox/tg/glx.h>
 
 
 
 namespace TG {
 
 	GLXScene::GLXScene(
-		const Target& target, const Frustum& frustum, int attributes[])
-		: target(target) {
-		assert(target.display);
+		XTG::Display& display,
+		unsigned width,
+		unsigned height,
+		XTG::Window* parent,
+		const Frustum& frustum,
+		int attributes[])
+		: XTG::Window(display, width, height), keep(true) {
 		Init(attributes);
+		glViewport(0, 0, width, height);
 		SetFrustum(frustum);
-	}
-	GLXScene::GLXScene(
-		const Target& target, const double projectionMatrix[], int attributes[])
-		: target(target) {
-		assert(target.display);
-		Init(attributes);
-		SetProjectionMatrix(projectionMatrix);
 	}
 
 	void GLXScene::Init(int* attributes) {
-		visual = glXChooseVisual(target.display, target.drawable, attributes);
-		context = glXCreateContext(target.display, visual, NULL, True);
+		assert(XDisplay());
+		assert(XWindow());
+		visual =
+			glXChooseVisual(XDisplay(), DefaultScreen(XDisplay()), attributes);
+		assert(visual);
+		context = glXCreateContext(XDisplay(), visual, NULL, True);
+		assert(context);
+		glXMakeCurrent(XDisplay(), XWindow(), context);
+
+		// glew初期化
+		if (GLEW_OK != glewInit()) {
+			throw "GLEWが使えません";
+		}
+	}
+
+
+	bool GLXScene::Finish() {
+		// Xのイベントを処理
+		if (XPending(XDisplay())) {
+			::XEvent ev;
+			XNextEvent(XDisplay(), &ev);
+			HandleEvent(ev);
+		}
+
+		// バッファを差し替えて表示
+		glXSwapBuffers(XDisplay(), XWindow());
+		return keep;
 	}
 
 

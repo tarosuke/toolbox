@@ -18,42 +18,42 @@
  */
 #pragma once
 
-#include <toolbox/tg/gltg.h>
+#include <toolbox/tg/tg.h>
+#include <toolbox/tg/x.h>
+#include <toolbox/gl/gl.h>
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <GL/glx.h>
 
+namespace XTG {
+	class Display;
+}
 
 
 namespace TG {
 
-	class GLXScene : public GLScene {
+	class GLXScene : public XTG::Window, public Scene {
 		GLXScene(const GLXScene&);
 		void operator=(const GLXScene&);
 
 	public:
-		struct Target {
-			Display* display;
-			Drawable drawable;
-		};
-
 		GLXScene(
-			const Target&,
+			XTG::Display&,
+			unsigned width,
+			unsigned height,
+			XTG::Window* parent,
 			const Frustum&,
 			int attirbutes[] = defaultAttributes);
-		GLXScene(
-			const Target&,
-			const double[],
-			int attirbutes[] = defaultAttributes);
+
+	protected:
+		void Quit() { keep = false; };
 
 	private:
 		static int defaultAttributes[];
-		const Target& target;
 		int* attributes;
 		XVisualInfo* visual;
 		GLXContext context;
+		bool keep;
 
 		void Init(int* attributes);
+		bool Finish() final;
 	};
 }

@@ -1,5 +1,5 @@
-/************************************************************ toolbox graphics
- * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+/** Scenery
+ * Copyright (C) 2017,2019,2021 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,24 +15,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * スカイスフィアやスカイボックスなどの抽象
  */
 #pragma once
 
-#include <toolbox/tg/tg.h>
-#include <GL/glew.h>
-#include <GL/gl.h>
+#include <toolbox/factory/factory.h>
+#include <toolbox/tg/object.h>
 
 
 
 namespace TG {
 
-	class GLScene : public Scene {
-		GLScene(const GLScene&);
-		void operator=(const GLScene&);
+	class Scenery {
+		Scenery();
+		Scenery(const Scenery&);
+		void operator=(const Scenery&);
+
+	public:
+		using Factory = FACTORY<Scenery, const TB::Image&>;
+		static Scenery* New(const char* path);
+		~Scenery() { delete mesh; };
+		void Draw() { (*mesh).Draw(); };
 
 	protected:
-		GLScene(){};
-		void SetFrustum(const Frustum& frustum);
-		void SetProjectionMatrix(const double projectionMatrix[]);
+		Scenery(TG::Mesh* mesh) : mesh(mesh){};
+
+	private:
+		static FACTORY<Scenery> factory;
+
+		Mesh* const mesh;
 	};
 }

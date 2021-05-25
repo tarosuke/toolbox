@@ -17,32 +17,90 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <toolbox/tg/tg.h>
+#include <toolbox/tg/object.h>
+#include <toolbox/tg/scenery.h>
+#include <toolbox/gl/gl.h>
 
+#include <assert.h>
 
 
 namespace TG {
 
-	void Scene::Draw() {
-		TB::Matrix<4, 4> mat;
-		mat.Identity();
+	Scene::Scene() : scenery(0) { view.Identity(); }
 
+	void Scene::SetFrustum(const Frustum& frustum) {
+		glMatrixMode(GL_PROJECTION);
+		glFrustum(
+			frustum.left,
+			frustum.right,
+			frustum.bottom,
+			frustum.top,
+			frustum.near,
+			frustum.far);
+		glMatrixMode(GL_MODELVIEW);
+	}
+
+	void Scene::SetProjectionMatrix(const double projectionMatrix[]) {
+		glMatrixMode(GL_PROJECTION);
+		glLoadMatrixd(projectionMatrix);
+		glMatrixMode(GL_MODELVIEW);
+	}
+
+	void Scene::AddLayer(Object& layer) { layers.Add(layer); }
+
+	void Scene::RegisterScenery(Scenery* ns) {
+		if (scenery) {
+			delete scenery;
+			scenery = 0;
+		}
+		if (ns) {
+			scenery = ns;
+		}
+	}
+
+	void Scene::Run() {
+		// GLのモード設定
+		glEnable(GL_POLYGON_SMOOTH);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_TEXTURE_2D);
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+		do {
+			Draw(view);
+			for (TB::List<Object>::I i(layers); ++i;) {
+				(*i).Tick();
+			}
+		} while (Finish());
+	}
+
+	void Scene::Draw(const TB::Matrix<4, 4, float>& v) {
+		//フレームバッファクリアモード
+		static const unsigned clearAll(
+			GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		static const unsigned clear(
+			GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		static unsigned clearFlags(clearAll);
+
+		//カメラの反映
+		glLoadMatrixf(view);
+
+		glClearColor(0, 0, 0.1, 1);
+		glClear(clearFlags);
+		glColor3f(1, 1, 1);
 		for (TB::List<Object>::I i(layers); ++i;) {
-			(*i).Draw(mat);
+			(*i).Draw(); // draw opaque objects
+		}
+		if (scenery) {
+			(*scenery).Draw();
+			clearFlags = clear;
+		} else {
+			clearFlags = clearAll;
+		}
+		for (TB::List<Object>::I i(layers); --i;) {
+			(*i).Traw(); // draw transparent objects
 		}
 	}
 
-	void Group::Draw(const TB::Matrix<4, 4>& mat) {
-		if (!visible) {
-			return;
-		}
-
-		TB::Matrix<4, 4> matrix(mat * view);
-
-		for (TB::List<Object>::I i(children); ++i;) {
-			(*i).Draw(matrix);
-		}
-		for (TB::List<Object>::I i(groups); ++i;) {
-			(*i).Draw(matrix);
-		}
-	}
 }

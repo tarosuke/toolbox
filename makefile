@@ -9,7 +9,7 @@ all: $(target)
 
 COPTS ?= -Iinclude -I/usr/include/gdbm
 
-COPTS += -Wall -Werror -g -IX11
+COPTS += -O2 -Wall -Werror -g -IX11
 CCOPTS += $(COPTS) -std=c++11
 
 suffixes := %.c %.cc %.glsl
@@ -25,6 +25,8 @@ tobjs := $(addprefix .builds/, $(addsuffix .o, $(tmods)))
 tdeps := $(addprefix .builds/, $(addsuffix .dep, $(tmods)))
 
 
+EXLIBS := -lstdc++ -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm
+
 
 
 ################################################################# COMMON RULES
@@ -33,7 +35,6 @@ tdeps := $(addprefix .builds/, $(addsuffix .dep, $(tmods)))
 -include $(deps) $(tdeps)
 
 vpath %.o .builds
-vpath % $(dirs)
 
 
 .builds/%.o : sources/%.cc makefile
@@ -54,12 +55,12 @@ vpath % $(dirs)
 .builds/%.dep : sources/%.cc makefile
 	@echo " CPP $@"
 	@mkdir -p $(dir $@)
-	@echo -n .builds/ > $@
+	@echo -n $(dir $@) > $@
 	@$(CPP) $(CCOPTS) -MM $< >> $@
 
 .builds/%.dep : sources/%.c makefile
 	@echo " CPP $@"
-	@echo -n .builds/ > $@
+	@echo -n $(dir $@) > $@
 	@mkdir -p $(dir $@)
 	@$(CPP) $(COPTS) -MM $< >> $@
 
@@ -82,6 +83,10 @@ clean:
 	rm -rf .builds/* $(target) $(shell find . -name "*.orig")
 
 test: $(target) $(tobjs)
-	@$(foreach m, $(tmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox;)
+	@echo -n building tests...
+	@$(foreach m, $(tmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox $(EXLIBS) &&) true
 	@$(foreach m, $(tmods), chmod +x .builds/$(m);)
+	@echo OK.
+
+runtest: test
 	@.builds/tests/test $(addprefix .builds/$(m), $(tmods))

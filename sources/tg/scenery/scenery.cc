@@ -1,5 +1,5 @@
-/************************************************************ toolbox graphics
- * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+/** Scenery
+ * Copyright (C) 2017,2019 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,24 +16,30 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <toolbox/tg/gltg.h>
+
+#include <toolbox/tg/scenery.h>
+
+#include <syslog.h>
 
 
 
 namespace TG {
 
-	void GLScene::SetFrustum(const Frustum& frustum) {
-		glFrustum(
-			frustum.left,
-			frustum.right,
-			frustum.bottom,
-			frustum.top,
-			frustum.near,
-			frustum.far);
-	}
+	extern unsigned skyboxMark;
+	extern unsigned sphereMark;
 
-	void GLScene::SetProjectionMatrix(const double projectionMatrix[]) {
-		glMatrixMode(GL_PROJECTION);
-		glLoadMatrixd(projectionMatrix);
+	template <> Scenery::Factory* Scenery::Factory::start(0);
+
+	Scenery* Scenery::New(const char* path) {
+		skyboxMark = sphereMark = 0;
+		if (auto* const image = TB::Image::New(path)) {
+			// Imageに対応するSceteryをnewする
+			if (auto* const scenery = Factory::New(*image)) {
+				delete image;
+				return scenery;
+			}
+			delete image;
+		}
+		return 0;
 	}
 }
