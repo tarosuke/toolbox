@@ -58,15 +58,8 @@ namespace TG {
 		}
 	}
 
-	void Scene::Draw() {
-		static const unsigned clearAll(
-			GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		static const unsigned clear(
-			GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-		unsigned clearFlags(clearAll);
-
-		// TODO:ループに入る前に実行
+	void Scene::Run() {
+		// GLのモード設定
 		glEnable(GL_POLYGON_SMOOTH);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -74,6 +67,21 @@ namespace TG {
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
+		do {
+			Draw(view);
+			for (TB::List<Object>::I i(layers); ++i;) {
+				(*i).Tick();
+			}
+		} while (Finish());
+	}
+
+	void Scene::Draw(const TB::Matrix<4, 4, float>& v) {
+		//フレームバッファクリアモード
+		static const unsigned clearAll(
+			GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		static const unsigned clear(
+			GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		static unsigned clearFlags(clearAll);
 
 		//カメラの反映
 		glLoadMatrixf(view);
@@ -84,7 +92,6 @@ namespace TG {
 		for (TB::List<Object>::I i(layers); ++i;) {
 			(*i).Draw(); // draw opaque objects
 		}
-
 		if (scenery) {
 			(*scenery).Draw();
 			clearFlags = clear;
@@ -95,9 +102,5 @@ namespace TG {
 			(*i).Traw(); // draw transparent objects
 		}
 	}
-	void Scene::Tick() {
-		for (TB::List<Object>::I i(layers); ++i;) {
-			(*i).Tick();
-		}
-	}
-	}
+
+}

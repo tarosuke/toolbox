@@ -43,15 +43,17 @@ namespace TG {
 			const Frustum&,
 			int attirbutes[] = defaultAttributes);
 
-		void Tick() final;
-		void Draw() final;
+	protected:
+		void Quit() { keep = false; };
 
 	private:
 		static int defaultAttributes[];
 		int* attributes;
 		XVisualInfo* visual;
 		GLXContext context;
+		bool keep;
 
 		void Init(int* attributes);
+		bool Finish() final;
 	};
 }
