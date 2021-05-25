@@ -32,7 +32,7 @@ namespace TG {
 		XTG::Window* parent,
 		const Frustum& frustum,
 		int attributes[])
-		: XTG::Window(display, width, height), keep(false) {
+		: XTG::Window(display, width, height), keep(true) {
 		Init(attributes);
 		glViewport(0, 0, width, height);
 		SetFrustum(frustum);
@@ -56,6 +56,13 @@ namespace TG {
 
 
 	bool GLXScene::Finish() {
+		// Xのイベントを処理
+		if (XPending(XDisplay())) {
+			::XEvent ev;
+			XNextEvent(XDisplay(), &ev);
+			HandleEvent(ev);
+		}
+
 		// バッファを差し替えて表示
 		glXSwapBuffers(XDisplay(), XWindow());
 		return keep;

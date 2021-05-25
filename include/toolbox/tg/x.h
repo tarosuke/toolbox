@@ -20,6 +20,7 @@
 
 #include <toolbox/container/list.h>
 #include <toolbox/geometry/vector.h>
+#include <toolbox/thread/pthread.h>
 
 #include <X11/Xlib.h>
 #include <assert.h>
@@ -40,18 +41,6 @@ namespace XTG {
 			}
 		}
 
-		//導出してこれを置き換えて使う
-		virtual void HandleEvent(const XEvent&) {}
-
-		// NOTE:Xはイベントを取りに行かないと処理が進まないので一度は呼ぶこと
-		void Run() {
-			if (xdisplay) {
-				XEvent ev;
-				::XNextEvent(xdisplay, &ev);
-				HandleEvent(ev);
-			}
-		};
-
 		operator bool() { return !!xdisplay; }
 
 	private:
@@ -70,12 +59,12 @@ namespace XTG {
 	protected:
 		::Display* XDisplay() const { return display.xdisplay; }
 		::Window XWindow() const { return xdrawable; }
+		virtual void HandleEvent(const XEvent&){};
 
 	private:
+		static const long defaultEventMask;
 		Display& display;
 		::Window const xdrawable;
 		TB::Vector<2, unsigned> size;
-
-		static const long defaultEventMask;
 	};
 }

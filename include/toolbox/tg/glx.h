@@ -43,6 +43,9 @@ namespace TG {
 			const Frustum&,
 			int attirbutes[] = defaultAttributes);
 
+	protected:
+		void Quit() { keep = false; };
+
 	private:
 		static int defaultAttributes[];
 		int* attributes;
