@@ -18,7 +18,10 @@
  */
 #pragma once
 
+#include <openvr/openvr.h>
+
 #include <toolbox/tg/tg.h>
+#include <toolbox/gl/framebuffer.h>
 
 
 
@@ -26,9 +29,45 @@ namespace TG {
 
 	class OpenVR : public Scene {
 	public:
-		OpenVR(){};
+		struct Exception {
+			const char* message;
+			vr::HmdError code;
+		};
+
+		OpenVR();
+		~OpenVR();
 
 	private:
+		struct Pose : public TB::Matrix<4, 4> {
+			Pose(){};
+			Pose(const vr::HmdMatrix44_t& o) { *this = o; };
+			Pose(const vr::HmdMatrix34_t& o) { *this = o; };
+			void operator=(const vr::HmdMatrix44_t& o) { Transpose(o.m); };
+			void operator=(const vr::HmdMatrix34_t& o) {
+				TransposeAffine(o.m);
+			};
+		};
+
+		static constexpr float nearClip = 0.01;
+		static constexpr float farClip = 10000;
+		static vr::TrackedDevicePose_t devicePoses[];
+		vr::IVRSystem& openVR;
+
+		//フレームバッファ他
+		TB::Framebuffer::Size renderSize;
+		struct Eye {
+			Eye(vr::IVRSystem&, vr::EVREye, TB::Framebuffer::Size&);
+			const vr::EVREye side;
+			TB::Framebuffer framebuffer;
+			vr::HmdMatrix44_t projecionMatrix;
+			Pose eye2HeadMatrix;
+			vr::Texture_t fbFeature;
+		} left, right;
+
+		//初期化サポート
+		static vr::IVRSystem& GetOpenVR(); //失敗したら例外
+		static TB::Framebuffer::Size GetRenderSize(vr::IVRSystem&);
+
 		void Draw(const TB::Matrix<4, 4, float>&) final;
 		bool Finish() final { return false; };
 	};

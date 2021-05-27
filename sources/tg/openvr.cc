@@ -17,11 +17,53 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <toolbox/tg/openvr.h>
+#include <toolbox/gl/gl.h>
+#include <toolbox/exception/exception.h>
 
 
 
 namespace TG {
 
+	OpenVR::OpenVR()
+		: openVR(GetOpenVR()), renderSize(GetRenderSize(openVR)),
+		  left(openVR, vr::Eye_Left, renderSize),
+		  right(openVR, vr::Eye_Right, renderSize) {
+		//基本設定
+		glEnable(GL_POLYGON_SMOOTH);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_TEXTURE_2D);
+	}
+	OpenVR::~OpenVR() { vr::VR_Shutdown(); }
+
 	void OpenVR::Draw(const TB::Matrix<4, 4, float>& viwe) {}
 
+	vr::IVRSystem& OpenVR::GetOpenVR() {
+		Exception exception = {"Failed to initialize OpenVR"};
+		if (vr::IVRSystem* const o =
+				vr::VR_Init(&exception.code, vr::VRApplication_Scene)) {
+			return *o;
+		}
+		throw exception;
+	}
+
+	TB::Framebuffer::Size OpenVR::GetRenderSize(vr::IVRSystem& o) {
+		TB::Framebuffer::Size size;
+		o.GetRecommendedRenderTargetSize(&size.width, &size.height);
+		return size;
+	}
+
+	//
+	//片目分
+	//
+	OpenVR::Eye::Eye(
+		vr::IVRSystem& hmd, vr::EVREye eye, TB::Framebuffer::Size& size)
+		: side(eye), framebuffer(size),
+		  projecionMatrix(hmd.GetProjectionMatrix(side, nearClip, farClip)),
+		  eye2HeadMatrix(hmd.GetEyeToHeadTransform(side)),
+		  fbFeature((vr::Texture_t){
+			  (void*)(uintptr_t)framebuffer.GetColorBufferID(),
+			  vr::TextureType_OpenGL,
+			  vr::ColorSpace_Gamma}) {}
 }
