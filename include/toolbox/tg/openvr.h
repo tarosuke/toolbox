@@ -62,7 +62,7 @@ namespace TG {
 			vr::HmdMatrix44_t projecionMatrix;
 			Pose eye2HeadMatrix;
 			vr::Texture_t fbFeature;
-		} left, right;
+		} eyes[2];
 
 		//初期化サポート
 		static vr::IVRSystem& GetOpenVR(); //失敗したら例外

@@ -26,8 +26,9 @@ namespace TG {
 
 	OpenVR::OpenVR()
 		: openVR(GetOpenVR()), renderSize(GetRenderSize(openVR)),
-		  left(openVR, vr::Eye_Left, renderSize),
-		  right(openVR, vr::Eye_Right, renderSize) {
+		  eyes{
+			  {openVR, vr::Eye_Left, renderSize},
+			  {openVR, vr::Eye_Right, renderSize}} {
 		//基本設定
 		glEnable(GL_POLYGON_SMOOTH);
 		glEnable(GL_BLEND);
