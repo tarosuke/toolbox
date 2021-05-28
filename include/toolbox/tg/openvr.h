@@ -51,7 +51,8 @@ namespace TG {
 
 		static constexpr float nearClip = 0.01;
 		static constexpr float farClip = 10000;
-		static vr::TrackedDevicePose_t devicePoses[];
+		vr::TrackedDevicePose_t devicePoses[vr::k_unMaxTrackedDeviceCount];
+		Pose headPose;
 		vr::IVRSystem& openVR;
 
 		//フレームバッファ他

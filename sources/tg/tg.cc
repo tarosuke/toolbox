@@ -92,7 +92,7 @@ namespace TG {
 		stickies.Foreach(&Object::Draw);
 
 		//カメラの反映
-		glLoadMatrixf(view);
+		glLoadMatrixf(v);
 		objects.Foreach(&Object::Draw);
 		if (scenery) {
 			(*scenery).Draw();

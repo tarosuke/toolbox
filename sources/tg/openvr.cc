@@ -94,6 +94,22 @@ namespace TG {
 	}
 
 	void OpenVR::Draw(const TB::Matrix<4, 4, float>& view) {
+		//全デバイスの姿勢を取得
+		vr::VRCompositor()
+			->WaitGetPoses(devicePoses, vr::k_unMaxTrackedDeviceCount, NULL, 0);
+		for (unsigned n(0); n < vr::k_unMaxTrackedDeviceCount; ++n) {
+			if (devicePoses[n].bPoseIsValid) {
+				switch (openVR.GetTrackedDeviceClass(n)) {
+				case vr::TrackedDeviceClass_HMD:
+					headPose = devicePoses[n].mDeviceToAbsoluteTracking;
+					headPose.InvertAffine();
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
 		for (auto& eye : eyes) {
 			TB::Framebuffer::Key key(eye.framebuffer);
 			glViewport(0, 0, renderSize.width, renderSize.height);
@@ -101,7 +117,7 @@ namespace TG {
 			glMatrixMode(GL_PROJECTION);
 			glLoadTransposeMatrixf(&eye.projecionMatrix.m[0][0]);
 			glMatrixMode(GL_MODELVIEW);
-			Scene::Draw(eye.eye2HeadMatrix);
+			Scene::Draw(headPose);
 			vr::VRCompositor()->Submit(eye.side, &eye.fbFeature);
 		}
 	}

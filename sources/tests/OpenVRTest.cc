@@ -12,10 +12,11 @@ int main() {
 		class VR : public TG::OpenVR {
 			bool Finish() final {
 				static unsigned n(0);
-				return ++n < 4500;
+				return ++n < 1000;
 			};
 		} scene;
-		scene.RegisterScenery(TG::Scenery::New(""));
+		scene.RegisterScenery(
+			TG::Scenery::New("/home/tarosuke/Pictures/sceneries/Cubic30.png"));
 		scene.Run();
 	} catch (const char* m) {
 		syslog(LOG_CRIT, "Fatal error: %s.", m);
