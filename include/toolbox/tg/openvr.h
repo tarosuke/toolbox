@@ -38,6 +38,7 @@ namespace TG {
 		~OpenVR();
 
 	private:
+		void* display;
 		struct Pose : public TB::Matrix<4, 4> {
 			Pose(){};
 			Pose(const vr::HmdMatrix44_t& o) { *this = o; };
@@ -69,6 +70,5 @@ namespace TG {
 		static TB::Framebuffer::Size GetRenderSize(vr::IVRSystem&);
 
 		void Draw(const TB::Matrix<4, 4, float>&) final;
-		bool Finish() final;
 	};
 }

@@ -18,14 +18,65 @@
  */
 #include <toolbox/tg/openvr.h>
 #include <toolbox/gl/gl.h>
+#include <toolbox/gl/glx.h>
 #include <toolbox/exception/exception.h>
 
+#include <X11/X.h>
 
+
+
+namespace {
+	::Display* GetDisplay() {
+		::Display* display(XOpenDisplay(""));
+
+		/** デフォルトのビジュアルフォーマット
+		 */
+		static int attr[] = {
+			GLX_USE_GL,
+			GLX_LEVEL,
+			0,
+			GLX_RGBA,
+			GLX_DOUBLEBUFFER,
+			GLX_RED_SIZE,
+			8,
+			GLX_GREEN_SIZE,
+			8,
+			GLX_BLUE_SIZE,
+			8,
+			GLX_ALPHA_SIZE,
+			8,
+			GLX_DEPTH_SIZE,
+			24,
+			GLX_STENCIL_SIZE,
+			8,
+			GLX_ACCUM_RED_SIZE,
+			0,
+			GLX_ACCUM_GREEN_SIZE,
+			0,
+			GLX_ACCUM_BLUE_SIZE,
+			0,
+			GLX_ACCUM_ALPHA_SIZE,
+			0,
+			None};
+		XVisualInfo* visual(
+			glXChooseVisual(display, DefaultScreen(display), attr));
+		GLXContext context(glXCreateContext(display, visual, NULL, True));
+		glXMakeCurrent(display, DefaultRootWindow(display), context);
+
+		// glew初期化
+		if (GLEW_OK != glewInit()) {
+			throw "GLEWが使えません";
+		}
+
+		return display;
+	}
+}
 
 namespace TG {
 
 	OpenVR::OpenVR()
-		: openVR(GetOpenVR()), renderSize(GetRenderSize(openVR)),
+		: display(GetDisplay()), openVR(GetOpenVR()),
+		  renderSize(GetRenderSize(openVR)),
 		  eyes{
 			  {openVR, vr::Eye_Left, renderSize},
 			  {openVR, vr::Eye_Right, renderSize}} {
@@ -37,7 +88,10 @@ namespace TG {
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_TEXTURE_2D);
 	}
-	OpenVR::~OpenVR() { vr::VR_Shutdown(); }
+	OpenVR::~OpenVR() {
+		XCloseDisplay((::Display*)display);
+		vr::VR_Shutdown();
+	}
 
 	void OpenVR::Draw(const TB::Matrix<4, 4, float>& view) {
 		for (auto& eye : eyes) {
@@ -48,12 +102,8 @@ namespace TG {
 			glLoadTransposeMatrixf(&eye.projecionMatrix.m[0][0]);
 			glMatrixMode(GL_MODELVIEW);
 			Scene::Draw(eye.eye2HeadMatrix);
+			vr::VRCompositor()->Submit(eye.side, &eye.fbFeature);
 		}
-	}
-
-	bool OpenVR::Finish() {
-		static unsigned n(0);
-		return ++n < 450;
 	}
 
 	vr::IVRSystem& OpenVR::GetOpenVR() {

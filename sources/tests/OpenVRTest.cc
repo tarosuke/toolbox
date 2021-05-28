@@ -9,7 +9,12 @@
 
 int main() {
 	try {
-		TG::OpenVR scene;
+		class VR : public TG::OpenVR {
+			bool Finish() final {
+				static unsigned n(0);
+				return ++n < 4500;
+			};
+		} scene;
 		scene.RegisterScenery(TG::Scenery::New(""));
 		scene.Run();
 	} catch (const char* m) {
