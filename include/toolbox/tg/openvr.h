@@ -69,6 +69,6 @@ namespace TG {
 		static TB::Framebuffer::Size GetRenderSize(vr::IVRSystem&);
 
 		void Draw(const TB::Matrix<4, 4, float>&) final;
-		bool Finish() final { return false; };
+		bool Finish() final;
 	};
 }

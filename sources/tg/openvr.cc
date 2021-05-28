@@ -29,6 +29,7 @@ namespace TG {
 		  eyes{
 			  {openVR, vr::Eye_Left, renderSize},
 			  {openVR, vr::Eye_Right, renderSize}} {
+
 		//基本設定
 		glEnable(GL_POLYGON_SMOOTH);
 		glEnable(GL_BLEND);
@@ -38,7 +39,22 @@ namespace TG {
 	}
 	OpenVR::~OpenVR() { vr::VR_Shutdown(); }
 
-	void OpenVR::Draw(const TB::Matrix<4, 4, float>& viwe) {}
+	void OpenVR::Draw(const TB::Matrix<4, 4, float>& view) {
+		for (auto& eye : eyes) {
+			TB::Framebuffer::Key key(eye.framebuffer);
+			glViewport(0, 0, renderSize.width, renderSize.height);
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadTransposeMatrixf(&eye.projecionMatrix.m[0][0]);
+			glMatrixMode(GL_MODELVIEW);
+			Scene::Draw(eye.eye2HeadMatrix);
+		}
+	}
+
+	bool OpenVR::Finish() {
+		static unsigned n(0);
+		return ++n < 450;
+	}
 
 	vr::IVRSystem& OpenVR::GetOpenVR() {
 		Exception exception = {"Failed to initialize OpenVR"};
