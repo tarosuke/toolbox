@@ -117,7 +117,7 @@ namespace TG {
 			glMatrixMode(GL_PROJECTION);
 			glLoadTransposeMatrixf(&eye.projecionMatrix.m[0][0]);
 			glMatrixMode(GL_MODELVIEW);
-			Scene::Draw(headPose);
+			Scene::Draw(eye.eye2HeadMatrix * headPose * view);
 			vr::VRCompositor()->Submit(eye.side, &eye.fbFeature);
 		}
 	}
