@@ -45,8 +45,7 @@ namespace TG {
 		};
 
 		Scene();
-
-		virtual ~Scene(){};
+		virtual ~Scene();
 
 		void SetFrustum(const Frustum& frustum);
 		void SetProjectionMatrix(const double projectionMatrix[]);
@@ -59,8 +58,9 @@ namespace TG {
 		// Note:近いレイヤーから登録すること
 		void AddLayer(Object& layer);
 
-		// Sceneryの登録(すでに登録されていたら削除される)
-		void RegisterScenery(Scenery*);
+		void RegisterStickies(Object&); // 顔張り付き物体の登録
+		void RegisterObject(Object&); // 物体の登録
+		void RegisterScenery(Scenery*); // Sceneryの登録
 
 		//周期処理の入口
 		void Run();
@@ -71,7 +71,8 @@ namespace TG {
 		virtual bool Finish() = 0;
 
 	private:
-		TB::List<Object> layers;
+		TB::List<Object> stickies;
+		TB::List<Object> objects;
 		Scenery* scenery;
 	};
 }

@@ -16,11 +16,10 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#include <toolbox/gl/gl.h>
 #include <toolbox/gl/framebuffer.h>
 
 #include <assert.h>
-
-#include <toolbox/gl/gl.h>
 
 
 

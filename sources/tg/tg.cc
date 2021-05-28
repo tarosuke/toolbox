@@ -27,6 +27,11 @@
 namespace TG {
 
 	Scene::Scene() : scenery(0) { view.Identity(); }
+	Scene::~Scene() {
+		if (scenery) {
+			delete scenery;
+		}
+	}
 
 	void Scene::SetFrustum(const Frustum& frustum) {
 		glMatrixMode(GL_PROJECTION);
@@ -46,16 +51,13 @@ namespace TG {
 		glMatrixMode(GL_MODELVIEW);
 	}
 
-	void Scene::AddLayer(Object& layer) { layers.Add(layer); }
-
-	void Scene::RegisterScenery(Scenery* ns) {
+	void Scene::RegisterStickies(Object& o) { stickies.Add(o); }
+	void Scene::RegisterObject(Object& o) { objects.Add(o); }
+	void Scene::RegisterScenery(Scenery* s) {
 		if (scenery) {
 			delete scenery;
-			scenery = 0;
 		}
-		if (ns) {
-			scenery = ns;
-		}
+		scenery = s;
 	}
 
 	void Scene::Run() {
@@ -69,9 +71,8 @@ namespace TG {
 
 		do {
 			Draw(view);
-			for (TB::List<Object>::I i(layers); ++i;) {
-				(*i).Tick();
-			}
+			stickies.Foreach(&Object::Tick);
+			objects.Foreach(&Object::Tick);
 		} while (Finish());
 	}
 
@@ -83,24 +84,25 @@ namespace TG {
 			GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		static unsigned clearFlags(clearAll);
 
-		//カメラの反映
-		glLoadMatrixf(view);
-
 		glClearColor(0, 0, 0.1, 1);
 		glClear(clearFlags);
 		glColor3f(1, 1, 1);
-		for (TB::List<Object>::I i(layers); ++i;) {
-			(*i).Draw(); // draw opaque objects
-		}
+
+		glLoadIdentity();
+		stickies.Foreach(&Object::Draw);
+
+		//カメラの反映
+		glLoadMatrixf(v);
+		objects.Foreach(&Object::Draw);
 		if (scenery) {
 			(*scenery).Draw();
 			clearFlags = clear;
 		} else {
 			clearFlags = clearAll;
 		}
-		for (TB::List<Object>::I i(layers); --i;) {
-			(*i).Traw(); // draw transparent objects
-		}
-	}
+		objects.Reveach(&Object::Traw);
 
+		glLoadIdentity();
+		stickies.Reveach(&Object::Traw);
+	}
 }

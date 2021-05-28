@@ -21,6 +21,18 @@ namespace TB{
 		T* operator[](unsigned r){ return m[r]; };
 		const T* operator[](unsigned r) const { return m[r]; };
 
+		bool operator==(const Matrix& o) const {
+			for (unsigned r(0); r < ROW; ++r) {
+				for (unsigned c(0); c < COL; ++c) {
+					if (m[r][c] != o.m[r][c]) {
+						return false;
+					}
+				}
+			}
+			return true;
+		};
+		bool operator!=(const Matrix& o) { return !(*this == o); };
+
 		void operator=(const T* o){
 			for(unsigned n(0); n < COL * ROW; ++n){
 				raw[n] = *o++;
@@ -57,15 +69,17 @@ namespace TB{
 		void Invert();
 		void InvertAffine(){ Invert(); };
 
-		template<unsigned C>
-			Matrix<C, ROW, T> operator *(const Matrix<C, COL, T>& o) const {
+		// ROW行COL列×COL行C列 = ROW行C列
+		template <unsigned C>
+		Matrix<C, ROW, T> operator*(const Matrix<C, COL, T>& o) const {
 			Matrix<C, ROW, T> rv;
 
 			for(unsigned r(0); r < ROW; ++r){
 				for(unsigned c(0); c < C; ++c){
-					rv[r][c] = 0;
-					for(unsigned n(0); n < COL; ++n){
-						rv[r][c] += m[r][n] * o[n][r];
+					auto& t(rv[r][c]);
+					t = 0;
+					for (unsigned n(0); n < COL; ++n) {
+						t += m[r][n] * o[n][c];
 					}
 				}
 			}
@@ -79,5 +93,4 @@ namespace TB{
 			T m[ROW][COL];
 		};
 	};
-
 }
