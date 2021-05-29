@@ -22,8 +22,6 @@
 
 namespace TG {
 
-	void RootWidget::SetHeadPose(const TB::Matrix<4, 4, float>& m) {}
-
 	void Widget::Draw() { subs.Foreach(&Widget::Draw); };
 	void Widget::Traw() { subs.Reveach(&Widget::Traw); };
 	void Widget::Tick() { subs.Foreach(&Widget::Tick); };

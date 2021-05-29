@@ -67,7 +67,7 @@ namespace TG {
 		void RegisterStickies(Object&); // 顔張り付き物体の登録
 		void RegisterObject(Object&); // 物体の登録
 		void RegisterScenery(Scenery*); // Sceneryの登録
-		static void RegisterRoot(RootWidget&); // Widgetの追加
+		void RegisterRoot(Object&); // rootWidgetの登録
 
 		//周期処理の入口
 		void Run();
@@ -76,12 +76,18 @@ namespace TG {
 		TB::Matrix<4, 4, float> view;
 		virtual void Draw(const TB::Matrix<4, 4, float>&);
 		virtual bool Finish() = 0;
-		static void SetHeadPose(const TB::Matrix<4, 4, float>&);
+		static void SetHeadPose(const TB::Matrix<4, 4, float>& p) {
+			headPose = p;
+		};
+		static const TB::Matrix<4, 4, float>& GetHeadPose() {
+			return headPose;
+		};
 
 	private:
+		static TB::Matrix<4, 4, float> headPose;
 		TB::List<Object> stickies;
 		TB::List<Object> objects;
 		Scenery* scenery;
-		static RootWidget* root;
+		Object* rootWidget;
 	};
 }

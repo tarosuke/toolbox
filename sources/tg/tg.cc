@@ -28,7 +28,7 @@
 
 namespace TG {
 
-	Scene::Scene() : scenery(0) { view.Identity(); }
+	Scene::Scene() : scenery(0), rootWidget(0) { view.Identity(); }
 	Scene::~Scene() {
 		if (scenery) {
 			delete scenery;
@@ -61,18 +61,8 @@ namespace TG {
 		}
 		scenery = s;
 	}
-
-	// widget関連
-	RootWidget* Scene::root(0);
-	void Scene::RegisterRoot(RootWidget& r) {
-		assert(!root);
-		root = &r;
-	}
-	void Scene::SetHeadPose(const TB::Matrix<4, 4, float>& p) {
-		if (root) {
-			(*root).SetHeadPose(p);
-		}
-	}
+	TB::Matrix<4, 4, float> Scene::headPose;
+	void Scene::RegisterRoot(Object& o) { rootWidget = &o; }
 
 	//全体の処理
 	void Scene::Run() {
@@ -88,8 +78,8 @@ namespace TG {
 			Draw(view);
 			stickies.Foreach(&Object::Tick);
 			objects.Foreach(&Object::Tick);
-			if (root) {
-				(*root).Tick();
+			if (rootWidget) {
+				(*rootWidget).Tick();
 			}
 		} while (Finish());
 	}
@@ -108,8 +98,8 @@ namespace TG {
 
 		glLoadIdentity();
 		stickies.Foreach(&Object::Draw);
-		if (root) {
-			(*root).Draw();
+		if (rootWidget) {
+			(*rootWidget).Draw();
 		}
 
 		//カメラの反映
@@ -123,8 +113,8 @@ namespace TG {
 		}
 		objects.Reveach(&Object::Traw);
 
-		if (root) {
-			(*root).Traw();
+		if (rootWidget) {
+			(*rootWidget).Traw();
 		}
 		glLoadIdentity();
 		stickies.Reveach(&Object::Traw);

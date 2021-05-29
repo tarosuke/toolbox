@@ -24,7 +24,7 @@
 
 namespace TG {
 
-	class Widget : public TB::List<Widget>::Node {
+	class Widget : public Scene::Object {
 	public:
 		//周期処理
 		virtual void Draw();
@@ -79,8 +79,6 @@ namespace TG {
 	class RootWidget : public Widget {
 
 	public:
-		void SetHeadPose(const TB::Matrix<4, 4, float>& headPose);
-
 	private:
 		TB::Vector<2, int> lookingPoint;
 	};
