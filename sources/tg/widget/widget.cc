@@ -18,6 +18,7 @@
  */
 #include <toolbox/tg/widget.h>
 
+#include <math.h>
 
 
 namespace TG {
@@ -25,4 +26,27 @@ namespace TG {
 	void Widget::Draw() { subs.Foreach(&Widget::Draw); };
 	void Widget::Traw() { subs.Reveach(&Widget::Traw); };
 	void Widget::Tick() { subs.Foreach(&Widget::Tick); };
+
+
+
+	RootWidget::RootWidget() { Scene::RegisterRoot(*this); }
+	void RootWidget::Tick() {
+		//中止典型三
+		const auto& pose(Scene::GetHeadPose());
+
+		TB::Matrix<1, 4> front((const float[]){0.0f, 0.0f, 1.0f, 0.0f});
+		TB::Matrix<1, 4> point(pose * front);
+
+		//後ろ半分は使えないので角度を半分にする
+		const float x(point[0][0]);
+		const float y(point[0][1]);
+		const float len2(sqrtf(x * x + y * y));
+		const float a2(atan2f(len2, point[0][2]) * 0.5); //半分の角度
+		const float l2(sinf(a2));
+		const float z2(cosf(a2));
+
+		//注視点計算
+		const float lp[] = {(x * l2) / (z2 * len2), (y * l2) / (z2 * len2)};
+		lookingPoint = lp;
+	}
 }

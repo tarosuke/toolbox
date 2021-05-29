@@ -77,9 +77,14 @@ namespace TG {
 
 
 	class RootWidget : public Widget {
+		RootWidget(const RootWidget&);
+		void operator=(const RootWidget&);
 
 	public:
+		RootWidget();
+
 	private:
 		TB::Vector<2, int> lookingPoint;
+		void Tick() final;
 	};
 }
