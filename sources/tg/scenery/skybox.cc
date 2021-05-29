@@ -88,6 +88,42 @@ namespace TG {
 	};
 
 	Scenery* Skybox::New(const TB::Image& image) {
+		{
+			//スカイボックス画像の準備
+			TB::Image::Raw raw(image);
+			const unsigned w(raw.width / 4);
+			const unsigned w2(raw.width / 2);
+			const unsigned w3(raw.width * 3 / 4);
+			const unsigned h(raw.height / 3);
+			const unsigned h2(raw.height * 2 / 3);
+			//底移動反転
+			for (unsigned y(0); y < h; ++y) {
+				for (unsigned x(0); x < w; ++x) {
+					raw[h2 + y][w3 + x] = raw[raw.height - 1 - y][w2 - 1 - x];
+				}
+			}
+			//エッジの対面を転送(転送先が横)
+			for (unsigned x(0); x < w; ++x) {
+				const unsigned y(x * h / w);
+				raw[0][w3 + x] = raw[h2 - 1][w2 - 1 - x];
+				raw[h - 1][x] = raw[w][y];
+				raw[h - 1][w2 + x] = raw[h - 1 - y][w2 - 1];
+				raw[h - 1][w3 + x] = raw[0][w2 - 1 - x];
+				raw[h2][x] = raw[raw.height - 1 - y][w];
+				raw[h2][w2 + x] = raw[h2 + x][w2 - 1];
+			}
+			//エッジの対面を転送(転送先が縦)
+			for (unsigned y(0); y < h; ++y) {
+				const unsigned x(y * w / h);
+				raw[h2 + y][0] = raw[h2 - 1][x];
+				raw[y][w - 1] = raw[h][x];
+				raw[h2 + y][w - 1] = raw[h2 - 1][w - 1 - x];
+				raw[y][w2] = raw[h2 - 1][w3 - 1 - x];
+				raw[h2 + y][w2] = raw[h2 - 1][w2 + x];
+				raw[h2 + y][w3 - 1] = raw[h2 - 1][w3 - 1 - x];
+			}
+		}
+
 		if (auto* const mesh = Mesh::New(
 				elementsOf(indexes),
 				indexes,
