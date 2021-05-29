@@ -15,8 +15,10 @@ int main() {
 				return ++n < 1000;
 			};
 		} scene;
-		scene.RegisterScenery(
-			TG::Scenery::New("/home/tarosuke/Pictures/sceneries/Cubic30.png"));
+		scene.RegisterScenery(TG::Scenery::New(
+			"sources/tests/"
+			"kisspng-skybox-texture-mapping-cube-mapping-landscape-watercolor-"
+			"sky-5ac85ff2676e48.2605566015230812024237.png"));
 		scene.Run();
 	} catch (const char* m) {
 		syslog(LOG_CRIT, "Fatal error: %s.", m);

@@ -30,8 +30,10 @@ int main() {
 	private:
 		void HandleEvent(const XEvent& ev) final { Quit(); };
 	} window(display, 640, 640, frustum);
-	window.RegisterScenery(
-		TG::Scenery::New("/home/tarosuke/Pictures/sceneries/Cubic30.png"));
+	window.RegisterScenery(TG::Scenery::New(
+		"sources/tests/"
+		"kisspng-skybox-texture-mapping-cube-mapping-landscape-watercolor-"
+		"sky-5ac85ff2676e48.2605566015230812024237.png"));
 
 	assert(window.IsReady());
 	window.Run();
