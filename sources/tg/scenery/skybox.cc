@@ -88,6 +88,18 @@ namespace TG {
 	};
 
 	Scenery* Skybox::New(const TB::Image& image) {
+		{
+			TB::Image::Raw raw(image);
+			const unsigned w(raw.width / 4);
+			const unsigned h(raw.height / 3);
+			//スカイボックス画像の底移動反転
+			for (unsigned y(0); y < h; ++y) {
+				for (unsigned x(0); x < w; ++x) {
+					raw[raw.height - y][raw.width - x] = raw[h * 2 + y][w + x];
+				}
+			}
+		}
+
 		if (auto* const mesh = Mesh::New(
 				elementsOf(indexes),
 				indexes,
