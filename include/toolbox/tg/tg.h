@@ -28,6 +28,7 @@ namespace TG {
 
 	class Object;
 	class Scenery;
+	class RootWidget;
 
 	//フレームバッファや画面などの描画先
 	class Scene {
@@ -62,13 +63,11 @@ namespace TG {
 		void SetView(const TB::Matrix<4, 4, float>&);
 		void MulView(const TB::Matrix<4, 4, float>&);
 
-		//レイヤーの登録
-		// Note:近いレイヤーから登録すること
-		void AddLayer(Object& layer);
-
+		//コンテンツ登録
 		void RegisterStickies(Object&); // 顔張り付き物体の登録
 		void RegisterObject(Object&); // 物体の登録
 		void RegisterScenery(Scenery*); // Sceneryの登録
+		static void RegisterRoot(RootWidget&); // Widgetの追加
 
 		//周期処理の入口
 		void Run();
@@ -77,10 +76,12 @@ namespace TG {
 		TB::Matrix<4, 4, float> view;
 		virtual void Draw(const TB::Matrix<4, 4, float>&);
 		virtual bool Finish() = 0;
+		static void SetHeadPose(const TB::Matrix<4, 4, float>&);
 
 	private:
 		TB::List<Object> stickies;
 		TB::List<Object> objects;
 		Scenery* scenery;
+		static RootWidget* root;
 	};
 }
