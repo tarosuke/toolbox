@@ -29,20 +29,7 @@
 
 namespace TG {
 
-	class Object : public TB::List<Object>::Node {
-	public:
-		virtual void Draw(){};
-		virtual void Traw(){};
-		virtual void Tick(){};
-
-		virtual ~Object(){};
-
-	protected:
-	private:
-	};
-
-
-	class Mesh : public Object {
+	class Mesh : public Scene::Object {
 		Mesh();
 		Mesh(const Mesh&);
 		void operator=(const Mesh&);
@@ -84,14 +71,14 @@ namespace TG {
 	};
 
 
-	class Group : public Object {
+	class Group : public Scene::Object {
 	public:
-		void AddChild(Object& o) { children.Add(o); };
+		void AddChild(Scene::Object& o) { children.Add(o); };
 		void AddCHild(Group& g) { groups.Add(g); };
 
 	protected:
-		TB::List<Object> children;
-		TB::List<Object> groups;
+		TB::List<Scene::Object> children;
+		TB::List<Scene::Object> groups;
 
 	private:
 		TB::Matrix<4, 4, float> matrix;
@@ -104,5 +91,4 @@ namespace TG {
 		void Traw() final;
 		void Tick() final;
 	};
-
 }

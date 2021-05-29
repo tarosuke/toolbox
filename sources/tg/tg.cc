@@ -19,9 +19,11 @@
 #include <toolbox/tg/tg.h>
 #include <toolbox/tg/object.h>
 #include <toolbox/tg/scenery.h>
+#include <toolbox/tg/widget.h>
 #include <toolbox/gl/gl.h>
 
 #include <assert.h>
+
 
 
 namespace TG {
@@ -60,6 +62,19 @@ namespace TG {
 		scenery = s;
 	}
 
+	// widget関連
+	RootWidget* Scene::root(0);
+	void Scene::RegisterRoot(RootWidget& r) {
+		assert(!root);
+		root = &r;
+	}
+	void Scene::SetHeadPose(const TB::Matrix<4, 4, float>& p) {
+		if (root) {
+			(*root).SetHeadPose(p);
+		}
+	}
+
+	//全体の処理
 	void Scene::Run() {
 		// GLのモード設定
 		glEnable(GL_POLYGON_SMOOTH);
@@ -73,6 +88,9 @@ namespace TG {
 			Draw(view);
 			stickies.Foreach(&Object::Tick);
 			objects.Foreach(&Object::Tick);
+			if (root) {
+				(*root).Tick();
+			}
 		} while (Finish());
 	}
 
@@ -90,6 +108,9 @@ namespace TG {
 
 		glLoadIdentity();
 		stickies.Foreach(&Object::Draw);
+		if (root) {
+			(*root).Draw();
+		}
 
 		//カメラの反映
 		glLoadMatrixf(v);
@@ -102,6 +123,9 @@ namespace TG {
 		}
 		objects.Reveach(&Object::Traw);
 
+		if (root) {
+			(*root).Traw();
+		}
 		glLoadIdentity();
 		stickies.Reveach(&Object::Traw);
 	}

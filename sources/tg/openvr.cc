@@ -110,6 +110,8 @@ namespace TG {
 			}
 		}
 
+		TG::Scene::SetHeadPose(headPose);
+
 		for (auto& eye : eyes) {
 			TB::Framebuffer::Key key(eye.framebuffer);
 			glViewport(0, 0, renderSize.width, renderSize.height);
