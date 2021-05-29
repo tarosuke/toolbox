@@ -44,6 +44,14 @@ namespace TG {
 			double far;
 		};
 
+		class Object : public TB::List<Object>::Node {
+		public:
+			virtual void Draw(){};
+			virtual void Traw(){};
+			virtual void Tick(){};
+			virtual ~Object(){};
+		};
+
 		Scene();
 		virtual ~Scene();
 
