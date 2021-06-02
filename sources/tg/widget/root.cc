@@ -16,27 +16,31 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <toolbox/tg/widget.h>
-#include <toolbox/prefs.h>
+#include <toolbox/tg/widget/root.h>
 
-#include <math.h>
-#include <float.h>
 
 
 namespace TG {
+	RootWidget::RootWidget() { Scene::RegisterRoot(*this); }
+	void RootWidget::Tick() {
+		//注視点計算
+		const auto& pose(Scene::GetHeadPose());
 
-	void Widget::Draw() { subs.Foreach(&Widget::Draw); };
-	void Widget::Traw() { subs.Reveach(&Widget::Traw); };
-	void Widget::Tick() { subs.Foreach(&Widget::Tick); };
+		TB::Matrix<1, 4> front((const float[]){0.0f, 0.0f, 1.0f, 0.0f});
+		TB::Matrix<1, 4> point(pose * front);
 
-	Widget::Found Widget::Find(const Query& q) {
-		Found found = {0, FLT_MAX};
-		for (TB::List<Widget>::I i(subs); ++i;) {
-			const Found f((*i).Find(q));
-			if (f.widget && f.depth < found.depth) {
-				found = f;
-			}
-		}
-		return found;
+		//後ろ半分は使えないので角度を半分にする
+		const float x(point[0][0]);
+		const float y(point[0][1]);
+		const float len2(sqrtf(x * x + y * y));
+		const float a2(atan2f(len2, point[0][2]) * 0.5); //半分の角度
+		const float l2(sinf(a2));
+		const float z2(cosf(a2));
+
+		const float lp[] = {(x * l2) / (z2 * len2), (y * l2) / (z2 * len2)};
+		lookingPoint = lp;
+
+		// sub窓へ処理を渡す
+		Scene::Object::Tick();
 	}
 }

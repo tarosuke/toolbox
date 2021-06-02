@@ -1,6 +1,6 @@
 #include <toolbox/tg/openvr.h>
 #include <toolbox/tg/scenery.h>
-#include <toolbox/tg/widget.h>
+#include <toolbox/tg/widget/root.h>
 
 #include <assert.h>
 #include <unistd.h>

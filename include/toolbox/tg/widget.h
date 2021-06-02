@@ -25,6 +25,9 @@
 namespace TG {
 
 	class Widget : public Scene::Object {
+		Widget(const Widget&);
+		void operator=(const Widget&);
+
 	public:
 		//周期処理
 		virtual void Draw();
@@ -57,34 +60,19 @@ namespace TG {
 		virtual bool MayClose() { return true; };
 
 	protected:
+		TB::List<Widget> subs;
 		Widget() {}
 
-	private:
-		TB::List<Widget> subs;
-	};
-
-
-
-	class PositionWidget : public Widget {
-	private:
-		TB::Vector<2, int> position;
-	};
-
-	class RegionWidegt : public PositionWidget {
-	private:
-		TB::Vector<2, unsigned> size;
-	};
-
-
-	class RootWidget : public Widget {
-		RootWidget(const RootWidget&);
-		void operator=(const RootWidget&);
-
-	public:
-		RootWidget();
-
-	private:
-		TB::Vector<2, int> lookingPoint;
-		void Tick() final;
+		//窓の距離を考慮して仮想位置にあるポインタにかかっているWidgetを返す
+		struct Query {
+			const TB::Vector<2, float>& looknigPoint;
+			TB::Vector<2, float> pointer;
+			float depth;
+		};
+		struct Found {
+			Widget* widget;
+			float depth;
+		};
+		virtual Found Find(const Query&);
 	};
 }

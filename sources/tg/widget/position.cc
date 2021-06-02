@@ -16,27 +16,8 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <toolbox/tg/widget.h>
-#include <toolbox/prefs.h>
-
-#include <math.h>
-#include <float.h>
+#include <toolbox/tg/widget/position.h>
 
 
-namespace TG {
 
-	void Widget::Draw() { subs.Foreach(&Widget::Draw); };
-	void Widget::Traw() { subs.Reveach(&Widget::Traw); };
-	void Widget::Tick() { subs.Foreach(&Widget::Tick); };
-
-	Widget::Found Widget::Find(const Query& q) {
-		Found found = {0, FLT_MAX};
-		for (TB::List<Widget>::I i(subs); ++i;) {
-			const Found f((*i).Find(q));
-			if (f.widget && f.depth < found.depth) {
-				found = f;
-			}
-		}
-		return found;
-	}
-}
+namespace TG {}
