@@ -20,6 +20,8 @@
 
 #include <toolbox/tg/tg.h>
 
+#include <float.h>
+
 
 
 namespace TG {
@@ -35,27 +37,35 @@ namespace TG {
 		virtual void Tick();
 		virtual ~Widget(){};
 
-		//イベント
-		struct PointerEvent {
-			TB::Vector<2, int> position;
-			unsigned button;
+		//ボタン状態
+		struct ButtonState {
+			void operator=(unsigned newState) {
+				pressed = newState & ~state;
+				released = ~newState & state;
+				state = newState;
+			};
+			unsigned state;
 			unsigned pressed;
 			unsigned released;
-			Widget* target;
+		};
+
+		//イベント
+		struct PointerEvent {
+			const TB::Vector<2, int>& position;
+			const ButtonState& button;
 		};
 		struct KeyEvent {
-			enum { pressed, released, repeated } event;
 			unsigned keyCode;
 			unsigned charCode;
 		};
 
-		virtual void OnPointerEnter(const PointerEvent& e){};
-		virtual void OnPointerLeave(const PointerEvent& e){};
-		virtual void OnPointerMove(const PointerEvent& e){};
-		virtual void OnButtonDown(const PointerEvent& e){};
-		virtual void OnButtonUp(const PointerEvent& e){};
-		virtual void OnKeyDown(const KeyEvent& e){};
-		virtual void OnKeyUp(const KeyEvent& e){};
+		virtual void OnPointerEnter(const PointerEvent&){};
+		virtual void OnPointerLeave(const PointerEvent&){};
+		virtual void OnPointerMove(const PointerEvent&){};
+		virtual void OnButton(const PointerEvent&){};
+		virtual void OnKeyDown(const KeyEvent&){};
+		virtual void OnKeyUp(const KeyEvent&){};
+		virtual void OnKeyRepeated(const KeyEvent&){};
 		virtual void OnResized(const TB::Vector<2, unsigned>& p){};
 		virtual bool MayClose() { return true; };
 
@@ -70,9 +80,13 @@ namespace TG {
 			float depth;
 		};
 		struct Found {
+			Found() : widget(0), depth(FLT_MAX){};
 			Widget* widget;
 			float depth;
+			TB::Vector<2, int> where;
 		};
 		virtual Found Find(const Query&);
+
+	private:
 	};
 }

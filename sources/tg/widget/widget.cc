@@ -20,7 +20,6 @@
 #include <toolbox/prefs.h>
 
 #include <math.h>
-#include <float.h>
 
 
 namespace TG {
@@ -30,7 +29,7 @@ namespace TG {
 	void Widget::Tick() { subs.Foreach(&Widget::Tick); };
 
 	Widget::Found Widget::Find(const Query& q) {
-		Found found = {0, FLT_MAX};
+		Found found;
 		for (TB::List<Widget>::I i(subs); ++i;) {
 			const Found f((*i).Find(q));
 			if (f.widget && f.depth < found.depth) {

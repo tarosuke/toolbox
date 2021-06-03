@@ -31,7 +31,14 @@ namespace TG {
 		RootWidget();
 
 	private:
+		static const float navigationRadious;
+
 		TB::Vector<2, float> lookingPoint;
+		TB::Vector<2, float> pointer;
+		ButtonState button;
+		Found prev;
+
 		void Tick() final;
+		void EmitEvent(const TB::Vector<2, float>&, unsigned);
 	};
 }

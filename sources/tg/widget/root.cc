@@ -16,12 +16,17 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#include <float.h>
+
 #include <toolbox/tg/widget/root.h>
 
 
 
 namespace TG {
+	const float RootWidget::navigationRadious(1);
+
 	RootWidget::RootWidget() { Scene::RegisterRoot(*this); }
+
 	void RootWidget::Tick() {
 		//注視点計算
 		const auto& pose(Scene::GetHeadPose());
@@ -42,5 +47,52 @@ namespace TG {
 
 		// sub窓へ処理を渡す
 		Scene::Object::Tick();
+
+		EmitEvent(TB::Vector<2, float>(), 0); // TODO:マウスの状態を引数に
+	}
+
+	void RootWidget::EmitEvent(
+		const TB::Vector<2, float>& diff, unsigned buttonState) {
+		//状態更新
+		button = buttonState;
+		pointer += diff;
+
+		//ポインタが画面外に出るのを防ぐ
+		TB::Vector<2, float> pointerPosition(pointer - lookingPoint);
+		if (navigationRadious * navigationRadious < pointerPosition.Length2()) {
+			pointerPosition.Normalize();
+			pointerPosition *= navigationRadious;
+		}
+
+		//ポインタがある窓を探す
+		auto const found(Find((const Query){lookingPoint, pointer, FLT_MAX}));
+
+		//ボタンイベント
+		if (found.widget && (button.pressed || button.released)) {
+			(*found.widget).OnButton((const PointerEvent){found.where, button});
+		}
+
+		// Enter/Leave
+		if (found.widget != prev.widget) {
+			// Leave
+			if (prev.widget) {
+				(*prev.widget)
+					.OnPointerLeave((const PointerEvent){prev.where, button});
+			}
+			// Enter
+			if (found.widget) {
+				(*found.widget)
+					.OnPointerLeave((const PointerEvent){found.where, button});
+			}
+		} else if (prev.where != found.where) {
+			// Move
+			if (found.widget) {
+				(*found.widget)
+					.OnPointerMove((const PointerEvent){found.where, button});
+			}
+		}
+
+		//値の更新
+		prev = found;
 	}
 }
