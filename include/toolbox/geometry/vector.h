@@ -109,6 +109,11 @@ namespace TB{
 				value[n] /= t;
 			}
 		};
+		Vector operator/(T t) {
+			Vector v(*this);
+			v /= t;
+			return v;
+		};
 		T operator*(const Vector& t) const {
 			T v(0);
 			for (unsigned n(0); n < dimension; ++n) {

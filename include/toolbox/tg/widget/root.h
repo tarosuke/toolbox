@@ -16,41 +16,43 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#pragma once
+
 #include <toolbox/tg/widget.h>
 
-#include <math.h>
 
 
 namespace TG {
+	class RootWidget : Widget {
+		RootWidget(const RootWidget&);
+		void operator=(const RootWidget&);
 
-	Widget* Widget::root(0);
+	public:
+		RootWidget() : Widget(0), bridge(*this){};
 
-	Widget::Widget(Widget* super) {
-		if (!super) {
-			if (!root) {
-				//最初のWidegtはroot
-				root = this;
-				return;
-			}
-			//親が指定されていないならrootが親
-			super = root;
-		}
-		//親へ登録
-		(*super).subs.Add(*this);
-	}
+	private:
+		static const float navigationRadious;
 
-	void Widget::Draw() { subs.Foreach(&Widget::Draw); };
-	void Widget::Traw() { subs.Reveach(&Widget::Traw); };
-	void Widget::Tick() { subs.Foreach(&Widget::Tick); };
+		TB::Vector<2, float> lookingPoint;
+		TB::Vector<2, float> pointer;
+		ButtonState button;
+		Found prev;
 
-	Widget::Found Widget::Find(const Query& q) {
-		Found found;
-		for (TB::List<Widget>::I i(subs); ++i;) {
-			const Found f((*i).Find(q));
-			if (f.widget && f.depth < found.depth) {
-				found = f;
-			}
-		}
-		return found;
-	}
+		void Tick() final;
+		void EmitEvent(const TB::Vector<2, float>&, unsigned);
+
+		// Widgetを使わない時に何もリンクしないようにするための折り返し点
+		class Bridge : Scene::Object {
+		public:
+			Bridge(RootWidget& root) : root(root) {
+				Scene::RegisterRoot(*this);
+			};
+
+		private:
+			RootWidget& root;
+			void Tick() final { root.Tick(); };
+			void Draw() final;
+			void Traw() final;
+		} bridge;
+	};
 }
