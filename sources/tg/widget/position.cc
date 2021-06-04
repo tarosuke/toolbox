@@ -28,6 +28,12 @@ namespace TG {
 		p /= position[2];
 		Query qq(q);
 		qq.pointer -= p;
-		return Widget::Find(qq);
+
+		Found f(Widget::Find(qq));
+
+		if (!f.widget) {
+			f = Inside(qq.pointer);
+		}
+		return f;
 	}
 }

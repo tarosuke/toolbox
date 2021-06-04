@@ -16,26 +16,26 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#pragma once
-
-#include <toolbox/tg/widget.h>
+#include <toolbox/tg/widget/border.h>
 
 
 
 namespace TG {
-	class PositionWidget : public Widget {
-		PositionWidget();
-		PositionWidget(const PositionWidget&);
-		void operator=(const PositionWidget&);
 
-	public:
-		PositionWidget(const TB::Vector<3, float>&, Widget* super = 0);
+	Widget::Found BorderWidget::Inside(const TB::Vector<2, float>& p) {
+		Found f;
+		if (p[0] < 0 || p[1] < 0) {
+			return f;
+		}
 
-	protected:
-		TB::Vector<3, float> position;
-		virtual Found Inside(const TB::Vector<2, float>&) { return Found(); };
+		TB::Vector<2, unsigned> r(size);
+		r /= (unsigned)position[2];
 
-	private:
-		Found Find(const Query&) final;
-	};
+		if (p[0] < r[0] && p[1] < r[1]) {
+			f.depth = position[2];
+			f.widget = this;
+			f.where = TB::Vector<2, int>({(int)p[0], (int)p[1]});
+		}
+		return f;
+	}
 }
