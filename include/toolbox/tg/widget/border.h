@@ -24,10 +24,42 @@
 
 namespace TG {
 	class BorderWidget : public PositionWidget {
+	public:
+		BorderWidget(
+			const TB::Vector<3, float>& position,
+			const TB::Vector<2, int>& size,
+			unsigned color = 0,
+			Widget* super = 0)
+			: PositionWidget(position, super), size(size) {
+			SetColor(color);
+		};
+		void SetColor(unsigned c) {
+			color = c;
+			drawIt = (color & transparentMask) == transparentMask;
+			trawIt = !drawIt && !!(~color & transparentMask);
+		};
 
 	protected:
+		virtual void CommonDraw();
+
 	private:
+		static const unsigned transparentMask = 0xff000000;
 		TB::Vector<2, unsigned> size;
+		unsigned color;
+		bool drawIt;
+		bool trawIt;
+
+		void Draw() final {
+			if (drawIt) {
+				CommonDraw();
+			}
+		};
+		void Traw() final {
+			if (trawIt) {
+				CommonDraw();
+			}
+		};
+
 
 		Found Inside(const TB::Vector<2, float>&);
 	};

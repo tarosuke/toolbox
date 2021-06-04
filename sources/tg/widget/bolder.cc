@@ -16,6 +16,8 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#include <toolbox/gl/gl.h>
+
 #include <toolbox/tg/widget/border.h>
 
 
@@ -37,5 +39,17 @@ namespace TG {
 			f.where = TB::Vector<2, int>({(int)p[0], (int)p[1]});
 		}
 		return f;
+	}
+
+	void BorderWidget::CommonDraw() {
+		const TB::Vector<3, float> rb(
+			{position[0] + size[0], position[1] + size[1], position[2]});
+		glColor4bv((GLbyte*)&color);
+		glBegin(GL_TRIANGLE_FAN);
+		glVertex3fv(position);
+		glVertex3i(rb[0], position[1], position[2]);
+		glVertex3fv(rb);
+		glVertex3f(position[0], rb[2], position[2]);
+		glEnd();
 	}
 }
