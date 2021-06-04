@@ -20,4 +20,14 @@
 
 
 
-namespace TG {}
+namespace TG {
+
+	Widget::Found PositionWidget::Find(const Query& q) {
+		TB::Vector<2, float> p({position[0], position[1]});
+		p -= q.looknigPoint;
+		p /= position[2];
+		Query qq(q);
+		qq.pointer -= p;
+		return Widget::Find(qq);
+	}
+}

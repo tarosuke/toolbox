@@ -24,6 +24,10 @@
 
 namespace TG {
 	class BorderWidget : public PositionWidget {
+
+	protected:
+		Found Find(const Query&);
+
 	private:
 		TB::Vector<2, unsigned> size;
 	};
