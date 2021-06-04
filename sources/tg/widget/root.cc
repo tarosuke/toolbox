@@ -25,8 +25,6 @@
 namespace TG {
 	const float RootWidget::navigationRadious(1);
 
-	RootWidget::RootWidget() { Scene::RegisterRoot(*this); }
-
 	void RootWidget::Tick() {
 		//注視点計算
 		const auto& pose(Scene::GetHeadPose());
@@ -46,7 +44,7 @@ namespace TG {
 		lookingPoint = lp;
 
 		// sub窓へ処理を渡す
-		Scene::Object::Tick();
+		Widget::Tick();
 
 		EmitEvent(TB::Vector<2, float>(), 0); // TODO:マウスの状態を引数に
 	}

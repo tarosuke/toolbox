@@ -29,7 +29,9 @@ namespace TG {
 		void operator=(const PositionWidget&);
 
 	public:
-		PositionWidget(const TB::Vector<3, float>&, Widget* super = 0);
+		PositionWidget(const TB::Vector<3, float>& p, Widget* super = 0)
+			: Widget(super), position(p){};
+		;
 
 	protected:
 		TB::Vector<3, float> position;

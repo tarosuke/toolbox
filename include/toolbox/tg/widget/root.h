@@ -23,12 +23,12 @@
 
 
 namespace TG {
-	class RootWidget : public Widget {
+	class RootWidget : Widget {
 		RootWidget(const RootWidget&);
 		void operator=(const RootWidget&);
 
 	public:
-		RootWidget();
+		RootWidget() : Widget(0), bridge(*this){};
 
 	private:
 		static const float navigationRadious;
@@ -40,5 +40,19 @@ namespace TG {
 
 		void Tick() final;
 		void EmitEvent(const TB::Vector<2, float>&, unsigned);
+
+		// Widgetを使わない時に何もリンクしないようにするための折り返し点
+		class Bridge : Scene::Object {
+		public:
+			Bridge(RootWidget& root) : root(root) {
+				Scene::RegisterRoot(*this);
+			};
+
+		private:
+			RootWidget& root;
+			void Tick() final { root.Tick(); };
+			void Draw() final { root.Draw(); };
+			void Traw() final { root.Traw(); };
+		} bridge;
 	};
 }

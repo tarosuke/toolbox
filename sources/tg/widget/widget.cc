@@ -17,12 +17,27 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <toolbox/tg/widget.h>
-#include <toolbox/prefs.h>
 
 #include <math.h>
 
 
 namespace TG {
+
+	Widget* Widget::root(0);
+
+	Widget::Widget(Widget* super) {
+		if (!super) {
+			if (!root) {
+				//最初のWidegtはroot
+				root = this;
+				return;
+			}
+			//親が指定されていないならrootが親
+			super = root;
+		}
+		//親へ登録
+		(*super).subs.Add(*this);
+	}
 
 	void Widget::Draw() { subs.Foreach(&Widget::Draw); };
 	void Widget::Traw() { subs.Reveach(&Widget::Traw); };

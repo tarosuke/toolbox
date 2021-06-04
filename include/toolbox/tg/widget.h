@@ -26,7 +26,7 @@
 
 namespace TG {
 
-	class Widget : public Scene::Object {
+	class Widget : public TB::List<Widget>::Node {
 		Widget(const Widget&);
 		void operator=(const Widget&);
 
@@ -71,7 +71,7 @@ namespace TG {
 
 	protected:
 		TB::List<Widget> subs;
-		Widget() {}
+		Widget(Widget* super);
 
 		//窓の距離を考慮して仮想位置にあるポインタにかかっているWidgetを返す
 		struct Query {
@@ -88,5 +88,6 @@ namespace TG {
 		virtual Found Find(const Query&);
 
 	private:
+		static Widget* root;
 	};
 }
