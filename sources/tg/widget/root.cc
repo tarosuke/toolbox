@@ -19,6 +19,7 @@
 #include <float.h>
 
 #include <toolbox/tg/widget/root.h>
+#include <toolbox/gl/gl.h>
 
 
 
@@ -92,5 +93,21 @@ namespace TG {
 
 		//値の更新
 		prev = found;
+	}
+
+
+	void RootWidget::Bridge::Draw() {
+		glPushMatrix();
+		glScalef(1, 1, -1);
+		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
+		root.Draw();
+		glPopMatrix();
+	}
+	void RootWidget::Bridge::Traw() {
+		glPushMatrix();
+		glScalef(1, 1, -1);
+		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
+		root.Traw();
+		glPopMatrix();
 	}
 }

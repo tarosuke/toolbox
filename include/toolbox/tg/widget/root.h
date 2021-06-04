@@ -51,8 +51,8 @@ namespace TG {
 		private:
 			RootWidget& root;
 			void Tick() final { root.Tick(); };
-			void Draw() final { root.Draw(); };
-			void Traw() final { root.Traw(); };
+			void Draw() final;
+			void Traw() final;
 		} bridge;
 	};
 }
