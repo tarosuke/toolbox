@@ -1,6 +1,7 @@
 #include <toolbox/tg/openvr.h>
 #include <toolbox/tg/scenery.h>
 #include <toolbox/tg/widget/root.h>
+#include <toolbox/tg/widget/border.h>
 
 #include <assert.h>
 #include <unistd.h>
@@ -17,6 +18,10 @@ int main() {
 			};
 		} scene;
 		TG::RootWidget root;
+		TG::BorderWidget borderWidget(
+			TB::Vector<3, float>({0, 0, 1}),
+			TB::Vector<2, unsigned>({1, 1}),
+			0x55333322);
 		scene.RegisterScenery(TG::Scenery::New(
 			"sources/tests/"
 			"kisspng-skybox-texture-mapping-cube-mapping-landscape-watercolor-"
