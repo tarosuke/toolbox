@@ -41,8 +41,10 @@ namespace TG {
 		const float l2(sinf(a2));
 		const float z2(cosf(a2));
 
-		const float lp[] = {(x * l2) / (z2 * len2), (y * l2) / (z2 * len2)};
-		lookingPoint = lp;
+		static const float offset(0.01);
+		lookingPoint = {
+			(x * l2) / (z2 * len2 + offset),
+			(y * l2) / (z2 * len2 + offset)};
 
 		// sub窓へ処理を渡す
 		Widget::Tick();
