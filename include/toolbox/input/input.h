@@ -22,6 +22,9 @@
  * GetInputを呼び出すとハンドラが呼ばれるので処理
  * 初期化引数にtrueを与えるとグラブするが、すべてのeventデバイスを
  * グラブしてしまうので注意
+ *
+ * 使用するときはデバイスファイルのパーミッションを取得しておくこと *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 #include <toolbox/container/list.h>
 
@@ -33,10 +36,12 @@ namespace TB {
 		Input(const Input&);
 		void operator=(const Input&);
 
+	public:
+		void GetInput();
+
 	protected:
 		Input(bool grab = false);
 		virtual ~Input();
-		void GetInput();
 
 		virtual void OnKeyDown(unsigned key){};
 		virtual void OnKeyUp(unsigned key){};

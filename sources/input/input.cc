@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include <toolbox/input/input.h>
 
@@ -62,7 +63,7 @@ namespace TB {
 		if (sizeof(ev) == read(fd, &ev, sizeof(ev))) {
 			switch (ev.type) {
 			case EV_KEY:
-				switch (ev.code & 0xff00) {
+				switch (ev.code & 0xfff0) {
 				case KEY_RESERVED: //キーボード
 					switch (ev.value) {
 					case 0: // up
@@ -76,13 +77,13 @@ namespace TB {
 						break;
 					}
 					break;
-				case BTN_MISC: //マウスボタン他
+				case BTN_MOUSE: //マウスボタン他
 					switch (ev.value) {
 					case 0: // up
 						input.OnButtonUp(ev.code & 0xff);
 						break;
 					case 1: // down
-						input.OnKeyDown(ev.code & 0xff);
+						input.OnButtonDown(ev.code & 0xff);
 						break;
 					}
 					break;
