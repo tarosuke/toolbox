@@ -20,11 +20,16 @@
 
 #include <toolbox/tg/tg.h>
 
+#include <float.h>
+
 
 
 namespace TG {
 
-	class Widget : public Scene::Object {
+	class Widget : public TB::List<Widget>::Node {
+		Widget(const Widget&);
+		void operator=(const Widget&);
+
 	public:
 		//周期処理
 		virtual void Draw();
@@ -32,54 +37,57 @@ namespace TG {
 		virtual void Tick();
 		virtual ~Widget(){};
 
-		//イベント
-		struct PointerEvent {
-			TB::Vector<2, int> position;
-			unsigned button;
+		//ボタン状態
+		struct ButtonState {
+			void operator=(unsigned newState) {
+				pressed = newState & ~state;
+				released = ~newState & state;
+				state = newState;
+			};
+			unsigned state;
 			unsigned pressed;
 			unsigned released;
-			Widget* target;
+		};
+
+		//イベント
+		struct PointerEvent {
+			const TB::Vector<2, int>& position;
+			const ButtonState& button;
 		};
 		struct KeyEvent {
-			enum { pressed, released, repeated } event;
 			unsigned keyCode;
 			unsigned charCode;
 		};
 
-		virtual void OnPointerEnter(const PointerEvent& e){};
-		virtual void OnPointerLeave(const PointerEvent& e){};
-		virtual void OnPointerMove(const PointerEvent& e){};
-		virtual void OnButtonDown(const PointerEvent& e){};
-		virtual void OnButtonUp(const PointerEvent& e){};
-		virtual void OnKeyDown(const KeyEvent& e){};
-		virtual void OnKeyUp(const KeyEvent& e){};
+		virtual void OnPointerEnter(const PointerEvent&){};
+		virtual void OnPointerLeave(const PointerEvent&){};
+		virtual void OnPointerMove(const PointerEvent&){};
+		virtual void OnButton(const PointerEvent&){};
+		virtual void OnKeyDown(const KeyEvent&){};
+		virtual void OnKeyUp(const KeyEvent&){};
+		virtual void OnKeyRepeated(const KeyEvent&){};
 		virtual void OnResized(const TB::Vector<2, unsigned>& p){};
 		virtual bool MayClose() { return true; };
 
 	protected:
-		Widget() {}
-
-	private:
 		TB::List<Widget> subs;
-	};
+		Widget(Widget* super);
 
+		//窓の距離を考慮して仮想位置にあるポインタにかかっているWidgetを返す
+		struct Query {
+			const TB::Vector<2, float>& looknigPoint;
+			TB::Vector<2, float> pointer;
+			float depth;
+		};
+		struct Found {
+			Found() : widget(0), depth(FLT_MAX){};
+			Widget* widget;
+			float depth;
+			TB::Vector<2, int> where;
+		};
+		virtual Found Find(const Query&);
 
-
-	class PositionWidget : public Widget {
 	private:
-		TB::Vector<2, int> position;
-	};
-
-	class RegionWidegt : public PositionWidget {
-	private:
-		TB::Vector<2, unsigned> size;
-	};
-
-
-	class RootWidget : public Widget {
-
-	public:
-	private:
-		TB::Vector<2, int> lookingPoint;
+		static Widget* root;
 	};
 }

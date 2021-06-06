@@ -28,7 +28,7 @@
 
 namespace TG {
 
-	Scene::Scene() : scenery(0), rootWidget(0) { view.Identity(); }
+	Scene::Scene() : scenery(0) { view.Identity(); }
 	Scene::~Scene() {
 		if (scenery) {
 			delete scenery;
@@ -62,6 +62,7 @@ namespace TG {
 		scenery = s;
 	}
 	TB::Matrix<4, 4, float> Scene::headPose;
+	Scene::Object* Scene::rootWidget(0);
 	void Scene::RegisterRoot(Object& o) { rootWidget = &o; }
 
 	//全体の処理

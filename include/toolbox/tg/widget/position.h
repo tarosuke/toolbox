@@ -16,41 +16,28 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#pragma once
+
 #include <toolbox/tg/widget.h>
 
-#include <math.h>
 
 
 namespace TG {
+	class PositionWidget : public Widget {
+		PositionWidget();
+		PositionWidget(const PositionWidget&);
+		void operator=(const PositionWidget&);
 
-	Widget* Widget::root(0);
+	public:
+		PositionWidget(const TB::Vector<3, float>& p, Widget* super = 0)
+			: Widget(super), position(p){};
+		;
 
-	Widget::Widget(Widget* super) {
-		if (!super) {
-			if (!root) {
-				//最初のWidegtはroot
-				root = this;
-				return;
-			}
-			//親が指定されていないならrootが親
-			super = root;
-		}
-		//親へ登録
-		(*super).subs.Add(*this);
-	}
+	protected:
+		TB::Vector<3, float> position;
+		virtual Found Inside(const TB::Vector<2, float>&) { return Found(); };
 
-	void Widget::Draw() { subs.Foreach(&Widget::Draw); };
-	void Widget::Traw() { subs.Reveach(&Widget::Traw); };
-	void Widget::Tick() { subs.Foreach(&Widget::Tick); };
-
-	Widget::Found Widget::Find(const Query& q) {
-		Found found;
-		for (TB::List<Widget>::I i(subs); ++i;) {
-			const Found f((*i).Find(q));
-			if (f.widget && f.depth < found.depth) {
-				found = f;
-			}
-		}
-		return found;
-	}
+	private:
+		Found Find(const Query&) final;
+	};
 }

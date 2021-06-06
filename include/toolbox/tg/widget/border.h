@@ -16,41 +16,51 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <toolbox/tg/widget.h>
+#pragma once
 
-#include <math.h>
+#include <toolbox/tg/widget/position.h>
+
 
 
 namespace TG {
+	class BorderWidget : public PositionWidget {
+	public:
+		BorderWidget(
+			const TB::Vector<3, float>& position,
+			const TB::Vector<2, int>& size,
+			unsigned color = 0,
+			Widget* super = 0)
+			: PositionWidget(position, super), size(size) {
+			SetColor(color);
+		};
+		void SetColor(unsigned c) {
+			color = c;
+			drawIt = (color & transparentMask) == transparentMask;
+			trawIt = !drawIt && !!(~color & transparentMask);
+		};
 
-	Widget* Widget::root(0);
+	protected:
+		virtual void CommonDraw();
 
-	Widget::Widget(Widget* super) {
-		if (!super) {
-			if (!root) {
-				//最初のWidegtはroot
-				root = this;
-				return;
+	private:
+		static const unsigned transparentMask = 0xff000000;
+		TB::Vector<2, unsigned> size;
+		unsigned color;
+		bool drawIt;
+		bool trawIt;
+
+		void Draw() final {
+			if (drawIt) {
+				CommonDraw();
 			}
-			//親が指定されていないならrootが親
-			super = root;
-		}
-		//親へ登録
-		(*super).subs.Add(*this);
-	}
-
-	void Widget::Draw() { subs.Foreach(&Widget::Draw); };
-	void Widget::Traw() { subs.Reveach(&Widget::Traw); };
-	void Widget::Tick() { subs.Foreach(&Widget::Tick); };
-
-	Widget::Found Widget::Find(const Query& q) {
-		Found found;
-		for (TB::List<Widget>::I i(subs); ++i;) {
-			const Found f((*i).Find(q));
-			if (f.widget && f.depth < found.depth) {
-				found = f;
+		};
+		void Traw() final {
+			if (trawIt) {
+				CommonDraw();
 			}
-		}
-		return found;
-	}
+		};
+
+
+		Found Inside(const TB::Vector<2, float>&);
+	};
 }

@@ -16,41 +16,40 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <toolbox/tg/widget.h>
+#include <toolbox/gl/gl.h>
 
-#include <math.h>
+#include <toolbox/tg/widget/border.h>
+
 
 
 namespace TG {
 
-	Widget* Widget::root(0);
-
-	Widget::Widget(Widget* super) {
-		if (!super) {
-			if (!root) {
-				//最初のWidegtはroot
-				root = this;
-				return;
-			}
-			//親が指定されていないならrootが親
-			super = root;
+	Widget::Found BorderWidget::Inside(const TB::Vector<2, float>& p) {
+		Found f;
+		if (p[0] < 0 || p[1] < 0) {
+			return f;
 		}
-		//親へ登録
-		(*super).subs.Add(*this);
+
+		TB::Vector<2, unsigned> r(size);
+		r /= (unsigned)position[2];
+
+		if (p[0] < r[0] && p[1] < r[1]) {
+			f.depth = position[2];
+			f.widget = this;
+			f.where = TB::Vector<2, int>({(int)p[0], (int)p[1]});
+		}
+		return f;
 	}
 
-	void Widget::Draw() { subs.Foreach(&Widget::Draw); };
-	void Widget::Traw() { subs.Reveach(&Widget::Traw); };
-	void Widget::Tick() { subs.Foreach(&Widget::Tick); };
-
-	Widget::Found Widget::Find(const Query& q) {
-		Found found;
-		for (TB::List<Widget>::I i(subs); ++i;) {
-			const Found f((*i).Find(q));
-			if (f.widget && f.depth < found.depth) {
-				found = f;
-			}
-		}
-		return found;
+	void BorderWidget::CommonDraw() {
+		const TB::Vector<3, float> rb(
+			{position[0] + size[0], position[1] + size[1], position[2]});
+		glColor4bv((GLbyte*)&color);
+		glBegin(GL_TRIANGLE_FAN);
+		glVertex3fv(position);
+		glVertex3i(rb[0], position[1], position[2]);
+		glVertex3fv(rb);
+		glVertex3f(position[0], rb[2], position[2]);
+		glEnd();
 	}
 }

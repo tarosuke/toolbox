@@ -26,9 +26,7 @@
 
 namespace TG {
 
-	class Object;
 	class Scenery;
-	class RootWidget;
 
 	//フレームバッファや画面などの描画先
 	class Scene {
@@ -67,7 +65,10 @@ namespace TG {
 		void RegisterStickies(Object&); // 顔張り付き物体の登録
 		void RegisterObject(Object&); // 物体の登録
 		void RegisterScenery(Scenery*); // Sceneryの登録
-		void RegisterRoot(Object&); // rootWidgetの登録
+		static void RegisterRoot(Object&); // rootWidgetの登録
+		static const TB::Matrix<4, 4, float>& GetHeadPose() {
+			return headPose;
+		};
 
 		//周期処理の入口
 		void Run();
@@ -79,15 +80,12 @@ namespace TG {
 		static void SetHeadPose(const TB::Matrix<4, 4, float>& p) {
 			headPose = p;
 		};
-		static const TB::Matrix<4, 4, float>& GetHeadPose() {
-			return headPose;
-		};
 
 	private:
 		static TB::Matrix<4, 4, float> headPose;
+		static Object* rootWidget;
 		TB::List<Object> stickies;
 		TB::List<Object> objects;
 		Scenery* scenery;
-		Object* rootWidget;
 	};
 }
