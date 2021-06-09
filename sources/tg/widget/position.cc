@@ -16,6 +16,7 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#include <toolbox/gl/gl.h>
 #include <toolbox/tg/widget/position.h>
 
 
@@ -35,5 +36,18 @@ namespace TG {
 			f = Inside(qq.pointer);
 		}
 		return f;
+	}
+
+	void PositionWidget::Draw() {
+		glPopMatrix();
+		glTranslatef(position[0], position[1], position[2]);
+		Widget::Draw();
+		glPopMatrix();
+	}
+	void PositionWidget::Traw() {
+		glPopMatrix();
+		glTranslatef(position[0], position[1], position[2]);
+		Widget::Traw();
+		glPopMatrix();
 	}
 }

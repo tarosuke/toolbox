@@ -18,28 +18,31 @@
  */
 #pragma once
 
-#include <toolbox/tg/widget.h>
+#include <toolbox/geometry/vector.h>
 
 
 
 namespace TG {
-	class PositionWidget : public Widget {
-		PositionWidget();
-		PositionWidget(const PositionWidget&);
-		void operator=(const PositionWidget&);
+
+	class Widget;
+
+	class Cursor {
+		Cursor(const Cursor&);
+		void operator=(const Cursor&);
 
 	public:
-		PositionWidget(const TB::Vector<3, float>& p, Widget* super = 0)
-			: Widget(super), position(p){};
+		enum State {
+			arrow,
+			busy,
+		};
 
-	protected:
-		TB::Vector<3, float> position;
-		virtual Found Inside(const TB::Vector<2, float>&) { return Found(); };
-
-		void Draw() override;
-		void Traw() override;
+		static void Enter(Widget& w) { on = &w; };
+		static void Leave() { on = 0; };
+		static void Traw(Widget*, State);
+		static void SetPosition(const TB::Vector<2, int>& p) { position = p; };
 
 	private:
-		Found Find(const Query&) final;
+		static TB::Vector<2, int> position; //基準面上の位置
+		static Widget* on;
 	};
 }

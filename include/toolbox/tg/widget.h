@@ -19,6 +19,7 @@
 #pragma once
 
 #include <toolbox/tg/tg.h>
+#include <toolbox/geometry/rect.h>
 
 #include <float.h>
 
@@ -58,6 +59,10 @@ namespace TG {
 			unsigned keyCode;
 			unsigned charCode;
 		};
+
+		virtual void AtPointerEnter(const PointerEvent&){};
+		virtual void AtPointerLeave(const PointerEvent&){};
+		virtual void AtPointerMove(const PointerEvent&){};
 
 		virtual void OnPointerEnter(const PointerEvent&){};
 		virtual void OnPointerLeave(const PointerEvent&){};

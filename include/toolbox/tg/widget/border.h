@@ -19,10 +19,12 @@
 #pragma once
 
 #include <toolbox/tg/widget/position.h>
+#include <toolbox/tg/widget/cursor.h>
 
 
 
 namespace TG {
+
 	class BorderWidget : public PositionWidget {
 	public:
 		BorderWidget(
@@ -30,7 +32,8 @@ namespace TG {
 			const TB::Vector<2, int>& size,
 			unsigned color = 0,
 			Widget* super = 0)
-			: PositionWidget(position, super), size(size) {
+			: PositionWidget(position, super), size(size),
+			  state(Cursor::arrow) {
 			SetColor(color);
 		};
 		void SetColor(unsigned c) {
@@ -42,24 +45,20 @@ namespace TG {
 	protected:
 		virtual void CommonDraw();
 
+		void AtPointerEnter(const PointerEvent&) final;
+		void AtPointerLeave(const PointerEvent&) final;
+		void AtPointerMove(const PointerEvent&) final;
+
 	private:
 		static const unsigned transparentMask = 0xff000000;
 		TB::Vector<2, unsigned> size;
 		unsigned color;
 		bool drawIt;
 		bool trawIt;
+		Cursor::State state;
 
-		void Draw() final {
-			if (drawIt) {
-				CommonDraw();
-			}
-		};
-		void Traw() final {
-			if (trawIt) {
-				CommonDraw();
-			}
-		};
-
+		void Draw() final;
+		void Traw() final;
 
 		Found Inside(const TB::Vector<2, float>&);
 	};

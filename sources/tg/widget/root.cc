@@ -78,18 +78,18 @@ namespace TG {
 			// Leave
 			if (prev.widget) {
 				(*prev.widget)
-					.OnPointerLeave((const PointerEvent){prev.where, button});
+					.AtPointerLeave((const PointerEvent){prev.where, button});
 			}
 			// Enter
 			if (found.widget) {
 				(*found.widget)
-					.OnPointerLeave((const PointerEvent){found.where, button});
+					.AtPointerEnter((const PointerEvent){found.where, button});
 			}
 		} else if (prev.where != found.where) {
 			// Move
 			if (found.widget) {
 				(*found.widget)
-					.OnPointerMove((const PointerEvent){found.where, button});
+					.AtPointerMove((const PointerEvent){found.where, button});
 			}
 		}
 

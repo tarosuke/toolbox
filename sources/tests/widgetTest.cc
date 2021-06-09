@@ -19,7 +19,7 @@ int main() {
 		} scene;
 		TG::RootWidget root;
 		TG::BorderWidget borderWidget(
-			TB::Vector<3, float>({0, 0, 1}),
+			TB::Vector<3, float>({-0.5, -0.5, 1}),
 			TB::Vector<2, unsigned>({1, 1}),
 			0x55333322);
 		scene.RegisterScenery(TG::Scenery::New(
