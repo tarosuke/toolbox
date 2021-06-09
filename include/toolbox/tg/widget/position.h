@@ -36,8 +36,8 @@ namespace TG {
 		TB::Vector<3, float> position;
 		virtual Found Inside(const TB::Vector<2, float>&) { return Found(); };
 
-		void Draw() override;
-		void Traw() override;
+		void Draw(const TB::Rect<2, float>&) override;
+		void Traw(const TB::Rect<2, float>&) override;
 
 	private:
 		Found Find(const Query&) final;

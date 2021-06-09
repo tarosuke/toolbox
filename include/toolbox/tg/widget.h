@@ -33,8 +33,8 @@ namespace TG {
 
 	public:
 		//周期処理
-		virtual void Draw();
-		virtual void Traw();
+		virtual void Draw(const TB::Rect<2, float>&); //引数は視錐体
+		virtual void Traw(const TB::Rect<2, float>&);
 		virtual void Tick();
 		virtual ~Widget(){};
 

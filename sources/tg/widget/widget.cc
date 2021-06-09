@@ -39,8 +39,12 @@ namespace TG {
 		(*super).subs.Add(*this);
 	}
 
-	void Widget::Draw() { subs.Foreach(&Widget::Draw); };
-	void Widget::Traw() { subs.Reveach(&Widget::Traw); };
+	void Widget::Draw(const TB::Rect<2, float>& vr) {
+		subs.Foreach(&Widget::Draw, vr);
+	};
+	void Widget::Traw(const TB::Rect<2, float>& vr) {
+		subs.Reveach(&Widget::Traw, vr);
+	};
 	void Widget::Tick() { subs.Foreach(&Widget::Tick); };
 
 	Widget::Found Widget::Find(const Query& q) {

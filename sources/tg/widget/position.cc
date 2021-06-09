@@ -38,16 +38,16 @@ namespace TG {
 		return f;
 	}
 
-	void PositionWidget::Draw() {
+	void PositionWidget::Draw(const TB::Rect<2, float>& vr) {
 		glPopMatrix();
 		glTranslatef(position[0], position[1], position[2]);
-		Widget::Draw();
+		Widget::Draw(vr - TB::Vector<2, float>{position[0], position[1]});
 		glPopMatrix();
 	}
-	void PositionWidget::Traw() {
+	void PositionWidget::Traw(const TB::Rect<2, float>& vr) {
 		glPopMatrix();
 		glTranslatef(position[0], position[1], position[2]);
-		Widget::Traw();
+		Widget::Traw(vr - TB::Vector<2, float>{position[0], position[1]});
 		glPopMatrix();
 	}
 }

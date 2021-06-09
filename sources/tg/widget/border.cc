@@ -53,7 +53,7 @@ namespace TG {
 	}
 
 
-	void BorderWidget::Draw() {
+	void BorderWidget::Draw(const TB::Rect<2, float>&) {
 		if (drawIt) {
 			glPushMatrix();
 			glTranslatef(position[0], position[1], position[2]);
@@ -61,7 +61,7 @@ namespace TG {
 			glPopMatrix();
 		}
 	};
-	void BorderWidget::Traw() {
+	void BorderWidget::Traw(const TB::Rect<2, float>&) {
 		if (trawIt) {
 			CommonDraw();
 		}

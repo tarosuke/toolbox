@@ -25,6 +25,9 @@
 
 namespace TG {
 	const float RootWidget::navigationRadious(1);
+	const TB::Rect<2, float> RootWidget::viewRect{
+		TB::Vector<2, float>{-1, -1}, TB::Vector<2, float>{1, 1}};
+
 
 	void RootWidget::Tick() {
 		//注視点計算
@@ -102,14 +105,14 @@ namespace TG {
 		glPushMatrix();
 		glScalef(1, 1, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
-		root.Draw();
+		root.Draw(viewRect);
 		glPopMatrix();
 	}
 	void RootWidget::Bridge::Traw() {
 		glPushMatrix();
 		glScalef(1, 1, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
-		root.Traw();
+		root.Traw(viewRect);
 		glPopMatrix();
 	}
 }

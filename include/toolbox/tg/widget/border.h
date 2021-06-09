@@ -57,8 +57,8 @@ namespace TG {
 		bool trawIt;
 		Cursor::State state;
 
-		void Draw() final;
-		void Traw() final;
+		void Draw(const TB::Rect<2, float>&) final;
+		void Traw(const TB::Rect<2, float>&) final;
 
 		Found Inside(const TB::Vector<2, float>&);
 	};
