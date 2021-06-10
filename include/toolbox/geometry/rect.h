@@ -83,7 +83,12 @@ namespace TB{
 		Rect operator-(const Vector<dimensions, T>& t) const {
 			return Rect(points[0] - t, points[1] - t);
 		};
-		operator bool() const{
+		void operator*=(T m) {
+			points[0] *= m;
+			points[1] *= m;
+		};
+		Rect operator*(T m) { return Rect{points[0] * m, points[1] * m}; };
+		operator bool() const {
 			for(unsigned n(0); n < dimensions; ++n){
 				if(points[0][n] == points[1][n]){
 					return false;
