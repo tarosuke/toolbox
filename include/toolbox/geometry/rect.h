@@ -20,6 +20,8 @@
 
 #include "vector.h"
 
+
+
 namespace TB{
 
 	template <unsigned dimensions = 2, typename T = float> class Rect {

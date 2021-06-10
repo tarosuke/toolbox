@@ -60,6 +60,7 @@ namespace TG {
 		void Draw(const TB::Rect<2, float>&) final;
 		void Traw(const TB::Rect<2, float>&) final;
 
-		Found Inside(const TB::Vector<2, float>&);
+		Found Find(const Query&) final;
+		Found Inside(const Query&);
 	};
 }

@@ -34,12 +34,13 @@ namespace TG {
 
 	protected:
 		TB::Vector<3, float> position;
-		virtual Found Inside(const TB::Vector<2, float>&) { return Found(); };
 
 		void Draw(const TB::Rect<2, float>&) override;
 		void Traw(const TB::Rect<2, float>&) override;
 
+		Found Find(const Query&) override;
+		Query NewQuery(const Query&); //自座標系(みかけ)に変換
+
 	private:
-		Found Find(const Query&) final;
 	};
 }

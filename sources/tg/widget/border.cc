@@ -25,22 +25,30 @@
 
 namespace TG {
 
-	Widget::Found BorderWidget::Inside(const TB::Vector<2, float>& p) {
+	Widget::Found BorderWidget::Inside(const Query& q) {
+		const TB::Vector<2, int> p{
+			(int)(q.pointer[0] * q.depth),
+			(int)(q.pointer[1] * q.depth)};
 		Found f;
 		if (p[0] < 0 || p[1] < 0) {
 			return f;
 		}
 
-		TB::Vector<2, unsigned> r(size);
-		r /= (unsigned)position[2];
-
-		if (p[0] < r[0] && p[1] < r[1]) {
+		if ((unsigned)p[0] < size[0] && (unsigned)p[1] < size[1]) {
 			f.depth = position[2];
 			f.widget = this;
-			f.where = TB::Vector<2, int>({(int)p[0], (int)p[1]});
+			f.where = p;
 		}
 		return f;
 	}
+
+	Widget::Found BorderWidget::Find(const Query& q) {
+		const Query qq(NewQuery(q));
+
+		Found f(Widget::Find(qq));
+		return f.widget ? f : Inside(qq);
+	}
+
 
 	void BorderWidget::CommonDraw() {
 		glColor4bv((GLbyte*)&color);
@@ -51,7 +59,6 @@ namespace TG {
 		glVertex2i(0, size[1]);
 		glEnd();
 	}
-
 
 	void BorderWidget::Draw(const TB::Rect<2, float>&) {
 		if (drawIt) {
