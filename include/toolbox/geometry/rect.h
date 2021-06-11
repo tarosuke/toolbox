@@ -85,6 +85,10 @@ namespace TB{
 		Rect operator-(const Vector<dimensions, T>& t) const {
 			return Rect(points[0] - t, points[1] - t);
 		};
+		void operator-=(const Vector<dimensions, T>& t) {
+			points[0] -= t;
+			points[1] -= t;
+		};
 		void operator*=(T m) {
 			points[0] *= m;
 			points[1] *= m;
