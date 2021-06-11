@@ -69,10 +69,13 @@ namespace TG {
 		}
 	};
 	void BorderWidget::Traw(const TB::Rect<2, float>&) {
+		glPushMatrix();
+		glTranslatef(position[0], position[1], position[2]);
 		if (trawIt) {
 			CommonDraw();
 		}
 		Cursor::Traw(this, state);
+		glPopMatrix();
 	};
 
 	void BorderWidget::AtPointerEnter(const PointerEvent& e) {

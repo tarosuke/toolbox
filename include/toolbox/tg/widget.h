@@ -80,8 +80,9 @@ namespace TG {
 
 		//窓の距離を考慮して仮想位置にあるポインタにかかっているWidgetを返す
 		struct Query {
-			TB::Vector<2, float>& looknigPoint;
+			TB::Vector<2, float> looknigPoint;
 			TB::Vector<2, float> pointer;
+			const TB::Rect<2, float>& viewRect;
 			float depth;
 		};
 		struct Found {

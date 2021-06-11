@@ -24,6 +24,7 @@
 
 
 namespace TG {
+
 	const float RootWidget::navigationRadious(1);
 	const TB::Rect<2, float> RootWidget::viewRect{
 		TB::Vector<2, float>{-1, -1}, TB::Vector<2, float>{1, 1}};
@@ -69,7 +70,8 @@ namespace TG {
 		}
 
 		//ポインタがある窓を探す
-		auto const found(Find((const Query){lookingPoint, pointer, FLT_MAX}));
+		auto const found(
+			Find((const Query){lookingPoint, pointer, viewRect, FLT_MAX}));
 
 		//ボタンイベント
 		if (found.widget && (button.pressed || button.released)) {
