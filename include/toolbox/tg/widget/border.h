@@ -20,6 +20,7 @@
 
 #include <toolbox/tg/widget/position.h>
 #include <toolbox/tg/widget/cursor.h>
+#include <toolbox/geometry/spread.h>
 
 
 
@@ -29,7 +30,7 @@ namespace TG {
 	public:
 		BorderWidget(
 			const TB::Vector<3, float>& position,
-			const TB::Vector<2, int>& size,
+			const TB::Spread<2, unsigned>& size,
 			unsigned color = 0,
 			Widget* super = 0)
 			: PositionWidget(position, super), size(size),
@@ -51,7 +52,7 @@ namespace TG {
 
 	private:
 		static const unsigned transparentMask = 0xff000000;
-		TB::Vector<2, unsigned> size;
+		TB::Spread<2, unsigned> size;
 		unsigned color;
 		bool drawIt;
 		bool trawIt;

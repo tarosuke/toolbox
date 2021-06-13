@@ -26,7 +26,11 @@ namespace TB {
 	public:
 		operator T*() { return value; };
 		operator const T*() const { return value; }
-		Spread(const T* o) : value{o} {};
+		Spread(const T* o) {
+			for (unsigned n(0); n < D; ++n) {
+				value[n] = o[n];
+			}
+		};
 
 		void operator*=(T t) {
 			for (auto& e : value) {
