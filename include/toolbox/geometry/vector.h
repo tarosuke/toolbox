@@ -24,7 +24,7 @@
 
 namespace TB{
 
-	template <unsigned dimension, typename T = float> class Vector {
+	template <unsigned D, typename T = float> class Vector {
 	public:
 		operator T*(){
 			return value;
@@ -35,24 +35,24 @@ namespace TB{
 		Vector(T x, T y){ value[0] = x; value[1] = y; };
 		Vector(T x, T y, T z){ value[0] = x; value[1] = y; value[2] = z; };
 		Vector& operator=(const Vector& t){
-			for(unsigned n(0); n < dimension; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				value[n] = t[n];
 			}
 			return *this;
 		};
 		template<typename U> void operator=(const U t[]){
-			for(unsigned n(0); n < dimension; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				value[n] = (T)t[n];
 			}
 		};
-		template <typename U> Vector(const Vector<dimension, U>& iv) {
-			for(unsigned n(0); n < dimension; ++n){
+		template <typename U> Vector(const Vector<D, U>& iv) {
+			for (unsigned n(0); n < D; ++n) {
 				value[n] = (T)iv[n];
 			}
 		};
 		Vector(){ Clear(); };
 		void Clear(){
-			for(unsigned n(0); n < dimension; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				value[n] = 0;
 			}
 		};
@@ -60,7 +60,7 @@ namespace TB{
 			*this = iv;
 		};
 		bool operator==(const Vector& t) const{
-			for(unsigned n(0); n < dimension; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				if(value[n] != t.value[n]){
 					return false;
 				}
@@ -72,30 +72,30 @@ namespace TB{
 		};
 		Vector operator+(const Vector& t) const{
 			Vector r;
-			for(unsigned n(0); n < dimension; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				r.value[n] = value[n] + t.value[n];
 			}
 			return r;
 		};
 		void operator+=(const Vector& t){
-			for(unsigned n(0); n < dimension; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				value[n] += t.value[n];
 			}
 		};
 		Vector operator-(const Vector& t) const{
 			Vector r;
-			for(unsigned n(0); n < dimension; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				r.value[n] = value[n] - t.value[n];
 			}
 			return r;
 		};
 		void operator-=(const Vector& t){
-			for(unsigned n(0); n < dimension; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				value[n] -= t.value[n];
 			}
 		};
 		void operator*=(T t){
-			for(unsigned n(0); n < dimension; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				value[n] *= t;
 			}
 		};
@@ -105,7 +105,7 @@ namespace TB{
 			return v;
 		};
 		void operator/=(T t){
-			for(unsigned n(0); n < dimension; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				value[n] /= t;
 			}
 		};
@@ -116,20 +116,20 @@ namespace TB{
 		};
 		T operator*(const Vector& t) const {
 			T v(0);
-			for (unsigned n(0); n < dimension; ++n) {
+			for (unsigned n(0); n < D; ++n) {
 				v += value[n] * t.value[n];
 			}
 			return v;
 		};
 		void Min(const Vector& t) {
-			for(unsigned n(0); n < dimension; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				if(t.value[n] < value[n]){
 					value[n] = t.value[n];
 				}
 			}
 		};
 		void Max(const Vector& t){
-			for(unsigned n(0); n < dimension; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				if(value[n] < t.value[n]){
 					value[n] = t.value[n];
 				}
@@ -155,6 +155,6 @@ namespace TB{
 		Vector Cross(const Vector&) const;
 
 	private:
-		T value[dimension];
+		T value[D];
 	};
 };

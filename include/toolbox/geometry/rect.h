@@ -25,13 +25,13 @@
 
 namespace TB{
 
-	template <unsigned dimensions = 2, typename T = float> class Rect {
+	template <unsigned D = 2, typename T = float> class Rect {
 	public:
 		Rect(){};
-		Rect(const Vector<dimensions, T>& a, const Vector<dimensions, T>& b)
-			: points((const Vector<dimensions, T>[]){Less(a, b), More(a, b)}){};
-		Rect(const Vector<dimensions, T>& p, const Spread<dimensions, T>& s)
-			: Rect(p, Vector<dimensions, T>{p[0] + s[0], p[1] + s[1]}){};
+		Rect(const Vector<D, T>& a, const Vector<D, T>& b)
+			: points((const Vector<D, T>[]){Less(a, b), More(a, b)}){};
+		Rect(const Vector<D, T>& p, const Spread<D, T>& s)
+			: Rect(p, p + Vector<D, T>{s}){};
 		void Clear() {
 			points[0].Clear();
 			points[1].Clear();
@@ -67,10 +67,10 @@ namespace TB{
 			return r;
 		};
 		T operator&&(const Rect& t) const{
-			const Vector<dimensions, T> lt(More(points[0], t.points[0]));
-			const Vector<dimensions, T> rb(Less(points[1], t.points[1]));
+			const Vector<D, T> lt(More(points[0], t.points[0]));
+			const Vector<D, T> rb(Less(points[1], t.points[1]));
 			T v(0);
-			for(unsigned n(0); n < dimensions; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				const T a(lt[n]);
 				const T b(rb[n]);
 				if(b <= a){
@@ -82,13 +82,13 @@ namespace TB{
 		};
 		const T* Left() const { return points[0]; };
 		const T* Right() const { return points[1]; };
-		Rect operator+(const Vector<dimensions, T>& t) const {
+		Rect operator+(const Vector<D, T>& t) const {
 			return Rect(points[0] + t, points[1] + t);
 		};
-		Rect operator-(const Vector<dimensions, T>& t) const {
+		Rect operator-(const Vector<D, T>& t) const {
 			return Rect(points[0] - t, points[1] - t);
 		};
-		void operator-=(const Vector<dimensions, T>& t) {
+		void operator-=(const Vector<D, T>& t) {
 			points[0] -= t;
 			points[1] -= t;
 		};
@@ -98,7 +98,7 @@ namespace TB{
 		};
 		Rect operator*(T m) { return Rect{points[0] * m, points[1] * m}; };
 		operator bool() const {
-			for(unsigned n(0); n < dimensions; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				if(points[0][n] == points[1][n]){
 					return false;
 				}
@@ -107,35 +107,33 @@ namespace TB{
 		};
 		operator T() const{
 			T v(1);
-			for(unsigned n(0); n < dimensions; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				v *= points[1][n] - points[0][n];
 			}
 			return v;
 		};
 	private:
-		Vector<dimensions, T> points[2]; // keep points[0] lesser value
-		static Vector<dimensions, T>
-		Less(const Vector<dimensions, T>& a, const Vector<dimensions, T>& b) {
-			T v[dimensions];
-			for(unsigned n(0); n < dimensions; ++n){
+		Vector<D, T> points[2]; // keep points[0] lesser value
+		static Vector<D, T> Less(const Vector<D, T>& a, const Vector<D, T>& b) {
+			T v[D];
+			for (unsigned n(0); n < D; ++n) {
 				const T aa(a[n]);
 				const T bb(b[n]);
 				v[n] = aa < bb ? aa : bb;
 			}
-			return Vector<dimensions, T>(v);
+			return Vector<D, T>(v);
 		};
-		static Vector<dimensions, T>
-		More(const Vector<dimensions, T>& a, const Vector<dimensions, T>& b) {
-			T v[dimensions];
-			for(unsigned n(0); n < dimensions; ++n){
+		static Vector<D, T> More(const Vector<D, T>& a, const Vector<D, T>& b) {
+			T v[D];
+			for (unsigned n(0); n < D; ++n) {
 				const T aa(a[n]);
 				const T bb(b[n]);
 				v[n] = aa < bb ? bb : aa;
 			}
-			return Vector<dimensions, T>(v);
+			return Vector<D, T>(v);
 		};
 		bool HaveVolume() const{
-			for(unsigned n(0); n < dimensions; ++n){
+			for (unsigned n(0); n < D; ++n) {
 				if(points[1][n] <= points[0][n]){
 					//no volume
 					return false;
