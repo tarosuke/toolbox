@@ -19,6 +19,7 @@
 #pragma once
 
 #include "vector.h"
+#include "spread.h"
 
 
 
@@ -29,7 +30,9 @@ namespace TB{
 		Rect(){};
 		Rect(const Vector<dimensions, T>& a, const Vector<dimensions, T>& b)
 			: points((const Vector<dimensions, T>[]){Less(a, b), More(a, b)}){};
-		void Clear(){
+		Rect(const Vector<dimensions, T>& p, const Spread<dimensions, T>& s)
+			: Rect(p, Vector<dimensions, T>{p[0] + s[0], p[1] + s[1]}){};
+		void Clear() {
 			points[0].Clear();
 			points[1].Clear();
 		};
