@@ -60,20 +60,22 @@ namespace TG {
 		glEnd();
 	}
 
-	void BorderWidget::Draw(const TB::Rect<2, float>&) {
+	void BorderWidget::Draw(const TB::Rect<2, float>& r) {
+		glPushMatrix();
+		glTranslatef(position[0], position[1], position[2]);
+		Widget::Draw(r - TB::Vector<2, float>((float*)position));
 		if (drawIt) {
-			glPushMatrix();
-			glTranslatef(position[0], position[1], position[2]);
 			CommonDraw();
-			glPopMatrix();
 		}
+		glPopMatrix();
 	};
-	void BorderWidget::Traw(const TB::Rect<2, float>&) {
+	void BorderWidget::Traw(const TB::Rect<2, float>& r) {
 		glPushMatrix();
 		glTranslatef(position[0], position[1], position[2]);
 		if (trawIt) {
 			CommonDraw();
 		}
+		Widget::Traw(r - TB::Vector<2, float>((float*)position));
 		Cursor::Traw(this, state);
 		glPopMatrix();
 	};
