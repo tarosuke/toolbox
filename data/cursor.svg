@@ -27,7 +27,7 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="22.4"
-     inkscape:cx="18.735118"
+     inkscape:cx="11.354166"
      inkscape:cy="15.666049"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -37,8 +37,8 @@
      inkscape:pagecheckerboard="false"
      inkscape:window-width="1268"
      inkscape:window-height="1112"
-     inkscape:window-x="781"
-     inkscape:window-y="152"
+     inkscape:window-x="1199"
+     inkscape:window-y="174"
      inkscape:window-maximized="0" />
   <metadata
      id="metadata5">
@@ -48,7 +48,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -57,23 +57,11 @@
      inkscape:groupmode="layer"
      id="layer1">
     <path
-       sodipodi:type="star"
-       style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
        id="path851"
-       sodipodi:sides="3"
-       sodipodi:cx="5.2274313"
-       sodipodi:cy="5.4787796"
-       sodipodi:r1="1.3289559"
-       sodipodi:r2="0.66447794"
-       sodipodi:arg1="-0.15003511"
-       sodipodi:arg2="0.89716244"
-       inkscape:flatsided="true"
-       inkscape:rounded="0"
-       inkscape:randomized="0"
-       d="M 6.5414575,5.280137 4.7424479,6.7160813 4.3983885,4.4401212 Z"
-       inkscape:transform-center-x="-0.24249165"
-       inkscape:transform-center-y="0.099321386"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
+       style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       inkscape:transform-center-x="-1.0040682"
+       inkscape:transform-center-y="1.7894097"
+       d="M 6.3385853,6.9561463 5.6533613,7.2009644 5.8910948,7.8663594 5.2499191,8.0775425 5.0178562,7.428019 4.3326322,7.672837 4.3338979,4.5107929 Z"
+       sodipodi:nodetypes="cccccccc" />
   </g>
 </svg>
