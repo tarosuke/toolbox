@@ -32,6 +32,7 @@ namespace TG {
 
 	public:
 		enum State {
+			none,
 			arrow,
 			busy,
 		};
