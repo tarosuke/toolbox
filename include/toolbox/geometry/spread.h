@@ -31,6 +31,15 @@ namespace TB {
 				value[n] = o[n];
 			}
 		};
+		template <unsigned D1, typename T1>
+		void operator=(const Spread<D1, T1>& s) {
+			for (unsigned n(0); n < D; ++n) {
+				value[n] = (T)(n < D1 ? s[n] : 0);
+			}
+		};
+		template <unsigned D1, typename T1> Spread(const Spread<D1, T1>& s) {
+			*this = s;
+		};
 
 		void operator*=(T t) {
 			for (auto& e : value) {
