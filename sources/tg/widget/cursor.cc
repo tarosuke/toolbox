@@ -24,12 +24,8 @@
 namespace TG {
 
 	TB::Vector<2, int> Cursor::position;
-	Widget* Cursor::on(0);
 
-	void Cursor::Traw(Widget* w, State state) {
-		if (on != w) {
-			return;
-		}
+	void Cursor::Traw(State state) {
 		glColor3f(0, 0, 1);
 		glBegin(GL_TRIANGLE_FAN);
 		glVertex3f(0, 0, -0.001);

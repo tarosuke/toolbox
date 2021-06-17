@@ -33,8 +33,8 @@ namespace TG {
 			const TB::Spread<2, unsigned>& size,
 			unsigned color = 0,
 			Widget* super = 0)
-			: PositionWidget(position, super), size(size),
-			  state(Cursor::arrow) {
+			: PositionWidget(position, super), size(size), state(Cursor::arrow),
+			  trawCursor(DummyDrawCursor) {
 			SetColor(color);
 		};
 		void SetColor(unsigned c) {
@@ -63,13 +63,15 @@ namespace TG {
 		void (BorderWidget::*draw)();
 		void (BorderWidget::*traw)();
 
-
-		Cursor::State state;
-
 		void Draw(const TB::Rect<2, float>&) final;
 		void Traw(const TB::Rect<2, float>&) final;
 
 		Found Find(const Query&) final;
 		Found Inside(const Query&);
+
+		// カーソル関連
+		Cursor::State state;
+		void (*trawCursor)(Cursor::State);
+		static void DummyDrawCursor(Cursor::State){};
 	};
 }

@@ -72,20 +72,21 @@ namespace TG {
 		glTranslatef(position[0], position[1], position[2]);
 		(this->*traw)();
 		Widget::Traw(r - TB::Vector<2, float>((float*)position));
-		Cursor::Traw(this, state);
+		(*trawCursor)(state);
 		glPopMatrix();
 	};
 
 	void BorderWidget::AtPointerEnter(const PointerEvent& e) {
 		//カーソル登録
-		Cursor::Enter(*this);
+		Cursor::SetPosition(e.position);
+		trawCursor = Cursor::Traw;
 
 		//通常のイベント処理
 		OnPointerEnter(e);
 	}
 	void BorderWidget::AtPointerLeave(const PointerEvent& e) {
 		//カーソル抹消
-		Cursor::Leave();
+		trawCursor = DummyDrawCursor;
 
 		//通常のイベント処理
 		OnPointerEnter(e);

@@ -19,6 +19,8 @@
 #pragma once
 
 #include <toolbox/geometry/vector.h>
+#include <toolbox/image.h>
+#include <toolbox/gl/texture.h>
 
 
 
@@ -37,13 +39,18 @@ namespace TG {
 			busy,
 		};
 
-		static void Enter(Widget& w) { on = &w; };
-		static void Leave() { on = 0; };
-		static void Traw(Widget*, State);
+		// 新しいのをNewできたら古いのは置き換えられる
+		static void New(const char* path);
+
+		// カーソル操作
+		static void Traw(State);
 		static void SetPosition(const TB::Vector<2, int>& p) { position = p; };
 
 	private:
 		static TB::Vector<2, int> position; //基準面上の位置
-		static Widget* on;
+		static Cursor* instance;
+
+		Cursor(const char*);
+		TB::Texture texture;
 	};
 }
