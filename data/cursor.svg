@@ -217,8 +217,8 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="9.4045202"
-     inkscape:cx="69.262237"
+     inkscape:zoom="2.3511301"
+     inkscape:cx="236.55768"
      inkscape:cy="49.437474"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
@@ -226,10 +226,10 @@
      showgrid="false"
      units="px"
      inkscape:pagecheckerboard="false"
-     inkscape:window-width="1593"
+     inkscape:window-width="2026"
      inkscape:window-height="1292"
-     inkscape:window-x="554"
-     inkscape:window-y="98"
+     inkscape:window-x="309"
+     inkscape:window-y="106"
      inkscape:window-maximized="0" />
   <metadata
      id="metadata5">
@@ -247,20 +247,21 @@
      inkscape:label="レイヤー 1"
      inkscape:groupmode="layer"
      id="layer1"
-     sodipodi:insensitive="true"
-     style="display:inline">
+     style="display:inline"
+     sodipodi:insensitive="true">
     <g
-       id="g4688">
+       id="g4688"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path851"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path16"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -276,17 +277,18 @@
     </g>
     <g
        id="g5004"
-       transform="translate(8.4666661)">
+       transform="translate(8.4666661)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5000"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5002"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -302,17 +304,18 @@
     </g>
     <g
        id="g5014"
-       transform="translate(16.933332)">
+       transform="translate(16.933332)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5010"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5012"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -328,17 +331,18 @@
     </g>
     <g
        id="g5024"
-       transform="translate(25.399998)">
+       transform="translate(25.399998)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5020"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5022"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -354,17 +358,18 @@
     </g>
     <g
        id="g5034"
-       transform="translate(33.866664)">
+       transform="translate(33.866664)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5030"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5032"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -380,17 +385,18 @@
     </g>
     <g
        id="g5044"
-       transform="translate(42.33333)">
+       transform="translate(42.33333)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5040"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5042"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -406,17 +412,18 @@
     </g>
     <g
        id="g5054"
-       transform="translate(50.799996)">
+       transform="translate(50.799996)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5050"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5052"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -432,17 +439,18 @@
     </g>
     <g
        id="g5064"
-       transform="translate(59.266662)">
+       transform="translate(59.266662)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5060"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5062"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -458,17 +466,18 @@
     </g>
     <g
        id="g5074"
-       transform="translate(67.733328)">
+       transform="translate(67.733328)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5070"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5072"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -484,17 +493,18 @@
     </g>
     <g
        id="g5084"
-       transform="translate(76.199994)">
+       transform="translate(76.199994)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5080"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5082"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -510,17 +520,18 @@
     </g>
     <g
        id="g5094"
-       transform="translate(84.666661)">
+       transform="translate(84.666661)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5090"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5092"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -536,17 +547,18 @@
     </g>
     <g
        id="g5104"
-       transform="translate(93.133327)">
+       transform="translate(93.133327)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5100"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5102"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -562,17 +574,18 @@
     </g>
     <g
        id="g5114"
-       transform="translate(101.59999)">
+       transform="translate(101.59999)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5110"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5112"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -588,17 +601,18 @@
     </g>
     <g
        id="g5124"
-       transform="translate(110.06666)">
+       transform="translate(110.06666)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5120"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5122"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -614,17 +628,18 @@
     </g>
     <g
        id="g5134"
-       transform="translate(118.53332)">
+       transform="translate(118.53332)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5130"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5132"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -640,17 +655,18 @@
     </g>
     <g
        id="g5144"
-       transform="translate(126.99999)">
+       transform="translate(126.99999)"
+       style="stroke-width:0.79375;stroke-miterlimit:4;stroke-dasharray:none">
       <path
          id="path5140"
-         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.198484;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          inkscape:transform-center-x="-1.0040682"
          inkscape:transform-center-y="1.7894097"
          d="m 6.3385853,15.422812 -0.685224,0.244819 0.2377335,0.665395 -0.6411757,0.211183 -0.2320629,-0.649524 -0.685224,0.244818 0.00127,-3.162044 z"
          sodipodi:nodetypes="cccccccc" />
       <path
          sodipodi:type="star"
-         style="fill:#000000;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:square;stroke-miterlimit:3;paint-order:stroke fill markers"
+         style="fill:#000000;stroke:#ffffff;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
          id="path5142"
          sodipodi:sides="4"
          sodipodi:cx="4.233315"
@@ -669,7 +685,8 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="レイヤー 2"
-     style="display:inline">
+     style="display:inline"
+     sodipodi:insensitive="true">
     <ellipse
        style="fill:none;stroke:url(#linearGradient3668);stroke-width:1.14926;stroke-opacity:1;paint-order:stroke fill markers"
        id="path881"
