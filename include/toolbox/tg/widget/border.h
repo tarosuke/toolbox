@@ -39,12 +39,18 @@ namespace TG {
 		};
 		void SetColor(unsigned c) {
 			color = c;
-			drawIt = (color & transparentMask) == transparentMask;
-			trawIt = !drawIt && !!(~color & transparentMask);
+			if ((color & transparentMask) == transparentMask) {
+				draw = &BorderWidget::CommonDraw;
+				traw = &BorderWidget::DummyDraw;
+			} else {
+				traw = &BorderWidget::CommonDraw;
+				draw = &BorderWidget::DummyDraw;
+			}
 		};
 
 	protected:
 		virtual void CommonDraw();
+		void DummyDraw(){};
 
 		void AtPointerEnter(const PointerEvent&) final;
 		void AtPointerLeave(const PointerEvent&) final;
@@ -54,8 +60,10 @@ namespace TG {
 		static const unsigned transparentMask = 0xff000000;
 		TB::Spread<2, unsigned> size;
 		unsigned color;
-		bool drawIt;
-		bool trawIt;
+		void (BorderWidget::*draw)();
+		void (BorderWidget::*traw)();
+
+
 		Cursor::State state;
 
 		void Draw(const TB::Rect<2, float>&) final;

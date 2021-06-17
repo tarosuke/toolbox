@@ -64,17 +64,13 @@ namespace TG {
 		glPushMatrix();
 		glTranslatef(position[0], position[1], position[2]);
 		Widget::Draw(r - TB::Vector<2, float>((float*)position));
-		if (drawIt) {
-			CommonDraw();
-		}
+		(this->*draw)();
 		glPopMatrix();
 	};
 	void BorderWidget::Traw(const TB::Rect<2, float>& r) {
 		glPushMatrix();
 		glTranslatef(position[0], position[1], position[2]);
-		if (trawIt) {
-			CommonDraw();
-		}
+		(this->*traw)();
 		Widget::Traw(r - TB::Vector<2, float>((float*)position));
 		Cursor::Traw(this, state);
 		glPopMatrix();
