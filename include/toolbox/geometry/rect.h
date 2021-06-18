@@ -28,10 +28,11 @@ namespace TB{
 	template <unsigned D = 2, typename T = float> class Rect {
 	public:
 		Rect(){};
+
 		Rect(const Vector<D, T>& a, const Vector<D, T>& b)
 			: points((const Vector<D, T>[]){Less(a, b), More(a, b)}){};
 		Rect(const Vector<D, T>& p, const Spread<D, T>& s)
-			: Rect(p, p + Vector<D, T>{s}){};
+			: Rect(p, p + Vector<D, T>({s[0], s[1]})){};
 		void Clear() {
 			points[0].Clear();
 			points[1].Clear();

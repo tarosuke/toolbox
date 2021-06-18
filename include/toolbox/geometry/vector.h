@@ -29,11 +29,7 @@ namespace TB{
 		operator T*(){
 			return value;
 		};
-		operator const T*() const{
-			return value;
-		};
-		Vector(T x, T y){ value[0] = x; value[1] = y; };
-		Vector(T x, T y, T z){ value[0] = x; value[1] = y; value[2] = z; };
+		operator const T*() const { return value; };
 
 
 		//型違いコピー
@@ -42,13 +38,11 @@ namespace TB{
 				value[n] = (T)t[n];
 			}
 		};
-		template <typename U> Vector(const Vector<D, U>& t) { *this = t; };
 		template <typename U> void operator=(const U (&v)[D]) {
 			for (unsigned n(0); n < D; ++n) {
 				value[n] = (T)v[n];
 			}
 		};
-		template <typename U> Vector(const U (&v)[D]) { *this = v; };
 
 		// 次元、型違いコピー
 		template <unsigned E, typename U>
@@ -57,13 +51,15 @@ namespace TB{
 				value[n] = n < E ? (T)t[n] : 0;
 			}
 		};
-		template <unsigned E, typename U> Vector(const Vector<E, U>& t) {
-			*this = t;
-		}
 		template <unsigned E, typename U> void operator=(const U (&v)[E]) {
 			for (unsigned n(0); n < D; ++n) {
 				value[n] = n < E ? (T)v[n] : 0;
 			}
+		}
+
+		//コピーコンストラクタ
+		template <unsigned E, typename U> Vector(const Vector<E, U>& t) {
+			*this = t;
 		}
 		template <unsigned E, typename U> Vector(const U (&t)[E]) {
 			*this = t;

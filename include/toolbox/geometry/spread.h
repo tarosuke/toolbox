@@ -24,28 +24,35 @@ namespace TB {
 
 	template <unsigned D, typename T> class Spread {
 	public:
-		operator T*() { return value; };
-		operator const T*() const { return value; }
-		Spread(const T* o) {
+		//型違い配列からコピー
+		template <typename U> void operator=(const U (&o)[D]) {
 			for (unsigned n(0); n < D; ++n) {
-				value[n] = o[n];
+				value[n] = (T)o[n];
 			}
 		};
-		template <unsigned D1, typename T1>
-		void operator=(const Spread<D1, T1>& s) {
+		//型違い、次元違い配列からコピー
+		template <unsigned E, typename U> void operator=(const U (&o)[E]) {
 			for (unsigned n(0); n < D; ++n) {
-				value[n] = (T)(n < D1 ? s[n] : 0);
+				value[n] = n < E ? (T)o[n] : 0;
 			}
-		};
-		template <unsigned D1, typename T1> Spread(const Spread<D1, T1>& s) {
-			*this = s;
 		};
 
+		//コピーコンストラクタ
+		template <unsigned E, typename U> Spread(const Spread<E, U>& o) {
+			*this = o;
+		};
+		template <unsigned E, typename U> Spread(const U (&o)[E]) { *this = o; }
+
+		//配列として取り出す
+		operator T*() { return value; };
+		operator const T*() const { return value; }
+
+		//演算
 		void operator*=(T t) {
 			for (auto& e : value) {
 				e *= t;
 			}
-		};
+			};
 		Spread operator*(T t) const {
 			Spread r(*this);
 			r *= t;
