@@ -19,48 +19,59 @@
 #pragma once
 
 #include <toolbox/tg/widget/position.h>
+#include <toolbox/tg/widget/cursor.h>
+#include <toolbox/geometry/spread.h>
 
 
 
 namespace TG {
+
 	class BorderWidget : public PositionWidget {
 	public:
 		BorderWidget(
 			const TB::Vector<3, float>& position,
-			const TB::Vector<2, int>& size,
+			const TB::Spread<2, unsigned>& size,
 			unsigned color = 0,
 			Widget* super = 0)
-			: PositionWidget(position, super), size(size) {
+			: PositionWidget(position, super), size(size), state(Cursor::arrow),
+			  trawCursor(DummyDrawCursor) {
 			SetColor(color);
 		};
 		void SetColor(unsigned c) {
 			color = c;
-			drawIt = (color & transparentMask) == transparentMask;
-			trawIt = !drawIt && !!(~color & transparentMask);
+			if ((color & transparentMask) == transparentMask) {
+				draw = &BorderWidget::CommonDraw;
+				traw = &BorderWidget::DummyDraw;
+			} else {
+				traw = &BorderWidget::CommonDraw;
+				draw = &BorderWidget::DummyDraw;
+			}
 		};
 
 	protected:
 		virtual void CommonDraw();
+		void DummyDraw(){};
+
+		void AtPointerEnter(const PointerEvent&) final;
+		void AtPointerLeave(const PointerEvent&) final;
+		void AtPointerMove(const PointerEvent&) final;
 
 	private:
 		static const unsigned transparentMask = 0xff000000;
-		TB::Vector<2, unsigned> size;
+		TB::Spread<2, unsigned> size;
 		unsigned color;
-		bool drawIt;
-		bool trawIt;
+		void (BorderWidget::*draw)();
+		void (BorderWidget::*traw)();
 
-		void Draw() final {
-			if (drawIt) {
-				CommonDraw();
-			}
-		};
-		void Traw() final {
-			if (trawIt) {
-				CommonDraw();
-			}
-		};
+		void Draw(const TB::Rect<2, float>&) final;
+		void Traw(const TB::Rect<2, float>&) final;
 
+		Found Find(const Query&) final;
+		Found Inside(const Query&);
 
-		Found Inside(const TB::Vector<2, float>&);
+		// カーソル関連
+		Cursor::State state;
+		void (*trawCursor)(Cursor::State);
+		static void DummyDrawCursor(Cursor::State){};
 	};
 }

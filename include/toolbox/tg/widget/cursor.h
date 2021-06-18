@@ -16,40 +16,44 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <toolbox/gl/gl.h>
+#pragma once
 
-#include <toolbox/tg/widget/border.h>
+#include <toolbox/geometry/vector.h>
+#include <toolbox/image.h>
+#include <toolbox/gl/texture.h>
 
 
 
 namespace TG {
 
-	Widget::Found BorderWidget::Inside(const TB::Vector<2, float>& p) {
-		Found f;
-		if (p[0] < 0 || p[1] < 0) {
-			return f;
-		}
+	class Widget;
 
-		TB::Vector<2, unsigned> r(size);
-		r /= (unsigned)position[2];
+	class Cursor {
+		Cursor(const Cursor&);
+		void operator=(const Cursor&);
 
-		if (p[0] < r[0] && p[1] < r[1]) {
-			f.depth = position[2];
-			f.widget = this;
-			f.where = TB::Vector<2, int>({(int)p[0], (int)p[1]});
-		}
-		return f;
-	}
+	public:
+		enum State {
+			none,
+			arrow,
+			busy,
+		};
 
-	void BorderWidget::CommonDraw() {
-		const TB::Vector<3, float> rb(
-			{position[0] + size[0], position[1] + size[1], position[2]});
-		glColor4bv((GLbyte*)&color);
-		glBegin(GL_TRIANGLE_FAN);
-		glVertex3fv(position);
-		glVertex3i(rb[0], position[1], position[2]);
-		glVertex3fv(rb);
-		glVertex3f(position[0], rb[2], position[2]);
-		glEnd();
-	}
+		// 新しいのをNewできたら古いのは置き換えられる
+		static void New(const char* path);
+
+		// カーソル操作、描画
+		static void Traw(State);
+		static void SetPosition(const TB::Vector<2, int>& p) { position = p; };
+
+	private:
+		static TB::Vector<2, int> position; //基準面上の位置
+		static Cursor* instance;
+		static unsigned frameNumber;
+
+		Cursor(TB::Image&);
+		TB::Texture texture;
+		const TB::Spread<2, float> coordsSize;
+		const TB::Spread<2, unsigned> panelSize;
+	};
 }

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <toolbox/tg/tg.h>
+#include <toolbox/geometry/rect.h>
 
 #include <float.h>
 
@@ -32,8 +33,8 @@ namespace TG {
 
 	public:
 		//周期処理
-		virtual void Draw();
-		virtual void Traw();
+		virtual void Draw(const TB::Rect<2, float>&); //引数は視錐体
+		virtual void Traw(const TB::Rect<2, float>&);
 		virtual void Tick();
 		virtual ~Widget(){};
 
@@ -59,6 +60,10 @@ namespace TG {
 			unsigned charCode;
 		};
 
+		virtual void AtPointerEnter(const PointerEvent&){};
+		virtual void AtPointerLeave(const PointerEvent&){};
+		virtual void AtPointerMove(const PointerEvent&){};
+
 		virtual void OnPointerEnter(const PointerEvent&){};
 		virtual void OnPointerLeave(const PointerEvent&){};
 		virtual void OnPointerMove(const PointerEvent&){};
@@ -75,8 +80,9 @@ namespace TG {
 
 		//窓の距離を考慮して仮想位置にあるポインタにかかっているWidgetを返す
 		struct Query {
-			const TB::Vector<2, float>& looknigPoint;
+			TB::Vector<2, float> looknigPoint;
 			TB::Vector<2, float> pointer;
+			const TB::Rect<2, float>& viewRect;
 			float depth;
 		};
 		struct Found {

@@ -32,6 +32,7 @@ namespace TG {
 
 	private:
 		static const float navigationRadious;
+		static const TB::Rect<2, float> viewRect;
 
 		TB::Vector<2, float> lookingPoint;
 		TB::Vector<2, float> pointer;

@@ -16,24 +16,40 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#include <toolbox/gl/gl.h>
 #include <toolbox/tg/widget/position.h>
 
 
 
 namespace TG {
 
-	Widget::Found PositionWidget::Find(const Query& q) {
-		TB::Vector<2, float> p({position[0], position[1]});
-		p -= q.looknigPoint;
-		p /= position[2];
+	Widget::Query PositionWidget::NewQuery(const Query& q) {
 		Query qq(q);
+		qq.depth += position[2];
+		TB::Vector<2, float> p(
+			{position[0] / qq.depth, position[1] / qq.depth});
+		qq.looknigPoint -= p;
 		qq.pointer -= p;
+		return qq;
+	}
 
-		Found f(Widget::Find(qq));
+	Widget::Found PositionWidget::Find(const Query& q) {
+		const Query qq(NewQuery(q));
 
-		if (!f.widget) {
-			f = Inside(qq.pointer);
-		}
-		return f;
+		//子要素を検索
+		return Widget::Find(qq);
+	}
+
+	void PositionWidget::Draw(const TB::Rect<2, float>& vr) {
+		glPopMatrix();
+		glTranslatef(position[0], position[1], position[2]);
+		Widget::Draw(vr - TB::Vector<2, float>{position});
+		glPopMatrix();
+	}
+	void PositionWidget::Traw(const TB::Rect<2, float>& vr) {
+		glPopMatrix();
+		glTranslatef(position[0], position[1], position[2]);
+		Widget::Traw(vr - TB::Vector<2, float>(position));
+		glPopMatrix();
 	}
 }

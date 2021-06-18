@@ -24,7 +24,11 @@
 
 
 namespace TG {
+
 	const float RootWidget::navigationRadious(1);
+	const TB::Rect<2, float> RootWidget::viewRect(
+		TB::Vector<2, float>({-1, -1}), TB::Vector<2, float>({1, 1}));
+
 
 	void RootWidget::Tick() {
 		//注視点計算
@@ -66,7 +70,8 @@ namespace TG {
 		}
 
 		//ポインタがある窓を探す
-		auto const found(Find((const Query){lookingPoint, pointer, FLT_MAX}));
+		auto const found(
+			Find((const Query){lookingPoint, pointer, viewRect, FLT_MAX}));
 
 		//ボタンイベント
 		if (found.widget && (button.pressed || button.released)) {
@@ -78,18 +83,18 @@ namespace TG {
 			// Leave
 			if (prev.widget) {
 				(*prev.widget)
-					.OnPointerLeave((const PointerEvent){prev.where, button});
+					.AtPointerLeave((const PointerEvent){prev.where, button});
 			}
 			// Enter
 			if (found.widget) {
 				(*found.widget)
-					.OnPointerLeave((const PointerEvent){found.where, button});
+					.AtPointerEnter((const PointerEvent){found.where, button});
 			}
 		} else if (prev.where != found.where) {
 			// Move
 			if (found.widget) {
 				(*found.widget)
-					.OnPointerMove((const PointerEvent){found.where, button});
+					.AtPointerMove((const PointerEvent){found.where, button});
 			}
 		}
 
@@ -102,14 +107,14 @@ namespace TG {
 		glPushMatrix();
 		glScalef(1, 1, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
-		root.Draw();
+		root.Draw(viewRect);
 		glPopMatrix();
 	}
 	void RootWidget::Bridge::Traw() {
 		glPushMatrix();
 		glScalef(1, 1, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
-		root.Traw();
+		root.Traw(viewRect);
 		glPopMatrix();
 	}
 }
