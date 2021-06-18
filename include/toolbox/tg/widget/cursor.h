@@ -42,16 +42,18 @@ namespace TG {
 		// 新しいのをNewできたら古いのは置き換えられる
 		static void New(const char* path);
 
-		// カーソル操作
+		// カーソル操作、描画
 		static void Traw(State);
 		static void SetPosition(const TB::Vector<2, int>& p) { position = p; };
 
 	private:
 		static TB::Vector<2, int> position; //基準面上の位置
 		static Cursor* instance;
+		static unsigned frameNumber;
 
 		Cursor(TB::Image&);
 		TB::Texture texture;
-		TB::Spread<2, float> coordsSize;
+		const TB::Spread<2, float> coordsSize;
+		const TB::Spread<2, unsigned> panelSize;
 	};
 }

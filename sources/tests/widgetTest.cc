@@ -2,6 +2,7 @@
 #include <toolbox/tg/scenery.h>
 #include <toolbox/tg/widget/root.h>
 #include <toolbox/tg/widget/border.h>
+#include <toolbox/tg/widget/cursor.h>
 
 #include <assert.h>
 #include <unistd.h>
@@ -22,6 +23,7 @@ int main() {
 			(const float[3]){-0.5f, -0.5f, 1.0f},
 			(const unsigned[2]){1U, 1U},
 			0x55333322);
+		TG::Cursor::New("data/cursor.png");
 		scene.RegisterScenery(TG::Scenery::New(
 			"sources/tests/"
 			"kisspng-skybox-texture-mapping-cube-mapping-landscape-watercolor-"
