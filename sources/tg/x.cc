@@ -41,7 +41,7 @@ namespace XTG {
 								0,
 								0,
 								0)),
-		  size(width, height) {
+		  size({width, height}) {
 		if (xdrawable) {
 			XMapWindow(display.xdisplay, xdrawable);
 			display.Add(*this);

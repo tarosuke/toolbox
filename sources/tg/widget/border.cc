@@ -26,9 +26,9 @@
 namespace TG {
 
 	Widget::Found BorderWidget::Inside(const Query& q) {
-		const TB::Vector<2, int> p{
+		const TB::Vector<2, int> p((const int[2]){
 			(int)(q.pointer[0] * q.depth),
-			(int)(q.pointer[1] * q.depth)};
+			(int)(q.pointer[1] * q.depth)});
 		Found f;
 		if (p[0] < 0 || p[1] < 0) {
 			return f;
@@ -60,34 +60,33 @@ namespace TG {
 		glEnd();
 	}
 
-	void BorderWidget::Draw(const TB::Rect<2, float>&) {
-		if (drawIt) {
-			glPushMatrix();
-			glTranslatef(position[0], position[1], position[2]);
-			CommonDraw();
-			glPopMatrix();
-		}
-	};
-	void BorderWidget::Traw(const TB::Rect<2, float>&) {
+	void BorderWidget::Draw(const TB::Rect<2, float>& r) {
 		glPushMatrix();
 		glTranslatef(position[0], position[1], position[2]);
-		if (trawIt) {
-			CommonDraw();
-		}
-		Cursor::Traw(this, state);
+		Widget::Draw(r - TB::Vector<2, float>(position));
+		(this->*draw)();
+		glPopMatrix();
+	};
+	void BorderWidget::Traw(const TB::Rect<2, float>& r) {
+		glPushMatrix();
+		glTranslatef(position[0], position[1], position[2]);
+		(this->*traw)();
+		Widget::Traw(r - TB::Vector<2, float>(position));
+		(*trawCursor)(state);
 		glPopMatrix();
 	};
 
 	void BorderWidget::AtPointerEnter(const PointerEvent& e) {
 		//カーソル登録
-		Cursor::Enter(*this);
+		Cursor::SetPosition(e.position);
+		trawCursor = Cursor::Traw;
 
 		//通常のイベント処理
 		OnPointerEnter(e);
 	}
 	void BorderWidget::AtPointerLeave(const PointerEvent& e) {
 		//カーソル抹消
-		Cursor::Leave();
+		trawCursor = DummyDrawCursor;
 
 		//通常のイベント処理
 		OnPointerEnter(e);

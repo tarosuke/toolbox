@@ -33,18 +33,24 @@ namespace TG {
 			const TB::Spread<2, unsigned>& size,
 			unsigned color = 0,
 			Widget* super = 0)
-			: PositionWidget(position, super), size(size),
-			  state(Cursor::arrow) {
+			: PositionWidget(position, super), size(size), state(Cursor::arrow),
+			  trawCursor(DummyDrawCursor) {
 			SetColor(color);
 		};
 		void SetColor(unsigned c) {
 			color = c;
-			drawIt = (color & transparentMask) == transparentMask;
-			trawIt = !drawIt && !!(~color & transparentMask);
+			if ((color & transparentMask) == transparentMask) {
+				draw = &BorderWidget::CommonDraw;
+				traw = &BorderWidget::DummyDraw;
+			} else {
+				traw = &BorderWidget::CommonDraw;
+				draw = &BorderWidget::DummyDraw;
+			}
 		};
 
 	protected:
 		virtual void CommonDraw();
+		void DummyDraw(){};
 
 		void AtPointerEnter(const PointerEvent&) final;
 		void AtPointerLeave(const PointerEvent&) final;
@@ -54,14 +60,18 @@ namespace TG {
 		static const unsigned transparentMask = 0xff000000;
 		TB::Spread<2, unsigned> size;
 		unsigned color;
-		bool drawIt;
-		bool trawIt;
-		Cursor::State state;
+		void (BorderWidget::*draw)();
+		void (BorderWidget::*traw)();
 
 		void Draw(const TB::Rect<2, float>&) final;
 		void Traw(const TB::Rect<2, float>&) final;
 
 		Found Find(const Query&) final;
 		Found Inside(const Query&);
+
+		// カーソル関連
+		Cursor::State state;
+		void (*trawCursor)(Cursor::State);
+		static void DummyDrawCursor(Cursor::State){};
 	};
 }

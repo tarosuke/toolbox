@@ -69,8 +69,9 @@ namespace TB{
 		bool IsTransparent() const;
 		operator Rect<2, unsigned>() const {
 			return Rect<2, unsigned>(
-				Vector<2, unsigned>(0, 0),
-				Vector<2, unsigned>(GetWidth(), GetHeight()));
+				Vector<2, unsigned>((const unsigned[2]){0UL, 0UL}),
+				Spread<2, unsigned>(
+					(const unsigned[2]){GetWidth(), GetHeight()}));
 		};
 
 		/** 画像操作

@@ -23,19 +23,57 @@
 
 namespace TG {
 
+	TG::Cursor* TG::Cursor::instance(0);
 	TB::Vector<2, int> Cursor::position;
-	Widget* Cursor::on(0);
+	unsigned Cursor::frameNumber(0);
 
-	void Cursor::Traw(Widget* w, State state) {
-		if (on != w) {
-			return;
+
+	void Cursor::Traw(State state) {
+		if (instance) {
+			frameNumber = (frameNumber + 1) % (*instance).panelSize[0];
+			if ((*instance).panelSize[1] < state) {
+				state = arrow;
+			}
+			const TB::Vector<2, float> lt(
+				{(*instance).coordsSize[0] * frameNumber,
+				 (*instance).coordsSize[1] * state});
+			TB::Texture::Binder b((*instance).texture);
+			glColor3f(1, 1, 1);
+			glPushMatrix();
+			glTranslatef(position[0], position[1], 0);
+			glBegin(GL_TRIANGLE_FAN);
+			glTexCoord2f(lt[0], lt[1] + (*instance).coordsSize[1]);
+			glVertex3f(-0.16, -0.16, -0.001);
+			glTexCoord2f(
+				lt[0] + (*instance).coordsSize[0],
+				lt[1] + (*instance).coordsSize[1]);
+			glVertex3f(0.16, -0.16, -0.001);
+			glTexCoord2f(lt[0] + (*instance).coordsSize[0], lt[1]);
+			glVertex3f(0.16, 0.16, -0.001);
+			glTexCoord2f(lt[0], lt[1]);
+			glVertex3f(-0.16, 0.16, -0.001);
+			glEnd();
+			glPopMatrix();
 		}
-		glColor3f(0, 0, 1);
-		glBegin(GL_TRIANGLE_FAN);
-		glVertex3f(0, 0, -0.001);
-		glVertex3f(0.16, 0, -0.001);
-		glVertex3f(0.16, 0.16, -0.001);
-		glVertex3f(0, 0.16, -0.001);
-		glEnd();
+	}
+
+	void TG::Cursor::New(const char* path) {
+		if (auto* const image = TB::Image::New(path)) {
+			new Cursor(*image);
+			delete image;
+		}
+	}
+
+
+	TG::Cursor::Cursor(TB::Image& image)
+		: texture(image),
+		  coordsSize((const float[2]){
+			  32.0f / image.GetWidth(), 32.0f / image.GetHeight()}),
+		  panelSize((const unsigned[2]){
+			  image.GetWidth() / 32, image.GetHeight() / 32}) {
+		if (instance) {
+			delete instance;
+		}
+		instance = this;
 	}
 }

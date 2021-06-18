@@ -29,36 +29,51 @@ namespace TB{
 		operator T*(){
 			return value;
 		};
-		operator const T*() const{
-			return value;
-		};
-		Vector(T x, T y){ value[0] = x; value[1] = y; };
-		Vector(T x, T y, T z){ value[0] = x; value[1] = y; value[2] = z; };
-		Vector& operator=(const Vector& t){
-			for (unsigned n(0); n < D; ++n) {
-				value[n] = t[n];
-			}
-			return *this;
-		};
-		template<typename U> void operator=(const U t[]){
+		operator const T*() const { return value; };
+
+
+		//型違いコピー
+		template <typename U> void operator=(const Vector<D, U>& t) {
 			for (unsigned n(0); n < D; ++n) {
 				value[n] = (T)t[n];
 			}
 		};
-		template <typename U> Vector(const Vector<D, U>& iv) {
+		template <typename U> void operator=(const U (&v)[D]) {
 			for (unsigned n(0); n < D; ++n) {
-				value[n] = (T)iv[n];
+				value[n] = (T)v[n];
 			}
 		};
+
+		// 次元、型違いコピー
+		template <unsigned E, typename U>
+		void operator=(const Vector<E, U>& t) {
+			for (unsigned n(0); n < D; ++n) {
+				value[n] = n < E ? (T)t[n] : 0;
+			}
+		};
+		template <unsigned E, typename U> void operator=(const U (&v)[E]) {
+			for (unsigned n(0); n < D; ++n) {
+				value[n] = n < E ? (T)v[n] : 0;
+			}
+		}
+
+		//コピーコンストラクタ
+		template <unsigned E, typename U> Vector(const Vector<E, U>& t) {
+			*this = t;
+		}
+		template <unsigned E, typename U> Vector(const U (&t)[E]) {
+			*this = t;
+		};
+
+
+
 		Vector(){ Clear(); };
 		void Clear(){
 			for (unsigned n(0); n < D; ++n) {
 				value[n] = 0;
 			}
 		};
-		template<typename U> Vector(const U iv[]){
-			*this = iv;
-		};
+
 		bool operator==(const Vector& t) const{
 			for (unsigned n(0); n < D; ++n) {
 				if(value[n] != t.value[n]){
