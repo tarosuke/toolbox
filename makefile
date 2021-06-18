@@ -33,8 +33,9 @@ EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm
 
 ################################################################# COMMON RULES
 
-
+ifneq ($(MAKECMDGOALS),clean)
 -include $(deps) $(tdeps)
+endif
 
 vpath %.o .builds
 
