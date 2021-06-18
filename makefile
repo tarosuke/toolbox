@@ -1,4 +1,6 @@
 target := libtoolbox.a
+executable := $(shell echo $$PWD | sed s!.*/!! )
+
 
 all: $(target)
 
