@@ -71,8 +71,14 @@ vpath %.o .builds
 ############################################################### RULES & TARGET
 
 $(target): makefile $(objs)
+ifeq ($(suffix $(target)),)
+	@echo " LD $@"
+	@gcc -o $(executable) $(objs) $(EXLIBS)
+endif
+ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
 	@ar rc $@ $(objs)
+endif
 
 install: libtoolbox.a
 	@sudo cp libtoolbox.a /usr/local/lib
