@@ -26,8 +26,8 @@
 namespace TG {
 
 	const float RootWidget::navigationRadious(1);
-	const TB::Rect<2, float> RootWidget::viewRect{
-		TB::Vector<2, float>{-1, -1}, TB::Vector<2, float>{1, 1}};
+	const TB::Rect<2, float> RootWidget::viewRect(
+		TB::Vector<2, float>({-1, -1}), TB::Vector<2, float>({1, 1}));
 
 
 	void RootWidget::Tick() {

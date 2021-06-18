@@ -19,8 +19,8 @@ int main() {
 		} scene;
 		TG::RootWidget root;
 		TG::BorderWidget borderWidget(
-			(const float[]){-0.5f, -0.5f, 1.0f},
-			(const unsigned[]){1U, 1U},
+			(const float[3]){-0.5f, -0.5f, 1.0f},
+			(const unsigned[2]){1U, 1U},
 			0x55333322);
 		scene.RegisterScenery(TG::Scenery::New(
 			"sources/tests/"

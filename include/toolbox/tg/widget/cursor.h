@@ -50,7 +50,8 @@ namespace TG {
 		static TB::Vector<2, int> position; //基準面上の位置
 		static Cursor* instance;
 
-		Cursor(const char*);
+		Cursor(TB::Image&);
 		TB::Texture texture;
+		TB::Spread<2, float> coordsSize;
 	};
 }

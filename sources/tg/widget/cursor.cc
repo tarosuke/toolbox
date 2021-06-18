@@ -23,15 +23,40 @@
 
 namespace TG {
 
+	TG::Cursor* TG::Cursor::instance(0);
 	TB::Vector<2, int> Cursor::position;
 
 	void Cursor::Traw(State state) {
-		glColor3f(0, 0, 1);
-		glBegin(GL_TRIANGLE_FAN);
-		glVertex3f(0, 0, -0.001);
-		glVertex3f(0.16, 0, -0.001);
-		glVertex3f(0.16, 0.16, -0.001);
-		glVertex3f(0, 0.16, -0.001);
-		glEnd();
+		if (instance) {
+			TB::Texture::Binder b((*instance).texture);
+			glColor3f(1, 1, 1);
+			glPushMatrix();
+			glTranslatef(position[0], position[1], 0);
+			glBegin(GL_TRIANGLE_FAN);
+			glVertex3f(0, 0, -0.001);
+			glVertex3f(0.16, 0, -0.001);
+			glVertex3f(0.16, 0.16, -0.001);
+			glVertex3f(0, 0.16, -0.001);
+			glEnd();
+			glPopMatrix();
+		}
 	}
+
+	void TG::Cursor::New(const char* path) {
+		if (auto* const image = TB::Image::New(path)) {
+			new Cursor(*image);
+			delete image;
+		}
+	}
+
+
+	TG::Cursor::Cursor(TB::Image& image)
+		: texture(image),
+		  coordsSize((const float[2]){
+			  32.0f / image.GetWidth(), 32.0f / image.GetHeight()}) {
+		if (instance) {
+			delete instance;
+		}
+		instance = this;
+		}
 }

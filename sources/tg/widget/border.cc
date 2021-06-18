@@ -26,9 +26,9 @@
 namespace TG {
 
 	Widget::Found BorderWidget::Inside(const Query& q) {
-		const TB::Vector<2, int> p{
+		const TB::Vector<2, int> p((const int[2]){
 			(int)(q.pointer[0] * q.depth),
-			(int)(q.pointer[1] * q.depth)};
+			(int)(q.pointer[1] * q.depth)});
 		Found f;
 		if (p[0] < 0 || p[1] < 0) {
 			return f;
@@ -63,7 +63,7 @@ namespace TG {
 	void BorderWidget::Draw(const TB::Rect<2, float>& r) {
 		glPushMatrix();
 		glTranslatef(position[0], position[1], position[2]);
-		Widget::Draw(r - TB::Vector<2, float>((float*)position));
+		Widget::Draw(r - TB::Vector<2, float>(position));
 		(this->*draw)();
 		glPopMatrix();
 	};
@@ -71,7 +71,7 @@ namespace TG {
 		glPushMatrix();
 		glTranslatef(position[0], position[1], position[2]);
 		(this->*traw)();
-		Widget::Traw(r - TB::Vector<2, float>((float*)position));
+		Widget::Traw(r - TB::Vector<2, float>(position));
 		(*trawCursor)(state);
 		glPopMatrix();
 	};
