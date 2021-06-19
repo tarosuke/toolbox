@@ -19,6 +19,10 @@
  * dim: dimensions
  *     2: a + ib
  *     4: a + ib + jc + kd
+ *
+ * NOTE:
+ * 演算の中には特定次元でしかできないものがあるので注意 *
+ * できない次元数で演算しようとするとリンカエラーになる *
  */
 #pragma once
 
@@ -38,34 +42,87 @@ namespace TB {
 
 		// 配列からの代入演算子、コンストラクタ
 		template <typename U> void operator=(const U (&o)[D]) {
-			for (unsigned n(0); n < D; ++n) {
-				value[n] = (T)o[n];
-			}
+			InitFromComplex(o);
 		};
-		template <typename U> Complex(const U (&o)[D]) { *this = o; };
+		template <typename U> Complex(const U (&o)[D]) { InitFromComplex(o); };
 
 		// Complexからの代入演算子、コンストラクタ
 		template <typename U> void operator=(const Complex<D, U>& o) {
-			for (unsigned n(0); n < D; ++n) {
-				value[n] = (T)o[n];
-			}
+			InitFromComplex(o);
 		};
-		template <typename U> Complex(const Complex<D, U>& o) { *this = o; };
+		template <typename U> Complex(const Complex<D, U>& o) {
+			InitFromComplex(o);
+		};
+
+		// Vectorおよび配列からの変換代入演算子、コンストラクタ
+		template <typename U> void operator=(const U (&o)[D - 1]) {
+			InitFromVector(o);
+		};
+		template <typename U> void operator=(const Vector<D - 1, U>& o) {
+			InitFromVector(o);
+		};
+		template <typename U> Complex(const Vector<D - 1, U>& o) {
+			InitFromVector(o);
+		};
 
 		// ベクトルfrom→toの四元数を求める
 		Complex(const Vector<D - 1, T>& from, const Vector<D - 1, T>& to);
 
-
-
 		// 演算子
-		void Normalize() {
-			value[0] = 1;
+		const Complex operator-() const { //共役を求める
+			Complex t;
+			t.value[0] = value[0];
+			for (unsigned n(0); n < D; ++n) {
+				t.value[n] = -value[n];
+			}
+			return t;
+		};
+		void operator*=(const Complex&); //乗算
+		void operator*=(T t) { //大きさを乗算
+			value[0] = (1.0 - t) + value[0] * t;
 			for (unsigned n(1); n < D; ++n) {
-				value[n] = 0;
+				value[n] *= t;
+			}
+		};
+		Complex operator*(T t) const {
+			Complex o(*this);
+			o *= t;
+			return o;
+		};
+
+		// 回転
+		void Rotate(Vector<D - 1, T>&) const;
+		void ReverseRotate(Vector<D - 1, T>&) const;
+
+		// ノルム他
+		T Length2() const {
+			T l2(0);
+			for (auto& v : value) {
+				l2 += v * v;
+			}
+			return l2;
+		}
+		T Length() const { return sqrt(Length2()); };
+		void Normalize() {
+			const T norm(Length());
+			for (auto& v : value) {
+				v /= norm;
 			}
 		};
 
 	private:
 		T value[D];
+
+		template <typename U> void InitFromComplex(const U* o) {
+			for (unsigned n(0); n < D; ++n) {
+				value[n] = (T)o[n];
+			}
+		};
+		template <typename U> void InitFromVector(const U* o) {
+			value[0] = 0;
+			for (unsigned n(1); n < D; ++n) {
+				value[n] = (T)o[n - 1];
+			}
+		};
 	};
 }

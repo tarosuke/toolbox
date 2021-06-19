@@ -40,23 +40,74 @@ namespace {
 
 		r[0] = c; //実部はc
 		for (unsigned n(1); n < 4; ++n) {
-			r[n] = s * ex[n];
+			r[n] = s * ex[n - 1];
 		}
 	}
 
+	//四元数でベクトルを回転
+	template <typename T>
+	TB::Vector<3, T> Rotate(const TB::Complex<4, T>& er, TB::Vector<3, T>& v) {
+		TB::Complex<4, T> p(er);
+		TB::Complex<4, T> q(v);
+		TB::Complex<4, T> r(-er);
+
+		p *= q;
+		p *= r;
+
+		p.Normalize();
+		const T(&rv)[3] = &p[1];
+		return TB::Vector<3, T>(rv);
+	}
+	template <typename T> TB::Vector<3, T>
+	ReverseRotate(const TB::Complex<4, T>& er, TB::Vector<3, T>& v) {
+		TB::Complex<4, T> p(-er);
+		TB::Complex<4, T> q(v);
+		TB::Complex<4, T> r(er);
+
+		p *= q;
+		p *= r;
+
+		p.Normalize();
+		return TB::Vector<3, T>(p[1]);
+	}
+
+	// 乗算演算子
+	template <typename T>
+	TB::Complex<2, T> Mul(const TB::Complex<2, T>& v, TB::Complex<2, T>& r) {
+		return TB::Complex<2, T>(
+			{v[0] * r[0] - v[1] * r[1], v[0] * r[1] + v[1] * r[0]});
+	}
+
+	// template <> const COMPLEX<4>& COMPLEX<4>::operator*=(const COMPLEX<4>& r)
+	// { 	COMPLEX d(*this); 	R = d.R * r.R - d.a[0] * r.a[0] - d.a[1] *
+	// r.a[1]
+	// - d.a[2] * r.a[2]; 	a[0] = d.a[0] * r.R + d.R * r.a[0] + d.a[1] * r.a[2]
+	// - d.a[2] * r.a[1]; 	a[1] = d.a[1] * r.R + d.R * r.a[1] + d.a[2] * r.a[0]
+	// - d.a[0] * r.a[2]; 	a[2] = d.a[2] * r.R + d.R * r.a[2] + d.a[0] * r.a[1]
+	// - d.a[1] * r.a[0]; 	Normalize(); 	return *this;
+	// }
 }
 
 namespace TB {
 
 	template <> Complex<4, float>::Complex(
-		const TB::Vector<3, float>& from, const TB::Vector<3, float>& to) {
+		const Vector<3, float>& from, const Vector<3, float>& to) {
 		Diff(value, from, to);
 		Normalize();
 	}
 	template <> Complex<4, double>::Complex(
-		const TB::Vector<3, double>& from, const TB::Vector<3, double>& to) {
+		const Vector<3, double>& from, const Vector<3, double>& to) {
 		Diff(value, from, to);
 		Normalize();
 	}
 
+#define RnR(D, T)                                                              \
+	template <> void Complex<D, T>::Rotate(Vector<D - 1, T>& v) const {        \
+		::Rotate(*this, v);                                                    \
+	}                                                                          \
+	template <> void Complex<D, T>::ReverseRotate(Vector<D - 1, T>& v) const { \
+		::ReverseRotate(*this, v);                                             \
+	}
+
+	RnR(4, double) RnR(4, float)
 }
