@@ -1,5 +1,5 @@
 /** Complexes
- * Copyright (C) 2017 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2017, 2021 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,17 +24,41 @@
 
 
 
-template<typename T, unsigned dim = 2> class Complex{
-public:
-	Complex(){ Normalize(); };
+namespace TB {
 
-	void Normalize(){
-		value[0] = 1;
-		for(unsigned n(1); n < dim; ++n){
-			value[n] = 0;
-		}
-	}
+	template <unsigned D, typename T> class Complex {
+	public:
+		// コンストラクタ
+		Complex() { Normalize(); };
 
-private:
-	T value[dim];
-};
+		// 配列に見えるアクセサ
+		operator T*() { return value; };
+
+		// 配列からの代入演算子、コンストラクタ
+		template <typename U> void operator=(const U (&o)[D]) {
+			for (unsigned n(0); n < D; ++n) {
+				value[n] = (T)o[n];
+			}
+		};
+		template <typename U> Complex(const U (&o)[D]) { *this = o; };
+
+		// Complexからの代入演算子、コンストラクタ
+		template <typename U> void operator=(const Complex<D, U>& o) {
+			for (unsigned n(0); n < D; ++n) {
+				value[n] = (T)o[n];
+			}
+		};
+		template <typename U> Complex(const Complex<D, U>& o) { *this = o; };
+
+		// 演算子
+		void Normalize() {
+			value[0] = 1;
+			for (unsigned n(1); n < D; ++n) {
+				value[n] = 0;
+			}
+		};
+
+	private:
+		T value[D];
+	};
+}
