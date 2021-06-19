@@ -19,16 +19,18 @@
 #pragma once
 
 #include <toolbox/tg/widget.h>
+#include <toolbox/input/input.h>
 
 
 
 namespace TG {
-	class RootWidget : Widget {
+
+	class RootWidget : Widget, TB::Input {
 		RootWidget(const RootWidget&);
 		void operator=(const RootWidget&);
 
 	public:
-		RootWidget() : Widget(0), bridge(*this){};
+		RootWidget() : Widget(0), Input(false), bridge(*this){};
 
 	private:
 		static const float navigationRadious;
@@ -55,5 +57,13 @@ namespace TG {
 			void Draw() final;
 			void Traw() final;
 		} bridge;
+
+		//入力ハンドラ
+		void OnKeyDown(unsigned key) final;
+		void OnKeyUp(unsigned key) final;
+		void OnKeyRepeat(unsigned key) final;
+		void OnButtonDown(unsigned) final;
+		void OnButtonUp(unsigned) final;
+		void OnMouseMove(unsigned, int) final;
 	};
 }

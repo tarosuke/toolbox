@@ -118,4 +118,13 @@ namespace TG {
 		root.Traw(viewRect);
 		glPopMatrix();
 	}
+
+
+	//入力
+	void RootWidget::OnKeyDown(unsigned key){};
+	void RootWidget::OnKeyUp(unsigned key){};
+	void RootWidget::OnKeyRepeat(unsigned key){};
+	void RootWidget::OnButtonDown(unsigned button){};
+	void RootWidget::OnButtonUp(unsigned button){};
+	void RootWidget::OnMouseMove(unsigned axis, int diff){};
 }
