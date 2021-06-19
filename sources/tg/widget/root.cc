@@ -17,6 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <float.h>
+#include <math.h>
 
 #include <toolbox/tg/widget/root.h>
 #include <toolbox/gl/gl.h>
@@ -34,8 +35,8 @@ namespace TG {
 		//注視点計算
 		const auto& pose(Scene::GetHeadPose());
 
-		TB::Matrix<1, 4> front((const float[]){0.0f, 0.0f, 1.0f, 0.0f});
-		TB::Matrix<1, 4> point(pose * front);
+		TB::Matrix<1, 4, float> front((const float[]){0.0f, 0.0f, 1.0f, 0.0f});
+		TB::Matrix<1, 4, float> point(pose * front);
 
 		//後ろ半分は使えないので角度を半分にする
 		const float x(point[0][0]);

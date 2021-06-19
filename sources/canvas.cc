@@ -22,6 +22,7 @@
 #include <cairo/cairo.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <jpeglib.h>
 #include <unistd.h>
 #include <string.h>

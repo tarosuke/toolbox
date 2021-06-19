@@ -1,5 +1,5 @@
 /* Rect
- * Copyright (C) 2016 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2016, 2021 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,7 +25,7 @@
 
 namespace TB{
 
-	template <unsigned D = 2, typename T = float> class Rect {
+	template <unsigned D, typename T> class Rect {
 	public:
 		Rect(){};
 

@@ -18,13 +18,13 @@
  */
 #pragma once
 
-#include <math.h>
+// #include <math.h>
 
 
 
 namespace TB{
 
-	template <unsigned D, typename T = float> class Vector {
+	template <unsigned D, typename T> class Vector {
 	public:
 		operator T*(){
 			return value;
