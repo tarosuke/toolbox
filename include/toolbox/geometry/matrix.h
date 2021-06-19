@@ -1,5 +1,7 @@
 #pragma once
 
+#include <toolbox/geometry/vector.h>
+
 
 
 namespace TB{
@@ -85,6 +87,19 @@ namespace TB{
 			}
 
 			return rv;
+		};
+
+		// Matrix<ROW, COL, T> * Vector<ROW - 1, T> → Vector<ROW - 1, T>
+		// NOTE:Vector as Matrix(ROW, 1, T>
+		Vector<ROW - 1, T> operator*(const Vector<COL - 1, T>& v) const {
+			Vector<ROW - 1, T> r;
+			for (unsigned n(0); n < ROW - 1; ++n) {
+				for (unsigned c(0); c < COL - 1; ++c) {
+					r[n] += v[c] * m[n][c];
+				}
+				r[n] += m[n][COL - 1];
+			}
+			return r;
 		};
 
 	private:
