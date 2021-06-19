@@ -25,7 +25,7 @@ int main() {
 			0x55333322);
 		TG::Cursor::New("data/cursor.png");
 		scene.RegisterScenery(TG::Scenery::New(
-			"sources/tests/"
+			"sources/.mtests/"
 			"kisspng-skybox-texture-mapping-cube-mapping-landscape-watercolor-"
 			"sky-5ac85ff2676e48.2605566015230812024237.png"));
 		scene.Run();
