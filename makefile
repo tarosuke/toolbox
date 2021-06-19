@@ -9,7 +9,7 @@ all: $(target)
 
 COPTS ?= -Iinclude -I/usr/include/gdbm
 
-COPTS += -O2 -Wall -Werror -g -IX11
+COPTS += -O3 -Wall -Werror -g -IX11
 CCOPTS += $(COPTS) -std=c++11
 
 suffixes := %.c %.cc %.glsl
@@ -92,16 +92,16 @@ clean:
 test: $(target) $(tobjs)
 	@echo -n building tests...
 	@$(foreach m, $(tmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox $(EXLIBS) &&) true
-	@$(foreach m, $(tmods), chmod +x .builds/$(m);)
+	@$(foreach m, $(tmods), chmod +x .builds/$(m) &&) true
 	@echo OK.
 	@echo -n running tests...
-	@$(foreach m, $(tmods), .builds/$(m);)
+	@$(foreach m, $(tmods), .builds/$(m) &&) true
 	@echo OK.
 
 # 自動テストを実行、手動テストをビルド
 mtest: test $(mtobjs)
 	@echo -n building manual tests...
 	@$(foreach m, $(mtmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox $(EXLIBS) &&) true
-	@$(foreach m, $(mtmods), chmod +x .builds/$(m);)
+	@$(foreach m, $(mtmods), chmod +x .builds/$(m) &&) true
 	@echo OK.
 
