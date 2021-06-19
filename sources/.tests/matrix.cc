@@ -12,6 +12,7 @@ void Check(const TB::Matrix<C, R, int>& a, const TB::Matrix<C, R, int>& q) {
 		return;
 	}
 
+	puts("\n[matrix]\n");
 	for (unsigned r(0); r < R; ++r) {
 		for (unsigned c(0); c < C; ++c) {
 			printf(
@@ -23,6 +24,19 @@ void Check(const TB::Matrix<C, R, int>& a, const TB::Matrix<C, R, int>& q) {
 				r,
 				a[r][c]);
 		}
+	}
+	exit(-1);
+}
+
+void Check(
+	unsigned dim, const TB::Vector<2, int>& a, const TB::Vector<2, int> q) {
+	if (a == q) {
+		return;
+	}
+
+	puts("\n[matrix]\n");
+	for (unsigned n(0); n < dim; ++n) {
+		printf("q[%u]:%3d,\ta[%u]:%3d\n", n, q[n], n, a[n]);
 	}
 	exit(-1);
 }
@@ -45,11 +59,9 @@ int main() {
 
 	{
 		const TB::Matrix<3, 3, int> a((const int[]){1, 2, 3, 4, 5, 6});
-		const TB::Vector<2, int> b((const int[2]){7, 8});
-		const TB::Vector<2, float> c((const int[2]){9, 10});
-		if (a * b != c) {
-			exit(-1);
-		}
+		const TB::Vector<2, int> b((const int[2]){10, 11});
+		const TB::Vector<2, int> c((const int[2]){35, 101});
+		Check(2, a * b, c);
 	}
 	return 0;
 }
