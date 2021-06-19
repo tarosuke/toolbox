@@ -12,17 +12,30 @@ namespace TB{
 		typename T = float> class Matrix{
 	public:
 		Matrix(){};
-		Matrix(const T* o){
-			for(unsigned n(0); n < COL * ROW; ++n){
-				raw[n] = *o++;
-			}
-		};
 
+		// 配列として扱う
 		operator T*(){ return raw; };
 		operator T const*() const { return raw; };
 		T* operator[](unsigned r){ return m[r]; };
 		const T* operator[](unsigned r) const { return m[r]; };
 
+		// 代入とコピーコンストラクタ
+		template <typename U> void operator=(const U (&o)[ROW][COL]) {
+			for (unsigned r(0); 0 < ROW; ++r) {
+				for (unsigned c(0); c < COL; ++c) {
+					m[r][c] = (T)o[r][c];
+				}
+			}
+		};
+		template <typename U> void operator=(const U (&o)[COL * ROW]) {
+			for (unsigned n(0); n < COL * ROW; ++n) {
+				raw[n] = (T)o[n];
+			}
+		};
+		template <typename U> Matrix(const U (&o)[ROW * COL]) { *this = o; };
+		template <typename U> Matrix(const U (&o)[ROW][COL]) { *this = o; };
+
+		// その他の演算
 		bool operator==(const Matrix& o) const {
 			for (unsigned r(0); r < ROW; ++r) {
 				for (unsigned c(0); c < COL; ++c) {
@@ -34,12 +47,6 @@ namespace TB{
 			return true;
 		};
 		bool operator!=(const Matrix& o) { return !(*this == o); };
-
-		void operator=(const T* o){
-			for(unsigned n(0); n < COL * ROW; ++n){
-				raw[n] = *o++;
-			}
-		};
 
 		void Identity(){
 			for(unsigned n(0); n < ROW * COL; ++n){
