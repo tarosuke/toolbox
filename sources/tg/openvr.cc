@@ -78,8 +78,8 @@ namespace TG {
 		: display(GetDisplay()), openVR(GetOpenVR()),
 		  renderSize(GetRenderSize(openVR)),
 		  eyes{
-			  {openVR, vr::Eye_Left, renderSize},
-			  {openVR, vr::Eye_Right, renderSize}} {
+			  {openVR, vr::Eye_Right, renderSize},
+			  {openVR, vr::Eye_Left, renderSize}} {
 
 		//基本設定
 		glEnable(GL_POLYGON_SMOOTH);
