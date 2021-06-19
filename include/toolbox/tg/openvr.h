@@ -39,7 +39,7 @@ namespace TG {
 
 	private:
 		void* display;
-		struct Pose : public TB::Matrix<4, 4> {
+		struct Pose : public TB::Matrix<4, 4, float> {
 			Pose(){};
 			Pose(const vr::HmdMatrix44_t& o) { *this = o; };
 			Pose(const vr::HmdMatrix34_t& o) { *this = o; };
