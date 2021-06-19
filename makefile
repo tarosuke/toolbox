@@ -1,4 +1,6 @@
-target := libtoolbox.a
+-include target.make
+target ?= $(shell echo $$PWD | sed s!.*/!! )
+
 
 all: $(target)
 
@@ -37,8 +39,9 @@ EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm
 
 ################################################################# COMMON RULES
 
-
+ifneq ($(MAKECMDGOALS),clean)
 -include $(deps) $(tdeps)
+endif
 
 vpath %.o .builds
 
@@ -74,8 +77,14 @@ vpath %.o .builds
 ############################################################### RULES & TARGET
 
 $(target): makefile $(objs)
+ifeq ($(suffix $(target)),)
+	@echo " LD $@"
+	@gcc -o $(executable) $(objs) $(EXLIBS)
+endif
+ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
 	@ar rc $@ $(objs)
+endif
 
 install: libtoolbox.a
 	@sudo cp libtoolbox.a /usr/local/lib
@@ -86,7 +95,7 @@ uninstall:
 	@sudo rm -rf  /usr/local/include/toolbox
 
 clean:
-	rm -rf .builds/* $(target) $(shell find . -name "*.orig")
+	rm -rf .builds/* .builds/.tests .builds/.mtests $(target)* $(shell find . -name "*.orig")
 
 # 自動テストを実行
 test: $(target) $(tobjs)
