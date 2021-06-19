@@ -1,5 +1,5 @@
-target := libtoolbox.a
-executable := $(shell echo $$PWD | sed s!.*/!! )
+-include target.make
+target ?= $(shell echo $$PWD | sed s!.*/!! )
 
 
 all: $(target)
@@ -89,7 +89,7 @@ uninstall:
 	@sudo rm -rf  /usr/local/include/toolbox
 
 clean:
-	rm -rf .builds/* $(target) $(shell find . -name "*.orig")
+	rm -rf .builds/* .builds/.tests .builds/.mtests $(target)* $(shell find . -name "*.orig")
 
 test: $(target) $(tobjs)
 	@echo -n building tests...
