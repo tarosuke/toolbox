@@ -2,7 +2,7 @@ target := libtoolbox.a
 
 all: $(target)
 
-.PHONY : clean test watch uninstall
+.PHONY : clean test mtest watch uninstall
 
 
 ############################################################ FILE RECOGNITIONS
@@ -20,9 +20,15 @@ mods := $(filter-out tests/%, $(basename $(srcs)))
 objs := $(addprefix .builds/, $(addsuffix .o, $(mods)))
 deps := $(addprefix .builds/, $(addsuffix .dep, $(mods)))
 
-tmods := $(filter tests/%, $(basename $(srcs)))
+# テスト
+tmods := $(filter .tests/%, $(basename $(srcs)))
 tobjs := $(addprefix .builds/, $(addsuffix .o, $(tmods)))
 tdeps := $(addprefix .builds/, $(addsuffix .dep, $(tmods)))
+
+# 手動テスト
+mtmods := $(filter .mtests/%, $(basename $(srcs)))
+mtobjs := $(addprefix .builds/, $(addsuffix .o, $(tmods)))
+mtdeps := $(addprefix .builds/, $(addsuffix .dep, $(tmods)))
 
 
 EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm
@@ -82,11 +88,20 @@ uninstall:
 clean:
 	rm -rf .builds/* $(target) $(shell find . -name "*.orig")
 
+# 自動テストを実行
 test: $(target) $(tobjs)
 	@echo -n building tests...
 	@$(foreach m, $(tmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox $(EXLIBS) &&) true
 	@$(foreach m, $(tmods), chmod +x .builds/$(m);)
 	@echo OK.
+	@echo -n running tests...
+	@$(foreach m, $(tmods), .builds/$(m);)
+	@echo OK.
 
-runtest: test
-	@.builds/tests/test $(addprefix .builds/$(m), $(tmods))
+# 自動テストを実行、手動テストをビルド
+mtest: test $(mtobjs)
+	@echo -n building manual tests...
+	@$(foreach m, $(mtmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox $(EXLIBS) &&) true
+	@$(foreach m, $(mtmods), chmod +x .builds/$(m);)
+	@echo OK.
+
