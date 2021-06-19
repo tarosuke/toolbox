@@ -54,8 +54,8 @@ namespace {
 		p *= q;
 		p *= r;
 
-		p.Normalize();
-		const T(&rv)[3] = &p[1];
+		const T n(p.Length());
+		const T rv[3] = {p[1] / n, p[2] / n, p[3] / n};
 		return TB::Vector<3, T>(rv);
 	}
 	template <typename T> TB::Vector<3, T>
@@ -67,39 +67,40 @@ namespace {
 		p *= q;
 		p *= r;
 
-		p.Normalize();
-		return TB::Vector<3, T>(p[1]);
+		const T n(p.Length());
+		const T rv[3] = {p[1] / n, p[2] / n, p[3] / n};
+		return TB::Vector<3, T>(rv);
 	}
 
 	// 乗算演算子
-	template <typename T>
-	TB::Complex<2, T> Mul(const TB::Complex<2, T>& v, TB::Complex<2, T>& r) {
+	template <typename T> TB::Complex<2, T>
+	Mul(const TB::Complex<2, T>& v, const TB::Complex<2, T>& r) {
 		return TB::Complex<2, T>(
 			{v[0] * r[0] - v[1] * r[1], v[0] * r[1] + v[1] * r[0]});
 	}
 
-	// template <> const COMPLEX<4>& COMPLEX<4>::operator*=(const COMPLEX<4>& r)
-	// { 	COMPLEX d(*this); 	R = d.R * r.R - d.a[0] * r.a[0] - d.a[1] *
-	// r.a[1]
-	// - d.a[2] * r.a[2]; 	a[0] = d.a[0] * r.R + d.R * r.a[0] + d.a[1] * r.a[2]
-	// - d.a[2] * r.a[1]; 	a[1] = d.a[1] * r.R + d.R * r.a[1] + d.a[2] * r.a[0]
-	// - d.a[0] * r.a[2]; 	a[2] = d.a[2] * r.R + d.R * r.a[2] + d.a[0] * r.a[1]
-	// - d.a[1] * r.a[0]; 	Normalize(); 	return *this;
-	// }
+	template <typename T> TB::Complex<4, T>
+	Mul(const TB::Complex<4, T>& v, const TB::Complex<4, T>& r) {
+		return TB::Complex<4, T>(
+			{v[0] * r[0] - v[1] * r[1] - v[2] * r[2] - v[3] * r[3],
+			 v[1] * r[0] + v[0] * r[1] + v[2] * r[3] - v[3] * r[2],
+			 v[2] * r[0] + v[0] * r[2] + v[3] * r[1] - v[1] * r[3],
+			 v[3] * r[0] + v[0] * r[3] + v[1] * r[2] - v[2] * r[1]});
+	}
 }
 
 namespace TB {
 
-	template <> Complex<4, float>::Complex(
-		const Vector<3, float>& from, const Vector<3, float>& to) {
-		Diff(value, from, to);
-		Normalize();
+#define C(D, T)                                                                \
+	template <> Complex<D, T>::Complex(                                        \
+		const Vector<D - 1, T>& from,                                          \
+		const Vector<D - 1, T>& to) {                                          \
+		Diff(value, from, to);                                                 \
+		Normalize();                                                           \
 	}
-	template <> Complex<4, double>::Complex(
-		const Vector<3, double>& from, const Vector<3, double>& to) {
-		Diff(value, from, to);
-		Normalize();
-	}
+	C(4, double)
+	C(4, float)
+	C(4, int)
 
 #define RnR(D, T)                                                              \
 	template <> void Complex<D, T>::Rotate(Vector<D - 1, T>& v) const {        \
@@ -108,6 +109,18 @@ namespace TB {
 	template <> void Complex<D, T>::ReverseRotate(Vector<D - 1, T>& v) const { \
 		::ReverseRotate(*this, v);                                             \
 	}
+	RnR(4, double) RnR(4, float) RnR(4, int)
 
-	RnR(4, double) RnR(4, float)
+#define MUL(D, T)                                                              \
+	template <> Complex<D, T> Complex<D, T>::operator*(const Complex<D, T>& b) \
+		const {                                                                \
+		return ::Mul(*this, b);                                                \
+	}
+		;
+	MUL(2, double);
+	MUL(2, float);
+	MUL(4, double);
+	MUL(4, float);
+	MUL(2, int);
+	MUL(4, int);
 }

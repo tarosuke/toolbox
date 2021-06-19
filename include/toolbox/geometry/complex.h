@@ -35,10 +35,10 @@ namespace TB {
 	template <unsigned D, typename T> class Complex {
 	public:
 		// コンストラクタ
-		Complex() { Normalize(); };
+		Complex() : value{} {};
 
 		// 配列に見えるアクセサ
-		operator T*() { return value; };
+		T operator[](unsigned n) const { return value[n]; }
 
 		// 配列からの代入演算子、コンストラクタ
 		template <typename U> void operator=(const U (&o)[D]) {
@@ -62,7 +62,7 @@ namespace TB {
 			InitFromVector(o);
 		};
 		template <typename U> Complex(const Vector<D - 1, U>& o) {
-			InitFromVector(o);
+			InitFromVector((const U*)o);
 		};
 
 		// ベクトルfrom→toの四元数を求める
@@ -77,7 +77,8 @@ namespace TB {
 			}
 			return t;
 		};
-		void operator*=(const Complex&); //乗算
+		Complex operator*(const Complex&) const; //乗算
+		void operator*=(const Complex& t) { *this = *this * t; };
 		void operator*=(T t) { //大きさを乗算
 			value[0] = (1.0 - t) + value[0] * t;
 			for (unsigned n(1); n < D; ++n) {
@@ -97,8 +98,8 @@ namespace TB {
 		// ノルム他
 		T Length2() const {
 			T l2(0);
-			for (auto& v : value) {
-				l2 += v * v;
+			for (unsigned n(0); n < D; ++n) {
+				l2 += value[n] * value[n];
 			}
 			return l2;
 		}
