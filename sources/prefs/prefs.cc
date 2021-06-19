@@ -28,7 +28,7 @@
 #include <syslog.h>
 
 #include <toolbox/prefs.h>
-#include <toolbox/complex/complex.h>
+#include <toolbox/geometry/vector.h>
 #include <toolbox/string.h>
 
 
@@ -206,7 +206,8 @@ namespace TB{
 
 	/** 型ごとの=演算子
 	 */
-	template<> void Prefs<VECTOR<3> >::operator=(const char* v){ //TODO:VECTORへ移動
+	template <> void
+	Prefs<Vector<3, double>>::operator=(const char* v) { // TODO:Vectorへ移動
 		for(unsigned n(0); n < 3; ++n){
 			body[n] = strtod(v, const_cast<char**>(&v));
 		}
