@@ -18,6 +18,45 @@
  */
 #include <toolbox/geometry/complex.h>
 
+#include <math.h>
 
 
-namespace TB {}
+
+namespace {
+
+	// ベクトルfrom→toの四元数を求める
+	template <typename T> void
+	Diff(T (&r)[4], const TB::Vector<3, T>& from, const TB::Vector<3, T>& to) {
+		TB::Vector<3, T> ff(from);
+		TB::Vector<3, T> tt(to);
+		ff.Normalize();
+		tt.Normalize();
+
+		const T in(tt * ff); //内積(差分の回転角)
+		TB::Vector<3, T> ex(tt.Cross(ff)); //外積(差分の回転軸)
+
+		const T c(sqrt(0.5 * (1 + in)));
+		const T s(sqrt(0.5 * (1 - in)));
+
+		r[0] = c; //実部はc
+		for (unsigned n(1); n < 4; ++n) {
+			r[n] = s * ex[n];
+		}
+	}
+
+}
+
+namespace TB {
+
+	template <> Complex<4, float>::Complex(
+		const TB::Vector<3, float>& from, const TB::Vector<3, float>& to) {
+		Diff(value, from, to);
+		Normalize();
+	}
+	template <> Complex<4, double>::Complex(
+		const TB::Vector<3, double>& from, const TB::Vector<3, double>& to) {
+		Diff(value, from, to);
+		Normalize();
+	}
+
+}

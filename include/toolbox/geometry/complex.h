@@ -22,6 +22,8 @@
  */
 #pragma once
 
+#include <toolbox/geometry/vector.h>
+
 
 
 namespace TB {
@@ -49,6 +51,11 @@ namespace TB {
 			}
 		};
 		template <typename U> Complex(const Complex<D, U>& o) { *this = o; };
+
+		// ベクトルfrom→toの四元数を求める
+		Complex(const Vector<D - 1, T>& from, const Vector<D - 1, T>& to);
+
+
 
 		// 演算子
 		void Normalize() {
