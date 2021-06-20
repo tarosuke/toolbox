@@ -20,6 +20,7 @@
 
 #include <toolbox/tg/widget.h>
 #include <toolbox/input/input.h>
+#include <toolbox/tg/widget/cursor.h>
 
 
 
@@ -55,6 +56,10 @@ namespace TG {
 			void Draw() final;
 			void Traw() final;
 		} bridge;
+
+		// カーソル関連
+		static Cursor::TrawHandler trawCursor;
+		static void DummyTrawCursor(Cursor::State){};
 
 		//入力関連
 		TB::Vector<2, float> pointer;

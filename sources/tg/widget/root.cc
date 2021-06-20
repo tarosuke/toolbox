@@ -29,6 +29,7 @@ namespace TG {
 	const float RootWidget::navigationRadious(1000);
 	const TB::Rect<2, float> RootWidget::viewRect(
 		TB::Vector<2, float>({-1, -1}), TB::Vector<2, float>({1, 1}));
+	Cursor::TrawHandler RootWidget::trawCursor(DummyTrawCursor);
 
 
 	void RootWidget::Tick() {
@@ -80,23 +81,32 @@ namespace TG {
 			(*found.widget).OnButton((const PointerEvent){found.where, button});
 		}
 
-		// Enter/Leave
+		// ポインタ移動イベント
 		if (found.widget != prev.widget) {
-			// Leave
+			// Enter/Leave
 			if (prev.widget) {
+				// Leave
 				(*prev.widget)
 					.AtPointerLeave((const PointerEvent){prev.where, button});
 			}
-			// Enter
 			if (found.widget) {
+				// Enter
 				(*found.widget)
 					.AtPointerEnter((const PointerEvent){found.where, button});
+			} else {
+				// カーソルは「地べた」
+				trawCursor = Cursor::Traw;
+				Cursor::SetPosition(pointer);
 			}
 		} else if (prev.where != found.where) {
-			// Move
+			// 単純移動
 			if (found.widget) {
+				// Move
 				(*found.widget)
 					.AtPointerMove((const PointerEvent){found.where, button});
+			} else {
+				// カーソルの場所更新
+				Cursor::SetPosition(pointer);
 			}
 		}
 
@@ -118,6 +128,7 @@ namespace TG {
 		glScalef(1, 1, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
 		root.Traw(viewRect);
+		(*trawCursor)(Cursor::none);
 		glPopMatrix();
 	}
 

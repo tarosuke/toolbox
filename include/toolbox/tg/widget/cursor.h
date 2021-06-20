@@ -38,6 +38,7 @@ namespace TG {
 			arrow,
 			busy,
 		};
+		using TrawHandler = void (*)(State);
 
 		// 新しいのをNewできたら古いのは置き換えられる
 		static void New(const char* path);
