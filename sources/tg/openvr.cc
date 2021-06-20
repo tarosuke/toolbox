@@ -146,9 +146,11 @@ namespace TG {
 		vr::IVRSystem& hmd, vr::EVREye eye, TB::Framebuffer::Size& size)
 		: side(eye), framebuffer(size),
 		  projecionMatrix(hmd.GetProjectionMatrix(side, nearClip, farClip)),
-		  eye2HeadMatrix(hmd.GetEyeToHeadTransform(side)),
+		  eye2HeadMatrix(hmd.GetEyeToHeadTransform(eye)),
 		  fbFeature((vr::Texture_t){
 			  (void*)(uintptr_t)framebuffer.GetColorBufferID(),
 			  vr::TextureType_OpenGL,
-			  vr::ColorSpace_Gamma}) {}
+			  vr::ColorSpace_Gamma}) {
+		eye2HeadMatrix.InvertAffine();
+	}
 }
