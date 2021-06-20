@@ -40,11 +40,7 @@ namespace TG {
 
 		//ボタン状態
 		struct ButtonState {
-			void operator=(unsigned newState) {
-				pressed = newState & ~state;
-				released = ~newState & state;
-				state = newState;
-			};
+			void Clear() { pressed = released = 0; };
 			unsigned state;
 			unsigned pressed;
 			unsigned released;
