@@ -118,14 +118,14 @@ namespace TG {
 
 	void RootWidget::Bridge::Draw() {
 		glPushMatrix();
-		glScalef(1, 1, -1);
+		glScalef(0.01, 0.01, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
 		root.Draw(viewRect);
 		glPopMatrix();
 	}
 	void RootWidget::Bridge::Traw() {
 		glPushMatrix();
-		glScalef(1, 1, -1);
+		glScalef(0.01, 0.01, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
 		root.Traw(viewRect);
 		(*trawCursor)(Cursor::none);
