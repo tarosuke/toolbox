@@ -26,13 +26,22 @@
 
 namespace TG {
 
-	const float RootWidget::navigationRadious(1);
+	const float RootWidget::navigationRadious(1000);
 	const TB::Rect<2, float> RootWidget::viewRect(
 		TB::Vector<2, float>({-1, -1}), TB::Vector<2, float>({1, 1}));
 
 
 	void RootWidget::Tick() {
 		//注視点計算
+		CalcLoockingPoint();
+
+		// sub窓へ処理を渡す
+		Widget::Tick();
+
+		EmitEvent();
+	}
+
+	void RootWidget::CalcLoockingPoint() {
 		const auto& pose(Scene::GetHeadPose());
 
 		TB::Matrix<1, 4, float> front((const float[]){0.0f, 0.0f, 1.0f, 0.0f});
@@ -50,18 +59,10 @@ namespace TG {
 		lookingPoint = {
 			(x * l2) / (z2 * len2 + offset),
 			(y * l2) / (z2 * len2 + offset)};
-
-		// sub窓へ処理を渡す
-		Widget::Tick();
-
-		EmitEvent(TB::Vector<2, float>(), 0); // TODO:マウスの状態を引数に
 	}
-
-	void RootWidget::EmitEvent(
-		const TB::Vector<2, float>& diff, unsigned buttonState) {
-		//状態更新
-		button = buttonState;
-		pointer += diff;
+	void RootWidget::EmitEvent() {
+		//入力状態取得
+		GetInput();
 
 		//ポインタが画面外に出るのを防ぐ
 		TB::Vector<2, float> pointerPosition(pointer - lookingPoint);
@@ -101,6 +102,7 @@ namespace TG {
 
 		//値の更新
 		prev = found;
+		button.Clear();
 	}
 
 
@@ -120,11 +122,23 @@ namespace TG {
 	}
 
 
-	//入力
+	// inputデバイスからの入力
 	void RootWidget::OnKeyDown(unsigned key){};
 	void RootWidget::OnKeyUp(unsigned key){};
 	void RootWidget::OnKeyRepeat(unsigned key){};
-	void RootWidget::OnButtonDown(unsigned button){};
-	void RootWidget::OnButtonUp(unsigned button){};
-	void RootWidget::OnMouseMove(unsigned axis, int diff){};
+	void RootWidget::OnButtonDown(unsigned b) {
+		const unsigned p(1U << b);
+		button.pressed |= p;
+		button.state |= p;
+	};
+	void RootWidget::OnButtonUp(unsigned b) {
+		const unsigned p(1U << b);
+		button.released |= p;
+		button.state &= ~p;
+	};
+	void RootWidget::OnMouseMove(unsigned axis, int diff) {
+		if (axis < 2) {
+			pointer[axis] += diff;
+		}
+	};
 }

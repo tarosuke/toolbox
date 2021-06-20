@@ -11,7 +11,7 @@ all: $(target)
 
 COPTS ?= -Iinclude -I/usr/include/gdbm
 
-COPTS += -O3 -Wall -Werror -g -IX11
+COPTS += -O0 -Wall -Werror -g -IX11
 CCOPTS += $(COPTS) -std=c++11
 
 suffixes := %.c %.cc %.glsl

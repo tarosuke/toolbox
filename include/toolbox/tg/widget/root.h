@@ -37,12 +37,10 @@ namespace TG {
 		static const TB::Rect<2, float> viewRect;
 
 		TB::Vector<2, float> lookingPoint;
-		TB::Vector<2, float> pointer;
-		ButtonState button;
 		Found prev;
 
 		void Tick() final;
-		void EmitEvent(const TB::Vector<2, float>&, unsigned);
+		void CalcLoockingPoint();
 
 		// Widgetを使わない時に何もリンクしないようにするための折り返し点
 		class Bridge : Scene::Object {
@@ -58,7 +56,10 @@ namespace TG {
 			void Traw() final;
 		} bridge;
 
-		//入力ハンドラ
+		//入力関連
+		TB::Vector<2, float> pointer;
+		ButtonState button;
+		void EmitEvent();
 		void OnKeyDown(unsigned key) final;
 		void OnKeyUp(unsigned key) final;
 		void OnKeyRepeat(unsigned key) final;
