@@ -20,8 +20,8 @@ int main() {
 		} scene;
 		TG::RootWidget root;
 		TG::BorderWidget borderWidget(
-			(const float[3]){-0.5f, -0.5f, 1.0f},
-			(const unsigned[2]){1U, 1U},
+			(const float[3]){-50.0f, -50.0f, 1.0f},
+			(const unsigned[2]){100U, 100U},
 			0x55333322);
 		TG::Cursor::New("data/cursor.png");
 		scene.RegisterScenery(TG::Scenery::New(
