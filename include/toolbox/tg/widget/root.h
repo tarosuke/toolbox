@@ -34,6 +34,7 @@ namespace TG {
 		RootWidget() : Widget(0), Input(false), bridge(*this){};
 
 	private:
+		static const float scale;
 		static const float navigationRadious;
 		static const TB::Rect<2, float> viewRect;
 

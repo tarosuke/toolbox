@@ -26,9 +26,10 @@
 
 namespace TG {
 
+	const float RootWidget::scale(0.01); // mators per pixel
 	const float RootWidget::navigationRadious(1000);
 	const TB::Rect<2, float> RootWidget::viewRect(
-		TB::Vector<2, float>({-1, -1}), TB::Vector<2, float>({1, 1}));
+		TB::Vector<2, float>({-100, -100}), TB::Vector<2, float>({100, 100}));
 	Cursor::TrawHandler RootWidget::trawCursor(DummyTrawCursor);
 
 
@@ -118,14 +119,14 @@ namespace TG {
 
 	void RootWidget::Bridge::Draw() {
 		glPushMatrix();
-		glScalef(0.01, 0.01, -1);
+		glScalef(scale, scale, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
 		root.Draw(viewRect);
 		glPopMatrix();
 	}
 	void RootWidget::Bridge::Traw() {
 		glPushMatrix();
-		glScalef(0.01, 0.01, -1);
+		glScalef(scale, scale, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
 		root.Traw(viewRect);
 		(*trawCursor)(Cursor::none);
