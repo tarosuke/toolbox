@@ -19,28 +19,30 @@
 #pragma once
 
 #include <toolbox/tg/widget.h>
+#include <toolbox/input/input.h>
+#include <toolbox/tg/widget/cursor.h>
 
 
 
 namespace TG {
-	class RootWidget : Widget {
+
+	class RootWidget : Widget, TB::Input {
 		RootWidget(const RootWidget&);
 		void operator=(const RootWidget&);
 
 	public:
-		RootWidget() : Widget(0), bridge(*this){};
+		RootWidget() : Widget(0), Input(false), bridge(*this){};
 
 	private:
+		static const float scale;
 		static const float navigationRadious;
 		static const TB::Rect<2, float> viewRect;
 
 		TB::Vector<2, float> lookingPoint;
-		TB::Vector<2, float> pointer;
-		ButtonState button;
 		Found prev;
 
 		void Tick() final;
-		void EmitEvent(const TB::Vector<2, float>&, unsigned);
+		void CalcLoockingPoint();
 
 		// Widgetを使わない時に何もリンクしないようにするための折り返し点
 		class Bridge : Scene::Object {
@@ -55,5 +57,21 @@ namespace TG {
 			void Draw() final;
 			void Traw() final;
 		} bridge;
+
+		// カーソル関連
+		static Cursor::TrawHandler trawCursor;
+		static void DummyTrawCursor(Cursor::State){};
+
+		//入力関連
+		TB::Vector<2, float> pointer;
+		ButtonState button;
+		bool moved;
+		void EmitEvent();
+		void OnKeyDown(unsigned key) final;
+		void OnKeyUp(unsigned key) final;
+		void OnKeyRepeat(unsigned key) final;
+		void OnButtonDown(unsigned) final;
+		void OnButtonUp(unsigned) final;
+		void OnMouseMove(unsigned, int) final;
 	};
 }

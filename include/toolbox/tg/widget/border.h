@@ -71,7 +71,7 @@ namespace TG {
 
 		// カーソル関連
 		Cursor::State state;
-		void (*trawCursor)(Cursor::State);
+		Cursor::TrawHandler trawCursor;
 		static void DummyDrawCursor(Cursor::State){};
 	};
 }

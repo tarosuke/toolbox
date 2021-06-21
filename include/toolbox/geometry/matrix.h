@@ -71,7 +71,7 @@ namespace TB{
 				m[n][n] = 1;
 			}
 		};
-		void Transpose(const T o[COL][ROW]){
+		void Transpose(const T (&o)[COL][ROW]) {
 			T* d(raw);
 			for(unsigned x(0); x < COL; ++x){
 				for(unsigned y(0); y < ROW; ++y){
@@ -79,7 +79,7 @@ namespace TB{
 				}
 			}
 		};
-		void TransposeAffine(const T o[COL - 1][ROW]) {
+		void TransposeAffine(const T (&o)[COL - 1][ROW]) {
 			T* d(raw);
 			for(unsigned x(0); x < ROW; ++x){
 				for(unsigned y(0); y < COL - 1; ++y){

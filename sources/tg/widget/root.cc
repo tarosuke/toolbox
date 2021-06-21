@@ -26,13 +26,24 @@
 
 namespace TG {
 
-	const float RootWidget::navigationRadious(1);
+	const float RootWidget::scale(0.01); // mators per pixel
+	const float RootWidget::navigationRadious(1000);
 	const TB::Rect<2, float> RootWidget::viewRect(
-		TB::Vector<2, float>({-1, -1}), TB::Vector<2, float>({1, 1}));
+		TB::Vector<2, float>({-100, -100}), TB::Vector<2, float>({100, 100}));
+	Cursor::TrawHandler RootWidget::trawCursor(DummyTrawCursor);
 
 
 	void RootWidget::Tick() {
 		//注視点計算
+		CalcLoockingPoint();
+
+		// sub窓へ処理を渡す
+		Widget::Tick();
+
+		EmitEvent();
+	}
+
+	void RootWidget::CalcLoockingPoint() {
 		const auto& pose(Scene::GetHeadPose());
 
 		TB::Matrix<1, 4, float> front((const float[]){0.0f, 0.0f, 1.0f, 0.0f});
@@ -50,18 +61,10 @@ namespace TG {
 		lookingPoint = {
 			(x * l2) / (z2 * len2 + offset),
 			(y * l2) / (z2 * len2 + offset)};
-
-		// sub窓へ処理を渡す
-		Widget::Tick();
-
-		EmitEvent(TB::Vector<2, float>(), 0); // TODO:マウスの状態を引数に
 	}
-
-	void RootWidget::EmitEvent(
-		const TB::Vector<2, float>& diff, unsigned buttonState) {
-		//状態更新
-		button = buttonState;
-		pointer += diff;
+	void RootWidget::EmitEvent() {
+		//入力状態取得
+		GetInput();
 
 		//ポインタが画面外に出るのを防ぐ
 		TB::Vector<2, float> pointerPosition(pointer - lookingPoint);
@@ -72,50 +75,84 @@ namespace TG {
 
 		//ポインタがある窓を探す
 		auto const found(
-			Find((const Query){lookingPoint, pointer, viewRect, FLT_MAX}));
+			Find((const Query){lookingPoint, pointer, viewRect, 0}));
 
 		//ボタンイベント
 		if (found.widget && (button.pressed || button.released)) {
 			(*found.widget).OnButton((const PointerEvent){found.where, button});
 		}
 
-		// Enter/Leave
+		// ポインタ移動イベント
 		if (found.widget != prev.widget) {
-			// Leave
+			// Enter/Leave
 			if (prev.widget) {
+				// Leave
 				(*prev.widget)
 					.AtPointerLeave((const PointerEvent){prev.where, button});
 			}
-			// Enter
 			if (found.widget) {
+				// Enter
 				(*found.widget)
 					.AtPointerEnter((const PointerEvent){found.where, button});
+			} else {
+				// カーソルは「地べた」
+				trawCursor = Cursor::Traw;
+				Cursor::SetPosition(pointer);
 			}
-		} else if (prev.where != found.where) {
-			// Move
+		} else if (moved) {
+			// 単純移動
 			if (found.widget) {
+				// Move
 				(*found.widget)
 					.AtPointerMove((const PointerEvent){found.where, button});
+			} else {
+				// 「地べた」にいるカーソルの場所更新
+				Cursor::SetPosition(pointer);
 			}
 		}
 
 		//値の更新
 		prev = found;
+		button.Clear();
+		moved = false;
 	}
 
 
 	void RootWidget::Bridge::Draw() {
 		glPushMatrix();
-		glScalef(1, 1, -1);
+		glScalef(scale, scale, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
 		root.Draw(viewRect);
 		glPopMatrix();
 	}
 	void RootWidget::Bridge::Traw() {
 		glPushMatrix();
-		glScalef(1, 1, -1);
+		glScalef(scale, scale, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
 		root.Traw(viewRect);
+		(*trawCursor)(Cursor::none);
 		glPopMatrix();
 	}
+
+
+	// inputデバイスからの入力
+	void RootWidget::OnKeyDown(unsigned key){};
+	void RootWidget::OnKeyUp(unsigned key){};
+	void RootWidget::OnKeyRepeat(unsigned key){};
+	void RootWidget::OnButtonDown(unsigned b) {
+		const unsigned p(1U << b);
+		button.pressed |= p;
+		button.state |= p;
+	};
+	void RootWidget::OnButtonUp(unsigned b) {
+		const unsigned p(1U << b);
+		button.released |= p;
+		button.state &= ~p;
+	};
+	void RootWidget::OnMouseMove(unsigned axis, int diff) {
+		if (axis < 2) {
+			pointer[axis] += diff;
+		}
+		moved = true;
+	};
 }

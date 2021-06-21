@@ -1,6 +1,9 @@
 #include <toolbox/tg/glx.h>
 #include <toolbox/tg/x.h>
 #include <toolbox/tg/scenery.h>
+#include <toolbox/tg/widget/root.h>
+#include <toolbox/tg/widget/border.h>
+#include <toolbox/tg/widget/cursor.h>
 
 #include <assert.h>
 #include <unistd.h>
@@ -36,6 +39,12 @@ int main() {
 		"sky-5ac85ff2676e48.2605566015230812024237.png"));
 
 	assert(window.IsReady());
+	TG::RootWidget root;
+	TG::BorderWidget borderWidget(
+		(const float[3]){-50.0f, -50.0f, 1.0f},
+		(const unsigned[2]){100U, 100U},
+		0x55333322);
+	TG::Cursor::New("data/cursor.png");
 	window.Run();
 	return 0;
 }

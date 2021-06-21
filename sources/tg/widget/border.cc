@@ -89,7 +89,7 @@ namespace TG {
 		trawCursor = DummyDrawCursor;
 
 		//通常のイベント処理
-		OnPointerEnter(e);
+		OnPointerLeave(e);
 	}
 	void BorderWidget::AtPointerMove(const PointerEvent& e) {
 		//カーソル移動
