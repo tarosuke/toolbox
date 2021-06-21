@@ -75,7 +75,7 @@ namespace TG {
 
 		//ポインタがある窓を探す
 		auto const found(
-			Find((const Query){lookingPoint, pointer, viewRect, FLT_MAX}));
+			Find((const Query){lookingPoint, pointer, viewRect, 0}));
 
 		//ボタンイベント
 		if (found.widget && (button.pressed || button.released)) {
@@ -99,14 +99,14 @@ namespace TG {
 				trawCursor = Cursor::Traw;
 				Cursor::SetPosition(pointer);
 			}
-		} else if (prev.where != found.where) {
+		} else if (moved) {
 			// 単純移動
 			if (found.widget) {
 				// Move
 				(*found.widget)
 					.AtPointerMove((const PointerEvent){found.where, button});
 			} else {
-				// カーソルの場所更新
+				// 「地べた」にいるカーソルの場所更新
 				Cursor::SetPosition(pointer);
 			}
 		}
@@ -114,6 +114,7 @@ namespace TG {
 		//値の更新
 		prev = found;
 		button.Clear();
+		moved = false;
 	}
 
 
@@ -152,5 +153,6 @@ namespace TG {
 		if (axis < 2) {
 			pointer[axis] += diff;
 		}
+		moved = true;
 	};
 }

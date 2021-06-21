@@ -23,10 +23,13 @@
 #include <errno.h>
 
 #include <toolbox/input/input.h>
+#include <toolbox/type.h>
 
 
 
 namespace TB {
+
+	const int Input::relDirs[] = {1, -1, 1, 1, 1, 1, 1, 1};
 
 	Input::Input(bool grab) {
 		for (unsigned n(0);; ++n) {
@@ -60,7 +63,7 @@ namespace TB {
 	Input::Event::~Event() { ioctl(fd, EVIOCGRAB, 0); }
 	void Input::Event::GetInput() {
 		input_event ev;
-		if (sizeof(ev) == read(fd, &ev, sizeof(ev))) {
+		while (sizeof(ev) == read(fd, &ev, sizeof(ev))) {
 			switch (ev.type) {
 			case EV_KEY:
 				switch (ev.code & 0xfff0) {
@@ -90,8 +93,8 @@ namespace TB {
 				}
 				break;
 			case EV_REL:
-				if (ev.code < 3) {
-					input.OnMouseMove(ev.code, ev.value);
+				if (ev.code < elementsOf(relDirs)) {
+					input.OnMouseMove(ev.code, relDirs[ev.code] * ev.value);
 				}
 				break;
 			default:

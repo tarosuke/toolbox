@@ -52,6 +52,7 @@ namespace TB {
 		virtual void OnMouseMove(unsigned axis, int diff){};
 
 	private:
+		static const int relDirs[];
 		class Event : public List<Event>::Node {
 		public:
 			Event(Input&, int fd, bool grab);

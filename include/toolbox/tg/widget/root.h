@@ -65,6 +65,7 @@ namespace TG {
 		//入力関連
 		TB::Vector<2, float> pointer;
 		ButtonState button;
+		bool moved;
 		void EmitEvent();
 		void OnKeyDown(unsigned key) final;
 		void OnKeyUp(unsigned key) final;
