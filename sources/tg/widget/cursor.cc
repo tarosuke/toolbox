@@ -40,18 +40,18 @@ namespace TG {
 			TB::Texture::Binder b((*instance).texture);
 			glColor3f(1, 1, 1);
 			glPushMatrix();
-			glTranslatef(position[0], position[1], 0);
+			glTranslatef(position[0], position[1], -0.1);
 			glBegin(GL_TRIANGLE_FAN);
 			glTexCoord2f(lt[0], lt[1] + (*instance).coordsSize[1]);
-			glVertex3f(-0.16, -0.16, -0.001);
+			glVertex2i(-16, -16);
 			glTexCoord2f(
 				lt[0] + (*instance).coordsSize[0],
 				lt[1] + (*instance).coordsSize[1]);
-			glVertex3f(0.16, -0.16, -0.001);
+			glVertex2i(16, -16);
 			glTexCoord2f(lt[0] + (*instance).coordsSize[0], lt[1]);
-			glVertex3f(0.16, 0.16, -0.001);
+			glVertex2i(16, 16);
 			glTexCoord2f(lt[0], lt[1]);
-			glVertex3f(-0.16, 0.16, -0.001);
+			glVertex2i(-16, 16);
 			glEnd();
 			glPopMatrix();
 		}

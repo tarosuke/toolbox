@@ -26,9 +26,10 @@
 
 namespace TG {
 
+	const float RootWidget::scale(0.01); // mators per pixel
 	const float RootWidget::navigationRadious(1000);
 	const TB::Rect<2, float> RootWidget::viewRect(
-		TB::Vector<2, float>({-1, -1}), TB::Vector<2, float>({1, 1}));
+		TB::Vector<2, float>({-100, -100}), TB::Vector<2, float>({100, 100}));
 	Cursor::TrawHandler RootWidget::trawCursor(DummyTrawCursor);
 
 
@@ -74,7 +75,7 @@ namespace TG {
 
 		//ポインタがある窓を探す
 		auto const found(
-			Find((const Query){lookingPoint, pointer, viewRect, FLT_MAX}));
+			Find((const Query){lookingPoint, pointer, viewRect, 0}));
 
 		//ボタンイベント
 		if (found.widget && (button.pressed || button.released)) {
@@ -98,14 +99,14 @@ namespace TG {
 				trawCursor = Cursor::Traw;
 				Cursor::SetPosition(pointer);
 			}
-		} else if (prev.where != found.where) {
+		} else if (moved) {
 			// 単純移動
 			if (found.widget) {
 				// Move
 				(*found.widget)
 					.AtPointerMove((const PointerEvent){found.where, button});
 			} else {
-				// カーソルの場所更新
+				// 「地べた」にいるカーソルの場所更新
 				Cursor::SetPosition(pointer);
 			}
 		}
@@ -113,19 +114,20 @@ namespace TG {
 		//値の更新
 		prev = found;
 		button.Clear();
+		moved = false;
 	}
 
 
 	void RootWidget::Bridge::Draw() {
 		glPushMatrix();
-		glScalef(1, 1, -1);
+		glScalef(scale, scale, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
 		root.Draw(viewRect);
 		glPopMatrix();
 	}
 	void RootWidget::Bridge::Traw() {
 		glPushMatrix();
-		glScalef(1, 1, -1);
+		glScalef(scale, scale, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
 		root.Traw(viewRect);
 		(*trawCursor)(Cursor::none);
@@ -151,5 +153,6 @@ namespace TG {
 		if (axis < 2) {
 			pointer[axis] += diff;
 		}
+		moved = true;
 	};
 }
