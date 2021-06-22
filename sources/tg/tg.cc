@@ -114,10 +114,10 @@ namespace TG {
 		}
 		objects.Reveach(&Object::Traw);
 
+		glLoadIdentity();
 		if (rootWidget) {
 			(*rootWidget).Traw();
 		}
-		glLoadIdentity();
 		stickies.Reveach(&Object::Traw);
 	}
 }
