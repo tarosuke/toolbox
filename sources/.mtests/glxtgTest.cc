@@ -41,7 +41,7 @@ int main() {
 	assert(window.IsReady());
 	TG::RootWidget root;
 	TG::BorderWidget borderWidget(
-		(const float[3]){-50.0f, -50.0f, 1.0f},
+		(const float[3]){-50.0f, -50.0f, 0.8},
 		(const unsigned[2]){100U, 100U},
 		0x55333322);
 	TG::Cursor::New("data/cursor.png");
