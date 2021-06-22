@@ -92,6 +92,7 @@ namespace TG {
 			}
 			if (found.widget) {
 				// Enter
+				trawCursor = DummyTrawCursor;
 				(*found.widget)
 					.AtPointerEnter((const PointerEvent){found.where, button});
 			} else {
@@ -121,16 +122,16 @@ namespace TG {
 	void RootWidget::Bridge::Draw() {
 		glPushMatrix();
 		glScalef(scale, scale, -1);
-		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
+		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 1.0f);
 		root.Draw(viewRect);
 		glPopMatrix();
 	}
 	void RootWidget::Bridge::Traw() {
 		glPushMatrix();
 		glScalef(scale, scale, -1);
-		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0);
+		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 1.0f);
 		root.Traw(viewRect);
-		(*trawCursor)(Cursor::none);
+		(*trawCursor)(Cursor::none); //地べたカーソル描画
 		glPopMatrix();
 	}
 
