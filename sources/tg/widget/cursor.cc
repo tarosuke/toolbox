@@ -40,7 +40,7 @@ namespace TG {
 			TB::Texture::Binder b((*instance).texture);
 			glColor3f(1, 1, 1);
 			glPushMatrix();
-			glTranslatef(position[0], position[1], -0.1);
+			glTranslatef(position[0], position[1], -0.001);
 			glBegin(GL_TRIANGLE_FAN);
 			glTexCoord2f(lt[0], lt[1] + (*instance).coordsSize[1]);
 			glVertex2i(-16, -16);
