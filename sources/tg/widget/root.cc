@@ -122,15 +122,16 @@ namespace TG {
 	void RootWidget::Bridge::Draw() {
 		glPushMatrix();
 		glScalef(scale, scale, -1);
-		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 1.0f);
+		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0.0f);
 		root.Draw(viewRect);
 		glPopMatrix();
 	}
 	void RootWidget::Bridge::Traw() {
 		glPushMatrix();
 		glScalef(scale, scale, -1);
-		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 1.0f);
+		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0.0f);
 		root.Traw(viewRect);
+		glTranslatef(0, 0, 1);
 		(*trawCursor)(Cursor::none); //地べたカーソル描画
 		glPopMatrix();
 	}
