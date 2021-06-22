@@ -18,6 +18,7 @@
  */
 #include <float.h>
 #include <math.h>
+#include <stdio.h>
 
 #include <toolbox/tg/widget/root.h>
 #include <toolbox/gl/gl.h>
@@ -26,7 +27,8 @@
 
 namespace TG {
 
-	const float RootWidget::scale(0.01); // mators per pixel
+	const float RootWidget::scale(0.005); // mators per pixel
+	const float RootWidget::virtualDistance(0.5); // small makes slow at center
 	const float RootWidget::navigationRadious(1000);
 	const TB::Rect<2, float> RootWidget::viewRect(
 		TB::Vector<2, float>({-100, -100}), TB::Vector<2, float>({100, 100}));
@@ -46,21 +48,21 @@ namespace TG {
 	void RootWidget::CalcLoockingPoint() {
 		const auto& pose(Scene::GetHeadPose());
 
-		TB::Matrix<1, 4, float> front((const float[]){0.0f, 0.0f, 1.0f, 0.0f});
-		TB::Matrix<1, 4, float> point(pose * front);
+		// 「前」をモデル系で回す
+		TB::Vector<3, float> front(
+			(const float[]){0.0f, 0.0f, virtualDistance});
+		front = pose * front;
 
 		//後ろ半分は使えないので角度を半分にする
-		const float x(point[0][0]);
-		const float y(point[0][1]);
+		const float x(front[0]);
+		const float y(front[1]);
 		const float len2(sqrtf(x * x + y * y));
-		const float a2(atan2f(len2, point[0][2]) * 0.5); //半分の角度
+		const float a2(atan2f(len2, front[2]) * 0.5); //半分の角度
 		const float l2(sinf(a2));
 		const float z2(cosf(a2));
 
-		static const float offset(0.01);
-		lookingPoint = {
-			(x * l2) / (z2 * len2 + offset),
-			(y * l2) / (z2 * len2 + offset)};
+		const float distance(l2 / (z2 + 0.001));
+		lookingPoint = {distance * x / len2, distance * y / len2};
 	}
 	void RootWidget::EmitEvent() {
 		//入力状態取得
@@ -121,15 +123,15 @@ namespace TG {
 
 	void RootWidget::Bridge::Draw() {
 		glPushMatrix();
-		glScalef(scale, scale, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0.0f);
+		glScalef(scale, scale, -1);
 		root.Draw(viewRect);
 		glPopMatrix();
 	}
 	void RootWidget::Bridge::Traw() {
 		glPushMatrix();
-		glScalef(scale, scale, -1);
 		glTranslatef(root.lookingPoint[0], root.lookingPoint[1], 0.0f);
+		glScalef(scale, scale, -1);
 		root.Traw(viewRect);
 		glTranslatef(0, 0, 1);
 		(*trawCursor)(Cursor::none); //地べたカーソル描画

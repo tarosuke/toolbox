@@ -35,6 +35,7 @@ namespace TG {
 
 	private:
 		static const float scale;
+		static const float virtualDistance;
 		static const float navigationRadious;
 		static const TB::Rect<2, float> viewRect;
 
