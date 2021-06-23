@@ -25,16 +25,19 @@ namespace TB {
 	template <unsigned D, typename T> class Spread {
 	public:
 		//型違い配列からコピー
-		template <typename U> void operator=(const U (&o)[D]) {
+		template <typename U> const Spread& operator=(const U (&o)[D]) {
 			for (unsigned n(0); n < D; ++n) {
 				value[n] = (T)o[n];
 			}
+			return *this;
 		};
 		//型違い、次元違い配列からコピー
-		template <unsigned E, typename U> void operator=(const U (&o)[E]) {
+		template <unsigned E, typename U>
+		const Spread& operator=(const U (&o)[E]) {
 			for (unsigned n(0); n < D; ++n) {
 				value[n] = n < E ? (T)o[n] : 0;
 			}
+			return *this;
 		};
 
 		//コピーコンストラクタ

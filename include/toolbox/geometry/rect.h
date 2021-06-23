@@ -29,10 +29,22 @@ namespace TB{
 	public:
 		Rect(){};
 
-		Rect(const Vector<D, T>& a, const Vector<D, T>& b)
+		// コンストラクタ
+		template <unsigned E, typename U>
+		Rect(const Vector<E, U>& a, const Vector<E, U>& b)
 			: points((const Vector<D, T>[]){Less(a, b), More(a, b)}){};
-		Rect(const Vector<D, T>& p, const Spread<D, T>& s)
+		template <unsigned E, typename U>
+		Rect(const Vector<E, U>& p, const Spread<E, U>& s)
 			: Rect(p, p + Vector<D, T>({s[0], s[1]})){};
+
+		// コピー
+		template <unsigned E, typename U>
+		const Rect& operator=(const Rect<E, U>& o) {
+			points[0] = o.points[0];
+			points[1] = o.points[1];
+		};
+
+
 		void Clear() {
 			points[0].Clear();
 			points[1].Clear();
