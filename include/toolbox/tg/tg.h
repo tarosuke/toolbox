@@ -77,6 +77,8 @@ namespace TG {
 		TB::Matrix<4, 4, float> view;
 		virtual void Draw(const TB::Matrix<4, 4, float>&);
 		virtual bool Finish() = 0;
+		virtual void Tick(){};
+
 		static void SetHeadPose(const TB::Matrix<4, 4, float>& p) {
 			headPose = p;
 		};
