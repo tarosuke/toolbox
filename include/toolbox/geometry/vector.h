@@ -31,30 +31,34 @@ namespace TB{
 		};
 		operator const T*() const { return value; };
 
-
 		//型違いコピー
-		template <typename U> void operator=(const Vector<D, U>& t) {
+		template <typename U> const Vector& operator=(const Vector<D, U>& t) {
 			for (unsigned n(0); n < D; ++n) {
 				value[n] = (T)t[n];
 			}
+			return *this;
 		};
-		template <typename U> void operator=(const U (&v)[D]) {
+		template <typename U> const Vector& operator=(const U (&v)[D]) {
 			for (unsigned n(0); n < D; ++n) {
 				value[n] = (T)v[n];
 			}
+			return *this;
 		};
 
 		// 次元、型違いコピー
 		template <unsigned E, typename U>
-		void operator=(const Vector<E, U>& t) {
+		const Vector& operator=(const Vector<E, U>& t) {
 			for (unsigned n(0); n < D; ++n) {
 				value[n] = n < E ? (T)t[n] : 0;
 			}
+			return *this;
 		};
-		template <unsigned E, typename U> void operator=(const U (&v)[E]) {
+		template <unsigned E, typename U>
+		const Vector& operator=(const U (&v)[E]) {
 			for (unsigned n(0); n < D; ++n) {
 				value[n] = n < E ? (T)v[n] : 0;
 			}
+			return *this;
 		}
 
 		//コピーコンストラクタ
@@ -109,22 +113,22 @@ namespace TB{
 				value[n] -= t.value[n];
 			}
 		};
-		void operator*=(T t){
+		template <typename U> void operator*=(U t) {
 			for (unsigned n(0); n < D; ++n) {
 				value[n] *= t;
 			}
 		};
-		Vector operator*(T t){
+		template <typename U> Vector operator*(U t) const {
 			Vector v(*this);
 			v *= t;
 			return v;
 		};
-		void operator/=(T t){
+		template <typename U> void operator/=(U t) {
 			for (unsigned n(0); n < D; ++n) {
 				value[n] /= t;
 			}
 		};
-		Vector operator/(T t) {
+		template <typename U> Vector operator/(U t) const {
 			Vector v(*this);
 			v /= t;
 			return v;

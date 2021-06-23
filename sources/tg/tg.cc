@@ -82,6 +82,7 @@ namespace TG {
 			if (rootWidget) {
 				(*rootWidget).Tick();
 			}
+			Tick();
 		} while (Finish());
 	}
 

@@ -35,17 +35,19 @@ namespace TB{
 		const T* operator[](unsigned r) const { return m[r]; };
 
 		// 代入とコピーコンストラクタ
-		template <typename U> void operator=(const U (&o)[ROW][COL]) {
+		template <typename U> const Matrix& operator=(const U (&o)[ROW][COL]) {
 			for (unsigned r(0); 0 < ROW; ++r) {
 				for (unsigned c(0); c < COL; ++c) {
 					m[r][c] = (T)o[r][c];
 				}
 			}
+			return *this;
 		};
-		template <typename U> void operator=(const U (&o)[COL * ROW]) {
+		template <typename U> const Matrix& operator=(const U (&o)[COL * ROW]) {
 			for (unsigned n(0); n < COL * ROW; ++n) {
 				raw[n] = (T)o[n];
 			}
+			return *this;
 		};
 		template <typename U> Matrix(const U (&o)[ROW * COL]) { *this = o; };
 		template <typename U> Matrix(const U (&o)[ROW][COL]) { *this = o; };
