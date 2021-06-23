@@ -52,4 +52,14 @@ namespace TG {
 		Widget::Traw(vr - TB::Vector<2, float>(position));
 		glPopMatrix();
 	}
+
+	float PositionWidget::followRatio(1.9 / 3);
+	void PositionWidget::Tick() {
+		const TB::Vector<3, float> diff(targetPosition - position);
+		if (diff.Length2() < 1.0f) {
+			position = targetPosition;
+		} else {
+			position += (diff * followRatio);
+		}
+	}
 }

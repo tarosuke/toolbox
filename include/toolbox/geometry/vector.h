@@ -113,22 +113,22 @@ namespace TB{
 				value[n] -= t.value[n];
 			}
 		};
-		void operator*=(T t){
+		template <typename U> void operator*=(U t) {
 			for (unsigned n(0); n < D; ++n) {
 				value[n] *= t;
 			}
 		};
-		Vector operator*(T t){
+		template <typename U> Vector operator*(U t) const {
 			Vector v(*this);
 			v *= t;
 			return v;
 		};
-		void operator/=(T t){
+		template <typename U> void operator/=(U t) {
 			for (unsigned n(0); n < D; ++n) {
 				value[n] /= t;
 			}
 		};
-		Vector operator/(T t) {
+		template <typename U> Vector operator/(U t) const {
 			Vector v(*this);
 			v /= t;
 			return v;

@@ -30,11 +30,22 @@ namespace TG {
 
 	public:
 		PositionWidget(const TB::Vector<3, float>& p, Widget* super = 0)
-			: Widget(super), position(p){};
+			: Widget(super), position(p), targetPosition(p){};
+
+		template <unsigned E, typename U>
+		void MoveTo(const TB::Vector<E, U>& to) {
+			targetPosition = to;
+		};
+		template <unsigned E, typename U>
+		void JumpTo(const TB::Vector<E, U>& to) {
+			position = targetPosition = to;
+		};
+
 
 	protected:
 		TB::Vector<3, float> position;
 
+		void Tick() override;
 		void Draw(const TB::Rect<2, float>&) override;
 		void Traw(const TB::Rect<2, float>&) override;
 
@@ -42,5 +53,7 @@ namespace TG {
 		Query NewQuery(const Query&); //自座標系(みかけ)に変換
 
 	private:
+		static float followRatio;
+		TB::Vector<3, float> targetPosition;
 	};
 }
