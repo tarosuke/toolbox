@@ -29,7 +29,7 @@ int main() {
 		  unsigned height,
 		  const TG::Scene::Frustum& frustum)
 			: TG::GLXScene(display, width, height, 0, frustum){};
-		TG::PositionWidget* pw;
+		TG::Widget* pw;
 
 	private:
 		void HandleEvent(const XEvent& ev) final { Quit(); };

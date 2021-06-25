@@ -32,16 +32,6 @@ namespace TG {
 		PositionWidget(const TB::Vector<3, float>& p, Widget* super = 0)
 			: Widget(super), position(p), targetPosition(p){};
 
-		template <unsigned E, typename U>
-		void MoveTo(const TB::Vector<E, U>& to) {
-			targetPosition = to;
-		};
-		template <unsigned E, typename U>
-		void JumpTo(const TB::Vector<E, U>& to) {
-			position = targetPosition = to;
-		};
-
-
 	protected:
 		TB::Vector<3, float> position;
 
@@ -51,6 +41,14 @@ namespace TG {
 
 		Found Find(const Query&) override;
 		Query NewQuery(const Query&); //自座標系(みかけ)に変換
+
+		void MoveTo(const TB::Vector<3, float>& to) override {
+			targetPosition = to;
+		};
+		void JumpTo(const TB::Vector<3, float>& to) override {
+			position = targetPosition = to;
+		};
+		void DepthTo(float depth) { targetPosition[2] = depth; };
 
 	private:
 		static float followRatio;

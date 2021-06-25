@@ -28,7 +28,7 @@ int main() {
 				}
 				return true;
 			};
-			TG::PositionWidget* pw;
+			TG::Widget* pw;
 		} scene;
 		TG::RootWidget root;
 		TG::BorderWidget borderWidget(

@@ -32,12 +32,6 @@ namespace TG {
 		void operator=(const Widget&);
 
 	public:
-		//周期処理
-		virtual void Draw(const TB::Rect<2, float>&); //引数は視錐体
-		virtual void Traw(const TB::Rect<2, float>&);
-		virtual void Tick();
-		virtual ~Widget(){};
-
 		//ボタン状態
 		struct ButtonState {
 			void Clear() { pressed = released = 0; };
@@ -70,9 +64,20 @@ namespace TG {
 		virtual void OnResized(const TB::Vector<2, unsigned>& p){};
 		virtual bool MayClose() { return true; };
 
+		//コマンド
+		virtual void MoveTo(const TB::Vector<3, float>&){};
+		virtual void JumpTo(const TB::Vector<3, float>&){};
+		virtual void DepthTo(float depth){};
+
 	protected:
 		TB::List<Widget> subs;
 		Widget(Widget* super);
+
+		//周期処理
+		virtual void Draw(const TB::Rect<2, float>&); //引数は視錐体
+		virtual void Traw(const TB::Rect<2, float>&);
+		virtual void Tick();
+		virtual ~Widget(){};
 
 		//窓の距離を考慮して仮想位置にあるポインタにかかっているWidgetを返す
 		struct Query {
