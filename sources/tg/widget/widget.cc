@@ -17,8 +17,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <toolbox/tg/widget.h>
+#include <toolbox/tg/widget/root.h>
 
 #include <math.h>
+
 
 
 namespace TG {
@@ -34,9 +36,13 @@ namespace TG {
 			}
 			//親が指定されていないならrootが親
 			super = root;
+			//親へ登録してReDepth
+			(*super).subs.Insert(*this);
+			RootWidget::ReDepth();
+		} else {
+			//親へ登録
+			(*super).subs.Insert(*this);
 		}
-		//親へ登録
-		(*super).subs.Add(*this);
 	}
 
 	void Widget::Draw(const TB::Rect<2, float>& vr) {
