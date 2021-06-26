@@ -24,6 +24,8 @@
 namespace TG {
 
 	Widget* Widget::root(0);
+	const float Widget::baseDepth(1);
+	const float Widget::depthDiff(0.05);
 
 	Widget::Widget(Widget* super) {
 		if (!super) {
@@ -56,5 +58,12 @@ namespace TG {
 			}
 		}
 		return found;
+	}
+
+	void Widget::ReDepth() {
+		float d(baseDepth);
+		for (TB::List<Widget>::I i(subs); ++i; d += depthDiff) {
+			(*i).DepthTo(d);
+		}
 	}
 }

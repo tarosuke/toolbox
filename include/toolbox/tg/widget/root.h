@@ -32,6 +32,7 @@ namespace TG {
 
 	public:
 		RootWidget() : Widget(0), Input(false), bridge(*this){};
+		static void ReDepth() { (*root).ReDepth(); };
 
 	private:
 		static const float scale;

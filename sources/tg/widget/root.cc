@@ -34,7 +34,6 @@ namespace TG {
 		TB::Vector<2, float>({-100, -100}), TB::Vector<2, float>({100, 100}));
 	Cursor::TrawHandler RootWidget::trawCursor(DummyTrawCursor);
 
-
 	void RootWidget::Tick() {
 		//注視点計算
 		CalcLoockingPoint();
