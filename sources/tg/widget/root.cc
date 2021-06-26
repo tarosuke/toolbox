@@ -30,10 +30,11 @@ namespace TG {
 	const float RootWidget::scale(0.005); // mators per pixel
 	const float RootWidget::virtualDistance(0.5); // small makes slow at center
 	const float RootWidget::navigationRadious(1000);
+	const float RootWidget::baseDepth(1);
+	const float RootWidget::depthDiff(0.05);
 	const TB::Rect<2, float> RootWidget::viewRect(
 		TB::Vector<2, float>({-100, -100}), TB::Vector<2, float>({100, 100}));
 	Cursor::TrawHandler RootWidget::trawCursor(DummyTrawCursor);
-
 
 	void RootWidget::Tick() {
 		//注視点計算

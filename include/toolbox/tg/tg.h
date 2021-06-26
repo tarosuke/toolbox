@@ -76,8 +76,7 @@ namespace TG {
 	protected:
 		TB::Matrix<4, 4, float> view;
 		virtual void Draw(const TB::Matrix<4, 4, float>&);
-		virtual bool Finish() = 0;
-		virtual void Tick(){};
+		virtual bool Finish(unsigned tick) { return true; };
 
 		static void SetHeadPose(const TB::Matrix<4, 4, float>& p) {
 			headPose = p;
@@ -86,6 +85,7 @@ namespace TG {
 	private:
 		static TB::Matrix<4, 4, float> headPose;
 		static Object* rootWidget;
+		static unsigned tick;
 		TB::List<Object> stickies;
 		TB::List<Object> objects;
 		Scenery* scenery;

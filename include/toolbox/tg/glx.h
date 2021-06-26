@@ -54,6 +54,6 @@ namespace TG {
 		bool keep;
 
 		void Init(int* attributes);
-		bool Finish() final;
+		bool Finish(unsigned) final;
 	};
 }

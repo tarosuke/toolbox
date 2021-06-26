@@ -66,6 +66,7 @@ namespace TG {
 	void Scene::RegisterRoot(Object& o) { rootWidget = &o; }
 
 	//全体の処理
+	unsigned Scene::tick(0);
 	void Scene::Run() {
 		// GLのモード設定
 		glEnable(GL_POLYGON_SMOOTH);
@@ -82,8 +83,7 @@ namespace TG {
 			if (rootWidget) {
 				(*rootWidget).Tick();
 			}
-			Tick();
-		} while (Finish());
+		} while (Finish(tick++));
 	}
 
 	void Scene::Draw(const TB::Matrix<4, 4, float>& v) {

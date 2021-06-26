@@ -29,21 +29,10 @@ int main() {
 		  unsigned height,
 		  const TG::Scene::Frustum& frustum)
 			: TG::GLXScene(display, width, height, 0, frustum){};
-		TG::PositionWidget* pw;
+		TG::Widget* pw;
 
 	private:
 		void HandleEvent(const XEvent& ev) final { Quit(); };
-		void Tick() final {
-			static unsigned n(0);
-			switch (++n) {
-			case 200:
-				(*pw).MoveTo(TB::Vector<3, float>({50, 50, 3}));
-				break;
-			case 400:
-				(*pw).MoveTo(TB::Vector<3, float>({-50, -50, 1}));
-				break;
-			}
-		};
 	} window(display, 640, 640, frustum);
 	window.RegisterScenery(TG::Scenery::New(
 		"sources/.mtests/"
