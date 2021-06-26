@@ -55,7 +55,7 @@ namespace TG {
 	}
 
 
-	bool GLXScene::Finish() {
+	bool GLXScene::Finish(unsigned) {
 		// Xのイベントを処理
 		if (XPending(XDisplay())) {
 			::XEvent ev;
