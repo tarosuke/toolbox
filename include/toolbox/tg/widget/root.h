@@ -32,12 +32,14 @@ namespace TG {
 
 	public:
 		RootWidget() : Widget(0), Input(false), bridge(*this){};
-		static void ReDepth() { (*root).ReDepth(); };
+		static void ReDepth() { (*root).ReDepth(baseDepth, depthDiff); };
 
 	private:
 		static const float scale;
 		static const float virtualDistance;
 		static const float navigationRadious;
+		static const float baseDepth;
+		static const float depthDiff;
 		static const TB::Rect<2, float> viewRect;
 
 		TB::Vector<2, float> lookingPoint;

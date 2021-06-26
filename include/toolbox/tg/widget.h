@@ -68,11 +68,9 @@ namespace TG {
 		virtual void MoveTo(const TB::Vector<3, float>&){};
 		virtual void JumpTo(const TB::Vector<3, float>&){};
 		virtual void DepthTo(float depth){};
-		void ReDepth();
+		void ReDepth(float baseDepth, float depthDiff);
 
 	protected:
-		static const float baseDepth;
-		static const float depthDiff;
 		static Widget* root;
 		TB::List<Widget> subs;
 		Widget(Widget* super);
