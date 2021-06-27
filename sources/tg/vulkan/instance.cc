@@ -25,14 +25,15 @@
 namespace TB {
 	namespace VK {
 
-		Instance::Instance() : instance(MakeInstance()) {}
+		Instance::Instance() : instance(MakeInstance()) {
+			GetPhysicalDevices();
+		}
 
 
 		VkInstance Instance::MakeInstance() {
-
 			std::vector<char*> extentionNames;
 
-
+			//このへんで機能拡張をextensionNamesに格納しておく
 
 			const VkApplicationInfo appInfo = {
 				.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -57,6 +58,23 @@ namespace TB {
 			}
 
 			return instance;
+		}
+
+		void Instance::GetPhysicalDevices() {
+			unsigned numGpu;
+			if (vkEnumeratePhysicalDevices(instance, &numGpu, NULL) !=
+				VK_SUCCESS) {
+				throw -1;
+			};
+
+			physcalDevices.resize(numGpu);
+
+			if (vkEnumeratePhysicalDevices(
+					instance,
+					&numGpu,
+					physcalDevices.data()) != VK_SUCCESS) {
+				throw -1;
+			};
 		}
 	}
 }

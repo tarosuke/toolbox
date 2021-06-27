@@ -20,6 +20,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include <vector>
+
 
 
 namespace TB {
@@ -33,6 +35,8 @@ namespace TB {
 		private:
 			static VkInstance MakeInstance();
 			VkInstance instance;
+			void GetPhysicalDevices();
+			std::vector<VkPhysicalDevice> physcalDevices;
 		};
 	}
 }
