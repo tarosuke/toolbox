@@ -27,6 +27,7 @@ namespace TB {
 
 		Instance::Instance() : instance(MakeInstance()) {
 			GetPhysicalDevices();
+			GetQueue();
 		}
 
 
@@ -75,6 +76,21 @@ namespace TB {
 					physcalDevices.data()) != VK_SUCCESS) {
 				throw -1;
 			};
+		}
+
+		void Instance::GetQueue(unsigned index) {
+			if (physcalDevices.size() <= index) {
+				throw -1;
+			}
+
+			auto& dev(physcalDevices[index]);
+			unsigned numQ(0);
+			vkGetPhysicalDeviceQueueFamilyProperties(dev, &numQ, nullptr);
+			if (numQ < 1) {
+				throw -1;
+			}
+			queue.resize(numQ);
+			vkGetPhysicalDeviceQueueFamilyProperties(dev, &numQ, queue.data());
 		}
 	}
 }

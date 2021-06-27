@@ -37,6 +37,8 @@ namespace TB {
 			VkInstance instance;
 			void GetPhysicalDevices();
 			std::vector<VkPhysicalDevice> physcalDevices;
+			void GetQueue(unsigned deviceIndex = 0);
+			std::vector<VkQueueFamilyProperties> queue;
 		};
 	}
 }
