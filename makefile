@@ -33,7 +33,7 @@ mtobjs := $(addprefix .builds/, $(addsuffix .o, $(tmods)))
 mtdeps := $(addprefix .builds/, $(addsuffix .dep, $(tmods)))
 
 
-EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm
+EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lvulkan
 
 
 
