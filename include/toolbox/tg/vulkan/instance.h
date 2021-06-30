@@ -30,15 +30,23 @@ namespace TB {
 		class Instance {
 		public:
 			Instance();
-			~Instance() { vkDestroyInstance(instance, nullptr); };
+			~Instance() {
+				for (auto&& d : devices) {
+					vkDestroyDevice(d, nullptr);
+				}
+				vkDestroyInstance(instance, nullptr);
+			};
 
 		private:
 			static VkInstance MakeInstance();
 			VkInstance instance;
 			void GetPhysicalDevices();
-			std::vector<VkPhysicalDevice> physcalDevices;
-			void GetQueue(unsigned deviceIndex = 0);
-			std::vector<VkQueueFamilyProperties> queue;
+			std::vector<VkPhysicalDevice> physicalDevices;
+			void GetQueue(unsigned phyDeviceIndex = 0);
+			unsigned physicalDeviceIndex;
+			std::vector<VkQueueFamilyProperties> queueFamilies;
+			void GetDevices();
+			std::vector<VkDevice> devices;
 		};
 	}
 }

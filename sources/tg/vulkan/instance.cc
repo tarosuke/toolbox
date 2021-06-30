@@ -28,6 +28,7 @@ namespace TB {
 		Instance::Instance() : instance(MakeInstance()) {
 			GetPhysicalDevices();
 			GetQueue();
+			GetDevices();
 		}
 
 
@@ -68,29 +69,65 @@ namespace TB {
 				throw -1;
 			};
 
-			physcalDevices.resize(numGpu);
+			physicalDevices.resize(numGpu);
 
 			if (vkEnumeratePhysicalDevices(
 					instance,
 					&numGpu,
-					physcalDevices.data()) != VK_SUCCESS) {
+					physicalDevices.data()) != VK_SUCCESS) {
 				throw -1;
 			};
 		}
 
 		void Instance::GetQueue(unsigned index) {
-			if (physcalDevices.size() <= index) {
+			if (physicalDevices.size() <= index) {
 				throw -1;
 			}
+			physicalDeviceIndex = index;
 
-			auto& dev(physcalDevices[index]);
+			auto& dev(physicalDevices[index]);
 			unsigned numQ(0);
 			vkGetPhysicalDeviceQueueFamilyProperties(dev, &numQ, nullptr);
 			if (numQ < 1) {
 				throw -1;
 			}
-			queue.resize(numQ);
-			vkGetPhysicalDeviceQueueFamilyProperties(dev, &numQ, queue.data());
+			queueFamilies.resize(numQ);
+			devices.resize(numQ);
+			vkGetPhysicalDeviceQueueFamilyProperties(
+				dev,
+				&numQ,
+				queueFamilies.data());
+		}
+
+		void Instance::GetDevices() {
+			for (unsigned n(0); n < queueFamilies.size(); ++n) {
+				float priority(1.0);
+				const VkDeviceQueueCreateInfo qInfo = {
+					.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+					.pNext = NULL,
+					.flags = 0,
+					.queueFamilyIndex = n,
+					.queueCount = 1,
+					.pQueuePriorities = &priority,
+				};
+				const VkDeviceCreateInfo createInfo = {
+					.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+					.pNext = NULL,
+					.flags = 0,
+					.queueCreateInfoCount = 1,
+					.pQueueCreateInfos = &qInfo,
+					.enabledLayerCount = 0,
+					.enabledExtensionCount = 0,
+					.pEnabledFeatures = NULL,
+				};
+				if (vkCreateDevice(
+						physicalDevices[physicalDeviceIndex],
+						&createInfo,
+						nullptr,
+						&devices[n]) != VK_SUCCESS) {
+					throw -1;
+				}
+			}
 		}
 	}
 }
