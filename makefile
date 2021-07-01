@@ -73,6 +73,11 @@ vpath %.o .builds
 	@mkdir -p $(dir $@)
 	@$(CPP) $(COPTS) -MM $< >> $@
 
+# Vulkan shader
+.builds/%.spv : sources/%.glsl
+	@echo " GLSLC $@"
+	@glslc $< -o $@
+
 
 ############################################################### RULES & TARGET
 
