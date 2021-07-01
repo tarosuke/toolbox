@@ -129,6 +129,7 @@ namespace TB {
 					throw -1;
 				}
 				vkGetDeviceQueue(dq.device, n, 0, &dq.queue);
+				dq.flags = queueFamilies[n].queueFlags;
 			}
 		}
 	}

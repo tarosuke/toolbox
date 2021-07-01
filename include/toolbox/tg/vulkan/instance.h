@@ -49,6 +49,7 @@ namespace TB {
 			struct DevQ {
 				VkDevice device;
 				VkQueue queue;
+				unsigned flags;
 			};
 			std::vector<DevQ> devQ;
 		};
