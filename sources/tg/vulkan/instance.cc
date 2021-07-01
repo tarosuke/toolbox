@@ -92,7 +92,7 @@ namespace TB {
 				throw -1;
 			}
 			queueFamilies.resize(numQ);
-			devices.resize(numQ);
+			devQ.resize(numQ);
 			vkGetPhysicalDeviceQueueFamilyProperties(
 				dev,
 				&numQ,
@@ -120,13 +120,15 @@ namespace TB {
 					.enabledExtensionCount = 0,
 					.pEnabledFeatures = NULL,
 				};
+				DevQ& dq(devQ[n]);
 				if (vkCreateDevice(
 						physicalDevices[physicalDeviceIndex],
 						&createInfo,
 						nullptr,
-						&devices[n]) != VK_SUCCESS) {
+						&dq.device) != VK_SUCCESS) {
 					throw -1;
 				}
+				vkGetDeviceQueue(dq.device, n, 0, &dq.queue);
 			}
 		}
 	}

@@ -31,8 +31,8 @@ namespace TB {
 		public:
 			Instance();
 			~Instance() {
-				for (auto&& d : devices) {
-					vkDestroyDevice(d, nullptr);
+				for (auto&& dq : devQ) {
+					vkDestroyDevice(dq.device, nullptr);
 				}
 				vkDestroyInstance(instance, nullptr);
 			};
@@ -46,7 +46,11 @@ namespace TB {
 			unsigned physicalDeviceIndex;
 			std::vector<VkQueueFamilyProperties> queueFamilies;
 			void GetDevices();
-			std::vector<VkDevice> devices;
+			struct DevQ {
+				VkDevice device;
+				VkQueue queue;
+			};
+			std::vector<DevQ> devQ;
 		};
 	}
 }
