@@ -37,6 +37,27 @@ namespace TB {
 				vkDestroyInstance(instance, nullptr);
 			};
 
+			class FrameBuffer {
+			public:
+				FrameBuffer(Instance&, unsigned width, unsigned height);
+				~FrameBuffer();
+
+			private:
+				Instance& instance;
+			};
+
+			class RenderPass {
+			public:
+				RenderPass(Instance&);
+				~RenderPass();
+
+			private:
+				VkDevice& device;
+				VkRenderPass renderPass;
+				VkPipelineLayout pipelineLayout;
+			};
+
+
 		private:
 			static VkInstance MakeInstance();
 			VkInstance instance;

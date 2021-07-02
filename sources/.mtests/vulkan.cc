@@ -9,6 +9,7 @@
 int main() {
 	try {
 		TB::VK::Instance instance;
+		TB::VK::Instance::RenderPass renderPass(instance);
 
 #if false
 		class VR : public TG::OpenVR {
