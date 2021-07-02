@@ -31,9 +31,7 @@ namespace TB {
 		public:
 			Instance();
 			~Instance() {
-				for (auto&& dq : devQ) {
-					vkDestroyDevice(dq.device, nullptr);
-				}
+				vkDestroyDevice(device, nullptr);
 				vkDestroyInstance(instance, nullptr);
 			};
 
@@ -43,7 +41,8 @@ namespace TB {
 				~FrameBuffer();
 
 			private:
-				Instance& instance;
+				VkDevice& device;
+				std::vector<VkFramebuffer> fbSwapChain;
 			};
 
 			class RenderPass {
@@ -67,12 +66,8 @@ namespace TB {
 			unsigned physicalDeviceIndex;
 			std::vector<VkQueueFamilyProperties> queueFamilies;
 			void GetDevices();
-			struct DevQ {
-				VkDevice device;
-				VkQueue queue;
-				unsigned flags;
-			};
-			std::vector<DevQ> devQ;
+			VkDevice device;
+			VkQueue queue;
 		};
 	}
 }

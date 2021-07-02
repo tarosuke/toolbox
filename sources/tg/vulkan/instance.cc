@@ -92,7 +92,6 @@ namespace TB {
 				throw -1;
 			}
 			queueFamilies.resize(numQ);
-			devQ.resize(numQ);
 			vkGetPhysicalDeviceQueueFamilyProperties(
 				dev,
 				&numQ,
@@ -100,6 +99,8 @@ namespace TB {
 		}
 
 		void Instance::GetDevices() {
+			std::vector<VkDeviceQueueCreateInfo> qInfos;
+			unsigned presentFamilyIndex(0);
 			for (unsigned n(0); n < queueFamilies.size(); ++n) {
 				float priority(1.0);
 				const VkDeviceQueueCreateInfo qInfo = {
@@ -110,32 +111,35 @@ namespace TB {
 					.queueCount = 1,
 					.pQueuePriorities = &priority,
 				};
-				const VkDeviceCreateInfo createInfo = {
-					.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-					.pNext = NULL,
-					.flags = 0,
-					.queueCreateInfoCount = 1,
-					.pQueueCreateInfos = &qInfo,
-					.enabledLayerCount = 0,
-					.enabledExtensionCount = 0,
-					.pEnabledFeatures = NULL,
-				};
-				DevQ& dq(devQ[n]);
-				if (vkCreateDevice(
-						physicalDevices[physicalDeviceIndex],
-						&createInfo,
-						nullptr,
-						&dq.device) != VK_SUCCESS) {
-					throw -1;
+				qInfos.push_back(qInfo);
+				if (queueFamilies[n].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+					presentFamilyIndex = n;
 				}
-				vkGetDeviceQueue(dq.device, n, 0, &dq.queue);
-				dq.flags = queueFamilies[n].queueFlags;
 			}
+
+			const VkDeviceCreateInfo createInfo = {
+				.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+				.pNext = NULL,
+				.flags = 0,
+				.queueCreateInfoCount = (unsigned)qInfos.size(),
+				.pQueueCreateInfos = qInfos.data(),
+				.enabledLayerCount = 0,
+				.enabledExtensionCount = 0,
+				.pEnabledFeatures = NULL,
+			};
+			if (vkCreateDevice(
+					physicalDevices[physicalDeviceIndex],
+					&createInfo,
+					nullptr,
+					&device) != VK_SUCCESS) {
+				throw -1;
+			}
+			vkGetDeviceQueue(device, presentFamilyIndex, 0, &queue);
 		}
 
 
 		Instance::RenderPass::RenderPass(Instance& instance)
-			: device(instance.devQ[0].device) {
+			: device(instance.device) {
 			VkAttachmentDescription colorAttachment{
 				.format = VK_FORMAT_B8G8R8A8_UNORM,
 				.samples = VK_SAMPLE_COUNT_1_BIT,
