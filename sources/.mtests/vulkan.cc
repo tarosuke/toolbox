@@ -1,4 +1,4 @@
-#include <toolbox/tg/vulkan/instance.h>
+#include <toolbox/tg/vulkan/device.h>
 
 #include <assert.h>
 #include <unistd.h>
@@ -8,8 +8,7 @@
 
 int main() {
 	try {
-		TB::VK::Instance instance;
-		TB::VK::Instance::RenderPass renderPass(instance);
+		TB::VK::RenderPass renderPass;
 
 #if false
 		class VR : public TG::OpenVR {

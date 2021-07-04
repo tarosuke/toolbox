@@ -16,7 +16,7 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <toolbox/tg/vulkan/instance.h>
+#include <toolbox/tg/vulkan/device.h>
 
 #include <vector>
 
@@ -25,14 +25,16 @@
 namespace TB {
 	namespace VK {
 
-		Instance::Instance() : instance(MakeInstance()) {
+		Device::Instance Device::instance;
+
+		Device::Instance::Instance() : instance(MakeInstance()) {
 			GetPhysicalDevices();
 			GetQueue();
 			GetDevices();
 		}
 
 
-		VkInstance Instance::MakeInstance() {
+		VkInstance Device::Instance::MakeInstance() {
 			std::vector<char*> extentionNames;
 
 			//このへんで機能拡張をextensionNamesに格納しておく
@@ -62,7 +64,7 @@ namespace TB {
 			return instance;
 		}
 
-		void Instance::GetPhysicalDevices() {
+		void Device::Instance::GetPhysicalDevices() {
 			unsigned numGpu;
 			if (vkEnumeratePhysicalDevices(instance, &numGpu, NULL) !=
 				VK_SUCCESS) {
@@ -79,7 +81,7 @@ namespace TB {
 			};
 		}
 
-		void Instance::GetQueue(unsigned index) {
+		void Device::Instance::GetQueue(unsigned index) {
 			if (physicalDevices.size() <= index) {
 				throw -1;
 			}
@@ -98,7 +100,7 @@ namespace TB {
 				queueFamilies.data());
 		}
 
-		void Instance::GetDevices() {
+		void Device::Instance::GetDevices() {
 			std::vector<VkDeviceQueueCreateInfo> qInfos;
 			unsigned presentFamilyIndex(0);
 			for (unsigned n(0); n < queueFamilies.size(); ++n) {
@@ -138,8 +140,7 @@ namespace TB {
 		}
 
 
-		Instance::RenderPass::RenderPass(Instance& instance)
-			: device(instance.device) {
+		RenderPass::RenderPass() {
 			VkAttachmentDescription colorAttachment{
 				.format = VK_FORMAT_B8G8R8A8_UNORM,
 				.samples = VK_SAMPLE_COUNT_1_BIT,
@@ -171,7 +172,7 @@ namespace TB {
 				throw -1;
 			}
 		}
-		Instance::RenderPass::~RenderPass() {
+		RenderPass::~RenderPass() {
 			// vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 			vkDestroyRenderPass(device, renderPass, nullptr);
 		}

@@ -27,47 +27,54 @@
 namespace TB {
 	namespace VK {
 
-		class Instance {
-		public:
-			Instance();
-			~Instance() {
-				vkDestroyDevice(device, nullptr);
-				vkDestroyInstance(instance, nullptr);
-			};
-
-			class FrameBuffer {
-			public:
-				FrameBuffer(Instance&, unsigned width, unsigned height);
-				~FrameBuffer();
-
-			private:
-				VkDevice& device;
-				std::vector<VkFramebuffer> fbSwapChain;
-			};
-
-			class RenderPass {
-			public:
-				RenderPass(Instance&);
-				~RenderPass();
-
-			private:
-				VkDevice& device;
-				VkRenderPass renderPass;
-				VkPipelineLayout pipelineLayout;
-			};
-
+		class Device {
+		protected:
+			Device() : device(instance.device){};
+			VkDevice& device;
 
 		private:
-			static VkInstance MakeInstance();
-			VkInstance instance;
-			void GetPhysicalDevices();
-			std::vector<VkPhysicalDevice> physicalDevices;
-			void GetQueue(unsigned phyDeviceIndex = 0);
-			unsigned physicalDeviceIndex;
-			std::vector<VkQueueFamilyProperties> queueFamilies;
-			void GetDevices();
-			VkDevice device;
-			VkQueue queue;
+			static class Instance {
+			public:
+				VkDevice device;
+
+				Instance();
+				~Instance() {
+					vkDestroyDevice(device, nullptr);
+					vkDestroyInstance(instance, nullptr);
+				};
+
+			private:
+				static VkInstance MakeInstance();
+				VkInstance instance;
+				void GetPhysicalDevices();
+				std::vector<VkPhysicalDevice> physicalDevices;
+				void GetQueue(unsigned phyDeviceIndex = 0);
+				unsigned physicalDeviceIndex;
+				std::vector<VkQueueFamilyProperties> queueFamilies;
+				void GetDevices();
+				VkQueue queue;
+			}  instance;
+		};
+
+
+
+		class FrameBuffer : Device {
+		public:
+			FrameBuffer(unsigned width, unsigned height);
+			~FrameBuffer();
+
+		private:
+			std::vector<VkFramebuffer> fbSwapChain;
+		};
+
+		class RenderPass : Device {
+		public:
+			RenderPass();
+			~RenderPass();
+
+		private:
+			VkRenderPass renderPass;
+			VkPipelineLayout pipelineLayout;
 		};
 	}
 }
