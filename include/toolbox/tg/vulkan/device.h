@@ -28,9 +28,9 @@ namespace TB {
 	namespace VK {
 
 		class Device {
-		protected:
-			Device() : device(instance.device){};
-			VkDevice& device;
+		public:
+			Device(){};
+			operator VkDevice() { return instance.device; };
 
 		private:
 			static class Instance {
@@ -58,21 +58,22 @@ namespace TB {
 
 
 
-		class FrameBuffer : Device {
+		class FrameBuffer {
 		public:
 			FrameBuffer(unsigned width, unsigned height);
 			~FrameBuffer();
 
 		private:
-			std::vector<VkFramebuffer> fbSwapChain;
+			Device device;
 		};
 
-		class RenderPass : Device {
+		class RenderPass {
 		public:
 			RenderPass();
 			~RenderPass();
 
 		private:
+			Device device;
 			VkRenderPass renderPass;
 			VkPipelineLayout pipelineLayout;
 		};
