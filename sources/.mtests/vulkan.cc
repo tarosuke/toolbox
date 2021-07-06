@@ -8,7 +8,8 @@
 
 int main() {
 	try {
-		TB::VK::Image(640, 480);
+		TB::VK::Image i(640, 480);
+		TB::VK::ImageView iv(i);
 
 #if false
 		class VR : public TG::OpenVR {

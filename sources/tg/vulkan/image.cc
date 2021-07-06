@@ -23,6 +23,7 @@
 namespace TB {
 	namespace VK {
 
+		// 代表的な設定
 		const VkImageCreateInfo Image::colorBufferImageInfo{
 			.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
 			.pNext = 0,
@@ -51,18 +52,49 @@ namespace TB {
 			.queueFamilyIndexCount = 1,
 			.initialLayout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL};
 
-
-
 		Image::Image(
 			unsigned width,
 			unsigned height,
-			const VkImageCreateInfo& createInfo) {
-			VkImageCreateInfo info(createInfo);
+			const VkImageCreateInfo& createInfo)
+			: info(createInfo) {
 			info.extent = {.width = width, .height = height, .depth = 1};
 
-			vkCreateImage(device, &info, NULL, &image);
+			if (vkCreateImage(device, &info, NULL, &image) != VK_SUCCESS) {
+				throw 1;
+			};
 		}
 
 		Image::~Image() { vkDestroyImage(device, image, NULL); }
+
+
+
+		ImageView::ImageView(Image& image) : image(image) {
+			const VkImageViewCreateInfo info{
+				.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+				.pNext = 0,
+				.image = image,
+				.viewType = VK_IMAGE_VIEW_TYPE_2D,
+				.format = image,
+				.components =
+					{.r = VK_COMPONENT_SWIZZLE_IDENTITY,
+					 .g = VK_COMPONENT_SWIZZLE_IDENTITY,
+					 .b = VK_COMPONENT_SWIZZLE_IDENTITY,
+					 .a = VK_COMPONENT_SWIZZLE_IDENTITY},
+				.subresourceRange = {
+					.aspectMask = (VkImageUsageFlags)image ==
+										  VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+									? VK_IMAGE_ASPECT_COLOR_BIT
+									: VK_IMAGE_ASPECT_DEPTH_BIT,
+					.baseMipLevel = 0,
+					.levelCount = 1,
+					.baseArrayLayer = 0,
+					.layerCount = 1}};
+			if (vkCreateImageView(device, &info, NULL, &imageView) !=
+				VK_SUCCESS) {
+				throw -1;
+			}
+		}
+
+		ImageView::~ImageView() { vkDestroyImageView(device, imageView, NULL); }
 	}
 }

@@ -32,6 +32,9 @@ namespace TB {
 			~Image();
 
 			operator VkImage&() { return image; };
+			operator VkFormat() { return info.format; };
+			operator VkExtent3D&() { return info.extent; };
+			operator VkImageUsageFlags() { return info.usage; };
 
 			static const VkImageCreateInfo colorBufferImageInfo;
 			static const VkImageCreateInfo depthBufferImageInfo;
@@ -39,9 +42,23 @@ namespace TB {
 		private:
 			Device device;
 			VkImage image;
+			VkImageCreateInfo info;
 		};
 
+		class ImageView {
+		public:
+			ImageView(Image&);
+			~ImageView();
 
+			operator VkImageView&() { return imageView; };
+			operator VkFormat() { return image; };
+			operator VkExtent3D&() { return image; };
+
+		private:
+			Device device;
+			Image& image;
+			VkImageView imageView;
+		};
 
 		class FrameBuffer {
 		public:
@@ -54,8 +71,8 @@ namespace TB {
 
 		private:
 			Device device;
-			Image color;
-			Image depth;
+			ImageView color;
+			ImageView depth;
 		};
 	}
 }
