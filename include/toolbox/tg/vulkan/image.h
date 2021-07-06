@@ -18,57 +18,44 @@
  */
 #pragma once
 
-#include <vulkan/vulkan.h>
-
-#include <vector>
-
-
+#include "device.h"
 
 namespace TB {
 	namespace VK {
 
-		class Device {
+		class Image {
 		public:
-			Device(){};
-			operator VkDevice() { return instance.device; };
+			Image(
+				unsigned width,
+				unsigned height,
+				const VkImageCreateInfo& createInfo = colorBufferImageInfo);
+			~Image();
+
+			operator VkImage&() { return image; };
+
+			static const VkImageCreateInfo colorBufferImageInfo;
+			static const VkImageCreateInfo depthBufferImageInfo;
 
 		private:
-			static class Instance {
-			public:
-				VkDevice device;
-
-				Instance();
-				~Instance() {
-					vkDestroyDevice(device, nullptr);
-					vkDestroyInstance(instance, nullptr);
-				};
-
-			private:
-				static VkInstance MakeInstance();
-				VkInstance instance;
-				void GetPhysicalDevices();
-				std::vector<VkPhysicalDevice> physicalDevices;
-				void GetQueue(unsigned phyDeviceIndex = 0);
-				unsigned physicalDeviceIndex;
-				std::vector<VkQueueFamilyProperties> queueFamilies;
-				void GetDevices();
-				VkQueue queue;
-			}  instance;
+			Device device;
+			VkImage image;
 		};
 
 
 
-
-
-		class RenderPass {
+		class FrameBuffer {
 		public:
-			RenderPass();
-			~RenderPass();
+			FrameBuffer(
+				unsigned width,
+				unsigned height,
+				VkFormat format = VK_FORMAT_B8G8R8_UINT,
+				VkFormat depthForm = VK_FORMAT_D24_UNORM_S8_UINT);
+			~FrameBuffer();
 
 		private:
 			Device device;
-			VkRenderPass renderPass;
-			VkPipelineLayout pipelineLayout;
+			Image color;
+			Image depth;
 		};
 	}
 }

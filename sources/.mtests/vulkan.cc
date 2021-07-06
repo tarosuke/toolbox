@@ -1,4 +1,4 @@
-#include <toolbox/tg/vulkan/device.h>
+#include <toolbox/tg/vulkan/image.h>
 
 #include <assert.h>
 #include <unistd.h>
@@ -8,7 +8,7 @@
 
 int main() {
 	try {
-		TB::VK::RenderPass renderPass;
+		TB::VK::Image(640, 480);
 
 #if false
 		class VR : public TG::OpenVR {
