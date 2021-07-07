@@ -46,6 +46,20 @@ namespace TB {
 		};
 
 
+		class RenderPass {
+		public:
+			RenderPass(VkFormat format = VK_FORMAT_B8G8R8A8_UINT);
+			~RenderPass();
+
+			operator VkRenderPass&() { return renderPass; };
+
+		private:
+			Device device;
+			VkRenderPass renderPass;
+			VkPipelineLayout pipelineLayout;
+		};
+
+
 		class FrameBuffer {
 		public:
 			FrameBuffer(
@@ -55,11 +69,15 @@ namespace TB {
 				VkFormat depthFormat = VK_FORMAT_D24_UNORM_S8_UINT);
 			~FrameBuffer();
 
+			operator VkFramebuffer&() { return framebuffer; };
+
 		private:
 			Device device;
 			Image colorBuffer;
 			Image depthBuffer;
+			RenderPass colorPass;
 			VkImageView views[2];
+			VkFramebuffer framebuffer;
 			void MakeImageView(Image&, VkImageView*);
 		};
 	}

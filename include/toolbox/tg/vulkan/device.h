@@ -55,20 +55,5 @@ namespace TB {
 				VkQueue queue;
 			}  instance;
 		};
-
-
-
-
-
-		class RenderPass {
-		public:
-			RenderPass();
-			~RenderPass();
-
-		private:
-			Device device;
-			VkRenderPass renderPass;
-			VkPipelineLayout pipelineLayout;
-		};
 	}
 }
