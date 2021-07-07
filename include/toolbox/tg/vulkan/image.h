@@ -45,34 +45,22 @@ namespace TB {
 			VkImageCreateInfo info;
 		};
 
-		class ImageView {
-		public:
-			ImageView(Image&);
-			~ImageView();
-
-			operator VkImageView&() { return imageView; };
-			operator VkFormat() { return image; };
-			operator VkExtent3D&() { return image; };
-
-		private:
-			Device device;
-			Image& image;
-			VkImageView imageView;
-		};
 
 		class FrameBuffer {
 		public:
 			FrameBuffer(
 				unsigned width,
 				unsigned height,
-				VkFormat format = VK_FORMAT_B8G8R8_UINT,
-				VkFormat depthForm = VK_FORMAT_D24_UNORM_S8_UINT);
+				VkFormat colorFormat = VK_FORMAT_B8G8R8_UINT,
+				VkFormat depthFormat = VK_FORMAT_D24_UNORM_S8_UINT);
 			~FrameBuffer();
 
 		private:
 			Device device;
-			ImageView color;
-			ImageView depth;
+			Image colorBuffer;
+			Image depthBuffer;
+			VkImageView views[2];
+			void MakeImageView(Image&, VkImageView*);
 		};
 	}
 }

@@ -8,8 +8,7 @@
 
 int main() {
 	try {
-		TB::VK::Image i(640, 480);
-		TB::VK::ImageView iv(i);
+		TB::VK::FrameBuffer fv(640, 480);
 
 #if false
 		class VR : public TG::OpenVR {

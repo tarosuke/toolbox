@@ -68,7 +68,24 @@ namespace TB {
 
 
 
-		ImageView::ImageView(Image& image) : image(image) {
+		FrameBuffer::FrameBuffer(
+			unsigned width,
+			unsigned height,
+			VkFormat colorFormat,
+			VkFormat depthFormat)
+			: colorBuffer(width, height, Image::colorBufferImageInfo),
+			  depthBuffer(width, height, Image::depthBufferImageInfo) {
+			MakeImageView(colorBuffer, &views[0]);
+			MakeImageView(depthBuffer, &views[1]);
+		}
+
+		FrameBuffer::~FrameBuffer() {
+			vkDestroyImageView(device, views[0], NULL);
+			vkDestroyImageView(device, views[1], NULL);
+		}
+
+
+		void FrameBuffer::MakeImageView(Image& image, VkImageView* imageView) {
 			const VkImageViewCreateInfo info{
 				.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
 				.pNext = 0,
@@ -89,12 +106,10 @@ namespace TB {
 					.levelCount = 1,
 					.baseArrayLayer = 0,
 					.layerCount = 1}};
-			if (vkCreateImageView(device, &info, NULL, &imageView) !=
+			if (vkCreateImageView(device, &info, NULL, imageView) !=
 				VK_SUCCESS) {
 				throw -1;
 			}
 		}
-
-		ImageView::~ImageView() { vkDestroyImageView(device, imageView, NULL); }
 	}
 }
