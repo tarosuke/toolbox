@@ -1,9 +1,12 @@
 #version 450
 
-layout(location = 0) in vec3 fragColor;
+// 入力
+layout(location = 0) in vec2 texCoord;
+layout(binding = 1) uniform sampler2D texSampler;
 
-layout(location = 0) out vec4 outColor;
+// 出力色(location=0が鍵？)
+layout(location = 0) out vec4 out_color;
 
 void main() {
-    outColor = vec4(fragColor, 1.0);
+    out_color = texture(texSampler, texCoord);
 }
