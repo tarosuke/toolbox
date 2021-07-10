@@ -18,8 +18,10 @@ suffixes := %.c %.cc %.glsl
 
 files := $(subst sources/,, $(shell find sources -type f))
 srcs := $(filter $(suffixes), $(files))
+spvs := $(filter %.frag %.vert, $(files))
+sbins:= $(addprefix .builds/, $(addsuffix .spv, $(spvs)))
 mods := $(filter-out tests/%, $(basename $(srcs)))
-objs := $(addprefix .builds/, $(addsuffix .o, $(mods)))
+objs := $(addprefix .builds/, $(addsuffix .o, $(mods) $(spvs)))
 deps := $(addprefix .builds/, $(addsuffix .dep, $(mods)))
 
 # テスト
@@ -61,6 +63,11 @@ vpath %.o .builds
 	@mkdir -p $(dir $@)
 	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
 
+.builds/%.o : .builds/%.spv makefile
+	@echo " OBJCOPY $@"
+	@mkdir -p $(dir $@)
+	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
+
 .builds/%.dep : sources/%.cc makefile
 	@echo " CPP $@"
 	@mkdir -p $(dir $@)
@@ -73,15 +80,24 @@ vpath %.o .builds
 	@mkdir -p $(dir $@)
 	@$(CPP) $(COPTS) -MM $< >> $@
 
-# Vulkan shader
-.builds/%.spv : sources/%.glsl
+# Vulkan shaders
+.builds/%.frag.spv : sources/%.frag
 	@echo " GLSLC $@"
 	@glslc $< -o $@
+
+.builds/%.vert.spv : sources/%.vert
+	@echo " GLSLC $@"
+	@glslc $< -o $@
+
+.builds/%.o : sources/%.spv
+	@echo " OBJCOPY $@"
+	@mkdir -p $(dir $@)
+	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
 
 
 ############################################################### RULES & TARGET
 
-$(target): makefile $(objs)
+$(target): makefile $(objs) $(sbins)
 ifeq ($(suffix $(target)),)
 	@echo " LD $@"
 	@gcc -o $(executable) $(objs) $(EXLIBS)
