@@ -1,4 +1,4 @@
-#include <toolbox/tg/vulkan/framebuffer.h>
+#include <toolbox/tg/vulkan.h>
 
 #include <assert.h>
 #include <unistd.h>

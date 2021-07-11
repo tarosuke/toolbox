@@ -18,11 +18,12 @@
  */
 #pragma once
 
-#include "device.h"
+#include <toolbox/tg/vulkan/device.h>
+
+
 
 namespace TB {
 	namespace VK {
-
 		class Image {
 		public:
 			Image(
@@ -49,31 +50,6 @@ namespace TB {
 		};
 
 
-		class RenderPass {
-		public:
-			RenderPass(VkFormat format = VK_FORMAT_B8G8R8A8_UINT);
-			~RenderPass();
-
-			operator VkRenderPass&() { return renderPass; };
-
-		private:
-			Device device;
-			VkRenderPass renderPass;
-			VkPipelineLayout pipelineLayout;
-		};
-
-
-		class CommandBuffer {
-		public:
-			CommandBuffer();
-			~CommandBuffer();
-			operator VkCommandBuffer&() { return commandBuffer; };
-
-		private:
-			VkCommandBuffer commandBuffer;
-		};
-
-
 		class Canvas {
 		public:
 			Canvas(
@@ -81,17 +57,17 @@ namespace TB {
 				VkFormat depthFormat = VK_FORMAT_D24_UNORM_S8_UINT);
 			~Canvas();
 
-			operator VkFramebuffer&() { return framebuffer; };
-
 		private:
 			Device device;
 			Image& colorBuffer;
 			Image depthBuffer;
-			RenderPass colorPass;
+			VkRenderPass renderPass;
 			VkImageView views[2];
 			VkFramebuffer framebuffer;
-			void MakeImageView(Image&, VkImageView*);
+			void MakeImageView(VkImageView*, Image&);
+			void MakeRenderPass(VkRenderPass*, VkFormat);
 		};
+
 
 		class FrameBuffer : public Image, public Canvas {
 		public:
@@ -100,7 +76,7 @@ namespace TB {
 				unsigned height,
 				VkFormat format = VK_FORMAT_B8G8R8_UINT)
 				: Image(width, height, MakeImageInfo(format)),
-				  Canvas((TB::VK::Image&)*this){};
+				  Canvas((TB::VK::Image&)*this, format){};
 
 		private:
 			VkImageCreateInfo MakeImageInfo(VkFormat format) {

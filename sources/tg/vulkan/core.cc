@@ -16,72 +16,27 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <toolbox/tg/vulkan/framebuffer.h>
+#include <toolbox/tg/vulkan.h>
 
 
 
 namespace TB {
 	namespace VK {
 
-		// 代表的な設定
-		const VkImageCreateInfo Image::colorBufferImageInfo{
-			.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-			.pNext = 0,
-			.imageType = VK_IMAGE_TYPE_2D,
-			.format = VK_FORMAT_B8G8R8_UINT,
-			.mipLevels = 1,
-			.arrayLayers = 1,
-			.samples = VK_SAMPLE_COUNT_1_BIT,
-			.tiling = VK_IMAGE_TILING_LINEAR,
-			.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-			.queueFamilyIndexCount = 1,
-			.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
-
-		const VkImageCreateInfo Image::depthBufferImageInfo{
-			.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-			.pNext = 0,
-			.imageType = VK_IMAGE_TYPE_2D,
-			.format = VK_FORMAT_D24_UNORM_S8_UINT,
-			.mipLevels = 1,
-			.arrayLayers = 1,
-			.samples = VK_SAMPLE_COUNT_1_BIT,
-			.tiling = VK_IMAGE_TILING_LINEAR,
-			.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-			.queueFamilyIndexCount = 1,
-			.initialLayout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL};
-
-		Image::Image(
-			unsigned width,
-			unsigned height,
-			const VkImageCreateInfo& createInfo)
-			: info(createInfo) {
-			info.extent = {.width = width, .height = height, .depth = 1};
-
-			if (vkCreateImage(device, &info, NULL, &image) != VK_SUCCESS) {
-				throw 1;
-			};
-		}
-
-		Image::~Image() { vkDestroyImage(device, image, NULL); }
-
-
-
 		Canvas::Canvas(Image& baseImage, VkFormat depthFormat)
 			: colorBuffer(baseImage), depthBuffer(
 										  baseImage.Width(),
 										  baseImage.Height(),
-										  Image::depthBufferImageInfo),
-			  colorPass(baseImage) {
-			MakeImageView(colorBuffer, &views[0]);
-			MakeImageView(depthBuffer, &views[1]);
+										  Image::depthBufferImageInfo) {
+			MakeImageView(&views[0], colorBuffer);
+			MakeImageView(&views[1], depthBuffer);
+			MakeRenderPass(&renderPass, (VkFormat)baseImage);
 
 			const VkFramebufferCreateInfo info{
 				.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
 				.pNext = NULL,
 				.flags = 0,
-				.renderPass = colorPass,
+				.renderPass = renderPass,
 				.attachmentCount = 2,
 				.pAttachments = views,
 				.width = baseImage.Width(),
@@ -91,15 +46,18 @@ namespace TB {
 				VK_SUCCESS) {
 				throw -1;
 			}
-		}
+		};
 
 		Canvas::~Canvas() {
+			vkDestroyRenderPass(device, renderPass, nullptr);
 			vkDestroyFramebuffer(device, framebuffer, NULL);
 			vkDestroyImageView(device, views[0], NULL);
 			vkDestroyImageView(device, views[1], NULL);
 		}
 
-		void Canvas::MakeImageView(Image& image, VkImageView* imageView) {
+
+
+		void Canvas::MakeImageView(VkImageView* imageView, Image& image) {
 			const VkImageViewCreateInfo info{
 				.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
 				.pNext = 0,
@@ -126,8 +84,7 @@ namespace TB {
 			}
 		}
 
-
-		RenderPass::RenderPass(VkFormat format) {
+		void Canvas::MakeRenderPass(VkRenderPass* renderPass, VkFormat format) {
 			VkAttachmentDescription colorAttachment{
 				.format = format,
 				.samples = VK_SAMPLE_COUNT_1_BIT,
@@ -155,13 +112,9 @@ namespace TB {
 					device,
 					&renderPassInfo,
 					nullptr,
-					&renderPass) != VK_SUCCESS) {
+					renderPass) != VK_SUCCESS) {
 				throw -1;
 			}
-		}
-		RenderPass::~RenderPass() {
-			// vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-			vkDestroyRenderPass(device, renderPass, nullptr);
 		}
 	}
 }
