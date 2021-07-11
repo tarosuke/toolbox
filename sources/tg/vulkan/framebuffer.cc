@@ -68,14 +68,12 @@ namespace TB {
 
 
 
-		FrameBuffer::FrameBuffer(
-			unsigned width,
-			unsigned height,
-			VkFormat colorFormat,
-			VkFormat depthFormat)
-			: colorBuffer(width, height, Image::colorBufferImageInfo),
-			  depthBuffer(width, height, Image::depthBufferImageInfo),
-			  colorPass(colorFormat) {
+		Canvas::Canvas(Image& baseImage, VkFormat depthFormat)
+			: colorBuffer(baseImage), depthBuffer(
+										  baseImage.Width(),
+										  baseImage.Height(),
+										  Image::depthBufferImageInfo),
+			  colorPass(baseImage) {
 			MakeImageView(colorBuffer, &views[0]);
 			MakeImageView(depthBuffer, &views[1]);
 
@@ -86,8 +84,8 @@ namespace TB {
 				.renderPass = colorPass,
 				.attachmentCount = 2,
 				.pAttachments = views,
-				.width = width,
-				.height = height,
+				.width = baseImage.Width(),
+				.height = baseImage.Height(),
 				.layers = 1};
 			if (vkCreateFramebuffer(device, &info, NULL, &framebuffer) !=
 				VK_SUCCESS) {
@@ -95,13 +93,13 @@ namespace TB {
 			}
 		}
 
-		FrameBuffer::~FrameBuffer() {
+		Canvas::~Canvas() {
 			vkDestroyFramebuffer(device, framebuffer, NULL);
 			vkDestroyImageView(device, views[0], NULL);
 			vkDestroyImageView(device, views[1], NULL);
 		}
 
-		void FrameBuffer::MakeImageView(Image& image, VkImageView* imageView) {
+		void Canvas::MakeImageView(Image& image, VkImageView* imageView) {
 			const VkImageViewCreateInfo info{
 				.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
 				.pNext = 0,

@@ -36,6 +36,9 @@ namespace TB {
 			operator VkExtent3D&() { return info.extent; };
 			operator VkImageUsageFlags() { return info.usage; };
 
+			unsigned Width() { return info.extent.width; };
+			unsigned Height() { return info.extent.height; };
+
 			static const VkImageCreateInfo colorBufferImageInfo;
 			static const VkImageCreateInfo depthBufferImageInfo;
 
@@ -60,25 +63,51 @@ namespace TB {
 		};
 
 
-		class FrameBuffer {
+		class CommandBuffer {
 		public:
-			FrameBuffer(
-				unsigned width,
-				unsigned height,
-				VkFormat colorFormat = VK_FORMAT_B8G8R8_UINT,
+			CommandBuffer();
+			~CommandBuffer();
+			operator VkCommandBuffer&() { return commandBuffer; };
+
+		private:
+			VkCommandBuffer commandBuffer;
+		};
+
+
+		class Canvas {
+		public:
+			Canvas(
+				Image& baseImage,
 				VkFormat depthFormat = VK_FORMAT_D24_UNORM_S8_UINT);
-			~FrameBuffer();
+			~Canvas();
 
 			operator VkFramebuffer&() { return framebuffer; };
 
 		private:
 			Device device;
-			Image colorBuffer;
+			Image& colorBuffer;
 			Image depthBuffer;
 			RenderPass colorPass;
 			VkImageView views[2];
 			VkFramebuffer framebuffer;
 			void MakeImageView(Image&, VkImageView*);
+		};
+
+		class FrameBuffer : public Image, public Canvas {
+		public:
+			FrameBuffer(
+				unsigned width,
+				unsigned height,
+				VkFormat format = VK_FORMAT_B8G8R8_UINT)
+				: Image(width, height, MakeImageInfo(format)),
+				  Canvas((TB::VK::Image&)*this){};
+
+		private:
+			VkImageCreateInfo MakeImageInfo(VkFormat format) {
+				VkImageCreateInfo info(Image::colorBufferImageInfo);
+				info.format = format;
+				return info;
+			};
 		};
 	}
 }
