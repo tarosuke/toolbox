@@ -30,23 +30,9 @@ namespace TB {
 										  Image::depthBufferImageInfo) {
 			MakeImageView(&views[0], colorBuffer);
 			MakeImageView(&views[1], depthBuffer);
-			MakeRenderPass(&renderPass, (VkFormat)baseImage);
-
-			const VkFramebufferCreateInfo info{
-				.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-				.pNext = NULL,
-				.flags = 0,
-				.renderPass = renderPass,
-				.attachmentCount = 2,
-				.pAttachments = views,
-				.width = baseImage.Width(),
-				.height = baseImage.Height(),
-				.layers = 1};
-			if (vkCreateFramebuffer(device, &info, NULL, &framebuffer) !=
-				VK_SUCCESS) {
-				throw -1;
-			}
-		};
+			MakeRenderPass((VkFormat)baseImage);
+			MakeFrameBuffer();
+		}
 
 		Canvas::~Canvas() {
 			vkDestroyRenderPass(device, renderPass, nullptr);
@@ -84,7 +70,7 @@ namespace TB {
 			}
 		}
 
-		void Canvas::MakeRenderPass(VkRenderPass* renderPass, VkFormat format) {
+		void Canvas::MakeRenderPass(VkFormat format) {
 			VkAttachmentDescription colorAttachment{
 				.format = format,
 				.samples = VK_SAMPLE_COUNT_1_BIT,
@@ -112,7 +98,24 @@ namespace TB {
 					device,
 					&renderPassInfo,
 					nullptr,
-					renderPass) != VK_SUCCESS) {
+					&renderPass) != VK_SUCCESS) {
+				throw -1;
+			}
+		}
+
+		void Canvas::MakeFrameBuffer() {
+			const VkFramebufferCreateInfo info{
+				.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+				.pNext = NULL,
+				.flags = 0,
+				.renderPass = renderPass,
+				.attachmentCount = 2,
+				.pAttachments = views,
+				.width = colorBuffer.Width(),
+				.height = colorBuffer.Height(),
+				.layers = 1};
+			if (vkCreateFramebuffer(device, &info, NULL, &framebuffer) !=
+				VK_SUCCESS) {
 				throw -1;
 			}
 		}

@@ -65,7 +65,8 @@ namespace TB {
 			VkImageView views[2];
 			VkFramebuffer framebuffer;
 			void MakeImageView(VkImageView*, Image&);
-			void MakeRenderPass(VkRenderPass*, VkFormat);
+			void MakeRenderPass(VkFormat);
+			void MakeFrameBuffer();
 		};
 
 
