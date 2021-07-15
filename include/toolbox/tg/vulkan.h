@@ -50,6 +50,25 @@ namespace TB {
 		};
 
 
+		class RenderPass {
+		public:
+			RenderPass(
+				VkFormat,
+				VkSubpassContents =
+					VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
+			~RenderPass();
+
+			operator VkRenderPass&() { return renderPass; };
+
+		private:
+			Device device;
+			VkRenderPass renderPass;
+			VkCommandBuffer commandBuffer;
+			void MakeRenderPass(VkFormat, VkSubpassContents);
+		};
+
+
+
 		class Canvas {
 		public:
 			Canvas(
@@ -61,11 +80,10 @@ namespace TB {
 			Device device;
 			Image& colorBuffer;
 			Image depthBuffer;
-			VkRenderPass renderPass;
+			RenderPass renderPass;
 			VkImageView views[2];
 			VkFramebuffer framebuffer;
 			void MakeImageView(VkImageView*, Image&);
-			void MakeRenderPass(VkFormat);
 			void MakeFrameBuffer();
 		};
 
@@ -85,6 +103,19 @@ namespace TB {
 				info.format = format;
 				return info;
 			};
+		};
+
+
+		class CommandBuffer {
+		public:
+			CommandBuffer();
+			~CommandBuffer();
+
+			operator VkCommandBuffer&() { return buffer; };
+
+		private:
+			VkCommandBuffer buffer;
+			VkCommandPool pool;
 		};
 	}
 }
