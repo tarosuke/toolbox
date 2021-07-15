@@ -1,3 +1,5 @@
+#include <toolbox/test.h>
+
 #include <toolbox/tg/glx.h>
 #include <toolbox/tg/x.h>
 #include <toolbox/tg/scenery.h>
@@ -5,7 +7,6 @@
 #include <toolbox/tg/widget/border.h>
 #include <toolbox/tg/widget/cursor.h>
 
-#include <assert.h>
 #include <unistd.h>
 
 

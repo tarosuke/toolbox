@@ -103,7 +103,7 @@ test: $(target) $(tobjs)
 	@$(foreach m, $(tmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox $(EXLIBS) &&) true
 	@$(foreach m, $(tmods), chmod +x .builds/$(m) &&) true
 	@echo OK.
-	@echo -n running tests...
+	@echo running tests...
 	@$(foreach m, $(tmods), .builds/$(m) &&) true
 	@echo OK.
 
