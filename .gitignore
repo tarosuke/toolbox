@@ -3,6 +3,7 @@
 *.o
 *.so
 *.a
+*.gcov
 
 *.kate-swp
 .hg

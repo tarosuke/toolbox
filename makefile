@@ -11,7 +11,7 @@ all: $(target)
 
 COPTS ?= -Iinclude -I/usr/include/gdbm
 
-COPTS += -O0 -Wall -Werror -g -IX11
+COPTS += -O0 -Wall -Werror -g -IX11 -fprofile-arcs -ftest-coverage
 CCOPTS += $(COPTS) -std=c++11
 
 suffixes := %.c %.cc %.glsl
@@ -95,22 +95,23 @@ uninstall:
 	@sudo rm -rf  /usr/local/include/toolbox
 
 clean:
-	rm -rf .builds/* .builds/.tests .builds/.mtests $(target)* $(shell find . -name "*.orig")
+	rm -rf .builds/* .builds/.tests .builds/.mtests $(target)* $(shell find . -name "*.orig" -name "*.gcov")
 
 # 自動テストを実行
 test: $(target) $(tobjs)
 	@echo -n building tests...
-	@$(foreach m, $(tmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox $(EXLIBS) &&) true
+	@$(foreach m, $(tmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox $(EXLIBS) -lgcov --coverage &&) true
 	@$(foreach m, $(tmods), chmod +x .builds/$(m) &&) true
 	@echo OK.
 	@echo running tests...
-	@$(foreach m, $(tmods), .builds/$(m) &&) true
+	@$(foreach m, $(tmods), .builds/$(m); gcov .builds/$(m).gdca;) true
+	@lcov -c -d .builds/.tests -o .builds/.tests/lcov.info
 	@echo OK.
 
 # 自動テストを実行、手動テストをビルド
 mtest: test $(mtobjs)
 	@echo -n building manual tests...
-	@$(foreach m, $(mtmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox $(EXLIBS) &&) true
+	@$(foreach m, $(mtmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox $(EXLIBS) -lgcov &&) true
 	@$(foreach m, $(mtmods), chmod +x .builds/$(m) &&) true
 	@echo OK.
 
