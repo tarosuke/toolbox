@@ -95,7 +95,7 @@ uninstall:
 	@sudo rm -rf  /usr/local/include/toolbox
 
 clean:
-	rm -rf .builds/* .builds/.tests .builds/.mtests $(target)* $(shell find . -name "*.orig" -name "*.gcov")
+	rm -rf .builds/* .builds/.tests .builds/.mtests $(target)* $(shell find . -name "*.orig")
 
 # 自動テストを実行
 test: $(target) $(tobjs)
@@ -104,7 +104,7 @@ test: $(target) $(tobjs)
 	@$(foreach m, $(tmods), chmod +x .builds/$(m) &&) true
 	@echo OK.
 	@echo running tests...
-	@$(foreach m, $(tmods), .builds/$(m); gcov .builds/$(m).gdca;) true
+	@$(foreach m, $(tmods), .builds/$(m);) true
 	@lcov -c -d .builds/.tests -o .builds/.tests/lcov.info
 	@echo OK.
 
