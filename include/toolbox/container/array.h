@@ -1,12 +1,11 @@
-/************************************************************************ 汎用配列
- * NOTE:コピーコンストラクタや代入演算子はありません。導出して作ってください
- * NOTE:作ったばかりの領域は初期化されていないのでまず書き込むこと
+/******************************************************************** 汎用配列
  */
 #pragma once
 
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+
+#include <stdexcept>
 
 
 
@@ -16,49 +15,57 @@ namespace TB{
 		Array(const Array&);
 		void operator=(const Array&);
 	public:
-		Array() : elements(0), body(0){};
+		Array() : elements(0), assigned(0), body(0){};
+		Array(const T* origin, unsigned elements)
+			: elements(elements), assigned(elements),
+			  body(malloc(sizeof(T) * elements)){};
 
 		~Array(){
 			if(body){ free(body); }
 		};
 		T& operator[](unsigned index){
-			Resize(index + 1);
-			if(!body){
-				//確保できなかったなどの理由で無効状態
-				return dummyEntry;
+			if (elements <= index) {
+				throw std::out_of_range("TB:Array");
 			}
 			return body[index];
 		};
 
+		unsigned Size() { return elements * sizeof(T); };
+		unsigned Length() { return elements; };
+
 	protected:
-		void Resize(unsigned requierd){
-			if(requierd <= elements){
+		void Resize(unsigned requierd) {
+			if (requierd <= elements) {
 				return;
 			}
-			const unsigned oldElements(elements);
-			if(!elements){ elements = 16; }
-			for(;elements < requierd; elements <<= 1);
-			body = (T*)realloc(body, sizeof(T) * elements);
-			assert(body); //TODO:継続動作するための方法を考えておく
-			memset(&body[oldElements], 0, elements - oldElements);
+			if (requierd <= assigned) {
+				elements = requierd;
+				return;
+			}
+			const unsigned r(GetOverPow2(requierd));
+			void* const newBody(realloc(body, sizeof(T) * r));
+			if (!newBody) {
+				throw std::runtime_error("realloc failed in 'TB::Array'");
+			}
+			body = (T*)newBody;
 		};
-		T* GetRawBody()const{
-			assert(body);
-			return body;
-		};
-		void Set(unsigned index, T content){
-			Resize(index + 1);
-			body[index] = content;
-		};
-		T Get(unsigned index){
-			Resize(index + 1);
-			return body[index];
+		T* GetRawBody() const { return body; };
+		void PushBack(const T& v) {
+			Resize(elements + 1);
+			body[elements] = v;
 		};
 
 	private:
 		unsigned elements;
+		unsigned assigned;
 		T* body;
-		T dummyEntry;
 
+		template <typename U> static U GetOverPow2(U n) {
+			n -= 1;
+			for (unsigned m(1); m < sizeof(U) * 8; m <<= 1) {
+				n |= n >> m;
+			}
+			return n + 1;
+		};
 	};
 }
