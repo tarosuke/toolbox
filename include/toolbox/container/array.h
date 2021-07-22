@@ -53,14 +53,15 @@ namespace TB {
 			return body[index];
 		};
 
-		T* GetRawBody() const { return body; };
 		void PushBack(const T& v) {
+			const unsigned e(elements);
 			Resize(elements + 1);
-			body[elements] = v;
+			body[e] = v;
 		};
 
 		unsigned Size() { return elements * sizeof(T); };
 		unsigned Length() { return elements; };
+		T* Raw() const { return body; };
 
 	protected:
 		void Resize(unsigned requierd) {

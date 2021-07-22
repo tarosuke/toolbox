@@ -90,7 +90,7 @@ namespace TB{
 		length = t.length;
 		if(length){
 			Resize(length + 1); //+1はゼロ終端の分
-			memcpy(&(*this)[0], t.GetRawBody(), length + 1);
+			memcpy(&(*this)[0], t.Raw(), length + 1);
 		}
 		(*this)[length] = 0;
 		return *this;
@@ -109,7 +109,7 @@ namespace TB{
 		if(!t.length){ return *this; }
 		const unsigned newLength(length + t.length);
 		Resize(newLength + 1);
-		memcpy(&(*this)[length], t.GetRawBody(), t.length + 1);
+		memcpy(&(*this)[length], t.Raw(), t.length + 1);
 		length = newLength;
 		(*this)[length] = 0;
 		return *this;
@@ -141,9 +141,7 @@ namespace TB{
 		return newString;
 	}
 
-	bool String::operator==(const char* t)const{
-		return !strcmp(GetRawBody(), t);
-	}
+	bool String::operator==(const char* t) const { return !strcmp(Raw(), t); }
 
 	String String::SubStr(unsigned b, unsigned l)const{
 		String newString;
@@ -160,7 +158,7 @@ namespace TB{
 
 		newString.Resize(l + 1);
 		newString.length = l;
-		memcpy(&newString[0], GetRawBody() + b, l);
+		memcpy(&newString[0], Raw() + b, l);
 		newString[l] = 0;
 		return newString;
 	}
