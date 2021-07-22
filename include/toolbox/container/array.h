@@ -1,64 +1,98 @@
-/************************************************************************ 汎用配列
- * NOTE:コピーコンストラクタや代入演算子はありません。導出して作ってください
- * NOTE:作ったばかりの領域は初期化されていないのでまず書き込むこと
+/** 汎用配列
+ * Copyright (C) 2016,2021 tarosuke<webmaster@tarosuke.net>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #pragma once
 
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+
+#include <stdexcept>
 
 
 
-namespace TB{
+namespace TB {
 
-	template<typename T> class Array{
-		Array(const Array&);
-		void operator=(const Array&);
+	template <typename T> class Array {
 	public:
-		Array() : elements(0), body(0){};
+		Array() : elements(0), assigned(0), body(0){};
+		Array(const T origin[], unsigned elements) : elements(0), assigned(0) {
+			Resize(origin.elements);
+			memcpy(body, origin, sizeof(T) * elements);
+		};
+		Array(const Array& origin) : elements(0), assigned(0) {
+			Resize(origin.elements);
+			memcpy(body, origin.body, sizeof(T) * elements);
+		};
+		void operator=(const Array& origin) {
+			Resize(origin.elements);
+			memcpy(body, origin.body, sizeof(T) * elements);
+		};
 
 		~Array(){
 			if(body){ free(body); }
 		};
 		T& operator[](unsigned index){
-			Resize(index + 1);
-			if(!body){
-				//確保できなかったなどの理由で無効状態
-				return dummyEntry;
+			if (elements <= index) {
+				throw std::out_of_range("TB:Array");
 			}
 			return body[index];
 		};
 
+		void PushBack(const T& v) {
+			const unsigned e(elements);
+			Resize(elements + 1);
+			body[e] = v;
+		};
+
+		unsigned Size() { return elements * sizeof(T); };
+		unsigned Length() { return elements; };
+		T* Raw() const { return body; };
+
 	protected:
-		void Resize(unsigned requierd){
-			if(requierd <= elements){
+		void Resize(unsigned requierd) {
+			if (requierd <= elements) {
 				return;
 			}
-			const unsigned oldElements(elements);
-			if(!elements){ elements = 16; }
-			for(;elements < requierd; elements <<= 1);
-			body = (T*)realloc(body, sizeof(T) * elements);
-			assert(body); //TODO:継続動作するための方法を考えておく
-			memset(&body[oldElements], 0, elements - oldElements);
-		};
-		T* GetRawBody()const{
-			assert(body);
-			return body;
-		};
-		void Set(unsigned index, T content){
-			Resize(index + 1);
-			body[index] = content;
-		};
-		T Get(unsigned index){
-			Resize(index + 1);
-			return body[index];
+			if (requierd <= assigned) {
+				elements = requierd;
+				return;
+			}
+			const unsigned r(GetOverPow2(requierd));
+			void* const newBody(realloc(body, sizeof(T) * r));
+			if (!newBody) {
+				throw std::runtime_error("realloc failed in 'TB::Array'");
+			}
+			body = (T*)newBody;
+			assigned = r;
+			elements = requierd;
 		};
 
 	private:
 		unsigned elements;
+		unsigned assigned;
 		T* body;
-		T dummyEntry;
 
+		template <typename U> static U GetOverPow2(U n) {
+			n -= 1;
+			for (unsigned m(1); m < sizeof(U) * 8; m <<= 1) {
+				n |= n >> m;
+			}
+			return n + 1;
+		};
 	};
 }
