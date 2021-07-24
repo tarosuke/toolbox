@@ -1,6 +1,21 @@
-/***** シリアライズ／デシリアライズ付きの型
+/***** 基本型のクラスとシノニム
+ * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
 #include <stdlib.h>
 #include <ctype.h>
 
@@ -8,22 +23,22 @@
 
 
 
-namespace{
+namespace {
 
 	const char* const num = "0123456789abcdef";
 
-	char* UDec(u128 v, char b[64]){
+	char* UDec(u128 v, char b[64]) {
 		char* p(&b[63]);
 		*p-- = 0;
-		do{
+		do {
 			*p-- = num[v % 10];
 			v /= 10;
-		}while(v);
+		} while (v);
 		return p + 1;
 	}
-	char* Dec(i128 v, char b[64]){
+	char* Dec(i128 v, char b[64]) {
 		char* p(UDec((u128)v, b));
-		if(0 <= v){
+		if (0 <= v) {
 			return p;
 		}
 		*--p = '-';
@@ -42,43 +57,45 @@ namespace{
 	// }
 }
 
-namespace TB{
+namespace TB {
 
-	template<> const String& Type<String>::operator=(const char* text){
+	template <>
+	const String& Serializable<String>::operator=(const char* text) {
 		body = text;
 		return body;
 	}
 
-	template<> const int& Type<int>::operator=(const char* text){
+	template <> const int& Serializable<int>::operator=(const char* text) {
 		body = atoi(text);
 		return body;
 	}
-	template<> const long& Type<long>::operator=(const char* text){
+	template <> const long& Serializable<long>::operator=(const char* text) {
 		body = strtol(text, 0, 0);
 		return body;
 	}
-	template<> const long long& Type<long long>::operator=(
-			const char* text){
+	template <>
+	const long long& Serializable<long long>::operator=(const char* text) {
 		body = strtoll(text, 0, 0);
 		return body;
 	}
-	template<> const unsigned& Type<unsigned>::operator=(const char* text){
+	template <>
+	const unsigned& Serializable<unsigned>::operator=(const char* text) {
 		body = strtoul(text, 0, 0);
 		return body;
 	}
-	template<> const unsigned long& Type<unsigned long>::operator=(
-			const char* text){
+	template <> const unsigned long&
+	Serializable<unsigned long>::operator=(const char* text) {
 		body = strtoul(text, 0, 0);
 		return body;
 	}
-	template<> const unsigned long long& Type<unsigned long long>::operator=(
-			const char* text){
+	template <> const unsigned long long&
+	Serializable<unsigned long long>::operator=(const char* text) {
 		body = strtoull(text, 0, 0);
 		return body;
 	}
 
-	template<> const float& Type<float>::operator=(const char* text){
-		if(text[0] == '0' && text[1] == 'x'){
+	template <> const float& Serializable<float>::operator=(const char* text) {
+		if (text[0] == '0' && text[1] == 'x') {
 			//ビットイメージで読み込み
 			union {
 				u32 raw;
@@ -91,8 +108,9 @@ namespace TB{
 		}
 		return body;
 	}
-	template<> const double& Type<double>::operator=(const char* text){
-		if(text[0] == '0' && text[1] == 'x'){
+	template <>
+	const double& Serializable<double>::operator=(const char* text) {
+		if (text[0] == '0' && text[1] == 'x') {
 			//ビットイメージで読み込み
 			union {
 				u64 raw;
@@ -105,17 +123,15 @@ namespace TB{
 		}
 		return body;
 	}
-	template<> const long double& Type<long double>::operator=(
-			const char* text){
-		if(text[0] == '0' && text[1] == 'x'){
+	template <>
+	const long double& Serializable<long double>::operator=(const char* text) {
+		if (text[0] == '0' && text[1] == 'x') {
 			//ビットイメージで読み込み
 			text += 2;
 			u128 v(0);
-			for(; *text && isxdigit(*text); ++text){
+			for (; *text && isxdigit(*text); ++text) {
 				v <<= 16;
-				v += isdigit(*text) ?
-					*text - '0' :
-					(*text & ~0x20) - 'A' + 10;
+				v += isdigit(*text) ? *text - '0' : (*text & ~0x20) - 'A' + 10;
 			}
 
 			union {
@@ -124,49 +140,47 @@ namespace TB{
 			} u;
 			u.raw = v;
 			body = u.val;
-		}else{
+		} else {
 			body = strtold(text, 0);
 		}
 		return body;
 	}
 
 
-	template<> String Type<String>::Serialize() const {
-		return body;
-	}
-	template<> String Type<int>::Serialize() const {
+	template <> String Serializable<String>::Serialize() const { return body; }
+	template <> String Serializable<int>::Serialize() const {
 		char b[64];
 		return String(Dec(body, b));
 	}
-	template<> String Type<uint>::Serialize() const {
+	template <> String Serializable<uint>::Serialize() const {
 		char b[64];
 		return String(UDec(body, b));
 	}
-	template<> String Type<long>::Serialize() const {
+	template <> String Serializable<long>::Serialize() const {
 		char b[64];
 		return String(Dec(body, b));
 	}
-	template<> String Type<unsigned long>::Serialize() const {
+	template <> String Serializable<unsigned long>::Serialize() const {
 		char b[64];
 		return String(UDec(body, b));
 	}
-	template<> String Type<long long>::Serialize() const {
+	template <> String Serializable<long long>::Serialize() const {
 		char b[64];
 		return String(Dec(body, b));
 	}
-	template<> String Type<unsigned long long>::Serialize() const {
+	template <> String Serializable<unsigned long long>::Serialize() const {
 		char b[64];
 		return String(UDec(body, b));
 	}
-	// template<> String Type<float>::Serialize() const {
+	// template<> String Serializable<float>::Serialize() const {
 	// 	char b[64];
 	// 	return String(Hex(*(u32*)&body, b));
 	// }
-	// template<> String Type<double>::Serialize() const {
+	// template<> String Serializable<double>::Serialize() const {
 	// 	char b[64];
 	// 	return String(Hex(*(u64*)&body, b));
 	// }
-	// template<> String Type<long double>::Serialize() const {
+	// template<> String Serializable<long double>::Serialize() const {
 	// 	char b[64];
 	// 	return String(Hex(*(u128*)&body, b));
 	// }
