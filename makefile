@@ -1,6 +1,8 @@
 #################################################################### makefile
 # 1. ソースを勝手に探して依存関係ファイルを作成
-# 3. ターゲット情報を拾って、なければディレクトリ名を使う
+# 2. ターゲット情報を拾って、なければディレクトリ名を使う
+
+.PHONY : clean RELEASE DEBUG
 
 
 
@@ -25,9 +27,7 @@ EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm
 
 -include target.make
 target ?= $(shell echo $$PWD | sed s!.*/!! )
-all: $(TARGETDIR)/$(target)
 
-.PHONY : clean
 
 
 
@@ -94,34 +94,31 @@ $(TARGETDIR)/%.dep : sources/%.c makefile
 ############################################################### RULES & TARGET
 
 $(TARGETDIR)/$(target): makefile $(objs)
-ifeq ($(suffix $(target)),)
-	@echo " LD $@"
-	@gcc -o $(executable) $(objs) $(EXLIBS)
-endif
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
 	@ar rc $@ $(objs)
+else
+	@echo " LD $@"
+	@gcc -o $(executable) $(objs) $(EXLIBS)
 endif
-
-
-
-clean:
-	rm -rf RELEASE DEBUG
-
-# 自動テストを実行
-test: $(target) $(tobjs)
+	@echo -n building manual tests...
+	@$(foreach m, $(mtmods), gcc -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L$(TARGETDIR) -ltoolbox $(EXLIBS) &&) true
+	@$(foreach m, $(mtmods), chmod +x $(TARGETDIR)/$(m) &&) true
+	@echo OK.
 	@echo -n building tests...
-	@$(foreach m, $(tmods), gcc -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L. -ltoolbox $(EXLIBS) &&) true
+	@$(foreach m, $(tmods), gcc -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L$(TARGETDIR) -ltoolbox $(EXLIBS) &&) true
 	@$(foreach m, $(tmods), chmod +x $(TARGETDIR)/$(m) &&) true
 	@echo OK.
 	@echo running tests...
 	@$(foreach m, $(tmods), $(TARGETDIR)/$(m) &&) true
 	@echo OK.
 
-# 自動テストを実行、手動テストをビルド
-mtest: test $(mtobjs)
-	@echo -n building manual tests...
-	@$(foreach m, $(mtmods), gcc -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L. -ltoolbox $(EXLIBS) &&) true
-	@$(foreach m, $(mtmods), chmod +x $(TARGETDIR)/$(m) &&) true
-	@echo OK.
+
+clean:
+	rm -rf RELEASE DEBUG
+
+RELEASE: RELEASE/$(target)
+
+DEBUG: DEBUG/$(target)
+
 
