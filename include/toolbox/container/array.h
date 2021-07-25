@@ -43,17 +43,19 @@ namespace TB {
 			memcpy(body, origin.body, sizeof(T) * elements);
 		};
 
-		~Array(){
-			if(body){ free(body); }
+		~Array() {
+			if (body) {
+				free(body);
+			}
 		};
-		T& operator[](unsigned index){
+		T& operator[](unsigned index) {
 			if (elements <= index) {
 				throw std::out_of_range("TB:Array");
 			}
 			return body[index];
 		};
 
-		void PushBack(const T& v) {
+		void operator+=(const T& v) {
 			const unsigned e(elements);
 			Resize(elements + 1);
 			body[e] = v;
