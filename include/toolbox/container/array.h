@@ -43,54 +43,67 @@ namespace TB {
 			memcpy(body, origin.body, sizeof(T) * elements);
 		};
 
-		~Array(){
-			if(body){ free(body); }
+		~Array() {
+			if (body) {
+				free(body);
+			}
 		};
-		T& operator[](unsigned index){
+		T& operator[](unsigned index) {
 			if (elements <= index) {
 				throw std::out_of_range("TB:Array");
 			}
 			return body[index];
 		};
 
-		void PushBack(const T& v) {
-			const unsigned e(elements);
-			Resize(elements + 1);
-			body[e] = v;
-		};
+		void operator+=(const T& v) { Append(v); };
+		void operator+=(const Array& v) { Append(v); };
 
-		unsigned Size() { return elements * sizeof(T); };
-		unsigned Length() { return elements; };
+		unsigned Size() const { return elements * sizeof(T); };
+		unsigned Length() const { return elements; };
 		T* Raw() const { return body; };
 
 	protected:
+		unsigned elements;
+		unsigned assigned;
+		T* body;
+
+		//サイズ変更
 		void Resize(unsigned requierd) {
-			if (requierd <= elements) {
-				return;
-			}
 			if (requierd <= assigned) {
 				elements = requierd;
 				return;
 			}
-			const unsigned r(GetOverPow2(requierd));
+			const unsigned r(requierd < 16 ? 16 : GetOverPow2(requierd));
 			void* const newBody(realloc(body, sizeof(T) * r));
-			if (!newBody) {
+			if (!!r && !newBody) {
 				throw std::runtime_error("realloc failed in 'TB::Array'");
 			}
 			body = (T*)newBody;
 			assigned = r;
 			elements = requierd;
 		};
+		//最後の要素を削除
+		void CutTail() {
+			if (elements) {
+				--elements;
+			}
+		};
+		//末尾に追加
+		void Append(const Array& t) {
+			const unsigned oldLength(elements);
+			Resize(elements + t.Length());
+			memcpy(body + oldLength, t.body, t.Length());
+		};
+		void Append(const T& v) {
+			const unsigned e(elements);
+			Resize(elements + 1);
+			body[e] = v;
+		};
 
 	private:
-		unsigned elements;
-		unsigned assigned;
-		T* body;
-
 		template <typename U> static U GetOverPow2(U n) {
-			n -= 1;
-			for (unsigned m(1); m < sizeof(U) * 8; m <<= 1) {
-				n |= n >> m;
+			for (unsigned m(1); m < sizeof(U) * 8; ++m) {
+				n |= n >> 1;
 			}
 			return n + 1;
 		};

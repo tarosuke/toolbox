@@ -1,5 +1,5 @@
 /********************************************************************** 文字列
- * Copyright (C) 2017,2019 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2017,2019,2021 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,9 +22,9 @@
 
 
 
-namespace TB{
+namespace TB {
 
-	class String : public Array<char>{
+	class String : protected Array<char> {
 	public:
 		// manipulators
 		class endl;
@@ -32,47 +32,43 @@ namespace TB{
 		class hex;
 
 		// constructors
-		String() : length(0){ (*this)[0] = 0; };
+		String() {
+			Resize(1);
+			body[0] = 0;
+		};
 		String(const String&);
 		String(const char*);
-		String(
-			long long,
-			unsigned length = 0,
-			char padding = ' ');
-		String(
-			unsigned long long,
-			unsigned length = 0,
-			char padding = ' ');
+		String(long long, unsigned length = 0, char padding = ' ');
+		String(unsigned long long, unsigned length = 0, char padding = ' ');
 
-		String& operator=(const String&);
 		String& operator=(const char*);
 
 		operator char*() { return Raw(); };
 		operator const char*() const { return Raw(); };
-		String& operator +=(const String&);
-		String& operator +=(const char*);
-		String& operator +=(char);
-		String operator +(const String&) const;
-		String operator +(const char*) const;
+		String& operator+=(const String&);
+		String& operator+=(const char*);
+		String& operator+=(char);
+		String operator+(const String&) const;
+		String operator+(const char*) const;
 
 		// << operator
-		String& operator <<(long long);
-		String& operator <<(long long unsigned);
-		String& operator <<(const String&);
+		String& operator<<(long long);
+		String& operator<<(long long unsigned);
+		String& operator<<(const String&);
 
 		bool operator==(const char*) const;
+		bool operator!=(const char* t) const { return !(*this == t); };
 
-		bool IsEmpty() const { return !length; };
-		unsigned Length() const { return length; };
+		bool IsEmpty() const { return Array::Length() <= 1; };
+		unsigned Length() const { return Array::Length() - 1; };
 
 		// string manipulators
-		String SubStr(unsigned start, unsigned length)const;
-		void Clear(){ (*this)[0] = 0; length = 0; };
+		void Clear() {
+			Resize(1);
+			(*this)[0] = 0;
+		};
 
 	private:
-		unsigned radix;
-		unsigned length;
-
 		void FromNumeric(
 			long long unsigned,
 			unsigned length,
