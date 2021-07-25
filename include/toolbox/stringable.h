@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2019 tarosuke<webmaster@tarosuke.net>
+/***** 基本型のクラスとシノニム
+ * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,28 +16,22 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#pragma once
 
-#include <toolbox/text.h>
-
-
-Text* Text::link(0);
-bool Text::inited(false);
-
-
-Text::Text(const char* key) : key(key){
-		if(!inited){
-			next = link;
-			link = this;
-		}
-}
+#include <toolbox/type.h>
+#include <toolbox/string.h>
 
 
 
-Text::operator const char*(){
-	return key;
-}
+namespace TB {
 
+	template <typename T> class Stringable : public Type<T> {
+	public:
+		// serializer and de-serializer
+		String Serialize() const { return String(body); };
+		void operator=(const char* o) { body = String(o); };
+	};
 
-void Text::Init(){
-	
+	template <> String Stringable<String>::Serialize() const { return body; };
+	template <> void Stringable<String>::operator=(const char* o) { body = o; };
 }
