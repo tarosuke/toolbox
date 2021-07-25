@@ -18,33 +18,20 @@
  */
 #pragma once
 
+#include <toolbox/type.h>
+#include <toolbox/string.h>
+
 
 
 namespace TB {
 
-	template <typename T> class Type {
+	template <typename T> class Stringable : public Type<T> {
 	public:
-		Type(const T& t) : body(t){};
-		const T& operator=(const T& t) {
-			body = t;
-			return body;
-		};
-		operator const T&() const { return body; };
-
-
-	protected:
-		T body;
+		// serializer and de-serializer
+		String Serialize() const { return String(body); };
+		void operator=(const char* o) { body = String(o); };
 	};
 
+	template <> String Stringable<String>::Serialize() const { return body; };
+	template <> void Stringable<String>::operator=(const char* o) { body = o; };
 }
-
-
-using u32 = __uint32_t;
-using i32 = __int32_t;
-using u64 = __uint64_t;
-using i64 = __int64_t;
-using u128 = __uint128_t;
-using i128 = __int128_t;
-
-
-#define elementsOf(a) (sizeof(a) / sizeof(a[0]))
