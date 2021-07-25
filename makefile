@@ -112,6 +112,8 @@ endif
 	@echo running tests...
 	@$(foreach m, $(tmods), $(TARGETDIR)/$(m) &&) true
 	@echo OK.
+	@rm -f $(target)
+	@ln -s $(TARGETDIR)/$(target) $(target)
 
 
 clean:
