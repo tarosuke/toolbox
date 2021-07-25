@@ -107,7 +107,7 @@ endif
 
 
 clean:
-	rm -rf RELEASE/* DEBUG/*
+	rm -rf RELEASE DEBUG
 
 # 自動テストを実行
 test: $(target) $(tobjs)

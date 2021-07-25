@@ -8,3 +8,5 @@
 .hg
 /*.code-workspace
 /.vscode
+/RELEASE
+/DEBUG
