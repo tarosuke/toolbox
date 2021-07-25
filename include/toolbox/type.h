@@ -39,7 +39,7 @@ namespace TB {
 	};
 
 
-	template <typename T> class Serializable : public Type<T> {
+	template <typename T> class Stringable : public Type<T> {
 	public:
 		// serializer and de-serializer
 		String Serialize() const;

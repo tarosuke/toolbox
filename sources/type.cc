@@ -60,41 +60,41 @@ namespace {
 namespace TB {
 
 	template <>
-	const String& Serializable<String>::operator=(const char* text) {
+	const String& Stringable<String>::operator=(const char* text) {
 		body = text;
 		return body;
 	}
 
-	template <> const int& Serializable<int>::operator=(const char* text) {
+	template <> const int& Stringable<int>::operator=(const char* text) {
 		body = atoi(text);
 		return body;
 	}
-	template <> const long& Serializable<long>::operator=(const char* text) {
+	template <> const long& Stringable<long>::operator=(const char* text) {
 		body = strtol(text, 0, 0);
 		return body;
 	}
 	template <>
-	const long long& Serializable<long long>::operator=(const char* text) {
+	const long long& Stringable<long long>::operator=(const char* text) {
 		body = strtoll(text, 0, 0);
 		return body;
 	}
 	template <>
-	const unsigned& Serializable<unsigned>::operator=(const char* text) {
+	const unsigned& Stringable<unsigned>::operator=(const char* text) {
 		body = strtoul(text, 0, 0);
 		return body;
 	}
 	template <> const unsigned long&
-	Serializable<unsigned long>::operator=(const char* text) {
+	Stringable<unsigned long>::operator=(const char* text) {
 		body = strtoul(text, 0, 0);
 		return body;
 	}
 	template <> const unsigned long long&
-	Serializable<unsigned long long>::operator=(const char* text) {
+	Stringable<unsigned long long>::operator=(const char* text) {
 		body = strtoull(text, 0, 0);
 		return body;
 	}
 
-	template <> const float& Serializable<float>::operator=(const char* text) {
+	template <> const float& Stringable<float>::operator=(const char* text) {
 		if (text[0] == '0' && text[1] == 'x') {
 			//ビットイメージで読み込み
 			union {
@@ -109,7 +109,7 @@ namespace TB {
 		return body;
 	}
 	template <>
-	const double& Serializable<double>::operator=(const char* text) {
+	const double& Stringable<double>::operator=(const char* text) {
 		if (text[0] == '0' && text[1] == 'x') {
 			//ビットイメージで読み込み
 			union {
@@ -124,7 +124,7 @@ namespace TB {
 		return body;
 	}
 	template <>
-	const long double& Serializable<long double>::operator=(const char* text) {
+	const long double& Stringable<long double>::operator=(const char* text) {
 		if (text[0] == '0' && text[1] == 'x') {
 			//ビットイメージで読み込み
 			text += 2;
@@ -147,40 +147,40 @@ namespace TB {
 	}
 
 
-	template <> String Serializable<String>::Serialize() const { return body; }
-	template <> String Serializable<int>::Serialize() const {
+	template <> String Stringable<String>::Serialize() const { return body; }
+	template <> String Stringable<int>::Serialize() const {
 		char b[64];
 		return String(Dec(body, b));
 	}
-	template <> String Serializable<uint>::Serialize() const {
+	template <> String Stringable<uint>::Serialize() const {
 		char b[64];
 		return String(UDec(body, b));
 	}
-	template <> String Serializable<long>::Serialize() const {
+	template <> String Stringable<long>::Serialize() const {
 		char b[64];
 		return String(Dec(body, b));
 	}
-	template <> String Serializable<unsigned long>::Serialize() const {
+	template <> String Stringable<unsigned long>::Serialize() const {
 		char b[64];
 		return String(UDec(body, b));
 	}
-	template <> String Serializable<long long>::Serialize() const {
+	template <> String Stringable<long long>::Serialize() const {
 		char b[64];
 		return String(Dec(body, b));
 	}
-	template <> String Serializable<unsigned long long>::Serialize() const {
+	template <> String Stringable<unsigned long long>::Serialize() const {
 		char b[64];
 		return String(UDec(body, b));
 	}
-	// template<> String Serializable<float>::Serialize() const {
+	// template<> String Stringable<float>::Serialize() const {
 	// 	char b[64];
 	// 	return String(Hex(*(u32*)&body, b));
 	// }
-	// template<> String Serializable<double>::Serialize() const {
+	// template<> String Stringable<double>::Serialize() const {
 	// 	char b[64];
 	// 	return String(Hex(*(u64*)&body, b));
 	// }
-	// template<> String Serializable<long double>::Serialize() const {
+	// template<> String Stringable<long double>::Serialize() const {
 	// 	char b[64];
 	// 	return String(Hex(*(u128*)&body, b));
 	// }
