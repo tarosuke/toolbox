@@ -13,24 +13,25 @@ COPTS := -O3
 endif
 ifeq ($(MAKECMDGOALS), DEBUG)
 TARGETDIR := DEBUG
-COPTS := -O0
+COPTS := -O0 -g
 endif
 
+COPTS += -O0 -Wall -Werror -Iinclude
+CCOPTS += $(COPTS) -std=c++11
+
+EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm
 
 
 
 -include target.make
 target ?= $(shell echo $$PWD | sed s!.*/!! )
-all: $(target)
+all: $(TARGETDIR)/$(target)
 
 .PHONY : clean
 
 
 
 ############################################################ FILE RECOGNITIONS
-
-COPTS := -O0 -Wall -Werror -g -IX11
-CCOPTS += $(COPTS) -std=c++11
 
 suffixes := %.c %.cc %.glsl
 
@@ -49,9 +50,6 @@ tdeps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(tmods)))
 mtmods := $(filter .mtests/%, $(basename $(srcs)))
 mtobjs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(tmods)))
 mtdeps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(tmods)))
-
-
-EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm
 
 
 
@@ -92,9 +90,10 @@ $(TARGETDIR)/%.dep : sources/%.c makefile
 	@$(CPP) $(COPTS) -MM $< >> $@
 
 
+
 ############################################################### RULES & TARGET
 
-$(target): makefile $(objs)
+$(TARGETDIR)/$(target): makefile $(objs)
 ifeq ($(suffix $(target)),)
 	@echo " LD $@"
 	@gcc -o $(executable) $(objs) $(EXLIBS)
