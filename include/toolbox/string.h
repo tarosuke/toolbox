@@ -1,5 +1,5 @@
 /********************************************************************** 文字列
- * Copyright (C) 2017,2019 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2017,2019,2021 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,9 +22,9 @@
 
 
 
-namespace TB{
+namespace TB {
 
-	class String : public Array<char>{
+	class String : public Array<char> {
 	public:
 		// manipulators
 		class endl;
@@ -32,33 +32,27 @@ namespace TB{
 		class hex;
 
 		// constructors
-		String() : length(0){ (*this)[0] = 0; };
+		String() : length(0) { (*this)[0] = 0; };
 		String(const String&);
 		String(const char*);
-		String(
-			long long,
-			unsigned length = 0,
-			char padding = ' ');
-		String(
-			unsigned long long,
-			unsigned length = 0,
-			char padding = ' ');
+		String(long long, unsigned length = 0, char padding = ' ');
+		String(unsigned long long, unsigned length = 0, char padding = ' ');
 
 		String& operator=(const String&);
 		String& operator=(const char*);
 
 		operator char*() { return Raw(); };
 		operator const char*() const { return Raw(); };
-		String& operator +=(const String&);
-		String& operator +=(const char*);
-		String& operator +=(char);
-		String operator +(const String&) const;
-		String operator +(const char*) const;
+		String& operator+=(const String&);
+		String& operator+=(const char*);
+		String& operator+=(char);
+		String operator+(const String&) const;
+		String operator+(const char*) const;
 
 		// << operator
-		String& operator <<(long long);
-		String& operator <<(long long unsigned);
-		String& operator <<(const String&);
+		String& operator<<(long long);
+		String& operator<<(long long unsigned);
+		String& operator<<(const String&);
 
 		bool operator==(const char*) const;
 
@@ -66,8 +60,11 @@ namespace TB{
 		unsigned Length() const { return length; };
 
 		// string manipulators
-		String SubStr(unsigned start, unsigned length)const;
-		void Clear(){ (*this)[0] = 0; length = 0; };
+		String SubStr(unsigned start, unsigned length) const;
+		void Clear() {
+			(*this)[0] = 0;
+			length = 0;
+		};
 
 	private:
 		unsigned radix;
