@@ -24,7 +24,7 @@
 
 namespace TB {
 
-	class String : public Array<char> {
+	class String : protected Array<char> {
 	public:
 		// manipulators
 		class endl;
@@ -32,13 +32,15 @@ namespace TB {
 		class hex;
 
 		// constructors
-		String() : length(0) { (*this)[0] = 0; };
+		String() {
+			Resize(1);
+			body[0] = 0;
+		};
 		String(const String&);
 		String(const char*);
 		String(long long, unsigned length = 0, char padding = ' ');
 		String(unsigned long long, unsigned length = 0, char padding = ' ');
 
-		String& operator=(const String&);
 		String& operator=(const char*);
 
 		operator char*() { return Raw(); };
@@ -55,21 +57,18 @@ namespace TB {
 		String& operator<<(const String&);
 
 		bool operator==(const char*) const;
+		bool operator!=(const char* t) const { return !(*this == t); };
 
-		bool IsEmpty() const { return !length; };
-		unsigned Length() const { return length; };
+		bool IsEmpty() const { return Array::Length() <= 1; };
+		unsigned Length() const { return Array::Length() - 1; };
 
 		// string manipulators
-		String SubStr(unsigned start, unsigned length) const;
 		void Clear() {
+			Resize(1);
 			(*this)[0] = 0;
-			length = 0;
 		};
 
 	private:
-		unsigned radix;
-		unsigned length;
-
 		void FromNumeric(
 			long long unsigned,
 			unsigned length,
