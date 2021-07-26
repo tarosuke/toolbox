@@ -1,10 +1,12 @@
+#include <toolbox/test.h>
+
 #include <toolbox/tg/openvr.h>
 #include <toolbox/tg/scenery.h>
 #include <toolbox/tg/widget/root.h>
 #include <toolbox/tg/widget/border.h>
 #include <toolbox/tg/widget/cursor.h>
 
-#include <assert.h>
+
 #include <unistd.h>
 #include <syslog.h>
 

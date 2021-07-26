@@ -1,18 +1,41 @@
+#################################################################### makefile
+# 1. ソースを勝手に探して依存関係ファイルを作成
+# 2. ターゲット情報を拾って、なければディレクトリ名を使う
+
+.PHONY : clean RELEASE DEBUG COVERAGE
+
+
+
+############################################################# TARGET & OPTIONS
+
+MAKECMDGOALS ?= RELEASE
+ifeq ($(MAKECMDGOALS), RELEASE)
+TARGETDIR := RELEASE
+COPTS := -O3
+endif
+ifeq ($(MAKECMDGOALS), DEBUG)
+TARGETDIR := DEBUG
+COPTS := -O0 -g
+endif
+ifeq ($(MAKECMDGOALS), COVERAGE)
+TARGETDIR := COVERAGE
+COPTS := -g -coverage
+endif
+
+COPTS += -Wall -Werror -Iinclude
+CCOPTS += $(COPTS) -std=c++11
+
+EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov
+
+
+
 -include target.make
 target ?= $(shell echo $$PWD | sed s!.*/!! )
 
 
-all: $(target)
-
-.PHONY : clean test mtest watch uninstall
 
 
 ############################################################ FILE RECOGNITIONS
-
-COPTS ?= -Iinclude -I/usr/include/gdbm
-
-COPTS += -O0 -Wall -Werror -g -IX11
-CCOPTS += $(COPTS) -std=c++11
 
 suffixes := %.c %.cc %.glsl
 
@@ -21,21 +44,18 @@ srcs := $(filter $(suffixes), $(files))
 spvs := $(filter %.frag %.vert, $(files))
 sbins:= $(addprefix .builds/, $(addsuffix .spv, $(spvs)))
 mods := $(filter-out tests/%, $(basename $(srcs)))
-objs := $(addprefix .builds/, $(addsuffix .o, $(mods) $(spvs)))
-deps := $(addprefix .builds/, $(addsuffix .dep, $(mods)))
+objs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(mods)))
+deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
 
 # テスト
 tmods := $(filter .tests/%, $(basename $(srcs)))
-tobjs := $(addprefix .builds/, $(addsuffix .o, $(tmods)))
-tdeps := $(addprefix .builds/, $(addsuffix .dep, $(tmods)))
+tobjs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(tmods)))
+tdeps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(tmods)))
 
 # 手動テスト
 mtmods := $(filter .mtests/%, $(basename $(srcs)))
-mtobjs := $(addprefix .builds/, $(addsuffix .o, $(tmods)))
-mtdeps := $(addprefix .builds/, $(addsuffix .dep, $(tmods)))
-
-
-EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lvulkan
+mtobjs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(tmods)))
+mtdeps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(tmods)))
 
 
 
@@ -45,36 +65,31 @@ ifneq ($(MAKECMDGOALS),clean)
 -include $(deps) $(tdeps)
 endif
 
-vpath %.o .builds
+vpath %.o $(TARGETDIR)
 
 
-.builds/%.o : sources/%.cc makefile
+$(TARGETDIR)/%.o : sources/%.cc makefile
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
 	@$(CC) $(CCOPTS) -c -o $@ $<
 
-.builds/%.o : sources/%.c makefile
+$(TARGETDIR)/%.o : sources/%.c makefile
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
 	@${CC} $(COPTS) -c -o $@ $<
 
-.builds/%.o : sources/%.glsl makefile
+$(TARGETDIR)/%.o : sources/%.glsl makefile
 	@echo " OBJCOPY $@"
 	@mkdir -p $(dir $@)
 	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
 
-.builds/%.o : .builds/%.spv makefile
-	@echo " OBJCOPY $@"
-	@mkdir -p $(dir $@)
-	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
-
-.builds/%.dep : sources/%.cc makefile
+$(TARGETDIR)/%.dep : sources/%.cc makefile
 	@echo " CPP $@"
 	@mkdir -p $(dir $@)
 	@echo -n $(dir $@) > $@
 	@$(CPP) $(CCOPTS) -MM $< >> $@
 
-.builds/%.dep : sources/%.c makefile
+$(TARGETDIR)/%.dep : sources/%.c makefile
 	@echo " CPP $@"
 	@echo -n $(dir $@) > $@
 	@mkdir -p $(dir $@)
@@ -95,43 +110,38 @@ vpath %.o .builds
 	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
 
 
+
 ############################################################### RULES & TARGET
 
-$(target): makefile $(objs) $(sbins)
-ifeq ($(suffix $(target)),)
-	@echo " LD $@"
-	@gcc -o $(executable) $(objs) $(EXLIBS)
-endif
+$(TARGETDIR)/$(target): makefile $(objs)
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
 	@ar rc $@ $(objs)
+else
+	@echo " LD $@"
+	@gcc -o $(executable) $(objs) $(EXLIBS)
 endif
+	@echo -n building manual tests...
+	@$(foreach m, $(mtmods), gcc -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L$(TARGETDIR) -ltoolbox $(EXLIBS) &&) true
+	@$(foreach m, $(mtmods), chmod +x $(TARGETDIR)/$(m) &&) true
+	@echo OK.
+	@echo -n building tests...
+	@$(foreach m, $(tmods), gcc -coverage -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L$(TARGETDIR) -ltoolbox $(EXLIBS) &&) true
+	@$(foreach m, $(tmods), chmod +x $(TARGETDIR)/$(m) &&) true
+	@echo OK.
+	@echo running tests...
+	@$(foreach m, $(tmods), $(TARGETDIR)/$(m) &&) true
+	@echo OK.
+	@rm -f $(target)
+	@ln -s $(TARGETDIR)/$(target) $(target)
 
-install: libtoolbox.a
-	@sudo cp libtoolbox.a /usr/local/lib
-	@sudo cp -a include/toolbox /usr/local/include
-
-uninstall:
-	@sudo rm -f /usr/local/lib/libtoolbox.a
-	@sudo rm -rf  /usr/local/include/toolbox
 
 clean:
-	rm -rf .builds/* .builds/.tests .builds/.mtests $(target)* $(shell find . -name "*.orig")
+	rm -rf RELEASE DEBUG COVERAGE .builds *.gcov
 
-# 自動テストを実行
-test: $(target) $(tobjs)
-	@echo -n building tests...
-	@$(foreach m, $(tmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox $(EXLIBS) &&) true
-	@$(foreach m, $(tmods), chmod +x .builds/$(m) &&) true
-	@echo OK.
-	@echo -n running tests...
-	@$(foreach m, $(tmods), .builds/$(m) &&) true
-	@echo OK.
+RELEASE: RELEASE/$(target)
 
-# 自動テストを実行、手動テストをビルド
-mtest: test $(mtobjs)
-	@echo -n building manual tests...
-	@$(foreach m, $(mtmods), gcc -o .builds/$(m) .builds/$(m).o -L. -ltoolbox $(EXLIBS) &&) true
-	@$(foreach m, $(mtmods), chmod +x .builds/$(m) &&) true
-	@echo OK.
+DEBUG: DEBUG/$(target)
 
+COVERAGE: COVERAGE/$(target)
+	@lcov -c -d $(TARGETDIR) -o $(TARGETDIR)/lcov.info
