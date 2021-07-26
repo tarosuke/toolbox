@@ -3,6 +3,7 @@
 *.o
 *.so
 *.a
+*.gcov
 
 *.kate-swp
 .hg
@@ -10,3 +11,5 @@
 /.vscode
 /RELEASE
 /DEBUG
+/COVERAGE
+/.builds
