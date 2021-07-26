@@ -121,7 +121,7 @@ endif
 
 
 clean:
-	rm -rf RELEASE DEBUG COVERAGE
+	rm -rf RELEASE DEBUG COVERAGE .builds *.gcov
 
 RELEASE: RELEASE/$(target)
 
