@@ -26,10 +26,7 @@
 namespace TB {
 
 	String::String(const String& t) { *this = t; }
-
-
-	String::String(const char* t) { *this = t; }
-
+	String::String(const char* t) { Load(t); }
 	String::String(long long value, unsigned length, char padding) {
 		if (value < 0) {
 			*this += '-';
@@ -78,12 +75,16 @@ namespace TB {
 
 
 	String& String::operator=(const char* t) {
+		Load(t);
+		return *this;
+	}
+
+	void String::Load(const char* t) {
 		Resize(0);
 		for (; t && *t; ++t) {
-			*this += *t;
+			Append(*t);
 		}
 		Append(0);
-		return *this;
 	}
 
 	String& String::operator+=(const String& t) {
