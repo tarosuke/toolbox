@@ -18,6 +18,8 @@
  */
 #pragma once
 
+#include <cstdint>
+
 
 
 namespace TB {
