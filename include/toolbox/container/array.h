@@ -32,15 +32,15 @@ namespace TB {
 		Array() : elements(0), assigned(0), body(0){};
 		Array(const T origin[], unsigned elements) : elements(0), assigned(0) {
 			Resize(origin.elements);
-			memcpy(body, origin, sizeof(T) * elements);
+			memmove(body, origin, sizeof(T) * elements);
 		};
 		Array(const Array& origin) : elements(0), assigned(0) {
 			Resize(origin.elements);
-			memcpy(body, origin.body, sizeof(T) * elements);
+			memmove(body, origin.body, sizeof(T) * elements);
 		};
 		void operator=(const Array& origin) {
 			Resize(origin.elements);
-			memcpy(body, origin.body, sizeof(T) * elements);
+			memmove(body, origin.body, sizeof(T) * elements);
 		};
 
 		~Array() {
@@ -83,21 +83,14 @@ namespace TB {
 			elements = requierd;
 		};
 		//最後の要素を削除
-		void CutTail() {
-			if (elements) {
-				--elements;
-			}
-		};
 		//末尾に追加
-		void Append(const Array& t) {
-			const unsigned oldLength(elements);
-			Resize(elements + t.Length());
-			memcpy(body + oldLength, t.body, t.Length());
+		void Copy(const Array& t, unsigned offset) {
+			Resize(offset + t.Length());
+			memmove(body + offset, t.body, t.Length());
 		};
-		void Append(const T& v) {
-			const unsigned e(elements);
-			Resize(elements + 1);
-			body[e] = v;
+		void Copy(const T& v, unsigned offset) {
+			Resize(offset + 1);
+			body[offset] = v;
 		};
 
 	private:

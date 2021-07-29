@@ -26,10 +26,7 @@
 namespace TB {
 
 	String::String(const String& t) { *this = t; }
-
-
-	String::String(const char* t) { *this = t; }
-
+	String::String(const char* t) { Load(t); }
 	String::String(long long value, unsigned length, char padding) {
 		if (value < 0) {
 			*this += '-';
@@ -78,31 +75,35 @@ namespace TB {
 
 
 	String& String::operator=(const char* t) {
-		Resize(0);
-		for (; t && *t; ++t) {
-			*this += *t;
-		}
-		Append(0);
+		Load(t);
 		return *this;
 	}
 
+	void String::Load(const char* t) {
+		Resize(0);
+		unsigned i(0);
+		for (; t && *t; ++t, ++i) {
+			Copy(*t, i);
+		}
+		Copy(0, i);
+	}
+
 	String& String::operator+=(const String& t) {
-		CutTail();
-		Append(t);
+		Copy(t, Length());
 		return *this;
 	}
 	String& String::operator+=(const char* t) {
-		CutTail();
-		for (; t && *t; ++t) {
-			Append(*t);
+		unsigned i(Length());
+		for (; t && *t; ++t, ++i) {
+			Copy(*t, i);
 		}
-		Append(0);
+		Copy(0, i);
 		return *this;
 	}
 	String& String::operator+=(char c) {
-		CutTail();
-		Append(c);
-		Append(0);
+		const unsigned l(Length());
+		Copy(c, l);
+		Copy(0, l + 1);
 		return *this;
 	}
 	String String::operator+(const String& t) const {
@@ -128,7 +129,7 @@ namespace TB {
 
 	String& String::operator<<(long long i) {
 		if (i < 0) {
-			Append('-');
+			*this += '-';
 			i = -i;
 		}
 		FromNumeric(static_cast<unsigned>(i), 0, ' ', 10);

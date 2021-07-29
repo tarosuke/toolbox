@@ -74,6 +74,6 @@ namespace TB {
 			unsigned length,
 			char padding,
 			unsigned radix = 10);
+		void Load(const char*);
 	};
-
 }
