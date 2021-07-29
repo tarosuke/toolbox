@@ -83,21 +83,14 @@ namespace TB {
 			elements = requierd;
 		};
 		//最後の要素を削除
-		void CutTail() {
-			if (elements) {
-				--elements;
-			}
-		};
 		//末尾に追加
-		void Append(const Array& t) {
-			const unsigned oldLength(elements);
-			Resize(elements + t.Length());
-			memmove(body + oldLength, t.body, t.Length());
+		void Copy(const Array& t, unsigned offset) {
+			Resize(offset + t.Length());
+			memmove(body + offset, t.body, t.Length());
 		};
-		void Append(const T& v) {
-			const unsigned e(elements);
-			Resize(elements + 1);
-			body[e] = v;
+		void Copy(const T& v, unsigned offset) {
+			Resize(offset + 1);
+			body[offset] = v;
 		};
 
 	private:
