@@ -55,8 +55,8 @@ namespace TB {
 			return body[index];
 		};
 
-		void operator+=(const T& v) { Append(v); };
-		void operator+=(const Array& v) { Append(v); };
+		void operator+=(const T& v) { Copy(v, Length()); };
+		void operator+=(const Array& v) { Copy(v, Length()); };
 
 		unsigned Size() const { return elements * sizeof(T); };
 		unsigned Length() const { return elements; };

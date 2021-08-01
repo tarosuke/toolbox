@@ -32,5 +32,16 @@ int main() {
 	assertEQ(string.Length(), 32, HU);
 	assertEQ(string, "/abc/abc/abc/abc/abc/abc/abc/abc", H);
 
+	auto s(string.Split("/a"));
+	assertEQ(s.Length(), 9, HU);
+	for (unsigned n(0); n < 9; ++n) {
+		assertEQ(*s[n], "bc", H);
+	};
+	auto p(string.Split("/abc"));
+	assertEQ(s.Length(), 9, HU);
+	for (unsigned n(0); n < 9; ++n) {
+		assertEQ(*s[n], "", H);
+	};
+
 	return 0;
 }

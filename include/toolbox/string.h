@@ -62,6 +62,8 @@ namespace TB {
 		bool IsEmpty() const { return Array::Length() <= 1; };
 		unsigned Length() const { return Array::Length() - 1; };
 
+		Array<String*> Split(const char* delimiter);
+
 		// string manipulators
 		void Clear() {
 			Resize(1);
