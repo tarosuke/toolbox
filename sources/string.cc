@@ -136,13 +136,13 @@ namespace TB {
 		return *this;
 	}
 
-	Array<String*> String::Split(const char* delimitor) {
-		Array<String*> arr;
+	Array<String> String::Split(const char* delimitor) {
+		Array<String> arr;
 		if (!delimitor) {
-			arr += new String(*this);
+			arr += *this;
 			return arr;
 		}
-		String* newString(new String);
+		String newString;
 		for (const char* c(*this); c && *c; ++c) {
 			if (*delimitor == *c) {
 				// デリミタチェック
@@ -152,7 +152,7 @@ namespace TB {
 				if (!*d) {
 					// デリミタ確認
 					arr += newString;
-					newString = new String;
+					newString.Clear();
 					c = e - 1;
 				} else {
 					// すでにcを一つ進めてあるので代わりを追加

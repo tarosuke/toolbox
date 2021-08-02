@@ -18,6 +18,8 @@
  */
 #pragma once
 
+#include <type_traits>
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -26,6 +28,7 @@
 
 
 namespace TB {
+	// is_trivially_constructible
 
 	template <typename T> class Array {
 	public:
@@ -35,8 +38,8 @@ namespace TB {
 			memmove(body, origin, sizeof(T) * elements);
 		};
 		Array(const Array& origin) : elements(0), assigned(0) {
-			Resize(origin.elements);
-			memmove(body, origin.body, sizeof(T) * elements);
+			Resize(0);
+			Copy(origin, 0);
 		};
 		void operator=(const Array& origin) {
 			Resize(origin.elements);
@@ -85,8 +88,8 @@ namespace TB {
 		//最後の要素を削除
 		//末尾に追加
 		void Copy(const Array& t, unsigned offset) {
-			Resize(offset + t.Length());
-			memmove(body + offset, t.body, t.Length());
+			std::is_trivially_constructible<T>* b(0);
+			Copy(t, offset, b);
 		};
 		void Copy(const T& v, unsigned offset) {
 			Resize(offset + 1);
@@ -99,6 +102,10 @@ namespace TB {
 				n |= n >> 1;
 			}
 			return n + 1;
+		};
+		void Copy(const Array& t, unsigned offset, std::true_type*) {
+			Resize(offset + t.Length());
+			memmove(body + offset, t.body, t.Length());
 		};
 	};
 }
