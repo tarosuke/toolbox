@@ -34,8 +34,9 @@ namespace TB {
 	public:
 		Array() : elements(0), assigned(0), body(0){};
 		Array(const T origin[], unsigned elements) : elements(0), assigned(0) {
-			Resize(origin.elements);
-			memmove(body, origin, sizeof(T) * elements);
+			for (unsigned n(0); n < elements; ++n) {
+				Copy(origin[n], n);
+			}
 		};
 		Array(const Array& origin) : elements(0), assigned(0) {
 			Resize(0);
