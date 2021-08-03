@@ -136,4 +136,33 @@ namespace TB {
 		return *this;
 	}
 
+	Array<String> String::Split(const char* delimitor) {
+		Array<String> arr;
+		if (!delimitor) {
+			arr += *this;
+			return arr;
+		}
+		String newString;
+		for (const char* c(*this); c && *c; ++c) {
+			if (*delimitor == *c) {
+				// デリミタチェック
+				const char* d(delimitor + 1);
+				const char* e(++c);
+				for (; *d && *e && *d == *e; ++d, ++e) {}
+				if (!*d) {
+					// デリミタ確認
+					arr += newString;
+					newString.Clear();
+					c = e - 1;
+				} else {
+					// すでにcを一つ進めてあるので代わりを追加
+					*newString += *delimitor;
+				}
+			} else {
+				*newString += *c;
+			}
+		}
+		arr += newString;
+		return arr;
+	}
 }
