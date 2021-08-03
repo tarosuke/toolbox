@@ -33,12 +33,13 @@ namespace TB {
 	template <typename T> class Array {
 	public:
 		Array() : elements(0), assigned(0), body(0){};
-		Array(const T origin[], unsigned elements) : elements(0), assigned(0) {
+		Array(const T origin[], unsigned elements)
+			: elements(0), assigned(0), body(0) {
 			for (unsigned n(0); n < elements; ++n) {
 				Copy(origin[n], n);
 			}
 		};
-		Array(const Array& origin) : elements(0), assigned(0) {
+		Array(const Array& origin) : elements(0), assigned(0), body(0) {
 			Resize(0);
 			Copy(origin, 0);
 		};
@@ -52,6 +53,12 @@ namespace TB {
 				Free(TribialConstructable());
 			}
 		};
+		const T& operator[](unsigned index) const {
+			if (elements <= index) {
+				throw std::out_of_range("TB:Array");
+			}
+			return body[index];
+		};
 		T& operator[](unsigned index) {
 			if (elements <= index) {
 				throw std::out_of_range("TB:Array");
@@ -61,6 +68,14 @@ namespace TB {
 
 		void operator+=(const T& v) { Copy(v, Length()); };
 		void operator+=(const Array& v) { Copy(v, Length()); };
+
+		bool operator==(const Array& v) const {
+			if (elements != v.elements) {
+				return false;
+			}
+			return Compare(v, TribialConstructable());
+		};
+		bool operator!=(const Array& t) const { return !(*this == t); };
 
 		unsigned Size() const { return elements * sizeof(T); };
 		unsigned Length() const { return elements; };
@@ -105,6 +120,17 @@ namespace TB {
 			}
 			return n + 1;
 		};
+		bool Compare(const Array& v, const std::true_type&&) const {
+			return !memcmp(body, v.body, sizeof(T) * elements);
+		};
+		bool Compare(const Array& v, const std::false_type&&) const {
+			for (unsigned n(0); n < elements; ++n) {
+				if (body[n] != v.body[n]) {
+					return false;
+				}
+			}
+			return true;
+		};
 		void Copy(const Array& t, unsigned offset, const std::true_type&&) {
 			Resize(offset + t.Length());
 			memmove(body + offset, t.body, t.Length());
@@ -120,10 +146,13 @@ namespace TB {
 		};
 		T* Realloc(unsigned el, const std::false_type&&) {
 			T* newBody(new T[el]);
-
+			if (newBody) {
+				delete[] body;
+			}
 			return newBody;
 		};
 		void Free(const std::true_type&&) { free(body); };
 		void Free(const std::false_type&&) { delete[] body; };
 	};
 }
+

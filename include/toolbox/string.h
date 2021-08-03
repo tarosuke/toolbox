@@ -24,7 +24,7 @@
 
 namespace TB {
 
-	class String : protected Array<char> {
+	class String : public Array<char> {
 	public:
 		// manipulators
 		class endl;
