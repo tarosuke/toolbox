@@ -48,7 +48,7 @@ namespace TB {
 
 		~Array() {
 			if (body) {
-				free(body);
+				Free(TribialConstructable());
 			}
 		};
 		T& operator[](unsigned index) {
@@ -66,6 +66,8 @@ namespace TB {
 		T* Raw() const { return body; };
 
 	protected:
+		using TribialConstructable = std::is_trivially_constructible<T>;
+
 		unsigned elements;
 		unsigned assigned;
 		T* body;
@@ -77,7 +79,7 @@ namespace TB {
 				return;
 			}
 			const unsigned r(requierd < 16 ? 16 : GetOverPow2(requierd));
-			void* const newBody(realloc(body, sizeof(T) * r));
+			T* newBody(Realloc(r, TribialConstructable()));
 			if (!!r && !newBody) {
 				throw std::runtime_error("realloc failed in 'TB::Array'");
 			}
@@ -88,8 +90,7 @@ namespace TB {
 		//最後の要素を削除
 		//末尾に追加
 		void Copy(const Array& t, unsigned offset) {
-			std::is_trivially_constructible<T>* b(0);
-			Copy(t, offset, b);
+			Copy(t, offset, TribialConstructable());
 		};
 		void Copy(const T& v, unsigned offset) {
 			Resize(offset + 1);
@@ -103,9 +104,25 @@ namespace TB {
 			}
 			return n + 1;
 		};
-		void Copy(const Array& t, unsigned offset, std::true_type*) {
+		void Copy(const Array& t, unsigned offset, const std::true_type&&) {
 			Resize(offset + t.Length());
 			memmove(body + offset, t.body, t.Length());
 		};
+		void Copy(const Array& t, unsigned offset, const std::false_type&&) {
+			Resize(offset + t.Length());
+			for (unsigned n(0); n < t.elements; ++n) {
+				body[n + offset] = t.body[n];
+			}
+		};
+		T* Realloc(unsigned el, const std::true_type&&) {
+			return (T*)realloc(body, sizeof(T) * el);
+		};
+		T* Realloc(unsigned el, const std::false_type&&) {
+			T* newBody(new T[el]);
+
+			return newBody;
+		};
+		void Free(const std::true_type&&) { free(body); };
+		void Free(const std::false_type&&) { delete[] body; };
 	};
 }
