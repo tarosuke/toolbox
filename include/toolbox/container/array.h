@@ -103,7 +103,6 @@ namespace TB {
 			assigned = r;
 			elements = requierd;
 		};
-		//最後の要素を削除
 		//末尾に追加
 		void Copy(const Array& t, unsigned offset) {
 			Copy(t, offset, TribialConstructable());
@@ -132,11 +131,11 @@ namespace TB {
 			return true;
 		};
 		void Copy(const Array& t, unsigned offset, const std::true_type&&) {
-			Resize(offset + t.Length());
-			memmove(body + offset, t.body, t.Length());
+			Resize(offset + t.elements);
+			memmove(body + offset, t.body, t.elements * sizeof(T));
 		};
 		void Copy(const Array& t, unsigned offset, const std::false_type&&) {
-			Resize(offset + t.Length());
+			Resize(offset + t.elements);
 			for (unsigned n(0); n < t.elements; ++n) {
 				body[n + offset] = t.body[n];
 			}
