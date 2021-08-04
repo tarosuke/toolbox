@@ -39,6 +39,8 @@ namespace TB {
 		bool operator>(const Version& t) { return !((*this) <= t); };
 		bool operator>=(const Version& t) { return !((*this) < t); };
 
+		void TestPrint();
+
 	private:
 		unsigned rev[REVs];
 		static bool EQ(unsigned a, unsigned b) { return a == b; };
