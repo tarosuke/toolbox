@@ -26,6 +26,7 @@ namespace TB {
 
 	template <typename T> class Type {
 	public:
+		Type(){};
 		Type(const T& t) : body(t){};
 		const T& operator=(const T& t) {
 			body = t;
