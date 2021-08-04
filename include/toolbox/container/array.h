@@ -103,7 +103,6 @@ namespace TB {
 			assigned = r;
 			elements = requierd;
 		};
-		//最後の要素を削除
 		//末尾に追加
 		void Copy(const Array& t, unsigned offset) {
 			Copy(t, offset, TribialConstructable());
@@ -132,12 +131,14 @@ namespace TB {
 			return true;
 		};
 		void Copy(const Array& t, unsigned offset, const std::true_type&&) {
-			Resize(offset + t.Length());
-			memmove(body + offset, t.body, t.Length());
+			const unsigned tSize(t.elements);
+			Resize(offset + tSize);
+			memmove(body + offset, t.body, tSize * sizeof(T));
 		};
 		void Copy(const Array& t, unsigned offset, const std::false_type&&) {
-			Resize(offset + t.Length());
-			for (unsigned n(0); n < t.elements; ++n) {
+			const unsigned tSize(t.elements);
+			Resize(offset + tSize);
+			for (unsigned n(0); n < tSize; ++n) {
 				body[n + offset] = t.body[n];
 			}
 		};
@@ -147,6 +148,9 @@ namespace TB {
 		T* Realloc(unsigned el, const std::false_type&&) {
 			T* newBody(new T[el]);
 			if (newBody) {
+				for (unsigned n(0); n < elements; ++n) {
+					newBody[n] = body[n];
+				}
 				delete[] body;
 			}
 			return newBody;
