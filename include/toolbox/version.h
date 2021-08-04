@@ -18,6 +18,8 @@
  */
 #pragma once
 
+#include <toolbox/string.h>
+
 
 
 namespace TB {
@@ -30,16 +32,26 @@ namespace TB {
 				rev[n] = t[n];
 			}
 		};
+		Version(const String& o) { *this = o; };
+		Version(const char* o) : Version(String(o)){};
 		Version& operator=(const Version&) = default;
+		void operator=(const String& o) {
+			auto v(o.Split("."));
+			for (unsigned n(0); n < v.Length(); ++n) {}
+		};
+		void operator=(const char* o) { *this = String(o); };
 
-		bool operator==(const Version& t) { return Compare(t, EQ); };
-		bool operator!=(const Version& t) { return !(*this == t); };
-		bool operator<(const Version& t) { return Compare(t, LT); };
-		bool operator<=(const Version& t) { return Compare(t, LT); };
-		bool operator>(const Version& t) { return !((*this) <= t); };
-		bool operator>=(const Version& t) { return !((*this) < t); };
+		bool operator==(const Version& t) const { return Compare(t, EQ); };
+		bool operator!=(const Version& t) const { return !(*this == t); };
+		bool operator<(const Version& t) const { return Compare(t, LT); };
+		bool operator<=(const Version& t) const { return Compare(t, LT); };
+		bool operator>(const Version& t) const { return !((*this) <= t); };
+		bool operator>=(const Version& t) const { return !((*this) < t); };
 
-		void TestPrint();
+		operator String() const {
+			String r;
+			return r;
+		};
 
 	private:
 		unsigned rev[REVs];

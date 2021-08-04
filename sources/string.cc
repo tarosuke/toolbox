@@ -136,7 +136,7 @@ namespace TB {
 		return *this;
 	}
 
-	Array<String> String::Split(const char* delimitor) {
+	Array<String> String::Split(const char* delimitor) const {
 		Array<String> arr;
 		if (!delimitor) {
 			arr += *this;
