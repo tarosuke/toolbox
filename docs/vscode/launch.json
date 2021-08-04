@@ -1,0 +1,45 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "テストのデバッグ",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/DEBUG/.tests/${fileBasenameNoExtension}",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}/DEBUG/.tests",
+			"environment": [],
+			"externalConsole": false,
+			"MIMode": "gdb",
+			"setupCommands": [
+				{
+					"description": "gdb の再フォーマットを有効にする",
+					"text": "-enable-pretty-printing",
+					"ignoreFailures": true
+				}
+			],
+			"miDebuggerPath": "/usr/bin/gdb"
+		},
+		{
+			"name": "手動テストのデバッグ",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/DEBUG/.mtests/${fileBasenameNoExtension}",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}/DEBUG/.mtests/",
+			"environment": [],
+			"externalConsole": false,
+			"MIMode": "gdb",
+			"setupCommands": [
+				{
+					"description": "gdb の再フォーマットを有効にする",
+					"text": "-enable-pretty-printing",
+					"ignoreFailures": true
+				}
+			],
+			"miDebuggerPath": "/usr/bin/gdb"
+		}
+	]
+}
