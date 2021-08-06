@@ -26,12 +26,12 @@
 
 #define assert(c)                                                              \
 	if (!(c)) {                                                                \
-		fprintf(stderr, "%s:%u:0: failed: %s.\n", __FILE__, __LINE__, #c);     \
+		fprintf(stderr, "%s:%u:0: info: %s.\n", __FILE__, __LINE__, #c);       \
 	}
 #define assertEQ(A, B, H)                                                      \
 	{                                                                          \
 		if ((A) != (B)) {                                                      \
-			fprintf(stderr, "%s:%u:0: failed: ", __FILE__, __LINE__);          \
+			fprintf(stderr, "%s:%u:0: info: ", __FILE__, __LINE__);            \
 			H(A);                                                              \
 			fprintf(stdout, " != ");                                           \
 			H(B);                                                              \
@@ -41,7 +41,7 @@
 #define assertNE(A, B, H)                                                      \
 	{                                                                          \
 		if ((A) == (B)) {                                                      \
-			fprintf(stderr, "%s:%u:0: failed: ", __FILE__, __LINE__);          \
+			fprintf(stderr, "%s:%u:0: info: ", __FILE__, __LINE__);            \
 			H(A);                                                              \
 			fprintf(stdout, " == ");                                           \
 			H(B);                                                              \
