@@ -101,9 +101,9 @@ namespace TB {
 		return *this;
 	}
 	String& String::operator+=(char c) {
-		const unsigned l(Length());
-		Copy(c, l);
-		Copy(0, l + 1);
+		Resize(elements + 1);
+		body[elements - 2] = c;
+		body[elements - 1] = 0;
 		return *this;
 	}
 	String String::operator+(const String& t) const {
@@ -117,9 +117,7 @@ namespace TB {
 		return newString;
 	}
 
-	bool String::operator==(const char* t) const {
-		return !strncmp(body, t, Length());
-	}
+	bool String::operator==(const char* t) const { return !strcmp(body, t); }
 
 
 	String& String::operator<<(long long unsigned n) {
@@ -156,10 +154,10 @@ namespace TB {
 					c = e - 1;
 				} else {
 					// すでにcを一つ進めてあるので代わりを追加
-					*newString += *delimitor;
+					newString += *delimitor;
 				}
 			} else {
-				*newString += *c;
+				newString += *c;
 			}
 		}
 		arr += newString;
