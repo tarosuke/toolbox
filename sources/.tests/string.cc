@@ -39,9 +39,9 @@ int main() {
 		assertEQ(s[n], "bc", H);
 	};
 	TB::Array<TB::String> p(string.Split("/abc"));
-	assertEQ(s.Length(), 9, HU);
+	assertEQ(p.Length(), 9, HU);
 	for (unsigned n(0); n < 9; ++n) {
-		assertEQ(s[n], "", H);
+		assertEQ(p[n], "", H);
 	};
 
 	return 0;
