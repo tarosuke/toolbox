@@ -2,7 +2,7 @@
 # 1. ソースを勝手に探して依存関係ファイルを作成
 # 2. ターゲット情報を拾って、なければディレクトリ名を使う
 
-.PHONY : clean RELEASE DEBUG COVERAGE
+.PHONY : clean test RELEASE DEBUG COVERAGE
 
 
 
@@ -113,9 +113,6 @@ endif
 	@$(foreach m, $(tmods), gcc -coverage -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L$(TARGETDIR) -ltoolbox $(EXLIBS) &&) true
 	@$(foreach m, $(tmods), chmod +x $(TARGETDIR)/$(m) &&) true
 	@echo OK.
-	@echo running tests...
-	@$(foreach m, $(tmods), $(TARGETDIR)/$(m) &&) true
-	@echo OK.
 	@rm -f $(target)
 	@ln -s $(TARGETDIR)/$(target) $(target)
 
@@ -123,9 +120,14 @@ endif
 clean:
 	rm -rf RELEASE DEBUG COVERAGE .builds *.gcov
 
-RELEASE: RELEASE/$(target)
+test: $(TARGETDIR)/$(target)
+	@echo running tests...
+	@$(foreach m, $(tmods), $(TARGETDIR)/$(m) &&) true
+	@echo OK.
 
-DEBUG: DEBUG/$(target)
+RELEASE: RELEASE/$(target) test
 
-COVERAGE: COVERAGE/$(target)
+DEBUG: DEBUG/$(target) test
+
+COVERAGE: COVERAGE/$(target) test
 	@lcov -c -d $(TARGETDIR) -o $(TARGETDIR)/lcov.info
