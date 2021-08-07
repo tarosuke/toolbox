@@ -68,7 +68,7 @@ namespace TB {
 		static bool ELT(unsigned a, unsigned b) { return a <= b; };
 		bool Compare(const Version& t, bool (*op)(unsigned, unsigned)) const {
 			for (unsigned n(0); n < REVs; ++n) {
-				if (op(rev[n], t.rev[n])) {
+				if (!op(rev[n], t.rev[n])) {
 					return false;
 				}
 			}

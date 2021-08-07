@@ -14,13 +14,12 @@ namespace {
 }
 
 int main() {
-	TB::Version<3> ver("0.1.2");
+	TB::Version<3> ver("2250.1.25");
 	TB::Version<3> v2(ver);
 	assertEQ(ver, v2, H);
 
 	TB::String s(ver);
-	assertEQ(s, "0.1.2", HS);
-
+	assertEQ(s, "2250.1.25", HS);
 
 	return 0;
 }
