@@ -61,7 +61,7 @@ namespace TB {
 		f64 ToF64() const { return strtod(body, 0); };
 		f128 ToF128() const { return strtold(body, 0); };
 
-		// 何らかの文字列追加
+		// 文字、文字列追加
 		String& operator+=(const String&);
 		String& operator+=(const char*);
 		String& operator+=(char);
@@ -69,9 +69,21 @@ namespace TB {
 		String operator+(const char*) const;
 
 		// << operator
-		String& operator<<(long long);
-		String& operator<<(long long unsigned);
-		String& operator<<(const String&);
+		template <typename T> String& operator<<(T v) {
+			From(v);
+			return *this;
+		};
+		template <typename T> void From(
+			T v, unsigned minLen = 0, char padding = ' ', unsigned radix = 10) {
+			From(
+				v,
+				minLen,
+				padding,
+				radix,
+				std::true_type(), // is_arithmetic<T>(),
+				std::false_type(), //  is_floating_point<T>(),
+				std::true_type()); // is_unsigned<T>());
+		};
 
 		// C文字列と比較
 		bool operator==(const char*) const;
@@ -92,11 +104,50 @@ namespace TB {
 
 	private:
 		static const char* const numeric;
-		void FromNumeric(
-			long long unsigned,
-			unsigned length,
-			char padding,
-			unsigned radix = 10);
 		void Load(const char*);
+		void FromUnsigned(
+			long long unsigned,
+			unsigned length = 0,
+			char padding = ' ',
+			unsigned radix = 10);
+		template <typename T> void From(
+			T v,
+			unsigned minLen,
+			char pad,
+			unsigned radix,
+			std::true_type,
+			std::true_type,
+			std::false_type){
+			// 実数
+		};
+		template <typename T> void From(
+			T v,
+			unsigned minLen,
+			char pad,
+			unsigned radix,
+			std::true_type,
+			std::false_type,
+			std::false_type) {
+			// 符号あり整数
+			if (v < 0) {
+				*this += '-';
+				if (minLen) {
+					--minLen;
+				}
+				FromUnsigned(-v, minLen, pad, radix);
+			}
+			FromUnsigned(v, minLen, pad, radix);
+		};
+		template <typename T> void From(
+			T v,
+			unsigned minLen,
+			char pad,
+			unsigned radix,
+			std::true_type,
+			std::false_type,
+			std::true_type) {
+			// 符号なし整数
+			FromUnsigned(v, minLen, pad, radix);
+		};
 	};
 }

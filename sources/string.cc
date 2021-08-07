@@ -34,13 +34,13 @@ namespace TB {
 			*this += '-';
 			value = -value;
 		}
-		FromNumeric(static_cast<unsigned long long>(value), length, padding);
+		FromUnsigned(static_cast<unsigned long long>(value), length, padding);
 	}
 	String::String(unsigned long long value, unsigned length, char padding) {
-		FromNumeric(value, length, padding);
+		FromUnsigned(value, length, padding);
 	}
 
-	void String::FromNumeric(
+	void String::FromUnsigned(
 		long long unsigned value,
 		unsigned length,
 		char padding,
@@ -121,20 +121,6 @@ namespace TB {
 	bool String::operator==(const char* t) const { return !strcmp(body, t); }
 
 
-	String& String::operator<<(long long unsigned n) {
-		FromNumeric(n, 0, ' ', 10);
-		return *this;
-	}
-
-	String& String::operator<<(long long i) {
-		if (i < 0) {
-			*this += '-';
-			i = -i;
-		}
-		FromNumeric(static_cast<unsigned>(i), 0, ' ', 10);
-		return *this;
-	}
-
 	Array<String> String::Split(const char* delimitor) const {
 		Array<String> arr;
 		if (!delimitor) {
@@ -164,4 +150,9 @@ namespace TB {
 		arr += newString;
 		return arr;
 	}
+
+	template <> String& String::operator<<(const String& s) {
+		*this += s;
+		return *this;
+	};
 }

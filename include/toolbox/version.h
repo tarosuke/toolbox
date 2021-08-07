@@ -53,7 +53,7 @@ namespace TB {
 		operator String() const {
 			String r;
 			for (unsigned n(0); n < REVs; ++n) {
-				r += rev[n];
+				r << rev[n];
 				if (n < REVs - 1) {
 					r += '.';
 				}
