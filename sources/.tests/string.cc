@@ -22,8 +22,8 @@ int main() {
 	assertEQ(string.Length(), 4, HU);
 	assertEQ(string, "/abc", H);
 
-	TB::String s2("/abc");
-	string += s2;
+
+	string += TB::String("/abc");
 	assertEQ(string.Length(), 8, HU);
 	assertEQ(string, "/abc/abc", H);
 
@@ -34,13 +34,14 @@ int main() {
 
 	TB::Array<TB::String> s(string.Split("/a"));
 	assertEQ(s.Length(), 9, HU);
-	for (unsigned n(0); n < 9; ++n) {
+	assertEQ(s[0], "", H);
+	for (unsigned n(1); n < 9; ++n) {
 		assertEQ(s[n], "bc", H);
 	};
 	TB::Array<TB::String> p(string.Split("/abc"));
-	assertEQ(s.Length(), 9, HU);
+	assertEQ(p.Length(), 9, HU);
 	for (unsigned n(0); n < 9; ++n) {
-		assertEQ(s[n], "", H);
+		assertEQ(p[n], "", H);
 	};
 
 	return 0;
