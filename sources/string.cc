@@ -25,6 +25,8 @@
 
 namespace TB {
 
+	const char* const String::numeric = "0123456789abcdef";
+
 	String::String(const String& t) { *this = t; }
 	String::String(const char* t) { Load(t); }
 	String::String(long long value, unsigned length, char padding) {
@@ -32,13 +34,13 @@ namespace TB {
 			*this += '-';
 			value = -value;
 		}
-		FromNumeric(static_cast<unsigned long long>(value), length, padding);
+		FromUnsigned(static_cast<unsigned long long>(value), length, padding);
 	}
 	String::String(unsigned long long value, unsigned length, char padding) {
-		FromNumeric(value, length, padding);
+		FromUnsigned(value, length, padding);
 	}
 
-	void String::FromNumeric(
+	void String::FromUnsigned(
 		long long unsigned value,
 		unsigned length,
 		char padding,
@@ -59,18 +61,18 @@ namespace TB {
 		char b[blen];
 		char* p(&b[blen - 1]);
 		*p-- = 0;
-		char* p0(&p[-length]);
-		if (length) {
-			memset(p0, padding, length);
-		}
-		*p = '0';
+		char* const p0(&p[-length]); // pの初期位置からlength戻した位置
 
 		// convert from value
-		static const char* const numeric = "0123456789abcdef";
-		for (; value; *p-- = numeric[value % radix], value /= radix)
-			;
+		do {
+			*p-- = numeric[value % radix], value /= radix;
+		} while (value);
 
-		*this += p < p0 ? p : p0;
+		if (p0 < ++p) {
+			memset(p0, padding, p - p0 - 1);
+			p = p0;
+		}
+		*this += p;
 	}
 
 
@@ -120,20 +122,6 @@ namespace TB {
 	bool String::operator==(const char* t) const { return !strcmp(body, t); }
 
 
-	String& String::operator<<(long long unsigned n) {
-		FromNumeric(n, 0, ' ', 10);
-		return *this;
-	}
-
-	String& String::operator<<(long long i) {
-		if (i < 0) {
-			*this += '-';
-			i = -i;
-		}
-		FromNumeric(static_cast<unsigned>(i), 0, ' ', 10);
-		return *this;
-	}
-
 	Array<String> String::Split(const char* delimitor) const {
 		Array<String> arr;
 		if (!delimitor) {
@@ -163,4 +151,9 @@ namespace TB {
 		arr += newString;
 		return arr;
 	}
+
+	template <> String& String::operator<<(const String& s) {
+		*this += s;
+		return *this;
+	};
 }

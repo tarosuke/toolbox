@@ -19,7 +19,7 @@ namespace {
 	void HH(const TB::Array<I>& t) {
 		printf("{ ");
 		for (unsigned n(0); n < t.Length(); ++n) {
-			printf("%d ", (int)t[n]);
+			printf("%d ", (int&)t[n]);
 		}
 		printf("}");
 	}
