@@ -117,9 +117,7 @@ namespace TB {
 		return newString;
 	}
 
-	bool String::operator==(const char* t) const {
-		return !strncmp(body, t, Length());
-	}
+	bool String::operator==(const char* t) const { return !strcmp(body, t); }
 
 
 	String& String::operator<<(long long unsigned n) {
