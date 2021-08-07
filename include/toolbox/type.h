@@ -26,14 +26,13 @@ namespace TB {
 
 	template <typename T> class Type {
 	public:
-		Type(){};
+		Type() = default;
 		Type(const T& t) : body(t){};
-		const T& operator=(const T& t) {
+		T& operator=(const T& t) {
 			body = t;
 			return body;
 		};
-		operator const T&() const { return body; };
-
+		operator T&&() { return body; };
 
 	protected:
 		T body;
@@ -48,6 +47,17 @@ using u64 = __uint64_t;
 using i64 = __int64_t;
 using u128 = __uint128_t;
 using i128 = __int128_t;
+using f32 = float;
+using f64 = double;
+using f128 = long double;
+
+template <typename T> struct SameSizeInt;
+template <> struct SameSizeInt<f32> : public TB::Type<i32> {};
+template <> struct SameSizeInt<f64> : public TB::Type<i64> {};
+template <> struct SameSizeInt<f128> : public TB::Type<i128> {};
+template <> struct SameSizeInt<i32> : public TB::Type<i32> {};
+template <> struct SameSizeInt<i64> : public TB::Type<i64> {};
+template <> struct SameSizeInt<i128> : public TB::Type<i128> {};
 
 
 #define elementsOf(a) (sizeof(a) / sizeof(a[0]))

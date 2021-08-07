@@ -18,6 +18,11 @@
  */
 #pragma once
 
+#include <inttypes.h>
+#include <string.h>
+#include <math.h>
+
+#include <toolbox/type.h>
 #include <toolbox/container/array.h>
 
 
@@ -43,8 +48,20 @@ namespace TB {
 
 		String& operator=(const char*);
 
+		// 暗黙変換
 		operator char*() { return Raw(); };
 		operator const char*() const { return Raw(); };
+
+		// 明示的変換
+		u32 ToU(int radix = 10) const { return strtoul(body, 0, radix); };
+		i32 ToI(int radix = 10) const { return strtol(body, 0, radix); };
+		u64 ToU64(int radix = 10) const { return strtoull(body, 0, radix); };
+		i64 ToI64(int radix = 10) const { return strtoll(body, 0, radix); };
+		f32 ToF() const { return strtof(body, 0); };
+		f64 ToF64() const { return strtod(body, 0); };
+		f128 ToF128() const { return strtold(body, 0); };
+
+		// 何らかの文字列追加
 		String& operator+=(const String&);
 		String& operator+=(const char*);
 		String& operator+=(char);
@@ -56,21 +73,25 @@ namespace TB {
 		String& operator<<(long long unsigned);
 		String& operator<<(const String&);
 
+		// C文字列と比較
 		bool operator==(const char*) const;
 		bool operator!=(const char* t) const { return !(*this == t); };
 
+		// 内部状態取得
 		bool IsEmpty() const { return Array::Length() <= 1; };
 		unsigned Length() const { return Array::Length() - 1; };
 
+		// デリミタで分割
 		Array<String> Split(const char* delimiter) const;
 
-		// string manipulators
+		// クリア
 		void Clear() {
 			Resize(1);
 			(*this)[0] = 0;
 		};
 
 	private:
+		static const char* const numeric;
 		void FromNumeric(
 			long long unsigned,
 			unsigned length,

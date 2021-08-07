@@ -25,6 +25,8 @@
 
 namespace TB {
 
+	const char* const String::numeric = "0123456789abcdef";
+
 	String::String(const String& t) { *this = t; }
 	String::String(const char* t) { Load(t); }
 	String::String(long long value, unsigned length, char padding) {
@@ -66,7 +68,6 @@ namespace TB {
 		*p = '0';
 
 		// convert from value
-		static const char* const numeric = "0123456789abcdef";
 		for (; value; *p-- = numeric[value % radix], value /= radix)
 			;
 
