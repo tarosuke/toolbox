@@ -37,7 +37,9 @@ namespace TB {
 		Version& operator=(const Version&) = default;
 		void operator=(const String& o) {
 			auto v(o.Split("."));
-			for (unsigned n(0); n < v.Length(); ++n) {}
+			for (unsigned n(0); n < v.Length() && n < REVs; ++n) {
+				rev[n] = v[n].ToU();
+			}
 		};
 		void operator=(const char* o) { *this = String(o); };
 
@@ -50,6 +52,12 @@ namespace TB {
 
 		operator String() const {
 			String r;
+			for (unsigned n(0); n < REVs; ++n) {
+				r += rev[n];
+				if (n < REVs - 1) {
+					r += '.';
+				}
+			}
 			return r;
 		};
 
@@ -58,7 +66,7 @@ namespace TB {
 		static bool EQ(unsigned a, unsigned b) { return a == b; };
 		static bool LT(unsigned a, unsigned b) { return a < b; };
 		static bool ELT(unsigned a, unsigned b) { return a <= b; };
-		bool Compare(const Version& t, bool (*op)(unsigned, unsigned)) {
+		bool Compare(const Version& t, bool (*op)(unsigned, unsigned)) const {
 			for (unsigned n(0); n < REVs; ++n) {
 				if (op(rev[n], t.rev[n])) {
 					return false;
