@@ -61,17 +61,18 @@ namespace TB {
 		char b[blen];
 		char* p(&b[blen - 1]);
 		*p-- = 0;
-		char* p0(&p[-length]);
-		if (length) {
-			memset(p0, padding, length);
-		}
-		*p = '0';
+		char* const p0(&p[-length]); // pの初期位置からlength戻した位置
 
 		// convert from value
-		for (; value; *p-- = numeric[value % radix], value /= radix)
-			;
+		do {
+			*p-- = numeric[value % radix], value /= radix;
+		} while (value);
 
-		*this += p < p0 ? p : p0;
+		if (p0 < ++p) {
+			memset(p0, padding, p - p0 - 1);
+			p = p0;
+		}
+		*this += p;
 	}
 
 

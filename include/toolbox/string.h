@@ -107,7 +107,7 @@ namespace TB {
 		void Load(const char*);
 		void FromUnsigned(
 			long long unsigned,
-			unsigned length = 0,
+			unsigned length = 1,
 			char padding = ' ',
 			unsigned radix = 10);
 		template <typename T> void From(
