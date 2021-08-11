@@ -27,7 +27,7 @@
 
 
 
-namespace TB{
+namespace TB {
 
 	const char* App::projectName(0);
 	TB::Prefs<unsigned> logLevel("--verbose", 1, TB::CommonPrefs::nosave);
@@ -45,7 +45,7 @@ namespace TB{
 
 		//設定ファイルのパスを作る
 		TB::String prefsPath(".");
-		prefsPath += projectName;
+		prefsPath << projectName;
 
 		//設定ファイル読み込み／コマンドラインオプション取得
 		TB::CommonPrefs::Keeper prefs(prefsPath, argc, argv);
