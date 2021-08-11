@@ -72,38 +72,21 @@ namespace TB {
 		String& operator<<(const String& t);
 		String& operator<<(const char* t);
 		String& operator<<(char c);
-		template <typename T> String& operator<<(
-			typename std::enable_if<std::is_integral<T>::value>::type v) {
+		template <typename T>
+		typename std::enable_if<std::is_integral<T>::value, String&>::type
+		operator<<(T v) {
 			From(v);
 			return *this;
 		};
-		template <typename T> void From(
-			typename std::enable_if<std::is_unsigned<T>::value>::type v,
-			unsigned minLen = 0,
-			char padding = ' ',
-			unsigned radix = 10) {
-			FromUnsigned(
-				v,
-				minLen,
-				padding,
-				radix,
-				std::true_type(), // is_arithmetic<T>(),
-				std::false_type(), //  is_floating_point<T>(),
-				std::true_type()); // is_unsigned<T>());
+		template <typename T>
+		typename std::enable_if<std::is_unsigned<T>::value>::type From(
+			T v, unsigned minLen = 0, char padding = ' ', unsigned radix = 10) {
+			FromUnsigned(v, minLen, padding, radix);
 		};
-		template <typename T> void From(
-			typename std::enable_if<std::is_signed<T>::value>::type v,
-			unsigned minLen = 0,
-			char padding = ' ',
-			unsigned radix = 10) {
-			FromSigned(
-				v,
-				minLen,
-				padding,
-				radix,
-				std::true_type(), // is_arithmetic<T>(),
-				std::false_type(), //  is_floating_point<T>(),
-				std::true_type()); // is_unsigned<T>());
+		template <typename T>
+		typename std::enable_if<std::is_signed<T>::value>::type From(
+			T v, unsigned minLen = 0, char padding = ' ', unsigned radix = 10) {
+			FromSigned(v, minLen, padding, radix);
 		};
 
 		// C文字列と比較
