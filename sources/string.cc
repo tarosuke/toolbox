@@ -30,11 +30,11 @@ namespace TB {
 	String::String(const String& t) { *this = t; }
 	String::String(const char* t) { Load(t); }
 
-	template <> String& String::operator<<(const String& t) {
+	String& String::operator<<(const String& t) {
 		Copy(t, Length());
 		return *this;
 	}
-	template <> String& String::operator<<(const char* t) {
+	String& String::operator<<(const char* t) {
 		unsigned i(Length());
 		for (; t && *t; ++t, ++i) {
 			Copy(*t, i);
@@ -42,7 +42,7 @@ namespace TB {
 		Copy(0, i);
 		return *this;
 	}
-	template <> String& String::operator<<(char c) {
+	String& String::operator<<(char c) {
 		Resize(elements + 1);
 		body[elements - 2] = c;
 		body[elements - 1] = 0;
@@ -50,12 +50,9 @@ namespace TB {
 	}
 
 	void String::FromSigned(
-		long long v,
-		unsigned minLen,
-		char padding,
-		unsigned radix) {
+		long long v, unsigned minLen, char padding, unsigned radix) {
 		if (v < 0) {
-			*this += '-';
+			*this << '-';
 			if (minLen) {
 				--minLen;
 			}
@@ -77,7 +74,7 @@ namespace TB {
 
 		// pad if length is too long
 		for (; blen - 1 < length; --length) {
-			*this += padding;
+			*this << padding;
 		}
 
 		// build buffer
@@ -147,10 +144,10 @@ namespace TB {
 					c = e - 1;
 				} else {
 					// すでにcを一つ進めてあるので代わりを追加
-					newString += *delimitor;
+					newString << *delimitor;
 				}
 			} else {
-				newString += *c;
+				newString << *c;
 			}
 		}
 		arr += newString;

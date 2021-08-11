@@ -55,7 +55,7 @@ namespace TB {
 			for (unsigned n(0); n < REVs; ++n) {
 				r << rev[n];
 				if (n < REVs - 1) {
-					r += '.';
+					r << '.';
 				}
 			}
 			return r;

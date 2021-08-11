@@ -27,7 +27,7 @@ namespace TB {
 	Stream& Stream::operator>>(String& s) {
 		for (char b('\n'); Read(&b, 1) && b != '\n';) {
 			// append the charactor to string
-			s += b;
+			s << b;
 		}
 
 		return *this;
@@ -35,7 +35,7 @@ namespace TB {
 
 	// write String
 	Stream& Stream::operator<<(const String& s) {
-		*this += s;
+		*this << s;
 		return *this;
 	}
 
@@ -46,7 +46,7 @@ namespace TB {
 	}
 
 	Stream& Stream::operator<<(const endl&) {
-		*this += '\n';
+		*this << '\n';
 		Flush();
 		return *this;
 	}

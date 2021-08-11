@@ -31,6 +31,9 @@ namespace TB {
 
 	class String : public Array<char> {
 	public:
+		// 廃止
+		template <typename T> void operator+=(const T&) = delete;
+
 		// manipulators
 		class endl;
 		class end;
@@ -66,7 +69,9 @@ namespace TB {
 		String operator+(const char*) const;
 
 		// 文字、文字列への追加
-		template <typename T> String& operator<<(T v);
+		String& operator<<(const String& t);
+		String& operator<<(const char* t);
+		String& operator<<(char c);
 		template <typename T> String& operator<<(
 			typename std::enable_if<std::is_integral<T>::value>::type v) {
 			From(v);
