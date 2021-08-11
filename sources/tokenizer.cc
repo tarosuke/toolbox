@@ -43,7 +43,7 @@ namespace TB{
 			}
 
 			//トークンなので蓄積
-			token += c;
+			token << c;
 		}
 		return !token.IsEmpty();
 	}

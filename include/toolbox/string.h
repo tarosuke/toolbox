@@ -31,6 +31,9 @@ namespace TB {
 
 	class String : public Array<char> {
 	public:
+		// 廃止
+		template <typename T> void operator+=(const T&) = delete;
+
 		// manipulators
 		class endl;
 		class end;
@@ -62,27 +65,28 @@ namespace TB {
 		f128 ToF128() const { return strtold(body, 0); };
 
 		// 文字、文字列追加
-		String& operator+=(const String&);
-		String& operator+=(const char*);
-		String& operator+=(char);
 		String operator+(const String&) const;
 		String operator+(const char*) const;
 
-		// << operator
-		template <typename T> String& operator<<(T v) {
+		// 文字、文字列への追加
+		String& operator<<(const String& t);
+		String& operator<<(const char* t);
+		String& operator<<(char c);
+		template <typename T>
+		typename std::enable_if<std::is_integral<T>::value, String&>::type
+		operator<<(T v) {
 			From(v);
 			return *this;
 		};
-		template <typename T> void From(
+		template <typename T>
+		typename std::enable_if<std::is_unsigned<T>::value>::type From(
 			T v, unsigned minLen = 0, char padding = ' ', unsigned radix = 10) {
-			From(
-				v,
-				minLen,
-				padding,
-				radix,
-				std::true_type(), // is_arithmetic<T>(),
-				std::false_type(), //  is_floating_point<T>(),
-				std::true_type()); // is_unsigned<T>());
+			FromUnsigned(v, minLen, padding, radix);
+		};
+		template <typename T>
+		typename std::enable_if<std::is_signed<T>::value>::type From(
+			T v, unsigned minLen = 0, char padding = ' ', unsigned radix = 10) {
+			FromSigned(v, minLen, padding, radix);
 		};
 
 		// C文字列と比較
@@ -105,49 +109,14 @@ namespace TB {
 	private:
 		static const char* const numeric;
 		void Load(const char*);
+
+		void FromSigned(
+			long long value, unsigned minLen, char padding, unsigned radix);
+
 		void FromUnsigned(
-			long long unsigned,
-			unsigned length = 1,
-			char padding = ' ',
-			unsigned radix = 10);
-		template <typename T> void From(
-			T v,
+			long long unsigned value,
 			unsigned minLen,
-			char pad,
-			unsigned radix,
-			std::true_type,
-			std::true_type,
-			std::false_type){
-			// 実数
-		};
-		template <typename T> void From(
-			T v,
-			unsigned minLen,
-			char pad,
-			unsigned radix,
-			std::true_type,
-			std::false_type,
-			std::false_type) {
-			// 符号あり整数
-			if (v < 0) {
-				*this += '-';
-				if (minLen) {
-					--minLen;
-				}
-				FromUnsigned(-v, minLen, pad, radix);
-			}
-			FromUnsigned(v, minLen, pad, radix);
-		};
-		template <typename T> void From(
-			T v,
-			unsigned minLen,
-			char pad,
-			unsigned radix,
-			std::true_type,
-			std::false_type,
-			std::true_type) {
-			// 符号なし整数
-			FromUnsigned(v, minLen, pad, radix);
-		};
+			char padding,
+			unsigned radix);
 	};
 }

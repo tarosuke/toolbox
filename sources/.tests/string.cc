@@ -13,22 +13,22 @@ namespace {
 int main() {
 	TB::String string;
 	assert(string.IsEmpty());
-	string += '/';
+	string << '/';
 	assert(!string.IsEmpty());
 	assertEQ(string.Length(), 1, HU);
 	assertEQ(string, "/", H);
 
-	string += "abc";
+	string << "abc";
 	assertEQ(string.Length(), 4, HU);
 	assertEQ(string, "/abc", H);
 
 
-	string += TB::String("/abc");
+	string << TB::String("/abc");
 	assertEQ(string.Length(), 8, HU);
 	assertEQ(string, "/abc/abc", H);
 
-	string += string;
-	string += string;
+	string << string;
+	string << string;
 	assertEQ(string.Length(), 32, HU);
 	assertEQ(string, "/abc/abc/abc/abc/abc/abc/abc/abc", H);
 

@@ -29,15 +29,35 @@ namespace TB {
 
 	String::String(const String& t) { *this = t; }
 	String::String(const char* t) { Load(t); }
-	String::String(long long value, unsigned length, char padding) {
-		if (value < 0) {
-			*this += '-';
-			value = -value;
-		}
-		FromUnsigned(static_cast<unsigned long long>(value), length, padding);
+
+	String& String::operator<<(const String& t) {
+		Copy(t, Length());
+		return *this;
 	}
-	String::String(unsigned long long value, unsigned length, char padding) {
-		FromUnsigned(value, length, padding);
+	String& String::operator<<(const char* t) {
+		unsigned i(Length());
+		for (; t && *t; ++t, ++i) {
+			Copy(*t, i);
+		}
+		Copy(0, i);
+		return *this;
+	}
+	String& String::operator<<(char c) {
+		Resize(elements + 1);
+		body[elements - 2] = c;
+		body[elements - 1] = 0;
+		return *this;
+	}
+
+	void String::FromSigned(
+		long long v, unsigned minLen, char padding, unsigned radix) {
+		if (v < 0) {
+			*this << '-';
+			if (minLen) {
+				--minLen;
+			}
+			FromUnsigned(-v, minLen, padding, radix);
+		}
 	}
 
 	void String::FromUnsigned(
@@ -54,7 +74,7 @@ namespace TB {
 
 		// pad if length is too long
 		for (; blen - 1 < length; --length) {
-			*this += padding;
+			*this << padding;
 		}
 
 		// build buffer
@@ -72,7 +92,7 @@ namespace TB {
 			memset(p0, padding, p - p0 - 1);
 			p = p0;
 		}
-		*this += p;
+		*this << p;
 	}
 
 
@@ -90,32 +110,14 @@ namespace TB {
 		Copy(0, i);
 	}
 
-	String& String::operator+=(const String& t) {
-		Copy(t, Length());
-		return *this;
-	}
-	String& String::operator+=(const char* t) {
-		unsigned i(Length());
-		for (; t && *t; ++t, ++i) {
-			Copy(*t, i);
-		}
-		Copy(0, i);
-		return *this;
-	}
-	String& String::operator+=(char c) {
-		Resize(elements + 1);
-		body[elements - 2] = c;
-		body[elements - 1] = 0;
-		return *this;
-	}
 	String String::operator+(const String& t) const {
 		String newString(*this);
-		newString += t;
+		newString << t;
 		return newString;
 	}
 	String String::operator+(const char* t) const {
 		String newString(*this);
-		newString += t;
+		newString << t;
 		return newString;
 	}
 
@@ -142,18 +144,13 @@ namespace TB {
 					c = e - 1;
 				} else {
 					// すでにcを一つ進めてあるので代わりを追加
-					newString += *delimitor;
+					newString << *delimitor;
 				}
 			} else {
-				newString += *c;
+				newString << *c;
 			}
 		}
 		arr += newString;
 		return arr;
 	}
-
-	template <> String& String::operator<<(const String& s) {
-		*this += s;
-		return *this;
-	};
 }
