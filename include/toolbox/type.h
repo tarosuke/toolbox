@@ -41,6 +41,8 @@ namespace TB {
 }
 
 
+using u16 = __uint16_t;
+using i16 = __int16_t;
 using u32 = __uint32_t;
 using i32 = __int32_t;
 using u64 = __uint64_t;
