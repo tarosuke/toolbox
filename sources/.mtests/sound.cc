@@ -2,4 +2,7 @@
 
 
 
-int main() { return 0; }
+int main() {
+	//ホワイトノイズ、ブラウンノイズをそれぞれ1秒間出力
+	return 0;
+}

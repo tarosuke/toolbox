@@ -16,26 +16,64 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#pragma once
+#include <toolbox/sound/sound.h>
+
+#include <stdio.h>
 
 
 
 namespace TB {
-
 	namespace Sound {
 
-		// 入力(マイク、ファイルからの読み込み、生成など)
-		struct Source {};
-
-		// 出力(サウンドデバイスやファイルなど)
-		struct Target {};
-
-
-
-		// ホワイトノイズ生成
-		struct While : public Source {};
-
-		// ブラウンノイズ生成
-		struct Red : public Source {};
 	}
 }
+
+
+#if 0
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+#define MAX_Z 16
+
+double z[MAX_Z];
+double k[MAX_Z];
+
+double pinkfilter(double in) {
+	extern double z[MAX_Z];
+	extern double k[MAX_Z];
+	static double t = 0.0;
+	double q;
+	int i;
+
+	q = in;
+	for (i = 0; i < MAX_Z; i++) {
+		z[i] = (q * k[i] + z[i] * (1.0 - k[i]));
+		q = (q + z[i]) * 0.5;
+	}
+	return (t = 0.75 * q + 0.25 * t); /* add 1st order LPF */
+}
+
+void init_pink() {
+	extern double z[MAX_Z];
+	extern double k[MAX_Z];
+	int i;
+
+	for (i = 0; i < MAX_Z; i++)
+		z[i] = 0;
+	k[MAX_Z - 1] = 0.5;
+	for (i = MAX_Z - 1; i > 0; i--)
+		k[i - 1] = k[i] * 0.25;
+}
+
+int main() {
+	int i, j;
+	double n;
+
+	init_pink();
+	srandomdev();
+	for (i = 0; i < 65536; i++) {
+		printf("%.8g\n", pinkfilter(random() & 1 ? 1.0 : -1.0));
+	}
+}
+#endif

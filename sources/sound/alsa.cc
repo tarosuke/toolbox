@@ -21,5 +21,39 @@
 
 
 namespace TB {
-	namespace Sound {}
+	namespace Sound {
+
+		ALSASource::ALSASource(const char* deviceName)
+			: handle(Open(deviceName)) {}
+
+		snd_pcm_t* ALSASource::Open(const char* deviceName) {
+			snd_pcm_t* handle;
+			if (const int errorCode = snd_pcm_open(
+										  &handle,
+										  deviceName,
+										  SND_PCM_STREAM_CAPTURE,
+										  0) < 0) {
+				throw -1;
+			}
+
+			return handle;
+		}
+
+		ALSATarget::ALSATarget(const char* deviceName)
+			: handle(Open(deviceName)) {}
+
+		snd_pcm_t* ALSATarget::Open(const char* deviceName) {
+			snd_pcm_t* handle;
+			if (const int errorCode = snd_pcm_open(
+										  &handle,
+										  deviceName,
+										  SND_PCM_STREAM_PLAYBACK,
+										  0) < 0) {
+				throw -1;
+			}
+
+			return handle;
+		}
+
+	}
 }

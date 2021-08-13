@@ -20,20 +20,31 @@
 
 #include <alsa/asoundlib.h>
 
+#include <toolbox/sound/sound.h>
+
 
 
 namespace TB {
-
 	namespace Sound {
 
-		struct ALSA {
-
-
+		struct ALSASource : public Source {
+			ALSASource(const char* = "default");
 
 		private:
 			snd_pcm_t* const handle;
 			snd_pcm_sframes_t frames;
+
+			static snd_pcm_t* Open(const char*);
 		};
 
+		struct ALSATarget : public Target {
+			ALSATarget(const char* = "default");
+
+		private:
+			snd_pcm_t* const handle;
+			snd_pcm_sframes_t frames;
+
+			static snd_pcm_t* Open(const char*);
+		};
 	}
 }
