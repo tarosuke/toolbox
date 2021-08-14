@@ -1,4 +1,4 @@
-/************************************************************** riff container
+/********************************************************************** sounds
  * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
@@ -16,19 +16,15 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <toolbox/riff.h>
+#pragma once
 
 
 
 namespace TB {
+	namespace Sound {
 
-
-	u32 RIFF::Str2ID(const char* f) {
-		u32 r(0);
-		for (u32 ratio(1); *f; r += ratio * *f++, ratio <<= 8) {}
-		return r;
+		struct RiffTarget {
+			RiffTarget(const char* path);
+		};
 	}
-
-
-	RIFF::RIFF(const char* format) : chunk(Str2ID(format)) {}
 }
