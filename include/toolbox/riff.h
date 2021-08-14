@@ -24,12 +24,6 @@
 
 namespace TB {
 
-	struct Chunk {
-		u32 id;
-		u32 size;
-		char body[0];
-		Chunk(u32 id, u32 size) : id(id), size(size){};
-	};
 
 
 #define S2ID(s)                                                                \
@@ -37,14 +31,47 @@ namespace TB {
 	 (u32)((s)[0]))
 
 
-	struct RIFF : Chunk {
-		enum struct ChunkID : u32 {
-			RIFF = S2ID("RIFF"),
-			format = S2ID("fmt\0"),
-			format = S2ID("data"),
+	struct RIFF {
+		struct Chunk {
+			u32 id;
+			u32 size;
+			char body[0];
+			Chunk(u32 id, u32 size) : id(id), size(size - sizeof(*this)){};
 		};
 
-		struct FMT : Chunk {
+		RIFF(const char* format);
+		virtual ~RIFF();
+
+		void Add(Chunk*); //チャンクを追加する
+		void AddChild(Chunk*); //子チャンクを追加して子チャンクの次を待つ
+		void Close(); //チャンクを閉じる(一つ親チャンクに戻る)
+		void End(); //すべてのチャンクを閉じる
+
+	protected:
+		virtual void Write(const void*, unsigned size) = 0;
+		virtual void Read(unsigned size, void*) = 0;
+
+		static u32 Str2ID(const char*);
+
+	private:
+		struct RIFFChunk : public Chunk {
+			u32 formType;
+			RIFFChunk(u32 id)
+				: Chunk(S2ID("RIFF"), sizeof(*this)), formType(id){};
+		} chunk;
+	};
+
+
+
+	struct WAV : public RIFF {
+
+		// enum struct ChunkID : u32 {
+		// 	RIFF = S2ID("RIFF"),
+		// 	format = S2ID("fmt\0"),
+		// 	format = S2ID("data"),
+		// };
+
+		struct FMT : public Chunk {
 		private:
 			enum FormatTag : u16 {
 				PCM = 0x0001,
@@ -56,20 +83,29 @@ namespace TB {
 			u16 bitsPerSample;
 		};
 
-		struct PCM : Chunk {
+		struct PCM : public Chunk {
 		private:
 			struct Frame {
 				i16 left;
 				i16 right;
 			} data[0];
+
+			PCM(const Frame data[], unsigned frames);
 		};
 
-
-		RIFF(const char* format);
-
 	private:
-		char type[4]; //"wave"
+		static const char type[4]; //"wave"
 	};
+
+
+
+	// このあたりの構造を管理するのにマップしたファイルのイメージをそのまま使うか、管理領域は別にしてデータを指して使うかの判断をファイルの読み書きそれぞれに対してする必要がある。
+
+	// チャンクのヘッダ以外の部分は「葉」にしかないので管理領域は別に作る方がいいかも知れない。親チャンクへのポインタを持てるし
+	// 葉と枝の追加方法はちょっと違う...かも
+
+	// 作るときはArrayに格納？読むときもか。Arrayを使うならデータ上のインデックスはポインタではなく配列インデックスになる
+	// チャンクに何か追加するときには親チャンクにも同じだけのサイズを追加する必要があるので、チャンクの追加先は重要
 
 
 }
