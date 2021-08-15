@@ -39,8 +39,8 @@ namespace TB {
 			return handle;
 		}
 
-		ALSATarget::ALSATarget(const char* deviceName)
-			: handle(Open(deviceName)) {}
+		ALSATarget::ALSATarget(Source& source, const char* deviceName)
+			: Target(source), handle(Open(deviceName)) {}
 
 		snd_pcm_t* ALSATarget::Open(const char* deviceName) {
 			snd_pcm_t* handle;

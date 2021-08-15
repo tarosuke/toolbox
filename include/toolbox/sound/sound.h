@@ -18,17 +18,26 @@
  */
 #pragma once
 
+#include <toolbox/type.h>
+
 
 
 namespace TB {
 
 	namespace Sound {
 
+
 		// 入力(マイク、ファイルからの読み込み、生成など)
 		struct Source {};
 
 		// 出力(サウンドデバイスやファイルなど)
-		struct Target {};
+		struct Target {
+
+			Target(Source& source) : source(source){};
+
+		protected:
+			Source& source;
+		};
 
 
 

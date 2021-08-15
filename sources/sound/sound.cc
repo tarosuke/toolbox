@@ -23,9 +23,7 @@
 
 
 namespace TB {
-	namespace Sound {
-
-	}
+	namespace Sound {}
 }
 
 

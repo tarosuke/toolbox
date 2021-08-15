@@ -38,7 +38,7 @@ namespace TB {
 		};
 
 		struct ALSATarget : public Target {
-			ALSATarget(const char* = "default");
+			ALSATarget(Source& source, const char* = "default");
 
 		private:
 			snd_pcm_t* const handle;
