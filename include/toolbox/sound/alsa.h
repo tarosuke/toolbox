@@ -45,6 +45,7 @@ namespace TB {
 			snd_pcm_sframes_t frames;
 
 			static snd_pcm_t* Open(const char*);
+			void ThreadBody() final;
 		};
 	}
 }

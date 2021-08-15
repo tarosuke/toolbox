@@ -25,7 +25,7 @@ endif
 COPTS += -Wall -Werror -Iinclude
 CCOPTS += $(COPTS) -std=c++11
 
-EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lasound -lm -lgcov
+EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lasound -lm -lpthread -lgcov
 
 
 

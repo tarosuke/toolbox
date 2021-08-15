@@ -19,6 +19,7 @@
 #pragma once
 
 #include <toolbox/type.h>
+#include <toolbox/thread/pthread.h>
 
 
 
@@ -28,12 +29,25 @@ namespace TB {
 
 
 		// 入力(マイク、ファイルからの読み込み、生成など)
-		struct Source {};
+		struct Source {
+			template <typename T, unsigned channels> struct PCM {
+				T data[channels];
+			};
+
+			virtual ~Source(){};
+			virtual unsigned Read(PCM<i16, 2>*, unsigned maxSamples) {
+				return 0;
+			};
+			virtual unsigned Read(PCM<i16, 1>*, unsigned maxSamples) {
+				return 0;
+			};
+		};
 
 		// 出力(サウンドデバイスやファイルなど)
-		struct Target {
+		struct Target : TB::PThread {
 
 			Target(Source& source) : source(source){};
+			virtual ~Target(){};
 
 		protected:
 			Source& source;
@@ -42,9 +56,13 @@ namespace TB {
 
 
 		// ホワイトノイズ生成
-		struct While : public Source {};
+		struct While : public Source {
+			unsigned Read(PCM<i16, 1>*, unsigned maxSamples) final;
+		};
 
 		// ブラウンノイズ生成
-		struct Red : public Source {};
+		struct Red : public Source {
+			unsigned Read(PCM<i16, 1>*, unsigned maxSamples) final;
+		};
 	}
 }

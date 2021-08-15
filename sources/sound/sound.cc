@@ -18,60 +18,27 @@
  */
 #include <toolbox/sound/sound.h>
 
-#include <stdio.h>
+#include <stdlib.h>
 
 
 
 namespace TB {
-	namespace Sound {}
-}
+	namespace Sound {
 
+		unsigned While::Read(PCM<i16, 1>* to, unsigned maxSamples) {
+			for (unsigned n(0); n < maxSamples; ++n) {
+				to[n].data[0] = random() & 0x0000ffff;
+			}
+			return maxSamples;
+		}
 
-#if 0
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#define MAX_Z 16
-
-double z[MAX_Z];
-double k[MAX_Z];
-
-double pinkfilter(double in) {
-	extern double z[MAX_Z];
-	extern double k[MAX_Z];
-	static double t = 0.0;
-	double q;
-	int i;
-
-	q = in;
-	for (i = 0; i < MAX_Z; i++) {
-		z[i] = (q * k[i] + z[i] * (1.0 - k[i]));
-		q = (q + z[i]) * 0.5;
-	}
-	return (t = 0.75 * q + 0.25 * t); /* add 1st order LPF */
-}
-
-void init_pink() {
-	extern double z[MAX_Z];
-	extern double k[MAX_Z];
-	int i;
-
-	for (i = 0; i < MAX_Z; i++)
-		z[i] = 0;
-	k[MAX_Z - 1] = 0.5;
-	for (i = MAX_Z - 1; i > 0; i--)
-		k[i - 1] = k[i] * 0.25;
-}
-
-int main() {
-	int i, j;
-	double n;
-
-	init_pink();
-	srandomdev();
-	for (i = 0; i < 65536; i++) {
-		printf("%.8g\n", pinkfilter(random() & 1 ? 1.0 : -1.0));
+		unsigned Red::Read(PCM<i16, 1>* to, unsigned maxSamples) {
+			int v(random() & 0x0000ffff);
+			for (unsigned n(0); n < maxSamples; ++n) {
+				to[n].data[0] = v & 0x0000ffff;
+				v += random();
+			}
+			return maxSamples;
+		}
 	}
 }
-#endif

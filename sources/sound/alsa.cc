@@ -55,5 +55,7 @@ namespace TB {
 			return handle;
 		}
 
+		void ALSATarget::ThreadBody(){}
+
 	}
 }
