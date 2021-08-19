@@ -5,21 +5,17 @@
 
 
 
-namespace {
-	template <unsigned REVs> void H(const TB::Version<REVs>& t) {
-		printf("%s", (const char*)(const TB::String)t);
-	}
-	void HS(const char* s) { printf("%s", (const char*)s); }
-	// void HU(unsigned s) { printf("%u", s); }
+template <> TB::String::String(const TB::Version<3>& v) {
+	*this = v;
 }
 
 int main() {
 	TB::Version<3> ver("2250.1.25");
 	TB::Version<3> v2(ver);
-	assertEQ(ver, v2, H);
+	assertEQ(ver, v2);
 
 	TB::String s(ver);
-	assertEQ(s, "2250.1.25", HS);
+	assertEQ(s, "2250.1.25");
 
 	return 0;
 }
