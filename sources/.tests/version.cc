@@ -5,9 +5,7 @@
 
 
 
-template <> TB::String::String(const TB::Version<3>& v) {
-	*this = v;
-}
+template <> TB::String::String(const TB::Version<3>& v) { *this = v; }
 
 int main() {
 	TB::Version<3> ver("2250.1.25");
