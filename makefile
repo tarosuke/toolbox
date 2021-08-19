@@ -49,6 +49,7 @@ deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
 testPlaces := $(TARGETDIR)/.mtests/% $(TARGETDIR)/.tests/%
 nobjs := $(filter-out $(testPlaces), $(objs))
 tobjs := $(filter $(testPlaces), $(objs))
+tmods := $(filter .tests/%, $(mods))
 
 
 
@@ -108,10 +109,6 @@ clean:
 	rm -rf RELEASE DEBUG COVERAGE .builds *.gcov
 
 test: $(TARGETDIR)/$(target) $(tobjs)
-	@echo -n building  ftests...
-	@$(foreach m, $(mtmods), gcc -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L$(TARGETDIR) -ltoolbox $(EXLIBS) &&) true
-	@$(foreach m, $(mtmods), chmod +x $(TARGETDIR)/$(m) &&) true
-	@echo OK.
 	@echo -n building tests...
 	@$(foreach m, $(tmods), gcc -coverage -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L$(TARGETDIR) -ltoolbox $(EXLIBS) &&) true
 	@$(foreach m, $(tmods), chmod +x $(TARGETDIR)/$(m) &&) true
