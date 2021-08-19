@@ -28,23 +28,27 @@
 	if (!(c)) {                                                                \
 		fprintf(stderr, "%s:%u:0: info: %s.\n", __FILE__, __LINE__, #c);       \
 	}
-#define assertEQ(A, B, H)                                                      \
+#define assertEQ(A, B)                                                         \
 	{                                                                          \
 		if ((A) != (B)) {                                                      \
-			fprintf(stderr, "%s:%u:0: info: ", __FILE__, __LINE__);            \
-			H(A);                                                              \
-			fprintf(stdout, " != ");                                           \
-			H(B);                                                              \
-			fprintf(stdout, "\n");                                             \
+			fprintf(                                                           \
+				stderr,                                                        \
+				"%s:%u:0: info: %s != %s\n",                                   \
+				__FILE__,                                                      \
+				__LINE__,                                                      \
+				TB::String(A),                                                 \
+				TB::String(B));                                                \
 		}                                                                      \
 	}
 #define assertNE(A, B, H)                                                      \
 	{                                                                          \
 		if ((A) == (B)) {                                                      \
-			fprintf(stderr, "%s:%u:0: info: ", __FILE__, __LINE__);            \
-			H(A);                                                              \
-			fprintf(stdout, " == ");                                           \
-			H(B);                                                              \
-			fprintf(stdout, "\n");                                             \
+			fprintf(                                                           \
+				stderr,                                                        \
+				"%s:%u:0: info: %s == %s\n",                                   \
+				__FILE__,                                                      \
+				__LINE__,                                                      \
+				TB::String(A),                                                 \
+				TB::String(B));                                                \
 		}                                                                      \
 	}
