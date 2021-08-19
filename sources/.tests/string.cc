@@ -5,6 +5,9 @@
 
 
 
+template <> TB::String::String(const int& v) { From(v); }
+template <> TB::String::String(const unsigned& v) { From(v); }
+
 int main() {
 	TB::String string;
 	assert(string.IsEmpty());

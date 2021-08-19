@@ -6,7 +6,7 @@
 
 
 template <> TB::String::String(const TB::Version<3>& v) {
-	*this = (TB::String)v;
+	*this = v;
 }
 
 int main() {
