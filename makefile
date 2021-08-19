@@ -41,19 +41,14 @@ suffixes := %.c %.cc %.glsl
 
 files := $(subst sources/,, $(shell find sources -type f))
 srcs := $(filter $(suffixes), $(files))
-mods := $(filter-out tests/%, $(basename $(srcs)))
+mods := $(basename $(srcs))
 objs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(mods)))
 deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
 
-# テスト
-tmods := $(filter .tests/%, $(basename $(srcs)))
-tobjs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(tmods)))
-tdeps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(tmods)))
-
-# 手動テスト
-mtmods := $(filter .mtests/%, $(basename $(srcs)))
-mtobjs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(tmods)))
-mtdeps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(tmods)))
+# オブジェクトファイルの分類
+testPlaces := $(TARGETDIR)/.mtests/% $(TARGETDIR)/.tests/%
+nobjs := $(filter-out $(testPlaces), $(objs))
+tobjs := $(filter $(testPlaces), $(objs))
 
 
 
@@ -97,22 +92,14 @@ $(TARGETDIR)/%.dep : sources/%.c makefile
 
 ############################################################### RULES & TARGET
 
-$(TARGETDIR)/$(target): makefile $(objs)
+$(TARGETDIR)/$(target): makefile $(nobjs)
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
-	@ar rc $@ $(objs)
+	@ar rc $@ $(nobjs)
 else
 	@echo " LD $@"
-	@gcc -o $(executable) $(objs) $(EXLIBS)
+	@gcc -o $(executable) $(nobjs) $(EXLIBS)
 endif
-	@echo -n building manual tests...
-	@$(foreach m, $(mtmods), gcc -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L$(TARGETDIR) -ltoolbox $(EXLIBS) &&) true
-	@$(foreach m, $(mtmods), chmod +x $(TARGETDIR)/$(m) &&) true
-	@echo OK.
-	@echo -n building tests...
-	@$(foreach m, $(tmods), gcc -coverage -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L$(TARGETDIR) -ltoolbox $(EXLIBS) &&) true
-	@$(foreach m, $(tmods), chmod +x $(TARGETDIR)/$(m) &&) true
-	@echo OK.
 	@rm -f $(target)
 	@ln -s $(TARGETDIR)/$(target) $(target)
 
@@ -120,7 +107,15 @@ endif
 clean:
 	rm -rf RELEASE DEBUG COVERAGE .builds *.gcov
 
-test: $(TARGETDIR)/$(target)
+test: $(TARGETDIR)/$(target) $(tobjs)
+	@echo -n building  ftests...
+	@$(foreach m, $(mtmods), gcc -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L$(TARGETDIR) -ltoolbox $(EXLIBS) &&) true
+	@$(foreach m, $(mtmods), chmod +x $(TARGETDIR)/$(m) &&) true
+	@echo OK.
+	@echo -n building tests...
+	@$(foreach m, $(tmods), gcc -coverage -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L$(TARGETDIR) -ltoolbox $(EXLIBS) &&) true
+	@$(foreach m, $(tmods), chmod +x $(TARGETDIR)/$(m) &&) true
+	@echo OK.
 	@echo running tests...
 	@$(foreach m, $(tmods), $(TARGETDIR)/$(m) &&) true
 	@echo OK.
