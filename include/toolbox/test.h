@@ -19,6 +19,7 @@
 #pragma once
 
 #include <stdio.h>
+#include <toolbox/string.h>
 
 
 
@@ -36,8 +37,8 @@
 				"%s:%u:0: info: %s != %s\n",                                   \
 				__FILE__,                                                      \
 				__LINE__,                                                      \
-				TB::String(A),                                                 \
-				TB::String(B));                                                \
+				(const char*)TB::String(A),                                    \
+				(const char*)TB::String(B));                                   \
 		}                                                                      \
 	}
 #define assertNE(A, B, H)                                                      \
@@ -48,7 +49,7 @@
 				"%s:%u:0: info: %s == %s\n",                                   \
 				__FILE__,                                                      \
 				__LINE__,                                                      \
-				TB::String(A),                                                 \
-				TB::String(B));                                                \
+				(const char*)TB::String(A),                                    \
+				(const char*)TB::String(B));                                   \
 		}                                                                      \
 	}

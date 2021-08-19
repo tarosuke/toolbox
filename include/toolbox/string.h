@@ -48,6 +48,7 @@ namespace TB {
 		String(const char*);
 		String(long long, unsigned length = 0, char padding = ' ');
 		String(unsigned long long, unsigned length = 0, char padding = ' ');
+		template <typename U> String(const U&);
 
 		String& operator=(const char*);
 
