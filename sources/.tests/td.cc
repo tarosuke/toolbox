@@ -6,8 +6,7 @@
 int main() {
 	ManualTest;
 
-	TB::VK::WTD td(TB::VK::TD::Frustum());
-
+	TB::VK::WTD td(TB::TD::Frustum());
 
 
 	return 0;

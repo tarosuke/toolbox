@@ -34,7 +34,7 @@ namespace TB {
 
 
 		protected:
-			TD(const M44& proj);
+			TD(const M44& proj){};
 		};
 
 		// フレームバッファ版TD
