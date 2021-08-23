@@ -12,6 +12,8 @@
 
 
 int main() {
+	ManualTest;
+
 	XTG::Display display;
 	assert(display);
 

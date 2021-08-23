@@ -50,7 +50,6 @@ testPlaces := $(TARGETDIR)/.mtests/% $(TARGETDIR)/.tests/%
 nobjs := $(filter-out $(testPlaces), $(objs))
 tobjs := $(filter $(testPlaces), $(objs))
 tmods := $(filter .tests/%, $(mods))
-mtmods := $(filter .mtests/%, $(mods))
 
 
 
@@ -113,11 +112,9 @@ test: $(TARGETDIR)/$(target) $(tobjs)
 	@echo -n building tests...
 	@$(foreach m, $(tmods), gcc -coverage -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L$(TARGETDIR) -ltoolbox $(EXLIBS) &&) true
 	@$(foreach m, $(tmods), chmod +x $(TARGETDIR)/$(m) &&) true
-	@$(foreach m, $(mtmods), gcc -coverage -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L$(TARGETDIR) -ltoolbox $(EXLIBS) &&) true
-	@$(foreach m, $(mtmods), chmod +x $(TARGETDIR)/$(m) &&) true
 	@echo OK.
 	@echo running tests...
-	@$(foreach m, $(tmods), $(TARGETDIR)/$(m) &&) true
+	@$(shell for m in $(tmods); do AUTO_TEST=1 $(TARGETDIR)/$$m; done)
 	@echo OK.
 
 RELEASE: RELEASE/$(target) test

@@ -25,6 +25,7 @@
 
 
 int main() {
+	ManualTest;
 
 	class Test : public TB::Input {
 	public:
