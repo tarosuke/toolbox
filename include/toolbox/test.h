@@ -19,12 +19,16 @@
 #pragma once
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <toolbox/string.h>
 
 
-
-// NOTE:「H」は引数の値を出力するスタティックメソッド
-
+#define ManualTest                                                             \
+	{                                                                          \
+		if (getenv("AUTO_TEST")) {                                             \
+			exit(0);                                                           \
+		}                                                                      \
+	}
 #define assert(c)                                                              \
 	if (!(c)) {                                                                \
 		fprintf(stderr, "%s:%u:0: info: %s.\n", __FILE__, __LINE__, #c);       \
