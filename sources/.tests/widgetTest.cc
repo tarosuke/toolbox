@@ -13,6 +13,8 @@
 
 
 int main() {
+	ManualTest;
+
 	try {
 		class VR : public TG::OpenVR {
 			bool Finish(unsigned tick) final { return tick < 1000; };

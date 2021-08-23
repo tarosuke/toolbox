@@ -114,7 +114,7 @@ test: $(TARGETDIR)/$(target) $(tobjs)
 	@$(foreach m, $(tmods), chmod +x $(TARGETDIR)/$(m) &&) true
 	@echo OK.
 	@echo running tests...
-	@$(foreach m, $(tmods), $(TARGETDIR)/$(m) &&) true
+	@$(shell for m in $(tmods); do AUTO_TEST=1 $(TARGETDIR)/$$m; done)
 	@echo OK.
 
 RELEASE: RELEASE/$(target) test
