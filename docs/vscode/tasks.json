@@ -1,0 +1,95 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
+	// for the documentation about the tasks.json format
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "build (RELEASE)",
+			"type": "shell",
+			"command": "make -j RELEASE",
+			"problemMatcher": {
+				"owner": "$gcc",
+				"pattern": [
+					{
+						"regexp": "^(.*):(\\d+):(\\d+):\\s*(.*):\\s+(.*)$",
+						"file": 1,
+						"line": 2,
+						"severity": 4,
+						"message": 5,
+					}
+				],
+				"fileLocation": "relative"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"clear": true
+			}
+		},
+		{
+			"label": "build (DEBUG)",
+			"type": "shell",
+			"command": "make -j DEBUG",
+			"problemMatcher": {
+				"owner": "$gcc",
+				"pattern": [
+					{
+						"regexp": "^(.*):(\\d+):(\\d+):\\s*(.*):\\s+(.*)$",
+						"file": 1,
+						"line": 2,
+						"severity": 4,
+						"message": 5,
+					}
+				],
+				"fileLocation": "relative"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"clear": true
+			}
+		},
+		{
+			"label": "build (COVERAGE)",
+			"type": "shell",
+			"command": "make -j COVERAGE",
+			"problemMatcher": {
+				"owner": "$gcc",
+				"pattern": [
+					{
+						"regexp": "^(.*):(\\d+):(\\d+):\\s*(.*):\\s+(.*)$",
+						"file": 1,
+						"line": 2,
+						"severity": 4,
+						"message": 5,
+					}
+				],
+				"fileLocation": "relative"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"clear": true
+			}
+		},
+		{
+			"label": "clean",
+			"type": "shell",
+			"command": "make clean",
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"clear": true
+			}
+		}
+	]
+}
