@@ -18,6 +18,8 @@
  */
 #pragma once
 #include <toolbox/td.h>
+#include <toolbox/geometry/vector.h>
+
 #include <vulkan/vulkan.h>
 
 
@@ -26,8 +28,23 @@ namespace TB {
 
 	namespace VK {
 
+		// 初期化にフレームバッファが必要なVulkan版基本クラス
 		struct TD : public TB::TD {
-			TD() : TB::TD(){};
+			void Draw(const M44& view) override{};
+
+
+		protected:
+			TD(const M44& proj);
+		};
+
+		// フレームバッファ版TD
+		struct FBTD : public TD {
+			FBTD(const M44& proj, const S2& viewport) : TD(proj){};
+		};
+
+		// 窓版TD
+		struct WTD : public TD {
+			WTD(const M44& proj) : TD(proj){};
 		};
 	}
 }

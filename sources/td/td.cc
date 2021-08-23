@@ -16,48 +16,10 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#pragma once
-
-#include <toolbox/container/list.h>
-#include <toolbox/geometry/matrix.h>
-#include <toolbox/geometry/spread.h>
+#include <toolbox/td.h>
 
 
 
 namespace TB {
-
-	struct TD {
-		using M44 = Matrix<4, 4, float>;
-		using S2 = Spread<2, unsigned>;
-
-		static M44 Frustum();
-
-
-		struct Object : public List<Object>::Node {
-			virtual void Draw(/*未定*/) = 0;
-		};
-
-
-
-		void AddHead(Object& o) { head.Add(o); };
-		void AddExternal(Object& o) { external.Add(o); };
-		void AddScenery(Object& o) { scenery.Add(o); };
-
-
-		virtual void Draw(const M44& view) = 0;
-
-		virtual ~TD(){};
-
-	protected:
-		TD(){};
-
-
-	private:
-		struct Target {
-			Target() : regenerate(false){};
-			void Add(Object& o) { list.Add(o); };
-			List<Object> list;
-			bool regenerate; //コマンド再生成が必要
-		} head, external, scenery;
-	};
+	TD::M44 TD::Frustum() { return M44(); }
 }

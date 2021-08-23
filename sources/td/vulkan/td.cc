@@ -17,3 +17,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <toolbox/td/vulkan/td.h>
+
+
+
+namespace TB {
+	namespace VK {}
+}

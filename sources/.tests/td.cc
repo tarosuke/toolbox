@@ -6,7 +6,7 @@
 int main() {
 	ManualTest;
 
-	TB::VK::TD td;
+	TB::VK::WTD td(TB::VK::TD::Frustum());
 
 
 
