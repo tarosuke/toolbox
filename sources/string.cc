@@ -25,20 +25,42 @@
 
 namespace TB {
 
+	const char* const String::numeric = "0123456789abcdef";
+
 	String::String(const String& t) { *this = t; }
 	String::String(const char* t) { Load(t); }
-	String::String(long long value, unsigned length, char padding) {
-		if (value < 0) {
-			*this += '-';
-			value = -value;
-		}
-		FromNumeric(static_cast<unsigned long long>(value), length, padding);
+
+	String& String::operator<<(const String& t) {
+		Copy(t, Length());
+		return *this;
 	}
-	String::String(unsigned long long value, unsigned length, char padding) {
-		FromNumeric(value, length, padding);
+	String& String::operator<<(const char* t) {
+		unsigned i(Length());
+		for (; t && *t; ++t, ++i) {
+			Copy(*t, i);
+		}
+		Copy(0, i);
+		return *this;
+	}
+	String& String::operator<<(char c) {
+		Resize(elements + 1);
+		body[elements - 2] = c;
+		body[elements - 1] = 0;
+		return *this;
 	}
 
-	void String::FromNumeric(
+	void String::FromSigned(
+		long long v, unsigned minLen, char padding, unsigned radix) {
+		if (v < 0) {
+			*this << '-';
+			if (minLen) {
+				--minLen;
+			}
+			FromUnsigned(-v, minLen, padding, radix);
+		}
+	}
+
+	void String::FromUnsigned(
 		long long unsigned value,
 		unsigned length,
 		char padding,
@@ -52,25 +74,25 @@ namespace TB {
 
 		// pad if length is too long
 		for (; blen - 1 < length; --length) {
-			*this += padding;
+			*this << padding;
 		}
 
 		// build buffer
 		char b[blen];
 		char* p(&b[blen - 1]);
 		*p-- = 0;
-		char* p0(&p[-length]);
-		if (length) {
-			memset(p0, padding, length);
-		}
-		*p = '0';
+		char* const p0(&p[-length]); // pの初期位置からlength戻した位置
 
 		// convert from value
-		static const char* const numeric = "0123456789abcdef";
-		for (; value; *p-- = numeric[value % radix], value /= radix)
-			;
+		do {
+			*p-- = numeric[value % radix], value /= radix;
+		} while (value);
 
-		*this += p < p0 ? p : p0;
+		if (p0 < ++p) {
+			memset(p0, padding, p - p0 - 1);
+			p = p0;
+		}
+		*this << p;
 	}
 
 
@@ -88,55 +110,21 @@ namespace TB {
 		Copy(0, i);
 	}
 
-	String& String::operator+=(const String& t) {
-		Copy(t, Length());
-		return *this;
-	}
-	String& String::operator+=(const char* t) {
-		unsigned i(Length());
-		for (; t && *t; ++t, ++i) {
-			Copy(*t, i);
-		}
-		Copy(0, i);
-		return *this;
-	}
-	String& String::operator+=(char c) {
-		const unsigned l(Length());
-		Copy(c, l);
-		Copy(0, l + 1);
-		return *this;
-	}
 	String String::operator+(const String& t) const {
 		String newString(*this);
-		newString += t;
+		newString << t;
 		return newString;
 	}
 	String String::operator+(const char* t) const {
 		String newString(*this);
-		newString += t;
+		newString << t;
 		return newString;
 	}
 
-	bool String::operator==(const char* t) const {
-		return !strncmp(body, t, Length());
-	}
+	bool String::operator==(const char* t) const { return !strcmp(body, t); }
 
 
-	String& String::operator<<(long long unsigned n) {
-		FromNumeric(n, 0, ' ', 10);
-		return *this;
-	}
-
-	String& String::operator<<(long long i) {
-		if (i < 0) {
-			*this += '-';
-			i = -i;
-		}
-		FromNumeric(static_cast<unsigned>(i), 0, ' ', 10);
-		return *this;
-	}
-
-	Array<String> String::Split(const char* delimitor) {
+	Array<String> String::Split(const char* delimitor) const {
 		Array<String> arr;
 		if (!delimitor) {
 			arr += *this;
@@ -156,10 +144,10 @@ namespace TB {
 					c = e - 1;
 				} else {
 					// すでにcを一つ進めてあるので代わりを追加
-					*newString += *delimitor;
+					newString << *delimitor;
 				}
 			} else {
-				*newString += *c;
+				newString << *c;
 			}
 		}
 		arr += newString;

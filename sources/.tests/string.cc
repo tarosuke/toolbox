@@ -5,42 +5,41 @@
 
 
 
-namespace {
-	void H(const char* s) { printf("%s", (const char*)s); }
-	void HU(unsigned s) { printf("%u", s); }
-}
+template <> TB::String::String(const int& v) { From(v); }
+template <> TB::String::String(const unsigned& v) { From(v); }
 
 int main() {
 	TB::String string;
 	assert(string.IsEmpty());
-	string += '/';
+	string << '/';
 	assert(!string.IsEmpty());
-	assertEQ(string.Length(), 1, HU);
-	assertEQ(string, "/", H);
+	assertEQ(string.Length(), 1);
+	assertEQ(string, "/");
 
-	string += "abc";
-	assertEQ(string.Length(), 4, HU);
-	assertEQ(string, "/abc", H);
+	string << "abc";
+	assertEQ(string.Length(), 4);
+	assertEQ(string, "/abc");
 
-	TB::String s2("/abc");
-	string += s2;
-	assertEQ(string.Length(), 8, HU);
-	assertEQ(string, "/abc/abc", H);
 
-	string += string;
-	string += string;
-	assertEQ(string.Length(), 32, HU);
-	assertEQ(string, "/abc/abc/abc/abc/abc/abc/abc/abc", H);
+	string << TB::String("/abc");
+	assertEQ(string.Length(), 8);
+	assertEQ(string, "/abc/abc");
+
+	string << string;
+	string << string;
+	assertEQ(string.Length(), 32);
+	assertEQ(string, "/abc/abc/abc/abc/abc/abc/abc/abc");
 
 	TB::Array<TB::String> s(string.Split("/a"));
-	assertEQ(s.Length(), 9, HU);
-	for (unsigned n(0); n < 9; ++n) {
-		assertEQ(s[n], "bc", H);
+	assertEQ(s.Length(), 9);
+	assertEQ(s[0], "");
+	for (unsigned n(1); n < 9; ++n) {
+		assertEQ(s[n], "bc");
 	};
 	TB::Array<TB::String> p(string.Split("/abc"));
-	assertEQ(s.Length(), 9, HU);
+	assertEQ(p.Length(), 9);
 	for (unsigned n(0); n < 9; ++n) {
-		assertEQ(s[n], "", H);
+		assertEQ(p[n], "");
 	};
 
 	return 0;

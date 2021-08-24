@@ -1,4 +1,4 @@
-/** linux input subsystem
+/********************************************************************** sounds
  * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
@@ -16,38 +16,15 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <toolbox/test.h>
-
-#include <toolbox/input/input.h>
-
-#include <stdio.h>
+#pragma once
 
 
 
-int main() {
+namespace TB {
+	namespace Sound {
 
-	class Test : public TB::Input {
-	public:
-		Test() : Input(false){};
-		void OnKeyDown(unsigned key) final { printf("keydown:%x.\n", key); };
-		void OnKeyUp(unsigned key) final { printf("keyUp:%x.\n", key); };
-		void OnKeyRepeat(unsigned key) final {
-			printf("keyRepeat:%x.\n", key);
+		struct RiffTarget {
+			RiffTarget(const char* path);
 		};
-		void OnButtonDown(unsigned button) final {
-			printf("buttondown:%x.\n", button);
-		};
-		void OnButtonUp(unsigned button) final {
-			printf("buttonup:%x.\n", button);
-		};
-		void OnMouseMove(unsigned axis, int diff) final {
-			printf("mouseMove(%u):%d.\n", axis, diff);
-		};
-	} test;
-
-	for (unsigned n(0); n < 1000000; ++n) {
-		test.GetInput();
 	}
-
-	return 0;
 }

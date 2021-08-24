@@ -69,8 +69,8 @@ namespace TB{
 		//データベースのパス生成
 		const char* const home(getenv("HOME"));
 		path = home ? home : "/root";
-		path += "/";
-		path += name;
+		path << "/";
+		path << name;
 
 		//データベースを開く
 		if(!Open()){
@@ -106,7 +106,7 @@ namespace TB{
 			if(arg[1] != '-'){
 				//スイッチオプション(-/+xxx)
 				key = "-";
-				key += &arg[1];
+				key << &arg[1];
 				value = arg[0] == '+' ? "t" : "f";
 			}else{
 				//値オプション(--xxx yyy)

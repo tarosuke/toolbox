@@ -21,39 +21,39 @@
 
 
 
-namespace TB{
+namespace TB {
 
 	// read a line to String
-	Stream& Stream::operator>>(String& s){
-		for(char b('\n'); Read(&b, 1) && b != '\n';){
+	Stream& Stream::operator>>(String& s) {
+		for (char b('\n'); Read(&b, 1) && b != '\n';) {
 			// append the charactor to string
-			s += b;
+			s << b;
 		}
 
 		return *this;
 	}
 
 	// write String
-	Stream& Stream::operator<<(const String& s){
-		*this += s;
+	Stream& Stream::operator<<(const String& s) {
+		*this << s;
 		return *this;
 	}
 
 	// write null-terminated string
-	Stream& Stream::operator<<(const char* s){
-		*this += s;
+	Stream& Stream::operator<<(const char* s) {
+		*this << s;
 		return *this;
 	}
 
-	Stream& Stream::operator<<(const endl&){
-		*this += '\n';
+	Stream& Stream::operator<<(const endl&) {
+		*this << '\n';
 		Flush();
-		return * this;
+		return *this;
 	}
 
 	// flush writebuffer
-	void Stream::Flush(){
-		if(Length()){
+	void Stream::Flush() {
+		if (Length()) {
 			Write(static_cast<const char*>(*this), Length());
 			Clear();
 		}
