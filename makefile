@@ -25,8 +25,15 @@ endif
 COPTS += -Wall -Werror -Iinclude
 CCOPTS += $(COPTS) -std=c++11
 
-EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov
+EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov -lvulkan
 
+files := $(subst sources/,, $(shell find sources -type f))
+srcs := $(filter $(suffixes), $(files))
+spvs := $(filter %.frag %.vert, $(files))
+sbins:= $(addprefix .builds/, $(addsuffix .spv, $(spvs)))
+mods := $(filter-out tests/%, $(basename $(srcs)))
+objs := $(addprefix .builds/, $(addsuffix .o, $(mods) $(spvs)))
+deps := $(addprefix .builds/, $(addsuffix .dep, $(mods)))
 
 
 -include target.make
@@ -35,6 +42,7 @@ target ?= $(shell echo $$PWD | sed s!.*/!! )
 
 
 
+EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm
 ############################################################ FILE RECOGNITIONS
 
 suffixes := %.c %.cc %.glsl
@@ -88,6 +96,20 @@ $(TARGETDIR)/%.dep : sources/%.c makefile
 	@echo -n $(dir $@) > $@
 	@mkdir -p $(dir $@)
 	@$(CPP) $(COPTS) -MM $< >> $@
+
+# Vulkan shaders
+.builds/%.frag.spv : sources/%.frag
+	@echo " GLSLC $@"
+	@glslc $< -o $@
+
+.builds/%.vert.spv : sources/%.vert
+	@echo " GLSLC $@"
+	@glslc $< -o $@
+
+.builds/%.o : sources/%.spv
+	@echo " OBJCOPY $@"
+	@mkdir -p $(dir $@)
+	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
 
 
 
