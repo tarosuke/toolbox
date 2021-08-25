@@ -49,7 +49,7 @@ deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
 testPlaces := $(TARGETDIR)/.mtests/% $(TARGETDIR)/.tests/%
 nobjs := $(filter-out $(testPlaces), $(objs))
 tobjs := $(filter $(testPlaces), $(objs))
-tmods := $(filter .tests/%, $(mods))
+tmods := $(addprefix $(TARGETDIR)/, $(filter .tests/%, $(mods)))
 
 
 
@@ -108,14 +108,13 @@ endif
 clean:
 	rm -rf RELEASE DEBUG COVERAGE .builds *.gcov
 
-test: $(TARGETDIR)/$(target) $(tobjs)
-	@echo -n building tests...
-	@$(foreach m, $(tmods), gcc -coverage -o $(TARGETDIR)/$(m) $(TARGETDIR)/$(m).o -L$(TARGETDIR) -ltoolbox $(EXLIBS) &&) true
-	@$(foreach m, $(tmods), chmod +x $(TARGETDIR)/$(m) &&) true
-	@echo OK.
-	@echo running tests...
-	@$(shell for m in $(tmods); do AUTO_TEST=1 $(TARGETDIR)/$$m; done)
-	@echo OK.
+$(tmods) : $(tobjs) $(TARGETDIR)/$(target)
+	@echo " LD $@"
+	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS)
+
+test:  $(tmods)
+	@$(shell for m in $(tmods); do AUTO_TEST=1 $$m; done)
+	@echo "** TEST DONE."
 
 RELEASE: RELEASE/$(target) test
 
