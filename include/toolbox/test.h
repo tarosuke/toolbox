@@ -31,14 +31,14 @@
 	}
 #define assert(c)                                                              \
 	if (!(c)) {                                                                \
-		fprintf(stderr, "%s:%u:0: info: %s.\n", __FILE__, __LINE__, #c);       \
+		fprintf(stderr, "%s:%u:: info: %s.\n", __FILE__, __LINE__, #c);        \
 	}
 #define assertEQ(A, B)                                                         \
 	{                                                                          \
 		if ((A) != (B)) {                                                      \
 			fprintf(                                                           \
 				stderr,                                                        \
-				"%s:%u:0: info: %s != %s\n",                                   \
+				"%s:%u:: info: %s != %s\n",                                    \
 				__FILE__,                                                      \
 				__LINE__,                                                      \
 				(const char*)TB::String(A),                                    \
@@ -50,7 +50,7 @@
 		if ((A) == (B)) {                                                      \
 			fprintf(                                                           \
 				stderr,                                                        \
-				"%s:%u:0: info: %s == %s\n",                                   \
+				"%s:%u:: info: %s == %s\n",                                    \
 				__FILE__,                                                      \
 				__LINE__,                                                      \
 				(const char*)TB::String(A),                                    \
