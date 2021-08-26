@@ -11,14 +11,14 @@
 				"owner": "$gcc",
 				"pattern": [
 					{
-						"regexp": "^(.*):(\\d+):(\\d+):\\s*(.*):\\s+(.*)$",
+						"regexp": "^(.+):(\\d+):(.*):\\s*(.*):\\s+(.+)$",
 						"file": 1,
 						"line": 2,
 						"severity": 4,
 						"message": 5,
 					}
 				],
-				"fileLocation": "relative"
+				"fileLocation": "autoDetect"
 			},
 			"group": {
 				"kind": "build",
@@ -36,14 +36,14 @@
 				"owner": "$gcc",
 				"pattern": [
 					{
-						"regexp": "^(.*):(\\d+):(.*):\\s*(.*):\\s+(.*)$",
+						"regexp": "(?:^(.+):(\\d+)(:)(\\s+)(.+)$)|(?:^(.+):(\\d+):(.*):\\s*(.*):\\s+(.+)$)",
 						"file": 1,
 						"line": 2,
 						"severity": 4,
 						"message": 5,
 					}
 				],
-				"fileLocation": "relative"
+				"fileLocation": "autoDetect"
 			},
 			"group": {
 				"kind": "build",
