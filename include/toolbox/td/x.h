@@ -45,8 +45,15 @@ namespace TB {
 		};
 
 		struct Window {
+			Window() : xwindow(0){}; //入れ物用何もしないコンストラクタ
 			Window(unsigned width, unsigned height);
+			Window(Window& w) noexcept { *this = w; };
 			~Window();
+
+			void operator=(Window& w) noexcept {
+				xwindow = w.xwindow;
+				w.xwindow = 0;
+			};
 
 		private:
 			::Window xwindow;
