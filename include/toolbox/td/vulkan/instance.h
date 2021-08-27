@@ -38,6 +38,9 @@ namespace TB {
 			};
 
 			static VkInstance GetInstance() { return singleton.instance; };
+			static const std::vector<VkPhysicalDevice>& PhysicalDevice() {
+				return singleton.physicalDevices;
+			};
 
 		private:
 			static VkInstance MakeInstance();

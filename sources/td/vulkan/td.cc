@@ -30,7 +30,7 @@ namespace TB {
 
 		VkFramebuffer* XFBTD::MakeFrameBuffer(const TB::X::Window& w) {
 			auto attr(w.GetAttributes());
-			const S2 s((int[2]){attr.width, attr.height});
+
 
 			VkXlibSurfaceCreateInfoKHR sInfo{
 				.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
@@ -45,6 +45,31 @@ namespace TB {
 				&sInfo,
 				0,
 				&surface);
+
+			VkSwapchainCreateInfoKHR sc{
+				.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+				.pNext = 0,
+				.flags = 0,
+				.surface = surface,
+				.minImageCount = 2,
+				.imageFormat = VK_FORMAT_B8G8R8A8_SRGB,
+				.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
+				.imageExtent = {(unsigned)attr.width, (unsigned)attr.height},
+				.imageArrayLayers = 1,
+				.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+				.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
+				.queueFamilyIndexCount = 0,
+				.pQueueFamilyIndices = 0,
+				.preTransform =
+					VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR, // TODO:あとでデフォルトを取得して差し替える
+				.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+				.presentMode = VK_PRESENT_MODE_FIFO_KHR,
+				.clipped = VK_TRUE,
+				.oldSwapchain = VK_NULL_HANDLE,
+			};
+
+
+			// vkCreateSwapchainKHR
 
 			return 0;
 		}
