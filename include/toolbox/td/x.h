@@ -36,10 +36,10 @@ namespace TB {
 
 			void Tick();
 
-		private:
 			static ::Display* xdisplay;
 			static std::unordered_map<::Window, TB::X::Window*> dic;
 
+		private:
 			static void AddWindow(Window* w, ::Window xs) { dic[xs] = w; };
 			static void RemoveWindow(::Window xw) { dic.erase(xw); };
 		};
@@ -57,7 +57,6 @@ namespace TB {
 
 			XWindowAttributes GetAttributes() const;
 
-		private:
 			::Window xwindow;
 			static const long defaultEventMask = KeyPressMask | KeyReleaseMask |
 												 ButtonPressMask |

@@ -63,9 +63,11 @@ namespace TB {
 				xwindow = 0;
 				throw std::runtime_error("Failed to open X Window.");
 			}
+			Display::AddWindow(this, xwindow);
 		}
 		Window::~Window() {
 			if (xwindow) {
+				Display::RemoveWindow(xwindow);
 				XDestroyWindow(Display::xdisplay, xwindow);
 			}
 		}

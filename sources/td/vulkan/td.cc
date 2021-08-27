@@ -17,6 +17,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <toolbox/td/vulkan/td.h>
+#include <toolbox/td/vulkan/instance.h>
+
+#include <vulkan/vulkan_xlib.h>
 
 
 
@@ -25,6 +28,25 @@ namespace TB {
 
 		VkFramebuffer* FBTD::MakeFrameBuffer(const S2& s) { return 0; }
 
-		VkFramebuffer* XFBTD::MakeFrameBuffer(const S2& s) { return 0; }
+		VkFramebuffer* XFBTD::MakeFrameBuffer(const TB::X::Window& w) {
+			auto attr(w.GetAttributes());
+			const S2 s((int[2]){attr.width, attr.height});
+
+			VkXlibSurfaceCreateInfoKHR sInfo{
+				.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
+				.pNext = 0,
+				.flags = 0,
+				.dpy = ::TB::X::Display::xdisplay,
+				.window = w.xwindow,
+			};
+			VkSurfaceKHR surface;
+			vkCreateXlibSurfaceKHR(
+				Instance::GetInstance(),
+				&sInfo,
+				0,
+				&surface);
+
+			return 0;
+		}
 	}
 }

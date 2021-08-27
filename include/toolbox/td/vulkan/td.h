@@ -19,14 +19,12 @@
 #pragma once
 #include <toolbox/td.h>
 #include <toolbox/td/x.h>
-#include <toolbox/geometry/vector.h>
 
 #include <vulkan/vulkan.h>
 
 
 
 namespace TB {
-
 	namespace VK {
 
 		// 初期化にフレームバッファが必要なVulkan版基本クラス
@@ -49,11 +47,14 @@ namespace TB {
 
 		// X窓フレームバッファ版TD
 		struct XFBTD : public TD {
-			XFBTD(const M44& proj, const S2& size)
-				: TD(proj, MakeFrameBuffer(size)){};
+			XFBTD(const M44& proj, ::TB::X::Window& w)
+				: TD(proj, MakeFrameBuffer(w)), window(w){};
 
 		private:
-			static VkFramebuffer* MakeFrameBuffer(const S2& size);
+			::TB::X::Window window;
+
+
+			VkFramebuffer* MakeFrameBuffer(const TB::X::Window&);
 		};
 	}
 }
