@@ -21,5 +21,10 @@
 
 
 namespace TB {
-	namespace VK {}
+	namespace VK {
+
+		VkFramebuffer* FBTD::MakeFrameBuffer(const S2& s) { return 0; }
+
+		VkFramebuffer* XFBTD::MakeFrameBuffer(const S2& s) { return 0; }
+	}
 }

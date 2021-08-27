@@ -18,6 +18,7 @@
  */
 #pragma once
 #include <toolbox/td.h>
+#include <toolbox/td/x.h>
 #include <toolbox/geometry/vector.h>
 
 #include <vulkan/vulkan.h>
@@ -34,17 +35,25 @@ namespace TB {
 
 
 		protected:
-			TD(const M44& proj){};
+			TD(const M44& proj, VkFramebuffer*){};
 		};
 
 		// フレームバッファ版TD
 		struct FBTD : public TD {
-			FBTD(const M44& proj, const S2& viewport) : TD(proj){};
+			FBTD(const M44& proj, const S2& viewport)
+				: TD(proj, MakeFrameBuffer(viewport)){};
+
+		private:
+			static VkFramebuffer* MakeFrameBuffer(const S2&);
 		};
 
-		// 窓版TD
-		struct WTD : public TD {
-			WTD(const M44& proj) : TD(proj){};
+		// X窓フレームバッファ版TD
+		struct XFBTD : public TD {
+			XFBTD(const M44& proj, const S2& size)
+				: TD(proj, MakeFrameBuffer(size)){};
+
+		private:
+			static VkFramebuffer* MakeFrameBuffer(const S2& size);
 		};
 	}
 }
