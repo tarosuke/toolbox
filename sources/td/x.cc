@@ -69,5 +69,11 @@ namespace TB {
 				XDestroyWindow(Display::xdisplay, xwindow);
 			}
 		}
+
+		XWindowAttributes Window::GetAttributes() const {
+			XWindowAttributes attr;
+			XGetWindowAttributes(Display::xdisplay, xwindow, &attr);
+			return attr;
+		}
 	}
 }

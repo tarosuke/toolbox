@@ -55,6 +55,8 @@ namespace TB {
 				w.xwindow = 0;
 			};
 
+			XWindowAttributes GetAttributes() const;
+
 		private:
 			::Window xwindow;
 			static const long defaultEventMask = KeyPressMask | KeyReleaseMask |
