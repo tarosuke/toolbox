@@ -52,7 +52,8 @@ namespace TB {
 
 		private:
 			::TB::X::Window window;
-
+			VkSurfaceKHR surface;
+			VkSwapchainKHR swapchain;
 
 			VkFramebuffer* MakeFrameBuffer(const TB::X::Window&);
 		};

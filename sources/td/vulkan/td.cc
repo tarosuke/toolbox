@@ -39,7 +39,6 @@ namespace TB {
 				.dpy = ::TB::X::Display::xdisplay,
 				.window = w.xwindow,
 			};
-			VkSurfaceKHR surface;
 			vkCreateXlibSurfaceKHR(
 				Instance::GetInstance(),
 				&sInfo,
@@ -69,7 +68,7 @@ namespace TB {
 			};
 
 
-			// vkCreateSwapchainKHR
+			vkCreateSwapchainKHR(Instance::GetDevice(), &sc, 0, &swapchain);
 
 			return 0;
 		}

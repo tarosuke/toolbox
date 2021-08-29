@@ -27,10 +27,7 @@
 namespace TB {
 	namespace VK {
 
-		class Instance {
-		public:
-			VkDevice device;
-
+		struct Instance {
 			Instance();
 			~Instance() {
 				vkDestroyDevice(device, nullptr);
@@ -41,6 +38,7 @@ namespace TB {
 			static const std::vector<VkPhysicalDevice>& PhysicalDevice() {
 				return singleton.physicalDevices;
 			};
+			static VkDevice GetDevice() { return singleton.device; };
 
 		private:
 			static VkInstance MakeInstance();
@@ -53,6 +51,7 @@ namespace TB {
 			void GetDevices();
 			VkQueue queue;
 			static Instance singleton;
+			VkDevice device;
 		};
 	}
 }
