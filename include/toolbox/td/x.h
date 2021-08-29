@@ -42,6 +42,7 @@ namespace TB {
 		private:
 			static void AddWindow(Window* w, ::Window xs) { dic[xs] = w; };
 			static void RemoveWindow(::Window xw) { dic.erase(xw); };
+			static Display instance;
 		};
 
 		struct Window {

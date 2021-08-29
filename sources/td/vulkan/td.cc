@@ -18,8 +18,10 @@
  */
 #include <toolbox/td/vulkan/td.h>
 #include <toolbox/td/vulkan/instance.h>
+#include <toolbox/exception.h>
 
 #include <vulkan/vulkan_xlib.h>
+#include <stdexcept>
 
 
 
@@ -39,11 +41,13 @@ namespace TB {
 				.dpy = ::TB::X::Display::xdisplay,
 				.window = w.xwindow,
 			};
-			vkCreateXlibSurfaceKHR(
-				Instance::GetInstance(),
-				&sInfo,
-				0,
-				&surface);
+			if (const VkResult r = vkCreateXlibSurfaceKHR(
+					Instance::GetInstance(),
+					&sInfo,
+					0,
+					&surface)) {
+				THROW;
+			}
 
 			VkSwapchainCreateInfoKHR sc{
 				.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
@@ -68,7 +72,13 @@ namespace TB {
 			};
 
 
-			vkCreateSwapchainKHR(Instance::GetDevice(), &sc, 0, &swapchain);
+			if (vkCreateSwapchainKHR(
+					Instance::GetDevice(),
+					&sc,
+					0,
+					&swapchain)) {
+				THROW;
+			}
 
 			return 0;
 		}

@@ -25,6 +25,7 @@
 namespace TB {
 	namespace X {
 
+		Display Display::instance;
 		::Display* Display::xdisplay;
 		std::unordered_map<::Window, Window*> Display::dic;
 
