@@ -42,7 +42,6 @@ target ?= $(shell echo $$PWD | sed s!.*/!! )
 
 
 
-EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm
 ############################################################ FILE RECOGNITIONS
 
 suffixes := %.c %.cc %.glsl
