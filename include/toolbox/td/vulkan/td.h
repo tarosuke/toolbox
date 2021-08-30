@@ -49,6 +49,7 @@ namespace TB {
 		struct XFBTD : public TD {
 			XFBTD(const M44& proj, ::TB::X::Window& w)
 				: TD(proj, MakeFrameBuffer(w)), window(w){};
+			~XFBTD();
 
 		private:
 			::TB::X::Window window;

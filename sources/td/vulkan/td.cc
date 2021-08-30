@@ -82,5 +82,10 @@ namespace TB {
 
 			return 0;
 		}
+
+		XFBTD::~XFBTD() {
+			vkDestroySwapchainKHR(Instance::GetDevice(), swapchain, 0);
+			vkDestroySurfaceKHR(Instance::GetInstance(), surface, 0);
+		}
 	}
 }
