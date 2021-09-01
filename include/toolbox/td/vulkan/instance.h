@@ -34,12 +34,22 @@ namespace TB {
 				vkDestroyInstance(instance, nullptr);
 			};
 
-			static VkInstance GetInstance() { return singleton.instance; };
-			static const std::vector<VkPhysicalDevice>& PhysicalDevice() {
-				return singleton.physicalDevices;
+			struct Property {
+				VkInstance& instance;
+				VkPhysicalDevice& physicalDevice;
+				VkDevice& device;
 			};
-			static VkDevice GetDevice() { return singleton.device; };
+			static Property GetProperty() {
+				return Property{
+					.instance = singleton.instance,
+					.physicalDevice =
+						singleton
+							.physicalDevices[singleton.physicalDeviceIndex],
+					.device = singleton.device};
+			};
 
+
+			// 拡張を使うクラスでstaticメンバとしてインスタンス化
 			struct Extension {
 				Extension(const char* name) : next(root), name(name) {
 					root = this;
