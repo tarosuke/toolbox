@@ -17,7 +17,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <toolbox/td/vulkan/td.h>
-#include <toolbox/td/vulkan/instance.h>
 #include <toolbox/exception.h>
 
 #include <vulkan/vulkan_xlib.h>
@@ -72,7 +71,7 @@ namespace TB {
 			};
 
 
-			if (vkCreateSwapchainKHR(
+			if (const VkResult r = vkCreateSwapchainKHR(
 					Instance::GetDevice(),
 					&sc,
 					0,
@@ -87,5 +86,8 @@ namespace TB {
 			vkDestroySwapchainKHR(Instance::GetDevice(), swapchain, 0);
 			vkDestroySurfaceKHR(Instance::GetInstance(), surface, 0);
 		}
+
+		Instance::Extension
+			XFBTD::extensionKey(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
 	}
 }

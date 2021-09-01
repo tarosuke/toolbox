@@ -11,15 +11,16 @@
 MAKECMDGOALS ?= RELEASE
 ifeq ($(MAKECMDGOALS), RELEASE)
 TARGETDIR := RELEASE
-COPTS := -O3 -DNDEBUG -Wno-stringop-overflow
+COPTS := -O3 -DNDEBUG -Wno-stringop-overflow -DVK_USE_PLATFORM_XLIB_KHR
 endif
 ifeq ($(MAKECMDGOALS), DEBUG)
 TARGETDIR := DEBUG
-COPTS := -O0 -g
+COPTS := -O0 -g -DVK_USE_PLATFORM_XLIB_KHR
+
 endif
 ifeq ($(MAKECMDGOALS), COVERAGE)
 TARGETDIR := COVERAGE
-COPTS := -g -coverage
+COPTS := -g -coverage -DVK_USE_PLATFORM_XLIB_KHR
 endif
 
 COPTS += -Wall -Werror -Iinclude

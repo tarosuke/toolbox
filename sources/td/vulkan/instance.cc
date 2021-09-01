@@ -19,6 +19,8 @@
 #include <toolbox/td/vulkan/instance.h>
 
 #include <vector>
+#include <X11/Xlib.h>
+#include <vulkan/vulkan_xlib.h>
 
 
 
@@ -35,9 +37,10 @@ namespace TB {
 
 
 		VkInstance Instance::MakeInstance() {
-			std::vector<char*> extentionNames;
+			// 拡張リストの収集
+			std::vector<const char*> extensionNames;
+			Extension::GetExtensions(extensionNames);
 
-			//このへんで機能拡張をextensionNamesに格納しておく
 
 			const VkApplicationInfo appInfo = {
 				.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -52,8 +55,8 @@ namespace TB {
 				.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
 				.pNext = NULL,
 				.pApplicationInfo = &appInfo,
-				.enabledExtensionCount = (unsigned)extentionNames.size(),
-				.ppEnabledExtensionNames = extentionNames.data(),
+				.enabledExtensionCount = (unsigned)extensionNames.size(),
+				.ppEnabledExtensionNames = extensionNames.data(),
 			};
 
 			VkInstance instance;
@@ -137,6 +140,14 @@ namespace TB {
 				throw -1;
 			}
 			vkGetDeviceQueue(device, presentFamilyIndex, 0, &queue);
+		}
+
+		Instance::Extension* Instance::Extension::root(0);
+		void
+		Instance::Extension::GetExtensions(std::vector<const char*>& list) {
+			for (Extension* e(root); e; e = (*e).next) {
+				list.push_back((*e).name);
+			}
 		}
 	}
 }

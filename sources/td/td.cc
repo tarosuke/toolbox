@@ -21,5 +21,6 @@
 
 
 namespace TB {
+
 	TD::M44 TD::Frustum() { return M44(); }
 }

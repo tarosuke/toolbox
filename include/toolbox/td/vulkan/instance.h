@@ -40,7 +40,21 @@ namespace TB {
 			};
 			static VkDevice GetDevice() { return singleton.device; };
 
+			struct Extension {
+				Extension(const char* name) : next(root), name(name) {
+					root = this;
+				};
+				static void GetExtensions(std::vector<const char*>&);
+
+			private:
+				static Extension* root;
+				Extension* const next;
+				const char* name;
+			};
+
 		private:
+			static Instance singleton;
+
 			static VkInstance MakeInstance();
 			VkInstance instance;
 			void GetPhysicalDevices();
@@ -50,7 +64,6 @@ namespace TB {
 			std::vector<VkQueueFamilyProperties> queueFamilies;
 			void GetDevices();
 			VkQueue queue;
-			static Instance singleton;
 			VkDevice device;
 		};
 	}
