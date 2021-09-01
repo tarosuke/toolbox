@@ -19,6 +19,7 @@
 #pragma once
 #include <toolbox/td.h>
 #include <toolbox/td/x.h>
+#include <toolbox/td/vulkan/instance.h>
 
 #include <vulkan/vulkan.h>
 
@@ -52,6 +53,8 @@ namespace TB {
 			~XFBTD();
 
 		private:
+			static Instance::Extension extensionKey;
+
 			::TB::X::Window window;
 			VkSurfaceKHR surface;
 			VkSwapchainKHR swapchain;
