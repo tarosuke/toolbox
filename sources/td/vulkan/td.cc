@@ -31,7 +31,7 @@ namespace TB {
 
 		VkFramebuffer* XFBTD::MakeFrameBuffer(const TB::X::Window& w) {
 			auto attr(w.GetAttributes());
-
+			auto instance(Instance::GetProperty());
 
 			VkXlibSurfaceCreateInfoKHR sInfo{
 				.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
@@ -41,7 +41,7 @@ namespace TB {
 				.window = w.xwindow,
 			};
 			if (const VkResult r = vkCreateXlibSurfaceKHR(
-					Instance::GetInstance(),
+					instance.instance,
 					&sInfo,
 					0,
 					&surface)) {
@@ -63,7 +63,7 @@ namespace TB {
 				.queueFamilyIndexCount = 0,
 				.pQueueFamilyIndices = 0,
 				.preTransform =
-					VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR, // TODO:あとでデフォルトを取得して差し替える
+					VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR, // TODO:あとでデフォルトを取得して差し替える(でないと画面を回しているときに画面と合わないことが予想される)
 				.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
 				.presentMode = VK_PRESENT_MODE_FIFO_KHR,
 				.clipped = VK_TRUE,
@@ -71,11 +71,8 @@ namespace TB {
 			};
 
 
-			if (const VkResult r = vkCreateSwapchainKHR(
-					Instance::GetDevice(),
-					&sc,
-					0,
-					&swapchain)) {
+			if (const VkResult r =
+					vkCreateSwapchainKHR(instance.device, &sc, 0, &swapchain)) {
 				THROW;
 			}
 
@@ -83,8 +80,9 @@ namespace TB {
 		}
 
 		XFBTD::~XFBTD() {
-			vkDestroySwapchainKHR(Instance::GetDevice(), swapchain, 0);
-			vkDestroySurfaceKHR(Instance::GetInstance(), surface, 0);
+			auto instance(Instance::GetProperty());
+			vkDestroySwapchainKHR(instance.device, swapchain, 0);
+			vkDestroySurfaceKHR(instance.instance, surface, 0);
 		}
 
 		Instance::Extension
