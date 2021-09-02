@@ -43,10 +43,50 @@ namespace TB {
 			if (const VkResult r = vkCreateXlibSurfaceKHR(
 					instance.instance,
 					&sInfo,
-					0,
+					nullptr,
 					&surface)) {
 				THROW;
 			}
+
+			VkBool32 bSupportsPresent(VK_FALSE);
+			if (const VkResult r = vkGetPhysicalDeviceSurfaceSupportKHR(
+					instance.physicalDevice,
+					instance.presentFamilyIndex,
+					surface,
+					&bSupportsPresent)) {
+				THROW;
+			}
+			if (bSupportsPresent == VK_FALSE) {
+				THROW;
+			}
+
+
+
+			if (const VkResult r = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+					instance.physicalDevice,
+					surface,
+					&capabilities)) {
+				THROW;
+			}
+
+			uint32_t nFormat;
+			if (const VkResult r = vkGetPhysicalDeviceSurfaceFormatsKHR(
+					instance.physicalDevice,
+					surface,
+					&nFormat,
+					nullptr)) {
+				THROW;
+			}
+			if (nFormat) {
+				formats.resize(nFormat);
+				vkGetPhysicalDeviceSurfaceFormatsKHR(
+					instance.physicalDevice,
+					surface,
+					&nFormat,
+					formats.data());
+			}
+
+
 
 			VkSwapchainCreateInfoKHR sc{
 				.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,

@@ -29,7 +29,7 @@ namespace TB {
 
 		Instance Instance::singleton;
 
-		Instance::Instance() : instance(MakeInstance()) {
+		Instance::Instance() : instance(MakeInstance()), presentFamilyIndex(0) {
 			GetPhysicalDevices();
 			GetQueue();
 			GetDevices();
@@ -105,7 +105,6 @@ namespace TB {
 
 		void Instance::GetDevices() {
 			std::vector<VkDeviceQueueCreateInfo> qInfos;
-			unsigned presentFamilyIndex(0);
 			for (unsigned n(0); n < queueFamilies.size(); ++n) {
 				float priority(1.0);
 				const VkDeviceQueueCreateInfo qInfo = {

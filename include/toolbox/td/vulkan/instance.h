@@ -38,6 +38,9 @@ namespace TB {
 				VkInstance& instance;
 				VkPhysicalDevice& physicalDevice;
 				VkDevice& device;
+				unsigned& physicalDeviceIndex;
+				std::vector<VkPhysicalDevice>& physicalDevices;
+				unsigned& presentFamilyIndex;
 			};
 			static Property GetProperty() {
 				return Property{
@@ -45,7 +48,10 @@ namespace TB {
 					.physicalDevice =
 						singleton
 							.physicalDevices[singleton.physicalDeviceIndex],
-					.device = singleton.device};
+					.device = singleton.device,
+					.physicalDeviceIndex = singleton.physicalDeviceIndex,
+					.physicalDevices = singleton.physicalDevices,
+					.presentFamilyIndex = singleton.presentFamilyIndex};
 			};
 
 
@@ -72,6 +78,7 @@ namespace TB {
 			void GetQueue(unsigned phyDeviceIndex = 0);
 			unsigned physicalDeviceIndex;
 			std::vector<VkQueueFamilyProperties> queueFamilies;
+			unsigned presentFamilyIndex;
 			void GetDevices();
 			VkQueue queue;
 			VkDevice device;
