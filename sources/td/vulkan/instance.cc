@@ -28,6 +28,12 @@ namespace TB {
 	namespace VK {
 
 		Instance Instance::singleton;
+#ifndef NDEBUG
+		std::vector<const char*> Instance::layers{
+			"VK_LAYER_KHRONOS_validation"};
+#else
+		std::vector<const char*> Instance::layers;
+#endif
 
 		Instance::Instance() : instance(MakeInstance()), presentFamilyIndex(0) {
 			GetPhysicalDevices();
@@ -40,7 +46,6 @@ namespace TB {
 			// 拡張リストの収集
 			std::vector<const char*> extensionNames;
 			Extension::GetExtensions(extensionNames);
-
 
 			const VkApplicationInfo appInfo = {
 				.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -55,6 +60,8 @@ namespace TB {
 				.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
 				.pNext = NULL,
 				.pApplicationInfo = &appInfo,
+				.enabledLayerCount = (unsigned)layers.size(),
+				.ppEnabledLayerNames = layers.data(),
 				.enabledExtensionCount = (unsigned)extensionNames.size(),
 				.ppEnabledExtensionNames = extensionNames.data(),
 			};
@@ -127,7 +134,8 @@ namespace TB {
 				.flags = 0,
 				.queueCreateInfoCount = (unsigned)qInfos.size(),
 				.pQueueCreateInfos = qInfos.data(),
-				.enabledLayerCount = 0,
+				.enabledLayerCount = (unsigned)layers.size(),
+				.ppEnabledLayerNames = layers.data(),
 				.enabledExtensionCount = 0,
 				.pEnabledFeatures = NULL,
 			};
@@ -147,6 +155,9 @@ namespace TB {
 			for (Extension* e(root); e; e = (*e).next) {
 				list.push_back((*e).name);
 			}
+#ifndef NDEBUG
+			list.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+#endif
 		}
 	}
 }
