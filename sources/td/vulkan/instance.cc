@@ -45,7 +45,10 @@ namespace TB {
 		VkInstance Instance::MakeInstance() {
 			// 拡張リストの収集
 			std::vector<const char*> extensionNames;
-			Extension::GetExtensions(extensionNames);
+			Extension<VkInstance>::GetExtensions(extensionNames);
+#ifndef NDEBUG
+			extensionNames.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+#endif
 
 			const VkApplicationInfo appInfo = {
 				.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -149,15 +152,7 @@ namespace TB {
 			vkGetDeviceQueue(device, presentFamilyIndex, 0, &queue);
 		}
 
-		Instance::Extension* Instance::Extension::root(0);
-		void
-		Instance::Extension::GetExtensions(std::vector<const char*>& list) {
-			for (Extension* e(root); e; e = (*e).next) {
-				list.push_back((*e).name);
-			}
-#ifndef NDEBUG
-			list.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
-#endif
-		}
+		template <> Instance::Extension<VkInstance>*
+			Instance::Extension<VkInstance>::root(0);
 	}
 }

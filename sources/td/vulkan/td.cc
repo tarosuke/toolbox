@@ -21,6 +21,7 @@
 
 #include <vulkan/vulkan_xlib.h>
 #include <stdexcept>
+#include <string.h>
 
 
 
@@ -40,52 +41,13 @@ namespace TB {
 				.dpy = ::TB::X::Display::xdisplay,
 				.window = w.xwindow,
 			};
-			if (const VkResult r = vkCreateXlibSurfaceKHR(
+			if (vkCreateXlibSurfaceKHR(
 					instance.instance,
 					&sInfo,
 					nullptr,
 					&surface)) {
 				THROW;
 			}
-
-			VkBool32 bSupportsPresent(VK_FALSE);
-			if (const VkResult r = vkGetPhysicalDeviceSurfaceSupportKHR(
-					instance.physicalDevice,
-					instance.presentFamilyIndex,
-					surface,
-					&bSupportsPresent)) {
-				THROW;
-			}
-			if (bSupportsPresent == VK_FALSE) {
-				THROW;
-			}
-
-
-
-			if (const VkResult r = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
-					instance.physicalDevice,
-					surface,
-					&capabilities)) {
-				THROW;
-			}
-
-			uint32_t nFormat;
-			if (const VkResult r = vkGetPhysicalDeviceSurfaceFormatsKHR(
-					instance.physicalDevice,
-					surface,
-					&nFormat,
-					nullptr)) {
-				THROW;
-			}
-			if (nFormat) {
-				formats.resize(nFormat);
-				vkGetPhysicalDeviceSurfaceFormatsKHR(
-					instance.physicalDevice,
-					surface,
-					&nFormat,
-					formats.data());
-			}
-
 
 
 			VkSwapchainCreateInfoKHR sc{
@@ -96,7 +58,8 @@ namespace TB {
 				.minImageCount = 2,
 				.imageFormat = VK_FORMAT_B8G8R8A8_SRGB,
 				.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
-				.imageExtent = {(unsigned)attr.width, (unsigned)attr.height},
+				.imageExtent = {100U, 100U},
+				//				{(unsigned)attr.width, (unsigned)attr.height},
 				.imageArrayLayers = 1,
 				.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 				.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
@@ -111,8 +74,7 @@ namespace TB {
 			};
 
 
-			if (const VkResult r =
-					vkCreateSwapchainKHR(instance.device, &sc, 0, &swapchain)) {
+			if (vkCreateSwapchainKHR(instance.device, &sc, 0, &swapchain)) {
 				THROW;
 			}
 
@@ -125,7 +87,9 @@ namespace TB {
 			vkDestroySurfaceKHR(instance.instance, surface, 0);
 		}
 
-		Instance::Extension
+		Instance::Extension<VkInstance>
 			XFBTD::extensionKey(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+		// Instance::Extension
+		// 	XFBTD::swapChainExtensionKey(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 	}
 }
