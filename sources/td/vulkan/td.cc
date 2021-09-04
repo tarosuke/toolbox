@@ -34,7 +34,7 @@ namespace TB {
 			auto attr(w.GetAttributes());
 			auto instance(Instance::GetProperty());
 
-			VkXlibSurfaceCreateInfoKHR sInfo{
+			const VkXlibSurfaceCreateInfoKHR sInfo{
 				.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
 				.pNext = 0,
 				.flags = 0,
@@ -50,15 +50,16 @@ namespace TB {
 			}
 
 
-			VkSwapchainCreateInfoKHR sc{
+			const VkSwapchainCreateInfoKHR sc{
 				.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
 				.pNext = 0,
 				.flags = 0,
 				.surface = surface,
 				.minImageCount = 2,
-				.imageFormat = VK_FORMAT_B8G8R8A8_SRGB,
+				.imageFormat = format = VK_FORMAT_B8G8R8A8_SRGB,
 				.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
-				.imageExtent = {(unsigned)attr.width, (unsigned)attr.height},
+				.imageExtent =
+					extent = {(unsigned)attr.width, (unsigned)attr.height},
 				.imageArrayLayers = 1,
 				.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 				.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
@@ -72,16 +73,66 @@ namespace TB {
 				.oldSwapchain = VK_NULL_HANDLE,
 			};
 
-
 			if (vkCreateSwapchainKHR(instance.device, &sc, 0, &swapchain)) {
 				THROW;
 			}
 
+			unsigned numImages;
+			if (vkGetSwapchainImagesKHR(
+					instance.device,
+					swapchain,
+					&numImages,
+					nullptr)) {
+				THROW;
+			}
+			swapchainImages.resize(numImages);
+			if (vkGetSwapchainImagesKHR(
+					instance.device,
+					swapchain,
+					&numImages,
+					swapchainImages.data())) {
+				THROW;
+			}
+
+
+			// prepare swapchainImageView
+			swapchainImageViews.resize(swapchainImages.size());
+			for (unsigned n(0); n < swapchainImageViews.size(); ++n) {
+				VkImageViewCreateInfo cInfo{
+					.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+					.image = swapchainImages[n],
+					.viewType = VK_IMAGE_VIEW_TYPE_2D,
+					.format = format,
+					.components{
+						.r = VK_COMPONENT_SWIZZLE_IDENTITY,
+						.g = VK_COMPONENT_SWIZZLE_IDENTITY,
+						.b = VK_COMPONENT_SWIZZLE_IDENTITY,
+						.a = VK_COMPONENT_SWIZZLE_IDENTITY,
+					},
+					.subresourceRange{
+						.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+						.baseMipLevel = 0,
+						.levelCount = 1,
+						.baseArrayLayer = 0,
+						.layerCount = 1,
+					},
+				};
+				if (vkCreateImageView(
+						instance.device,
+						&cInfo,
+						nullptr,
+						&swapchainImageViews[n])) {
+					THROW;
+				}
+			}
 			return 0;
 		}
 
 		XFBTD::~XFBTD() {
 			auto instance(Instance::GetProperty());
+			for (auto imageView : swapchainImageViews) {
+				vkDestroyImageView(instance.device, imageView, nullptr);
+			}
 			vkDestroySwapchainKHR(instance.device, swapchain, 0);
 			vkDestroySurfaceKHR(instance.instance, surface, 0);
 		}

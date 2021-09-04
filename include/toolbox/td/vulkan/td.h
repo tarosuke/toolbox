@@ -59,8 +59,10 @@ namespace TB {
 			::TB::X::Window window;
 			VkSurfaceKHR surface;
 			VkSwapchainKHR swapchain;
-			VkSurfaceCapabilitiesKHR capabilities;
-			std::vector<VkSurfaceFormatKHR> formats;
+			std::vector<VkImage> swapchainImages;
+			VkFormat format;
+			VkExtent2D extent;
+			std::vector<VkImageView> swapchainImageViews;
 
 			VkFramebuffer* MakeFrameBuffer(const TB::X::Window&);
 		};
