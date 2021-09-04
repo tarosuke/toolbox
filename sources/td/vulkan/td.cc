@@ -58,8 +58,7 @@ namespace TB {
 				.minImageCount = 2,
 				.imageFormat = VK_FORMAT_B8G8R8A8_SRGB,
 				.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
-				.imageExtent = {100U, 100U},
-				//				{(unsigned)attr.width, (unsigned)attr.height},
+				.imageExtent = {(unsigned)attr.width, (unsigned)attr.height},
 				.imageArrayLayers = 1,
 				.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 				.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
@@ -89,7 +88,7 @@ namespace TB {
 
 		Instance::Extension<VkInstance>
 			XFBTD::extensionKey(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
-		// Instance::Extension
-		// 	XFBTD::swapChainExtensionKey(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+		Instance::Extension<VkDevice>
+			XFBTD::swapChainExtensionKey(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 	}
 }

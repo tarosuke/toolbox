@@ -131,6 +131,9 @@ namespace TB {
 				}
 			}
 
+			// 拡張リストの収集
+			std::vector<const char*> extensionNames;
+			Extension<VkDevice>::GetExtensions(extensionNames);
 			const VkDeviceCreateInfo createInfo = {
 				.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
 				.pNext = NULL,
@@ -139,7 +142,8 @@ namespace TB {
 				.pQueueCreateInfos = qInfos.data(),
 				.enabledLayerCount = (unsigned)layers.size(),
 				.ppEnabledLayerNames = layers.data(),
-				.enabledExtensionCount = 0,
+				.enabledExtensionCount = (unsigned)extensionNames.size(),
+				.ppEnabledExtensionNames = extensionNames.data(),
 				.pEnabledFeatures = NULL,
 			};
 			if (vkCreateDevice(
@@ -154,5 +158,7 @@ namespace TB {
 
 		template <> Instance::Extension<VkInstance>*
 			Instance::Extension<VkInstance>::root(0);
+		template <>
+		Instance::Extension<VkDevice>* Instance::Extension<VkDevice>::root(0);
 	}
 }

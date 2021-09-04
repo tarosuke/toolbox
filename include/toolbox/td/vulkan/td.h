@@ -54,7 +54,7 @@ namespace TB {
 
 		private:
 			static Instance::Extension<VkInstance> extensionKey;
-			// static Instance::Extension swapChainExtensionKey;
+			static Instance::Extension<VkDevice> swapChainExtensionKey;
 
 			::TB::X::Window window;
 			VkSurfaceKHR surface;
