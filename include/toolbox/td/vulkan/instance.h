@@ -30,6 +30,7 @@ namespace TB {
 		struct Instance {
 			Instance();
 			~Instance() {
+				vkDeviceWaitIdle(device);
 				vkDestroyDevice(device, nullptr);
 				vkDestroyInstance(instance, nullptr);
 			};
