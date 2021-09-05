@@ -49,6 +49,13 @@ namespace TB {
 				THROW;
 			}
 
+			VkBool32 bSupportsPresent = VK_FALSE;
+			Posit(!vkGetPhysicalDeviceSurfaceSupportKHR(
+				instance.physicalDevice,
+				instance.presentFamilyIndex,
+				surface,
+				&bSupportsPresent));
+			Posit(bSupportsPresent);
 
 			const VkSwapchainCreateInfoKHR sc{
 				.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
