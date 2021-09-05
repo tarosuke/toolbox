@@ -53,8 +53,8 @@ namespace TB {
 			~XFBTD();
 
 		private:
-			static Instance::Extension<VkInstance> extensionKey;
-			static Instance::Extension<VkDevice> swapChainExtensionKey;
+			static Instance::Extension<VkInstance> instanceExtensions;
+			static Instance::Extension<VkDevice> driverExtensions;
 
 			::TB::X::Window window;
 			VkSurfaceKHR surface;
