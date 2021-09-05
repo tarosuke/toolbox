@@ -41,13 +41,11 @@ namespace TB {
 				.dpy = ::TB::X::Display::xdisplay,
 				.window = w.xwindow,
 			};
-			if (vkCreateXlibSurfaceKHR(
-					instance.instance,
-					&sInfo,
-					nullptr,
-					&surface)) {
-				THROW;
-			}
+			Posit(!vkCreateXlibSurfaceKHR(
+				instance.instance,
+				&sInfo,
+				nullptr,
+				&surface));
 
 			VkBool32 bSupportsPresent = VK_FALSE;
 			Posit(!vkGetPhysicalDeviceSurfaceSupportKHR(
@@ -80,26 +78,20 @@ namespace TB {
 				.oldSwapchain = VK_NULL_HANDLE,
 			};
 
-			if (vkCreateSwapchainKHR(instance.device, &sc, 0, &swapchain)) {
-				THROW;
-			}
+			Posit(!vkCreateSwapchainKHR(instance.device, &sc, 0, &swapchain));
 
 			unsigned numImages;
-			if (vkGetSwapchainImagesKHR(
-					instance.device,
-					swapchain,
-					&numImages,
-					nullptr)) {
-				THROW;
-			}
+			Posit(!vkGetSwapchainImagesKHR(
+				instance.device,
+				swapchain,
+				&numImages,
+				nullptr));
 			swapchainImages.resize(numImages);
-			if (vkGetSwapchainImagesKHR(
-					instance.device,
-					swapchain,
-					&numImages,
-					swapchainImages.data())) {
-				THROW;
-			}
+			Posit(!vkGetSwapchainImagesKHR(
+				instance.device,
+				swapchain,
+				&numImages,
+				swapchainImages.data()));
 
 
 			// prepare swapchainImageView
@@ -124,13 +116,11 @@ namespace TB {
 						.layerCount = 1,
 					},
 				};
-				if (vkCreateImageView(
-						instance.device,
-						&cInfo,
-						nullptr,
-						&swapchainImageViews[n])) {
-					THROW;
-				}
+				Posit(!vkCreateImageView(
+					instance.device,
+					&cInfo,
+					nullptr,
+					&swapchainImageViews[n]));
 			}
 			return 0;
 		}
