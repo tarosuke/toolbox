@@ -27,10 +27,10 @@
 namespace TB {
 	namespace VK {
 
-		Instance Instance::singleton;
+		Instance Instance::singleton __attribute__((init_priority(65530)));
 #ifndef NDEBUG
-		std::vector<const char*> Instance::layers{
-			"VK_LAYER_KHRONOS_validation"};
+		std::vector<const char*> Instance::layers
+			__attribute__((init_priority(101))){"VK_LAYER_KHRONOS_validation"};
 #else
 		std::vector<const char*> Instance::layers;
 #endif

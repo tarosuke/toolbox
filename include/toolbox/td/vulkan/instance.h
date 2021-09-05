@@ -60,19 +60,22 @@ namespace TB {
 
 			// 拡張を使うクラスでstaticメンバとしてインスタンス化
 			template <typename> struct Extension {
-				Extension(const char* name) : next(root), name(name) {
+				Extension(const std::vector<const char*>& names)
+					: next(root), names(names) {
 					root = this;
 				};
 				static void GetExtensions(std::vector<const char*>& list) {
 					for (Extension* e(root); e; e = (*e).next) {
-						list.push_back((*e).name);
+						for (const auto& n : (*e).names) {
+							list.push_back(n);
+						}
 					}
 				};
 
 			private:
 				static Extension* root;
 				Extension* const next;
-				const char* const name;
+				std::vector<const char*> names;
 			};
 
 		private:
