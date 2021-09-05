@@ -32,7 +32,7 @@ namespace TB {
 
 		VkFramebuffer* XFBTD::MakeFrameBuffer(const TB::X::Window& w) {
 			auto attr(w.GetAttributes());
-			auto instance(Instance::GetProperty());
+			auto instance(Instance::GetInstance());
 
 			const VkXlibSurfaceCreateInfoKHR sInfo{
 				.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
@@ -129,7 +129,7 @@ namespace TB {
 		}
 
 		XFBTD::~XFBTD() {
-			auto instance(Instance::GetProperty());
+			auto instance(Instance::GetInstance());
 			for (auto imageView : swapchainImageViews) {
 				vkDestroyImageView(instance.device, imageView, nullptr);
 			}
@@ -139,7 +139,7 @@ namespace TB {
 
 		Instance::Extension<VkInstance> XFBTD::instanceExtensions(
 			{VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
-			 VK_KHR_SURFACE_PROTECTED_CAPABILITIES_EXTENSION_NAME});
+			 VK_KHR_SURFACE_EXTENSION_NAME});
 		Instance::Extension<VkDevice>
 			XFBTD::driverExtensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME});
 	}

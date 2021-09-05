@@ -28,13 +28,6 @@ namespace TB {
 	namespace VK {
 
 		struct Instance {
-			Instance();
-			~Instance() {
-				vkDeviceWaitIdle(device);
-				vkDestroyDevice(device, nullptr);
-				vkDestroyInstance(instance, nullptr);
-			};
-
 			struct Property {
 				VkInstance& instance;
 				VkPhysicalDevice& physicalDevice;
@@ -44,18 +37,7 @@ namespace TB {
 				unsigned& presentFamilyIndex;
 				std::vector<VkQueueFamilyProperties>& queueFamilies;
 			};
-			static Property GetProperty() {
-				return Property{
-					.instance = singleton.instance,
-					.physicalDevice =
-						singleton
-							.physicalDevices[singleton.physicalDeviceIndex],
-					.device = singleton.device,
-					.physicalDeviceIndex = singleton.physicalDeviceIndex,
-					.physicalDevices = singleton.physicalDevices,
-					.presentFamilyIndex = singleton.presentFamilyIndex,
-					.queueFamilies = singleton.queueFamilies};
-			};
+			static Property GetInstance();
 
 
 			// 拡張を使うクラスでstaticメンバとしてインスタンス化
@@ -79,7 +61,14 @@ namespace TB {
 			};
 
 		private:
-			static Instance singleton;
+			static Instance* singleton;
+
+			Instance();
+			~Instance() {
+				vkDeviceWaitIdle(device);
+				vkDestroyDevice(device, nullptr);
+				vkDestroyInstance(instance, nullptr);
+			};
 
 			static VkInstance MakeInstance();
 			VkInstance instance;
@@ -90,6 +79,7 @@ namespace TB {
 			std::vector<VkQueueFamilyProperties> queueFamilies;
 			unsigned presentFamilyIndex;
 			void GetDevices();
+			const float queuePriority;
 			VkQueue queue;
 			VkDevice device;
 			static std::vector<const char*> layers;
