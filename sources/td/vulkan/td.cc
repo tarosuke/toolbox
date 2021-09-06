@@ -47,7 +47,7 @@ namespace TB {
 				nullptr,
 				&surface));
 
-			VkBool32 bSupportsPresent = VK_FALSE;
+			VkBool32 bSupportsPresent(VK_FALSE);
 			Posit(!vkGetPhysicalDeviceSurfaceSupportKHR(
 				instance.physicalDevice,
 				instance.presentFamilyIndex,
@@ -55,12 +55,17 @@ namespace TB {
 				&bSupportsPresent));
 			Posit(bSupportsPresent);
 
+			Posit(!vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+				instance.physicalDevice,
+				surface,
+				&capabilities));
+
 			const VkSwapchainCreateInfoKHR sc{
 				.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
 				.pNext = 0,
 				.flags = 0,
 				.surface = surface,
-				.minImageCount = 2,
+				.minImageCount = capabilities.minImageCount,
 				.imageFormat = format = VK_FORMAT_B8G8R8A8_SRGB,
 				.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
 				.imageExtent =
@@ -70,8 +75,7 @@ namespace TB {
 				.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
 				.queueFamilyIndexCount = 0,
 				.pQueueFamilyIndices = 0,
-				.preTransform =
-					VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR, // TODO:あとでデフォルトを取得して差し替える(でないと画面を回しているときに画面と合わないことが予想される)
+				.preTransform = capabilities.currentTransform,
 				.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
 				.presentMode = VK_PRESENT_MODE_FIFO_KHR,
 				.clipped = VK_TRUE,
