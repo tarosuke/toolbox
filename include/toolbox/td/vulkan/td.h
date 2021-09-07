@@ -63,6 +63,7 @@ namespace TB {
 			VkFormat format;
 			VkExtent2D extent;
 			std::vector<VkImageView> swapchainImageViews;
+			VkSurfaceCapabilitiesKHR capabilities;
 
 			VkFramebuffer* MakeFrameBuffer(const TB::X::Window&);
 		};

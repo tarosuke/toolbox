@@ -17,6 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <toolbox/td/vulkan/instance.h>
+#include <toolbox/exception.h>
 
 #include <vector>
 #include <X11/Xlib.h>
@@ -27,15 +28,35 @@
 namespace TB {
 	namespace VK {
 
-		Instance Instance::singleton __attribute__((init_priority(65530)));
+		Instance* Instance::singleton(0);
+		Instance::Property Instance::GetInstance() {
+			static Instance instance;
+			singleton = &instance;
+
+			return Property{
+				.instance = (*singleton).instance,
+				.physicalDevice =
+					(*singleton)
+						.physicalDevices[(*singleton).physicalDeviceIndex],
+				.device = (*singleton).device,
+				.physicalDeviceIndex = (*singleton).physicalDeviceIndex,
+				.physicalDevices = (*singleton).physicalDevices,
+				.presentFamilyIndex = (*singleton).presentFamilyIndex,
+				.queueFamilies = (*singleton).queueFamilies};
+		};
+
+
+
 #ifndef NDEBUG
-		std::vector<const char*> Instance::layers
-			__attribute__((init_priority(101))){"VK_LAYER_KHRONOS_validation"};
+		std::vector<const char*> Instance::layers{
+			"VK_LAYER_KHRONOS_validation"};
 #else
 		std::vector<const char*> Instance::layers;
 #endif
 
-		Instance::Instance() : instance(MakeInstance()), presentFamilyIndex(0) {
+		Instance::Instance()
+			: instance(MakeInstance()), presentFamilyIndex(0),
+			  queuePriority(1.0) {
 			GetPhysicalDevices();
 			GetQueue();
 			GetDevices();
@@ -70,9 +91,7 @@ namespace TB {
 			};
 
 			VkInstance instance;
-			if (vkCreateInstance(&cinfo, NULL, &instance) != VK_SUCCESS) {
-				throw -1;
-			}
+			Posit(!vkCreateInstance(&cinfo, NULL, &instance));
 
 			return instance;
 		}
@@ -86,12 +105,11 @@ namespace TB {
 
 			physicalDevices.resize(numGpu);
 
-			if (vkEnumeratePhysicalDevices(
+			Posit(
+				!vkEnumeratePhysicalDevices(
 					instance,
 					&numGpu,
-					physicalDevices.data()) != VK_SUCCESS) {
-				throw -1;
-			};
+					physicalDevices.data()) != VK_SUCCESS);
 		}
 
 		void Instance::GetQueue(unsigned index) {
@@ -116,14 +134,13 @@ namespace TB {
 		void Instance::GetDevices() {
 			std::vector<VkDeviceQueueCreateInfo> qInfos;
 			for (unsigned n(0); n < queueFamilies.size(); ++n) {
-				float priority(1.0);
 				const VkDeviceQueueCreateInfo qInfo = {
 					.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
 					.pNext = NULL,
 					.flags = 0,
 					.queueFamilyIndex = n,
 					.queueCount = 1,
-					.pQueuePriorities = &priority,
+					.pQueuePriorities = &queuePriority,
 				};
 				qInfos.push_back(qInfo);
 				if (queueFamilies[n].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
@@ -146,13 +163,12 @@ namespace TB {
 				.ppEnabledExtensionNames = extensionNames.data(),
 				.pEnabledFeatures = NULL,
 			};
-			if (vkCreateDevice(
+			Posit(
+				!vkCreateDevice(
 					physicalDevices[physicalDeviceIndex],
 					&createInfo,
 					nullptr,
-					&device) != VK_SUCCESS) {
-				throw -1;
-			}
+					&device) != VK_SUCCESS);
 			vkGetDeviceQueue(device, presentFamilyIndex, 0, &queue);
 		}
 

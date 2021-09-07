@@ -18,7 +18,14 @@
  */
 #pragma once
 
+#include <stdexcept>
 
 
-#define THROW_ARG(f, l) f ":" #l "::"
-#define THROW throw THROW_ARG(__FILE__, __LINE__)
+
+#define THROW_ARG(f, l, c) f ":" #l ":: " #c
+#define THROW throw THROW_ARG(__FILE__, __LINE__, )
+
+#define Posit(c)                                                               \
+	if (!c) {                                                                  \
+		throw THROW_ARG(__FILE__, __LINE__, c);                                \
+	}
