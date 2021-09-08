@@ -22,5 +22,11 @@
 
 namespace TB {
 
-	TD::M44 TD::Frustum() { return M44(); }
+	TD::M44 TD::Frustum(float width, float height, float near, float far) {
+		return M44((const float[4][4]){
+			{2 * near / width, 0, 0, 0},
+			{0, 2 * near / height, 0, 0},
+			{0, 0, far / far - near, 1},
+			{0, 0, near * far / (near - far), 0}});
+	}
 }

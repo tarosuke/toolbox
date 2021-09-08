@@ -30,13 +30,14 @@ namespace TB {
 		using M44 = Matrix<4, 4, float>;
 		using S2 = Spread<2, unsigned>;
 
-		static M44 Frustum();
+		static M44 Frustum(float width, float height, float near, float far);
 
 
+		// 描画物(頂点バッファ＋テクスチャ)
 		struct Object : public List<Object>::Node {
 			virtual void Draw(/*未定*/) = 0;
+			virtual bool IsTransparent() { return true; };
 		};
-
 
 
 		void AddHead(Object& o) { head.Add(o); };
@@ -44,20 +45,30 @@ namespace TB {
 		void AddScenery(Object& o) { scenery.Add(o); };
 
 
-		virtual void Draw(const M44& view) = 0;
+		void Draw(const M44& view);
 
 		virtual ~TD(){};
 
 	protected:
-		TD(){};
-
+		TD() = delete;
+		TD(const M44& projectile) : projectile(projectile){};
 
 	private:
+		const M44 projectile;
+
 		struct Target {
-			Target() : regenerate(false){};
-			void Add(Object& o) { list.Add(o); };
-			List<Object> list;
-			bool regenerate; //コマンド再生成が必要
+			Target() : modified(false){};
+			void Add(Object& o) {
+				(o.IsTransparent() ? transparent : opaque).Add(o);
+				modified = true;
+			};
+			void DrawOpaque() { opaque.Foreach(&Object::Draw); };
+			void DrawTransparent() { transparent.Reveach(&Object::Draw); };
+
+		private:
+			List<Object> opaque;
+			List<Object> transparent;
+			bool modified; //コマンド再生成が必要
 		} head, external, scenery;
 	};
 }

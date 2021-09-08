@@ -30,11 +30,10 @@ namespace TB {
 
 		// 初期化にフレームバッファが必要なVulkan版基本クラス
 		struct TD : public TB::TD {
-			void Draw(const M44& view) override{};
 
 
 		protected:
-			TD(const M44& proj, VkFramebuffer*){};
+			TD(const M44& proj, VkFramebuffer*) : ::TB::TD(proj){};
 		};
 
 		// フレームバッファ版TD
