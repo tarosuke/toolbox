@@ -28,18 +28,18 @@
 namespace TB {
 	namespace VK {
 
-		Vulkan* Vulkan::singleton(0);
+		Base* Base::singleton(0);
 
 
 
 #ifndef NDEBUG
-		std::vector<const char*> Vulkan::layers{
+		std::vector<const char*> Base::layers{
 			"VK_LAYER_KHRONOS_validation"};
 #else
 		std::vector<const char*> Instance::layers;
 #endif
 
-		Vulkan::Vulkan()
+		Base::Base()
 			: instance(MakeInstance()), presentFamilyIndex(0),
 			  queuePriority(1.0) {
 			GetPhysicalDevices();
@@ -48,7 +48,7 @@ namespace TB {
 		}
 
 
-		VkInstance Vulkan::MakeInstance() {
+		VkInstance Base::MakeInstance() {
 			// 拡張リストの収集
 			std::vector<const char*> extensionNames;
 			Extension<VkInstance>::GetExtensions(extensionNames);
@@ -81,7 +81,7 @@ namespace TB {
 			return instance;
 		}
 
-		void Vulkan::GetPhysicalDevices() {
+		void Base::GetPhysicalDevices() {
 			unsigned numGpu;
 			if (vkEnumeratePhysicalDevices(instance, &numGpu, NULL) !=
 				VK_SUCCESS) {
@@ -97,7 +97,7 @@ namespace TB {
 					physicalDevices.data()) != VK_SUCCESS);
 		}
 
-		void Vulkan::GetQueue(unsigned index) {
+		void Base::GetQueue(unsigned index) {
 			if (physicalDevices.size() <= index) {
 				throw -1;
 			}
@@ -116,7 +116,7 @@ namespace TB {
 				queueFamilies.data());
 		}
 
-		void Vulkan::GetDevices() {
+		void Base::GetDevices() {
 			std::vector<VkDeviceQueueCreateInfo> qInfos;
 			for (unsigned n(0); n < queueFamilies.size(); ++n) {
 				const VkDeviceQueueCreateInfo qInfo = {
@@ -157,9 +157,9 @@ namespace TB {
 			vkGetDeviceQueue(device, presentFamilyIndex, 0, &queue);
 		}
 
-		template <> Vulkan::Extension<VkInstance>*
-			Vulkan::Extension<VkInstance>::root(0);
+		template <> Base::Extension<VkInstance>*
+			Base::Extension<VkInstance>::root(0);
 		template <>
-		Vulkan::Extension<VkDevice>* Vulkan::Extension<VkDevice>::root(0);
+		Base::Extension<VkDevice>* Base::Extension<VkDevice>::root(0);
 	}
 }

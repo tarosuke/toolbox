@@ -27,7 +27,7 @@
 namespace TB {
 	namespace VK {
 
-		struct Vulkan {
+		struct Base {
 			friend class Instance;
 
 			// 拡張を使うクラスでstaticメンバとしてインスタンス化
@@ -51,17 +51,17 @@ namespace TB {
 			};
 
 		private:
-			static Vulkan* singleton;
+			static Base* singleton;
 
-			Vulkan();
-			~Vulkan() {
+			Base();
+			~Base() {
 				vkDeviceWaitIdle(device);
 				vkDestroyDevice(device, nullptr);
 				vkDestroyInstance(instance, nullptr);
 			};
 
-			static Vulkan& GetInstance() {
-				static Vulkan instance;
+			static Base& GetInstance() {
+				static Base instance;
 				singleton = &instance;
 				return instance;
 			};
@@ -82,17 +82,17 @@ namespace TB {
 		};
 
 		struct Instance {
-			operator VkInstance() { return Vulkan::GetInstance().instance; };
-			operator VkDevice() { return Vulkan::GetInstance().device; };
+			operator VkInstance() { return Base::GetInstance().instance; };
+			operator VkDevice() { return Base::GetInstance().device; };
 			operator VkPhysicalDevice() {
-				Vulkan& instance(Vulkan::GetInstance());
+				Base& instance(Base::GetInstance());
 				return instance.physicalDevices[instance.physicalDeviceIndex];
 			};
 			operator std::vector<VkPhysicalDevice>&() {
-				return Vulkan::GetInstance().physicalDevices;
+				return Base::GetInstance().physicalDevices;
 			};
 			unsigned PhysicalFamilyIndex() {
-				return Vulkan::GetInstance().physicalDeviceIndex;
+				return Base::GetInstance().physicalDeviceIndex;
 			};
 		};
 	}

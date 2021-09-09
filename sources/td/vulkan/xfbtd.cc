@@ -132,10 +132,10 @@ namespace TB {
 			vkDestroySurfaceKHR(instance, surface, 0);
 		}
 
-		Vulkan::Extension<VkInstance> XFBTD::instanceExtensions(
+		Base::Extension<VkInstance> XFBTD::instanceExtensions(
 			{VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
 			 VK_KHR_SURFACE_EXTENSION_NAME});
-		Vulkan::Extension<VkDevice>
+		Base::Extension<VkDevice>
 			XFBTD::driverExtensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME});
 	}
 }

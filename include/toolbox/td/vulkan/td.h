@@ -53,8 +53,8 @@ namespace TB {
 			~XFBTD();
 
 		private:
-			static Vulkan::Extension<VkInstance> instanceExtensions;
-			static Vulkan::Extension<VkDevice> driverExtensions;
+			static Base::Extension<VkInstance> instanceExtensions;
+			static Base::Extension<VkDevice> driverExtensions;
 
 			::TB::X::Window window;
 			VkSurfaceKHR surface;
