@@ -31,7 +31,7 @@ namespace TB {
 
 		VkFramebuffer* XFBTD::MakeFrameBuffer(const TB::X::Window& w) {
 			auto attr(w.GetAttributes());
-			auto instance(Instance::GetInstance());
+			Instance instance;
 
 			const VkXlibSurfaceCreateInfoKHR sInfo{
 				.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
@@ -40,22 +40,18 @@ namespace TB {
 				.dpy = ::TB::X::Display::xdisplay,
 				.window = w.xwindow,
 			};
-			Posit(!vkCreateXlibSurfaceKHR(
-				instance.instance,
-				&sInfo,
-				nullptr,
-				&surface));
+			Posit(!vkCreateXlibSurfaceKHR(instance, &sInfo, nullptr, &surface));
 
 			VkBool32 bSupportsPresent(VK_FALSE);
 			Posit(!vkGetPhysicalDeviceSurfaceSupportKHR(
-				instance.physicalDevice,
-				instance.presentFamilyIndex,
+				instance,
+				instance.PhysicalFamilyIndex(),
 				surface,
 				&bSupportsPresent));
 			Posit(bSupportsPresent);
 
 			Posit(!vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
-				instance.physicalDevice,
+				instance,
 				surface,
 				&capabilities));
 
@@ -81,17 +77,17 @@ namespace TB {
 				.oldSwapchain = VK_NULL_HANDLE,
 			};
 
-			Posit(!vkCreateSwapchainKHR(instance.device, &sc, 0, &swapchain));
+			Posit(!vkCreateSwapchainKHR(instance, &sc, 0, &swapchain));
 
 			unsigned numImages(sc.minImageCount);
 			Posit(!vkGetSwapchainImagesKHR(
-				instance.device,
+				instance,
 				swapchain,
 				&numImages,
 				nullptr));
 			swapchainImages.resize(numImages);
 			Posit(!vkGetSwapchainImagesKHR(
-				instance.device,
+				instance,
 				swapchain,
 				&numImages,
 				swapchainImages.data()));
@@ -120,7 +116,7 @@ namespace TB {
 					},
 				};
 				Posit(!vkCreateImageView(
-					instance.device,
+					instance,
 					&cInfo,
 					nullptr,
 					&swapchainImageViews[n]));
@@ -129,18 +125,17 @@ namespace TB {
 		}
 
 		XFBTD::~XFBTD() {
-			auto instance(Instance::GetInstance());
 			for (auto imageView : swapchainImageViews) {
-				vkDestroyImageView(instance.device, imageView, nullptr);
+				vkDestroyImageView(instance, imageView, nullptr);
 			}
-			vkDestroySwapchainKHR(instance.device, swapchain, 0);
-			vkDestroySurfaceKHR(instance.instance, surface, 0);
+			vkDestroySwapchainKHR(instance, swapchain, 0);
+			vkDestroySurfaceKHR(instance, surface, 0);
 		}
 
-		Instance::Extension<VkInstance> XFBTD::instanceExtensions(
+		Vulkan::Extension<VkInstance> XFBTD::instanceExtensions(
 			{VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
 			 VK_KHR_SURFACE_EXTENSION_NAME});
-		Instance::Extension<VkDevice>
+		Vulkan::Extension<VkDevice>
 			XFBTD::driverExtensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME});
 	}
 }
