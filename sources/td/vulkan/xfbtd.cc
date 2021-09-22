@@ -29,16 +29,16 @@ namespace TB {
 	namespace VK {
 
 
-		VkFramebuffer* XFBTD::MakeFrameBuffer(const TB::X::Window& w) {
-			auto attr(w.GetAttributes());
-			Instance instance;
+		XFBTD::XFBTD(unsigned width, unsigned height, const M44& proj)
+			: TD(proj), window(width, height) {
+			auto attr(window.GetAttributes());
 
 			const VkXlibSurfaceCreateInfoKHR sInfo{
 				.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
 				.pNext = 0,
 				.flags = 0,
 				.dpy = ::TB::X::Display::xdisplay,
-				.window = w.xwindow,
+				.window = window.xwindow,
 			};
 			Posit(!vkCreateXlibSurfaceKHR(instance, &sInfo, nullptr, &surface));
 
@@ -121,7 +121,6 @@ namespace TB {
 					nullptr,
 					&swapchainImageViews[n]));
 			}
-			return 0;
 		}
 
 		XFBTD::~XFBTD() {

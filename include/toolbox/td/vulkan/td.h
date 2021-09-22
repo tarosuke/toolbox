@@ -34,13 +34,13 @@ namespace TB {
 
 		protected:
 			Instance instance;
-			TD(const M44& proj, VkFramebuffer*) : ::TB::TD(proj){};
+			VkFramebuffer frameBuffer;
+			TD(const M44& proj) : ::TB::TD(proj){};
 		};
 
 		// フレームバッファ版TD
 		struct FBTD : public TD {
-			FBTD(const M44& proj, const S2& viewport)
-				: TD(proj, MakeFrameBuffer(viewport)){};
+			FBTD(const M44& proj, const S2& viewport) : TD(proj){};
 
 		private:
 			static VkFramebuffer* MakeFrameBuffer(const S2&);
@@ -48,8 +48,7 @@ namespace TB {
 
 		// X窓フレームバッファ版TD
 		struct XFBTD : public TD {
-			XFBTD(const M44& proj, ::TB::X::Window& w)
-				: TD(proj, MakeFrameBuffer(w)), window(w){};
+			XFBTD(unsigned width, unsigned height, const M44& proj);
 			~XFBTD();
 
 		private:
