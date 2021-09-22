@@ -24,6 +24,17 @@
 #include <vulkan/vulkan.h>
 
 
+/** SHADER SYMBOL MEMO
+ * シェーダの.spvファイルがDEBUG/td/vulkan/test.frag.spvだとすると
+ * シェーダのバイナリは_binary_DEBUG_td_vulkan_test_frag_spv_startのシンボルから
+ * 始まっていて、同endで終わり。サイズは同sizeに格納されている。
+ * DEBUGの部分はmakefileにて_BUILD_TARGET_マクロとして設定されているので
+ * ソースコード上ではビルドターゲットに関わらず
+ *  _binary_##_BUILD_TARGET_##_td_vulkan_test_frag_spv_start
+ * になる。
+ */
+
+
 
 namespace TB {
 	namespace VK {
