@@ -17,6 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #pragma once
+#include <toolbox/type.h>
 #include <toolbox/td.h>
 #include <toolbox/td/x.h>
 #include <toolbox/td/vulkan/instance.h>
@@ -35,14 +36,11 @@
  */
 
 
-
 namespace TB {
 	namespace VK {
 
 		// 初期化にフレームバッファが必要なVulkan版基本クラス
 		struct TD : public TB::TD {
-
-
 		protected:
 			Instance instance;
 			VkFramebuffer frameBuffer;
@@ -76,6 +74,20 @@ namespace TB {
 			VkSurfaceCapabilitiesKHR capabilities;
 
 			VkFramebuffer* MakeFrameBuffer(const TB::X::Window&);
+		};
+
+
+
+		struct Shader {
+			Shader(const u32*, const u32*);
+			Shader(const char* path);
+			~Shader();
+
+			operator VkShaderModule() { return shaderModule; };
+
+		private:
+			Instance instance;
+			VkShaderModule shaderModule;
 		};
 	}
 }
