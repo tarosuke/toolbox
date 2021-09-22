@@ -140,9 +140,9 @@ $(tmods) : $(tobjs) $(TARGETDIR)/$(target)
 
 testTargets := $(addsuffix .test, $(tmods))
 
-$(testTargets) : $(tmods)
-	@echo $(basename $@)
-	@AUTO_TEST=1 $(basename $@)
+%.test : %
+	@echo $<
+	@AUTO_TEST=1 $<
 	@touch $@
 
 test: $(testTargets)
