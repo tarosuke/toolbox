@@ -47,9 +47,11 @@ target ?= $(shell echo $$PWD | sed s!.*/!! )
 
 suffixes := %.c %.cc %.glsl
 
-files := $(subst sources/,, $(shell find sources -type f))
+files:= $(subst sources/,, $(shell find sources -type f))
 srcs := $(filter $(suffixes), $(files))
-mods := $(basename $(srcs))
+ssrcs:= $(filter %.frag %.vert, $(files))
+spvs := $(addsuffix .spv, $(ssrcs)),
+mods := $(basename $(srcs) $(spvs))
 objs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(mods)))
 deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
 
@@ -98,15 +100,17 @@ $(TARGETDIR)/%.dep : sources/%.c makefile
 	@$(CPP) $(COPTS) -MM $< >> $@
 
 # Vulkan shaders
-.builds/%.frag.spv : sources/%.frag
+.PRECIOUS: $(addprefix $(TARGETDIR)/, $(spvs))
+
+$(TARGETDIR)/%.frag.spv : sources/%.frag makefile
 	@echo " GLSLC $@"
 	@glslc $< -o $@
 
-.builds/%.vert.spv : sources/%.vert
+$(TARGETDIR)/%.vert.spv : sources/%.vert makefile
 	@echo " GLSLC $@"
 	@glslc $< -o $@
 
-.builds/%.o : sources/%.spv
+$(TARGETDIR)/%.o : $(TARGETDIR)/%.spv makefile
 	@echo " OBJCOPY $@"
 	@mkdir -p $(dir $@)
 	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
@@ -134,9 +138,15 @@ $(tmods) : $(tobjs) $(TARGETDIR)/$(target)
 	@echo " LD $@"
 	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS)
 
-test:  $(tmods)
-	@$(shell for m in $(tmods); do AUTO_TEST=1 $$m; done)
-	@echo "** TEST DONE."
+testTargets := $(addsuffix .test, $(tmods))
+
+$(testTargets) : $(tmods)
+	@echo $(basename $@)
+	@AUTO_TEST=1 $(basename $@)
+	@touch $@
+
+test: $(testTargets)
+
 
 RELEASE: RELEASE/$(target) test
 
