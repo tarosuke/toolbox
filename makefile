@@ -23,7 +23,7 @@ TARGETDIR := COVERAGE
 COPTS := -g -coverage -DVK_USE_PLATFORM_XLIB_KHR
 endif
 
-COPTS += -Wall -Werror -Iinclude
+COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
 CCOPTS += $(COPTS) -std=c++11
 
 EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov -lvulkan
