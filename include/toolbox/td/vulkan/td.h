@@ -33,6 +33,7 @@ namespace TB {
 
 
 		protected:
+			Instance instance;
 			TD(const M44& proj, VkFramebuffer*) : ::TB::TD(proj){};
 		};
 
@@ -52,8 +53,8 @@ namespace TB {
 			~XFBTD();
 
 		private:
-			static Instance::Extension<VkInstance> instanceExtensions;
-			static Instance::Extension<VkDevice> driverExtensions;
+			static Base::Extension<VkInstance> instanceExtensions;
+			static Base::Extension<VkDevice> driverExtensions;
 
 			::TB::X::Window window;
 			VkSurfaceKHR surface;

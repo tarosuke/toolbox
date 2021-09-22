@@ -27,18 +27,8 @@
 namespace TB {
 	namespace VK {
 
-		struct Instance {
-			struct Property {
-				VkInstance& instance;
-				VkPhysicalDevice& physicalDevice;
-				VkDevice& device;
-				unsigned& physicalDeviceIndex;
-				std::vector<VkPhysicalDevice>& physicalDevices;
-				unsigned& presentFamilyIndex;
-				std::vector<VkQueueFamilyProperties>& queueFamilies;
-			};
-			static Property GetInstance();
-
+		struct Base {
+			friend class Instance;
 
 			// 拡張を使うクラスでstaticメンバとしてインスタンス化
 			template <typename> struct Extension {
@@ -61,13 +51,19 @@ namespace TB {
 			};
 
 		private:
-			static Instance* singleton;
+			static Base* singleton;
 
-			Instance();
-			~Instance() {
+			Base();
+			~Base() {
 				vkDeviceWaitIdle(device);
 				vkDestroyDevice(device, nullptr);
 				vkDestroyInstance(instance, nullptr);
+			};
+
+			static Base& GetInstance() {
+				static Base instance;
+				singleton = &instance;
+				return instance;
 			};
 
 			static VkInstance MakeInstance();
@@ -83,6 +79,21 @@ namespace TB {
 			VkQueue queue;
 			VkDevice device;
 			static std::vector<const char*> layers;
+		};
+
+		struct Instance {
+			operator VkInstance() { return Base::GetInstance().instance; };
+			operator VkDevice() { return Base::GetInstance().device; };
+			operator VkPhysicalDevice() {
+				Base& instance(Base::GetInstance());
+				return instance.physicalDevices[instance.physicalDeviceIndex];
+			};
+			operator std::vector<VkPhysicalDevice>&() {
+				return Base::GetInstance().physicalDevices;
+			};
+			unsigned PhysicalFamilyIndex() {
+				return Base::GetInstance().physicalDeviceIndex;
+			};
 		};
 	}
 }
