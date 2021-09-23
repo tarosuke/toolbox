@@ -33,8 +33,7 @@ namespace TB {
 
 
 #ifndef NDEBUG
-		std::vector<const char*> Base::layers{
-			"VK_LAYER_KHRONOS_validation"};
+		std::vector<const char*> Base::layers{"VK_LAYER_KHRONOS_validation"};
 #else
 		std::vector<const char*> Instance::layers;
 #endif
@@ -90,11 +89,10 @@ namespace TB {
 
 			physicalDevices.resize(numGpu);
 
-			Posit(
-				!vkEnumeratePhysicalDevices(
-					instance,
-					&numGpu,
-					physicalDevices.data()) != VK_SUCCESS);
+			Posit(!vkEnumeratePhysicalDevices(
+				instance,
+				&numGpu,
+				physicalDevices.data()));
 		}
 
 		void Base::GetQueue(unsigned index) {
@@ -148,17 +146,16 @@ namespace TB {
 				.ppEnabledExtensionNames = extensionNames.data(),
 				.pEnabledFeatures = NULL,
 			};
-			Posit(
-				!vkCreateDevice(
-					physicalDevices[physicalDeviceIndex],
-					&createInfo,
-					nullptr,
-					&device) != VK_SUCCESS);
+			Posit(!vkCreateDevice(
+				physicalDevices[physicalDeviceIndex],
+				&createInfo,
+				nullptr,
+				&device));
 			vkGetDeviceQueue(device, presentFamilyIndex, 0, &queue);
 		}
 
-		template <> Base::Extension<VkInstance>*
-			Base::Extension<VkInstance>::root(0);
+		template <>
+		Base::Extension<VkInstance>* Base::Extension<VkInstance>::root(0);
 		template <>
 		Base::Extension<VkDevice>* Base::Extension<VkDevice>::root(0);
 	}
