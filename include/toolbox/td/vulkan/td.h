@@ -68,17 +68,33 @@ namespace TB {
 
 
 		struct Shader {
-			Shader(const u32*, const u32*);
-			Shader(const char* path);
+			Shader(VkShaderStageFlagBits stage, const u32*, const u32*);
+			Shader(VkShaderStageFlagBits stage, const char* path);
 			~Shader();
 
 			operator VkShaderModule() { return shaderModule; };
+			operator const VkPipelineShaderStageCreateInfo&() {
+				return stageInfo;
+			};
 
 		private:
 			Instance instance;
 			VkShaderModule shaderModule;
+			VkPipelineShaderStageCreateInfo stageInfo;
 		};
-	}
+		struct VertexShader : public Shader {
+			VertexShader(const u32* start, const u32* end)
+				: Shader(VK_SHADER_STAGE_VERTEX_BIT, start, end){};
+			VertexShader(const char* path)
+				: Shader(VK_SHADER_STAGE_VERTEX_BIT, path){};
+		};
+		struct FragmentShader : public Shader {
+			FragmentShader(const u32* start, const u32* end)
+				: Shader(VK_SHADER_STAGE_FRAGMENT_BIT, start, end){};
+			FragmentShader(const char* path)
+				: Shader(VK_SHADER_STAGE_FRAGMENT_BIT, path){};
+		};
+	};
 }
 
 
