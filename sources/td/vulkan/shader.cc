@@ -16,13 +16,32 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <toolbox/td/vulkan/td.h>
+#include <toolbox/td/vulkan/shader.h>
 #include <toolbox/exception.h>
+#include <toolbox/blob.h>
 
+
+#define vertPath td_vulkan_test_vert_spv
+#define fragPath td_vulkan_test_frag_spv
+
+BlobDeclare(vertPath);
+BlobDeclare(fragPath);
 
 
 namespace TB {
 	namespace VK {
+
+		VertexShader::VertexShader()
+			: Shader(
+				  VK_SHADER_STAGE_VERTEX_BIT,
+				  BlobStart(vertPath),
+				  BlobEnd(vertPath)){};
+
+		FragmentShader::FragmentShader()
+			: Shader(
+				  VK_SHADER_STAGE_VERTEX_BIT,
+				  BlobStart(fragPath),
+				  BlobEnd(fragPath)){};
 
 		Shader::Shader(
 			VkShaderStageFlagBits stage,

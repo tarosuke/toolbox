@@ -65,37 +65,5 @@ namespace TB {
 			VkFramebuffer* MakeFrameBuffer(const TB::X::Window&);
 		};
 
-
-
-		struct Shader {
-			Shader(
-				VkShaderStageFlagBits stage,
-				const unsigned char*,
-				const unsigned char*);
-			Shader(VkShaderStageFlagBits stage, const char* path);
-			~Shader();
-
-			operator VkShaderModule() { return shaderModule; };
-			operator const VkPipelineShaderStageCreateInfo&() {
-				return stageInfo;
-			};
-
-		private:
-			Instance instance;
-			VkShaderModule shaderModule;
-			VkPipelineShaderStageCreateInfo stageInfo;
-		};
-		struct VertexShader : public Shader {
-			VertexShader(const unsigned char* start, const unsigned char* end)
-				: Shader(VK_SHADER_STAGE_VERTEX_BIT, start, end){};
-			VertexShader(const char* path)
-				: Shader(VK_SHADER_STAGE_VERTEX_BIT, path){};
-		};
-		struct FragmentShader : public Shader {
-			FragmentShader(const unsigned char* start, const unsigned char* end)
-				: Shader(VK_SHADER_STAGE_VERTEX_BIT, start, end){};
-			FragmentShader(const char* path)
-				: Shader(VK_SHADER_STAGE_FRAGMENT_BIT, path){};
-		};
 	};
 }
