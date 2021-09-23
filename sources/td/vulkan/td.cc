@@ -221,6 +221,9 @@ namespace TB {
 				&pipelineInfo,
 				nullptr,
 				&graphicsPipeline));
+
+
+			FillFramebuffers(framebuffers);
 		}
 
 		TD::~TD() {

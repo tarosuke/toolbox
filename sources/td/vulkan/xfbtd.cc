@@ -130,7 +130,34 @@ namespace TB {
 			Init();
 		}
 
+		void XFBTD::FillFramebuffers(std::vector<VkFramebuffer>& fb) {
+			fb.resize(swapchainImageViews.size());
+			for (unsigned n(0); n < fb.size(); ++n) {
+				VkImageView attachments[] = {swapchainImageViews[n]};
+
+				VkFramebufferCreateInfo framebufferInfo{};
+				framebufferInfo.sType =
+					VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+				framebufferInfo.renderPass = renderPass;
+				framebufferInfo.attachmentCount = 1;
+				framebufferInfo.pAttachments = attachments;
+				framebufferInfo.width = extent.width;
+				framebufferInfo.height = extent.height;
+				framebufferInfo.layers = 1;
+
+				Posit(!vkCreateFramebuffer(
+					instance,
+					&framebufferInfo,
+					nullptr,
+					&fb[n]));
+			}
+		}
+
+
 		XFBTD::~XFBTD() {
+			for (auto f : framebuffers) {
+				vkDestroyFramebuffer(instance, f, nullptr);
+			}
 			for (auto imageView : swapchainImageViews) {
 				vkDestroyImageView(instance, imageView, nullptr);
 			}

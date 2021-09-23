@@ -42,16 +42,18 @@ namespace TB {
 			VkFramebuffer frameBuffer;
 			VkFormat format;
 			VkExtent2D extent;
+			std::vector<VkFramebuffer> framebuffers;
+			VkRenderPass renderPass;
 			TD(const M44& proj, const Shaders* shaders = 0);
 			~TD();
 			void Init();
+			virtual void FillFramebuffers(std::vector<VkFramebuffer>&) = 0;
 
 		private:
 			VertexShader vertexShader;
 			FragmentShader fragmentShader;
 
 			VkPipelineLayout pipelineLayout;
-			VkRenderPass renderPass;
 			VkPipeline graphicsPipeline;
 
 			static const VkPipelineColorBlendAttachmentState opaqueBlend;
@@ -69,7 +71,6 @@ namespace TB {
 			};
 
 		private:
-			static VkFramebuffer* MakeFrameBuffer(const S2&);
 		};
 
 		// X窓フレームバッファ版TD
@@ -92,8 +93,7 @@ namespace TB {
 			std::vector<VkImageView> swapchainImageViews;
 			VkSurfaceCapabilitiesKHR capabilities;
 
-			VkFramebuffer* MakeFrameBuffer(const TB::X::Window&);
+			void FillFramebuffers(std::vector<VkFramebuffer>&) final;
 		};
-
 	};
 }
