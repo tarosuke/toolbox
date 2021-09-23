@@ -39,14 +39,17 @@ namespace TB {
 
 		FragmentShader::FragmentShader(const char* path)
 			: Shader(
-				  VK_SHADER_STAGE_VERTEX_BIT,
+				  VK_SHADER_STAGE_FRAGMENT_BIT,
 				  path ? path : BlobStart(fragPath),
 				  path ? 0 : BlobEnd(fragPath)){};
 
 		Shader::Shader(
-			VkShaderStageFlagBits stage, const char* start, const char* end) {
+			VkShaderStageFlagBits stage, const char* start, const char* end)
+			: stageInfo{} {
 			VkShaderModuleCreateInfo ci{
 				.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
 			};
 			if (end) {
 				// デフォルトシェーダを使用
@@ -60,6 +63,9 @@ namespace TB {
 
 			stageInfo.sType =
 				VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+			stageInfo.pNext = 0;
+			stageInfo.flags = 0;
+
 			stageInfo.stage = stage;
 			stageInfo.module = shaderModule;
 			stageInfo.pName = "main";

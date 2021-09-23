@@ -31,15 +31,15 @@ namespace TB {
 			  vertexShader(
 				  shaders && (*shaders).vertex ? (*shaders).vertex : 0),
 			  fragmentShader(
-				  shaders && (*shaders).fragment ? (*shaders).fragment : 0) {
+				  shaders && (*shaders).fragment ? (*shaders).fragment : 0) {}
 
 
-
-			/***** 固定機能設定
-			 */
+		void TD::Init() {
 			VkPipelineVertexInputStateCreateInfo vertexInputInfo{
 				.sType =
 					VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
 				.vertexBindingDescriptionCount = 0,
 				.pVertexBindingDescriptions = nullptr, // Optional
 				.vertexAttributeDescriptionCount = 0,
@@ -51,6 +51,8 @@ namespace TB {
 			VkPipelineInputAssemblyStateCreateInfo inputAssembly{
 				.sType =
 					VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
 				.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
 				.primitiveRestartEnable = VK_FALSE,
 			};
@@ -77,6 +79,8 @@ namespace TB {
 
 			VkPipelineViewportStateCreateInfo viewportState{
 				.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
 				.viewportCount = 1,
 				.pViewports = &viewport,
 				.scissorCount = 1,
@@ -88,6 +92,8 @@ namespace TB {
 			VkPipelineRasterizationStateCreateInfo rasterizer{
 				.sType =
 					VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
 				.depthClampEnable = VK_FALSE,
 				.rasterizerDiscardEnable = VK_FALSE,
 				.polygonMode = VK_POLYGON_MODE_FILL,
@@ -105,6 +111,8 @@ namespace TB {
 			VkPipelineMultisampleStateCreateInfo multisampling{
 				.sType =
 					VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
 				.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
 				.sampleShadingEnable = VK_FALSE,
 				.minSampleShading = 1.0f, // Optional
@@ -118,6 +126,8 @@ namespace TB {
 			VkPipelineColorBlendStateCreateInfo colorBlending{
 				.sType =
 					VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
 				.logicOpEnable = VK_FALSE,
 				.logicOp = VK_LOGIC_OP_COPY, // Optional
 				.attachmentCount = 1,
@@ -138,6 +148,8 @@ namespace TB {
 				VK_DYNAMIC_STATE_LINE_WIDTH};
 			VkPipelineDynamicStateCreateInfo dynamicState{
 				.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
 				.dynamicStateCount = 2,
 				.pDynamicStates = dynamicStates,
 			};
@@ -145,6 +157,8 @@ namespace TB {
 
 			VkPipelineLayoutCreateInfo info{
 				.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
 				.setLayoutCount = 0, // Optional
 				.pSetLayouts = nullptr, // Optional
 				.pushConstantRangeCount = 0, // Optional
@@ -158,6 +172,7 @@ namespace TB {
 
 
 			VkAttachmentDescription colorAttachment{
+				.flags = 0,
 				.format = format,
 				.samples = VK_SAMPLE_COUNT_1_BIT,
 				.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
@@ -173,6 +188,7 @@ namespace TB {
 				.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 			};
 			VkSubpassDescription subpass{
+				.flags = 0,
 				.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
 				.colorAttachmentCount = 1,
 				.pColorAttachments = &colorAttachmentRef,
@@ -180,6 +196,8 @@ namespace TB {
 
 			VkRenderPassCreateInfo renderPassInfo{
 				.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
 				.attachmentCount = 1,
 				.pAttachments = &colorAttachment,
 				.subpassCount = 1,
@@ -199,6 +217,8 @@ namespace TB {
 
 			VkGraphicsPipelineCreateInfo pipelineInfo{
 				.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
 				.stageCount = 2,
 				.pStages = shaderStages,
 
@@ -233,6 +253,7 @@ namespace TB {
 		TD::~TD() {
 			vkDestroyPipeline(instance, graphicsPipeline, nullptr);
 			vkDestroyPipelineLayout(instance, pipelineLayout, nullptr);
+			vkDestroyRenderPass(instance, renderPass, nullptr);
 		}
 
 		const VkPipelineColorBlendAttachmentState TD::opaqueBlend{

@@ -102,6 +102,8 @@ namespace TB {
 			for (unsigned n(0); n < swapchainImageViews.size(); ++n) {
 				VkImageViewCreateInfo cInfo{
 					.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+					.pNext = 0,
+					.flags = 0,
 					.image = swapchainImages[n],
 					.viewType = VK_IMAGE_VIEW_TYPE_2D,
 					.format = format,
@@ -125,6 +127,7 @@ namespace TB {
 					nullptr,
 					&swapchainImageViews[n]));
 			}
+			Init();
 		}
 
 		XFBTD::~XFBTD() {

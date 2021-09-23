@@ -44,6 +44,7 @@ namespace TB {
 			VkExtent2D extent;
 			TD(const M44& proj, const Shaders* shaders = 0);
 			~TD();
+			void Init();
 
 		private:
 			VertexShader vertexShader;
