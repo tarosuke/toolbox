@@ -40,10 +40,13 @@ namespace TB {
 			Instance instance;
 			VkFramebuffer frameBuffer;
 			TD(const M44& proj, const Shaders* shaders = 0);
+			~TD();
 
 		private:
 			VertexShader vertexShader;
 			FragmentShader fragmentShader;
+
+			VkPipelineLayout pipelineLayout;
 		};
 
 		// フレームバッファ版TD

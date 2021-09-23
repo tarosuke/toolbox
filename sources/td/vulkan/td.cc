@@ -31,7 +31,26 @@ namespace TB {
 			  vertexShader(
 				  shaders && (*shaders).vertex ? (*shaders).vertex : 0),
 			  fragmentShader(
-				  shaders && (*shaders).fragment ? (*shaders).fragment : 0){};
+				  shaders && (*shaders).fragment ? (*shaders).fragment : 0) {
 
+
+
+			VkPipelineLayoutCreateInfo info{
+				.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+				.setLayoutCount = 0, // Optional
+				.pSetLayouts = nullptr, // Optional
+				.pushConstantRangeCount = 0, // Optional
+				.pPushConstantRanges = nullptr, // Optional
+			};
+			Posit(!vkCreatePipelineLayout(
+				instance,
+				&info,
+				nullptr,
+				&pipelineLayout));
+		}
+
+		TD::~TD() {
+			vkDestroyPipelineLayout(instance, pipelineLayout, nullptr);
+		}
 	}
 }
