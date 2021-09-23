@@ -22,6 +22,7 @@
 #include <toolbox/td/x.h>
 #include <toolbox/td/vulkan/instance.h>
 #include <toolbox/td/vulkan/shader.h>
+#include <toolbox/geometry/spread.h>
 
 #include <vulkan/vulkan.h>
 
@@ -29,7 +30,7 @@
 namespace TB {
 	namespace VK {
 
-		// 初期化にフレームバッファが必要なVulkan版基本クラス
+		// Vulkan版基本クラス
 		struct TD : public TB::TD {
 			struct Shaders {
 				char* vertex;
@@ -39,21 +40,27 @@ namespace TB {
 		protected:
 			Instance instance;
 			VkFramebuffer frameBuffer;
-			TD(const M44& proj, const Shaders* shaders = 0);
+			TD(const M44& proj, const S2& spread, const Shaders* shaders = 0);
 			~TD();
 
 		private:
+			const S2& spread;
 			VertexShader vertexShader;
 			FragmentShader fragmentShader;
 
 			VkPipelineLayout pipelineLayout;
+
+			static const VkPipelineColorBlendAttachmentState opaqueBlend;
+			static const VkPipelineColorBlendAttachmentState alphaBlend;
 		};
+
+
 
 		// フレームバッファ版TD
 		struct FBTD : public TD {
 			FBTD(
 				const M44& proj, const S2& viewport, const Shaders* shaders = 0)
-				: TD(proj, shaders){};
+				: TD(proj, viewport, shaders){};
 
 		private:
 			static VkFramebuffer* MakeFrameBuffer(const S2&);

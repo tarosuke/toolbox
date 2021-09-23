@@ -34,7 +34,8 @@ namespace TB {
 			unsigned height,
 			const M44& proj,
 			const Shaders* shaders)
-			: TD(proj, shaders), window(width, height) {
+			: TD(proj, S2((const unsigned[]){width, height}), shaders),
+			  window(width, height) {
 			auto attr(window.GetAttributes());
 
 			const VkXlibSurfaceCreateInfoKHR sInfo{
