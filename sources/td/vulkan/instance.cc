@@ -30,7 +30,7 @@ namespace TB {
 
 		Base* Base::singleton(0);
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 		std::vector<const char*> Base::layers;
 #else
 		std::vector<const char*> Base::layers{"VK_LAYER_KHRONOS_validation"};
