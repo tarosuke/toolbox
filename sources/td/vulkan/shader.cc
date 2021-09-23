@@ -31,28 +31,30 @@ BlobDeclare(fragPath);
 namespace TB {
 	namespace VK {
 
-		VertexShader::VertexShader()
+		VertexShader::VertexShader(const char* path)
 			: Shader(
 				  VK_SHADER_STAGE_VERTEX_BIT,
-				  BlobStart(vertPath),
-				  BlobEnd(vertPath)){};
+				  path ? path : BlobStart(vertPath),
+				  path ? 0 : BlobEnd(vertPath)){};
 
-		FragmentShader::FragmentShader()
+		FragmentShader::FragmentShader(const char* path)
 			: Shader(
 				  VK_SHADER_STAGE_VERTEX_BIT,
-				  BlobStart(fragPath),
-				  BlobEnd(fragPath)){};
+				  path ? path : BlobStart(fragPath),
+				  path ? 0 : BlobEnd(fragPath)){};
 
 		Shader::Shader(
-			VkShaderStageFlagBits stage,
-			const unsigned char* start,
-			const unsigned char* end) {
+			VkShaderStageFlagBits stage, const char* start, const char* end) {
 			VkShaderModuleCreateInfo ci{
 				.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-				.pNext = 0,
-				.flags = 0,
-				.codeSize = (size_t)(end - start),
-				.pCode = (unsigned*)start,
+			};
+			if (end) {
+				// デフォルトシェーダを使用
+				ci.codeSize = (size_t)(end - start);
+				ci.pCode = (unsigned*)start;
+			} else {
+				// TODO: startはファイルのパスなのでファイルを呼んで設定
+				Posit(false);
 			};
 			Posit(!vkCreateShaderModule(instance, &ci, nullptr, &shaderModule));
 

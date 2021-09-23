@@ -29,8 +29,12 @@ namespace TB {
 	namespace VK {
 
 
-		XFBTD::XFBTD(unsigned width, unsigned height, const M44& proj)
-			: TD(proj), window(width, height) {
+		XFBTD::XFBTD(
+			unsigned width,
+			unsigned height,
+			const M44& proj,
+			const Shaders* shaders)
+			: TD(proj, shaders), window(width, height) {
 			auto attr(window.GetAttributes());
 
 			const VkXlibSurfaceCreateInfoKHR sInfo{

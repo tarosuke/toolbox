@@ -18,7 +18,9 @@
  */
 #pragma once
 #include <toolbox/type.h>
-#include <toolbox/td/vulkan/td.h>
+#include <toolbox/td/vulkan/instance.h>
+
+#include <vulkan/vulkan.h>
 
 
 
@@ -29,9 +31,8 @@ namespace TB {
 			Shader() = delete;
 			Shader(
 				VkShaderStageFlagBits stage,
-				const unsigned char*,
-				const unsigned char*);
-			Shader(VkShaderStageFlagBits stage, const char* path);
+				const char* path,
+				const char* end = 0);
 			~Shader();
 
 			operator VkShaderModule() { return shaderModule; };
@@ -45,14 +46,10 @@ namespace TB {
 			VkPipelineShaderStageCreateInfo stageInfo;
 		};
 		struct VertexShader : public Shader {
-			VertexShader();
-			VertexShader(const char* path)
-				: Shader(VK_SHADER_STAGE_VERTEX_BIT, path){};
+			VertexShader(const char* path = 0);
 		};
 		struct FragmentShader : public Shader {
-			FragmentShader();
-			FragmentShader(const char* path)
-				: Shader(VK_SHADER_STAGE_FRAGMENT_BIT, path){};
+			FragmentShader(const char* path = 0);
 		};
 
 	}

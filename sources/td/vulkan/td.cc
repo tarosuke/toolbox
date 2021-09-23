@@ -26,6 +26,12 @@
 namespace TB {
 	namespace VK {
 
-		VkFramebuffer* FBTD::MakeFrameBuffer(const S2& s) { return 0; }
+		TD::TD(const M44& proj, const Shaders* shaders)
+			: ::TB::TD(proj),
+			  vertexShader(
+				  shaders && (*shaders).vertex ? (*shaders).vertex : 0),
+			  fragmentShader(
+				  shaders && (*shaders).fragment ? (*shaders).fragment : 0){};
+
 	}
 }

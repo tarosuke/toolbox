@@ -21,6 +21,7 @@
 #include <toolbox/td.h>
 #include <toolbox/td/x.h>
 #include <toolbox/td/vulkan/instance.h>
+#include <toolbox/td/vulkan/shader.h>
 
 #include <vulkan/vulkan.h>
 
@@ -30,15 +31,26 @@ namespace TB {
 
 		// 初期化にフレームバッファが必要なVulkan版基本クラス
 		struct TD : public TB::TD {
+			struct Shaders {
+				char* vertex;
+				char* fragment;
+			};
+
 		protected:
 			Instance instance;
 			VkFramebuffer frameBuffer;
-			TD(const M44& proj) : ::TB::TD(proj){};
+			TD(const M44& proj, const Shaders* shaders = 0);
+
+		private:
+			VertexShader vertexShader;
+			FragmentShader fragmentShader;
 		};
 
 		// フレームバッファ版TD
 		struct FBTD : public TD {
-			FBTD(const M44& proj, const S2& viewport) : TD(proj){};
+			FBTD(
+				const M44& proj, const S2& viewport, const Shaders* shaders = 0)
+				: TD(proj, shaders){};
 
 		private:
 			static VkFramebuffer* MakeFrameBuffer(const S2&);
@@ -46,7 +58,11 @@ namespace TB {
 
 		// X窓フレームバッファ版TD
 		struct XFBTD : public TD {
-			XFBTD(unsigned width, unsigned height, const M44& proj);
+			XFBTD(
+				unsigned width,
+				unsigned height,
+				const M44& proj,
+				const Shaders* shaders = 0);
 			~XFBTD();
 
 		private:

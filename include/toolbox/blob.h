@@ -39,6 +39,6 @@
 #define BlobEnd(path) __Blob(_BUILD_TARGET_, path, _end)
 #define BlobSize(path) __Blob(_BUILD_TARGET_, path, _size)
 #define BlobDeclare(path)                                                      \
-	extern const unsigned char BlobStart(path)[];                              \
-	extern const unsigned char BlobEnd(path)[];                                \
-	extern const unsigned char BlobSize(path)[];
+	extern const char BlobStart(path)[];                                       \
+	extern const char BlobEnd(path)[];                                         \
+	extern const char BlobSize(path)[];
