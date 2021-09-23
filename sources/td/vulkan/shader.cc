@@ -25,13 +25,15 @@ namespace TB {
 	namespace VK {
 
 		Shader::Shader(
-			VkShaderStageFlagBits stage, const u32* start, const u32* end) {
+			VkShaderStageFlagBits stage,
+			const unsigned char* start,
+			const unsigned char* end) {
 			VkShaderModuleCreateInfo ci{
 				.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
 				.pNext = 0,
 				.flags = 0,
-				.codeSize = (end - start) * sizeof(u32),
-				.pCode = start,
+				.codeSize = (size_t)(end - start),
+				.pCode = (unsigned*)start,
 			};
 			Posit(!vkCreateShaderModule(instance, &ci, nullptr, &shaderModule));
 

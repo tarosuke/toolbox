@@ -68,7 +68,10 @@ namespace TB {
 
 
 		struct Shader {
-			Shader(VkShaderStageFlagBits stage, const u32*, const u32*);
+			Shader(
+				VkShaderStageFlagBits stage,
+				const unsigned char*,
+				const unsigned char*);
 			Shader(VkShaderStageFlagBits stage, const char* path);
 			~Shader();
 
@@ -83,33 +86,16 @@ namespace TB {
 			VkPipelineShaderStageCreateInfo stageInfo;
 		};
 		struct VertexShader : public Shader {
-			VertexShader(const u32* start, const u32* end)
+			VertexShader(const unsigned char* start, const unsigned char* end)
 				: Shader(VK_SHADER_STAGE_VERTEX_BIT, start, end){};
 			VertexShader(const char* path)
 				: Shader(VK_SHADER_STAGE_VERTEX_BIT, path){};
 		};
 		struct FragmentShader : public Shader {
-			FragmentShader(const u32* start, const u32* end)
-				: Shader(VK_SHADER_STAGE_FRAGMENT_BIT, start, end){};
+			FragmentShader(const unsigned char* start, const unsigned char* end)
+				: Shader(VK_SHADER_STAGE_VERTEX_BIT, start, end){};
 			FragmentShader(const char* path)
 				: Shader(VK_SHADER_STAGE_FRAGMENT_BIT, path){};
 		};
 	};
 }
-
-
-/** SHADER SYMBOL MEMO
- * シェーダの.spvファイルがDEBUG/td/vulkan/test.frag.spvだとすると
- * シェーダのバイナリは_binary_DEBUG_td_vulkan_test_frag_spv_startのシンボルから
- * 始まっていて、同endで終わり。サイズは同sizeに格納されている。
- * DEBUGの部分はmakefileにて_BUILD_TARGET_マクロとして設定されているので
- * ソース上ではビルドターゲットに関わらず
- *  _binary_##_BUILD_TARGET_##_td_vulkan_test_frag_spv_start
- * になる。ただしトークン結合演算子のほうが強いのでマクロ引数にして展開させる
- *
- * 下のマクロは_td_vulkan_test_frag_spvの部分を与えて全体を作るものである
- */
-#define __ShaderName(target, path, postfix) _binary_##target##_##path##postfix
-#define _ShaderName(target, path, postfix) __ShaderName(target, path, postfix)
-#define ShaderStart(path) _ShaderName(_BUILD_TARGET_, path, _start)
-#define ShaderEnd(path) _ShaderName(_BUILD_TARGET_, path, _end)
