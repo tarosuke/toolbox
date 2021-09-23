@@ -35,124 +35,7 @@ namespace TB {
 
 
 		void TD::Init() {
-			VkPipelineVertexInputStateCreateInfo vertexInputInfo{
-				.sType =
-					VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-				.pNext = 0,
-				.flags = 0,
-				.vertexBindingDescriptionCount = 0,
-				.pVertexBindingDescriptions = nullptr, // Optional
-				.vertexAttributeDescriptionCount = 0,
-				.pVertexAttributeDescriptions = nullptr, // Optional
-			};
 
-
-
-			VkPipelineInputAssemblyStateCreateInfo inputAssembly{
-				.sType =
-					VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
-				.pNext = 0,
-				.flags = 0,
-				.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
-				.primitiveRestartEnable = VK_FALSE,
-			};
-
-
-
-			VkViewport viewport{
-				.x = 0.0f,
-				.y = 0.0f,
-				.width = (float)extent.width,
-				.height = (float)extent.height,
-				.minDepth = 0.0f,
-				.maxDepth = 1.0f,
-			};
-
-
-
-			VkRect2D scissor{
-				.offset = {0, 0},
-				.extent = extent,
-			};
-
-
-
-			VkPipelineViewportStateCreateInfo viewportState{
-				.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
-				.pNext = 0,
-				.flags = 0,
-				.viewportCount = 1,
-				.pViewports = &viewport,
-				.scissorCount = 1,
-				.pScissors = &scissor,
-			};
-
-
-
-			VkPipelineRasterizationStateCreateInfo rasterizer{
-				.sType =
-					VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-				.pNext = 0,
-				.flags = 0,
-				.depthClampEnable = VK_FALSE,
-				.rasterizerDiscardEnable = VK_FALSE,
-				.polygonMode = VK_POLYGON_MODE_FILL,
-				.cullMode = VK_CULL_MODE_BACK_BIT,
-				.frontFace = VK_FRONT_FACE_CLOCKWISE,
-				.depthBiasEnable = VK_FALSE,
-				.depthBiasConstantFactor = 0.0f, // Optional
-				.depthBiasClamp = 0.0f, // Optional
-				.depthBiasSlopeFactor = 0.0f, // Optional
-				.lineWidth = 1.0f,
-			};
-
-
-
-			VkPipelineMultisampleStateCreateInfo multisampling{
-				.sType =
-					VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
-				.pNext = 0,
-				.flags = 0,
-				.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
-				.sampleShadingEnable = VK_FALSE,
-				.minSampleShading = 1.0f, // Optional
-				.pSampleMask = nullptr, // Optional
-				.alphaToCoverageEnable = VK_FALSE, // Optional
-				.alphaToOneEnable = VK_FALSE, // Optional
-			};
-
-
-
-			VkPipelineColorBlendStateCreateInfo colorBlending{
-				.sType =
-					VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
-				.pNext = 0,
-				.flags = 0,
-				.logicOpEnable = VK_FALSE,
-				.logicOp = VK_LOGIC_OP_COPY, // Optional
-				.attachmentCount = 1,
-				.pAttachments = &opaqueBlend,
-				.blendConstants =
-					{
-						0.0f, // Optional
-						0.0f, // Optional
-						0.0f, // Optional
-						0.0f, // Optional
-					},
-			};
-
-
-
-			VkDynamicState dynamicStates[] = {
-				VK_DYNAMIC_STATE_VIEWPORT,
-				VK_DYNAMIC_STATE_LINE_WIDTH};
-			VkPipelineDynamicStateCreateInfo dynamicState{
-				.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
-				.pNext = 0,
-				.flags = 0,
-				.dynamicStateCount = 2,
-				.pDynamicStates = dynamicStates,
-			};
 
 
 			VkPipelineLayoutCreateInfo info{
@@ -182,7 +65,6 @@ namespace TB {
 				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
 				.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
 			};
-
 			VkAttachmentReference colorAttachmentRef{
 				.attachment = 0,
 				.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -193,7 +75,6 @@ namespace TB {
 				.colorAttachmentCount = 1,
 				.pColorAttachments = &colorAttachmentRef,
 			};
-
 			VkRenderPassCreateInfo renderPassInfo{
 				.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
 				.pNext = 0,
@@ -213,8 +94,102 @@ namespace TB {
 
 			VkPipelineShaderStageCreateInfo shaderStages[] = {
 				vertexShader,
-				fragmentShader};
-
+				fragmentShader,
+			};
+			VkPipelineVertexInputStateCreateInfo vertexInputInfo{
+				.sType =
+					VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
+				.vertexBindingDescriptionCount = 0,
+				.pVertexBindingDescriptions = nullptr, // Optional
+				.vertexAttributeDescriptionCount = 0,
+				.pVertexAttributeDescriptions = nullptr, // Optional
+			};
+			VkPipelineInputAssemblyStateCreateInfo inputAssembly{
+				.sType =
+					VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
+				.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+				.primitiveRestartEnable = VK_FALSE,
+			};
+			VkViewport viewport{
+				.x = 0.0f,
+				.y = 0.0f,
+				.width = (float)extent.width,
+				.height = (float)extent.height,
+				.minDepth = 0.0f,
+				.maxDepth = 1.0f,
+			};
+			VkRect2D scissor{
+				.offset = {0, 0},
+				.extent = extent,
+			};
+			VkPipelineViewportStateCreateInfo viewportState{
+				.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
+				.viewportCount = 1,
+				.pViewports = &viewport,
+				.scissorCount = 1,
+				.pScissors = &scissor,
+			};
+			VkPipelineRasterizationStateCreateInfo rasterizer{
+				.sType =
+					VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
+				.depthClampEnable = VK_FALSE,
+				.rasterizerDiscardEnable = VK_FALSE,
+				.polygonMode = VK_POLYGON_MODE_FILL,
+				.cullMode = VK_CULL_MODE_BACK_BIT,
+				.frontFace = VK_FRONT_FACE_CLOCKWISE,
+				.depthBiasEnable = VK_FALSE,
+				.depthBiasConstantFactor = 0.0f, // Optional
+				.depthBiasClamp = 0.0f, // Optional
+				.depthBiasSlopeFactor = 0.0f, // Optional
+				.lineWidth = 1.0f,
+			};
+			VkPipelineMultisampleStateCreateInfo multisampling{
+				.sType =
+					VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
+				.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
+				.sampleShadingEnable = VK_FALSE,
+				.minSampleShading = 1.0f, // Optional
+				.pSampleMask = nullptr, // Optional
+				.alphaToCoverageEnable = VK_FALSE, // Optional
+				.alphaToOneEnable = VK_FALSE, // Optional
+			};
+			VkPipelineColorBlendStateCreateInfo colorBlending{
+				.sType =
+					VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
+				.logicOpEnable = VK_FALSE,
+				.logicOp = VK_LOGIC_OP_COPY, // Optional
+				.attachmentCount = 1,
+				.pAttachments = &opaqueBlend,
+				.blendConstants =
+					{
+						0.0f, // Optional
+						0.0f, // Optional
+						0.0f, // Optional
+						0.0f, // Optional
+					},
+			};
+			VkDynamicState dynamicStates[] = {
+				VK_DYNAMIC_STATE_VIEWPORT,
+				VK_DYNAMIC_STATE_LINE_WIDTH};
+			VkPipelineDynamicStateCreateInfo dynamicState{
+				.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
+				.dynamicStateCount = 2,
+				.pDynamicStates = dynamicStates,
+			};
 			VkGraphicsPipelineCreateInfo pipelineInfo{
 				.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
 				.pNext = 0,
@@ -239,8 +214,6 @@ namespace TB {
 				.basePipelineHandle = VK_NULL_HANDLE, // Optional
 				.basePipelineIndex = -1, // Optional
 			};
-
-
 			Posit(!vkCreateGraphicsPipelines(
 				instance,
 				VK_NULL_HANDLE,
