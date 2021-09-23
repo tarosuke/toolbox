@@ -26,8 +26,8 @@
 namespace TB {
 	namespace VK {
 
-		TD::TD(const M44& proj, const S2& spread, const Shaders* shaders)
-			: ::TB::TD(proj), spread(spread),
+		TD::TD(const M44& proj, const Shaders* shaders)
+			: ::TB::TD(proj),
 			  vertexShader(
 				  shaders && (*shaders).vertex ? (*shaders).vertex : 0),
 			  fragmentShader(
@@ -60,8 +60,8 @@ namespace TB {
 			VkViewport viewport{
 				.x = 0.0f,
 				.y = 0.0f,
-				.width = (float)spread[0],
-				.height = (float)spread[1],
+				.width = (float)extent.width,
+				.height = (float)extent.height,
 				.minDepth = 0.0f,
 				.maxDepth = 1.0f,
 			};
@@ -70,7 +70,7 @@ namespace TB {
 
 			VkRect2D scissor{
 				.offset = {0, 0},
-				.extent = {spread[0], spread[1]},
+				.extent = extent,
 			};
 
 
@@ -155,9 +155,83 @@ namespace TB {
 				&info,
 				nullptr,
 				&pipelineLayout));
+
+
+			VkAttachmentDescription colorAttachment{
+				.format = format,
+				.samples = VK_SAMPLE_COUNT_1_BIT,
+				.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+				.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+				.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+			};
+
+			VkAttachmentReference colorAttachmentRef{
+				.attachment = 0,
+				.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+			};
+			VkSubpassDescription subpass{
+				.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+				.colorAttachmentCount = 1,
+				.pColorAttachments = &colorAttachmentRef,
+			};
+
+			VkRenderPassCreateInfo renderPassInfo{
+				.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+				.attachmentCount = 1,
+				.pAttachments = &colorAttachment,
+				.subpassCount = 1,
+				.pSubpasses = &subpass,
+			};
+			Posit(!vkCreateRenderPass(
+				instance,
+				&renderPassInfo,
+				nullptr,
+				&renderPass));
+
+
+
+			VkPipelineShaderStageCreateInfo shaderStages[] = {
+				vertexShader,
+				fragmentShader};
+
+			VkGraphicsPipelineCreateInfo pipelineInfo{
+				.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+				.stageCount = 2,
+				.pStages = shaderStages,
+
+				.pVertexInputState = &vertexInputInfo,
+				.pInputAssemblyState = &inputAssembly,
+				.pViewportState = &viewportState,
+				.pRasterizationState = &rasterizer,
+				.pMultisampleState = &multisampling,
+				.pDepthStencilState = nullptr, // Optional
+				.pColorBlendState = &colorBlending,
+				.pDynamicState = &dynamicState, // Optional
+
+				.layout = pipelineLayout,
+
+				.renderPass = renderPass,
+				.subpass = 0,
+
+				.basePipelineHandle = VK_NULL_HANDLE, // Optional
+				.basePipelineIndex = -1, // Optional
+			};
+
+
+			Posit(!vkCreateGraphicsPipelines(
+				instance,
+				VK_NULL_HANDLE,
+				1,
+				&pipelineInfo,
+				nullptr,
+				&graphicsPipeline));
 		}
 
 		TD::~TD() {
+			vkDestroyPipeline(instance, graphicsPipeline, nullptr);
 			vkDestroyPipelineLayout(instance, pipelineLayout, nullptr);
 		}
 

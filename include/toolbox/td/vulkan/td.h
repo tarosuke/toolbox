@@ -40,15 +40,18 @@ namespace TB {
 		protected:
 			Instance instance;
 			VkFramebuffer frameBuffer;
-			TD(const M44& proj, const S2& spread, const Shaders* shaders = 0);
+			VkFormat format;
+			VkExtent2D extent;
+			TD(const M44& proj, const Shaders* shaders = 0);
 			~TD();
 
 		private:
-			const S2& spread;
 			VertexShader vertexShader;
 			FragmentShader fragmentShader;
 
 			VkPipelineLayout pipelineLayout;
+			VkRenderPass renderPass;
+			VkPipeline graphicsPipeline;
 
 			static const VkPipelineColorBlendAttachmentState opaqueBlend;
 			static const VkPipelineColorBlendAttachmentState alphaBlend;
@@ -60,7 +63,9 @@ namespace TB {
 		struct FBTD : public TD {
 			FBTD(
 				const M44& proj, const S2& viewport, const Shaders* shaders = 0)
-				: TD(proj, viewport, shaders){};
+				: TD(proj, shaders) {
+				extent = {viewport[0], viewport[1]};
+			};
 
 		private:
 			static VkFramebuffer* MakeFrameBuffer(const S2&);
@@ -83,8 +88,6 @@ namespace TB {
 			VkSurfaceKHR surface;
 			VkSwapchainKHR swapchain;
 			std::vector<VkImage> swapchainImages;
-			VkFormat format;
-			VkExtent2D extent;
 			std::vector<VkImageView> swapchainImageViews;
 			VkSurfaceCapabilitiesKHR capabilities;
 
