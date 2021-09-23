@@ -24,7 +24,8 @@
 namespace TB {
 	namespace VK {
 
-		Shader::Shader(const u32* start, const u32* end) {
+		Shader::Shader(
+			VkShaderStageFlagBits stage, const u32* start, const u32* end) {
 			VkShaderModuleCreateInfo ci{
 				.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
 				.pNext = 0,
@@ -33,6 +34,12 @@ namespace TB {
 				.pCode = start,
 			};
 			Posit(!vkCreateShaderModule(instance, &ci, nullptr, &shaderModule));
+
+			stageInfo.sType =
+				VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+			stageInfo.stage = stage;
+			stageInfo.module = shaderModule;
+			stageInfo.pName = "main";
 		}
 
 		Shader::~Shader() {
