@@ -35,6 +35,8 @@ namespace TB {
 
 
 		void TD::Init() {
+			/***** フレームバッファまで
+			 */
 			VkPipelineLayoutCreateInfo info{
 				.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
 				.pNext = 0,
@@ -86,7 +88,6 @@ namespace TB {
 				&renderPassInfo,
 				nullptr,
 				&renderPass));
-
 
 
 			VkPipelineShaderStageCreateInfo shaderStages[] = {
@@ -221,9 +222,33 @@ namespace TB {
 
 
 			FillFramebuffers(framebuffers);
+
+			/***** コマンドバッファ関連
+			 */
+			VkCommandPoolCreateInfo poolInfo{};
+			poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+			poolInfo.queueFamilyIndex = instance.PhysicalFamilyIndex();
+			poolInfo.flags = 0; // Optional
+			Posit(!vkCreateCommandPool(
+				instance,
+				&poolInfo,
+				nullptr,
+				&commandPool));
+
+			commandBuffers.resize(framebuffers.size());
+			VkCommandBufferAllocateInfo allocInfo{};
+			allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+			allocInfo.commandPool = commandPool;
+			allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+			allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+			Posit(!vkAllocateCommandBuffers(
+				instance,
+				&allocInfo,
+				commandBuffers.data()));
 		}
 
 		TD::~TD() {
+			vkDestroyCommandPool(instance, commandPool, nullptr);
 			for (auto f : framebuffers) {
 				vkDestroyFramebuffer(instance, f, nullptr);
 			}

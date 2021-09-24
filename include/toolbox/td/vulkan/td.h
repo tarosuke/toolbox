@@ -54,6 +54,8 @@ namespace TB {
 
 			VkPipelineLayout pipelineLayout;
 			VkPipeline graphicsPipeline;
+			VkCommandPool commandPool;
+			std::vector<VkCommandBuffer> commandBuffers;
 
 			static const VkPipelineColorBlendAttachmentState opaqueBlend;
 			static const VkPipelineColorBlendAttachmentState alphaBlend;
