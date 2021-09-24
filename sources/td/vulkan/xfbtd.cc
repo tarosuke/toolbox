@@ -155,6 +155,8 @@ namespace TB {
 
 
 		XFBTD::~XFBTD() {
+			vkDeviceWaitIdle(instance);
+
 			for (auto imageView : swapchainImageViews) {
 				vkDestroyImageView(instance, imageView, nullptr);
 			}

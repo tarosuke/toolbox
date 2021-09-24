@@ -37,11 +37,26 @@ namespace TB {
 				char* fragment;
 			};
 
+			struct RenderPass {
+				RenderPass() = delete;
+				RenderPass(TD&, VkFramebuffer, VkCommandBuffer);
+				~RenderPass();
+				void Draw(
+					unsigned vertexIndex,
+					unsigned vertexes,
+					unsigned instances = 1,
+					unsigned firstInstance = 1);
+
+			private:
+				TD& td;
+				VkFramebuffer fb;
+				VkCommandBuffer cb;
+			};
+
 		protected:
 			Instance instance;
 			VkFormat format;
 			VkExtent2D extent;
-			std::vector<VkFramebuffer> framebuffers;
 			VkRenderPass renderPass;
 			TD(const M44& proj, const Shaders* shaders = 0);
 			~TD();
@@ -54,6 +69,7 @@ namespace TB {
 
 			VkPipelineLayout pipelineLayout;
 			VkPipeline graphicsPipeline;
+			std::vector<VkFramebuffer> framebuffers;
 			VkCommandPool commandPool;
 			std::vector<VkCommandBuffer> commandBuffers;
 

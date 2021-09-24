@@ -281,5 +281,41 @@ namespace TB {
 				VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
 				VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
 		};
+
+		TD::RenderPass::RenderPass(
+			TD& td, VkFramebuffer framebuffer, VkCommandBuffer commandbuffer)
+			: td(td), fb(framebuffer), cb(commandbuffer) {
+			VkRenderPassBeginInfo renderPassInfo{};
+			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			renderPassInfo.renderPass = td.renderPass;
+			renderPassInfo.framebuffer = fb;
+
+			renderPassInfo.renderArea.offset = {0, 0};
+			renderPassInfo.renderArea.extent = td.extent;
+
+			VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+			renderPassInfo.clearValueCount = 1;
+			renderPassInfo.pClearValues = &clearColor;
+
+			vkCmdBeginRenderPass(
+				cb,
+				&renderPassInfo,
+				VK_SUBPASS_CONTENTS_INLINE);
+
+			vkCmdBindPipeline(
+				cb,
+				VK_PIPELINE_BIND_POINT_GRAPHICS,
+				td.graphicsPipeline);
+		}
+
+		TD::RenderPass::~RenderPass() { vkCmdEndRenderPass(cb); }
+
+		void TD::RenderPass::Draw(
+			unsigned firstVertex,
+			unsigned vertexes,
+			unsigned instances,
+			unsigned firstInstance) {
+			vkCmdDraw(cb, vertexes, instances, firstVertex, firstInstance);
+		}
 	}
 }
