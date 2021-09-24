@@ -35,9 +35,6 @@ namespace TB {
 
 
 		void TD::Init() {
-
-
-
 			VkPipelineLayoutCreateInfo info{
 				.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
 				.pNext = 0,
@@ -227,6 +224,9 @@ namespace TB {
 		}
 
 		TD::~TD() {
+			for (auto f : framebuffers) {
+				vkDestroyFramebuffer(instance, f, nullptr);
+			}
 			vkDestroyPipeline(instance, graphicsPipeline, nullptr);
 			vkDestroyPipelineLayout(instance, pipelineLayout, nullptr);
 			vkDestroyRenderPass(instance, renderPass, nullptr);

@@ -155,9 +155,6 @@ namespace TB {
 
 
 		XFBTD::~XFBTD() {
-			for (auto f : framebuffers) {
-				vkDestroyFramebuffer(instance, f, nullptr);
-			}
 			for (auto imageView : swapchainImageViews) {
 				vkDestroyImageView(instance, imageView, nullptr);
 			}

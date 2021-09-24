@@ -39,7 +39,6 @@ namespace TB {
 
 		protected:
 			Instance instance;
-			VkFramebuffer frameBuffer;
 			VkFormat format;
 			VkExtent2D extent;
 			std::vector<VkFramebuffer> framebuffers;
