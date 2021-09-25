@@ -73,6 +73,9 @@ namespace TB {
 			VkCommandPool commandPool;
 			std::vector<VkCommandBuffer> commandBuffers;
 
+			VkSemaphore imageAvailableSemaphore;
+			VkSemaphore renderFinishedSemaphore;
+
 			static const VkPipelineColorBlendAttachmentState opaqueBlend;
 			static const VkPipelineColorBlendAttachmentState alphaBlend;
 		};

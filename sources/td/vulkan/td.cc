@@ -245,9 +245,25 @@ namespace TB {
 				instance,
 				&allocInfo,
 				commandBuffers.data()));
+
+
+			VkSemaphoreCreateInfo semaphoreInfo{};
+			semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+			Posit(!vkCreateSemaphore(
+				instance,
+				&semaphoreInfo,
+				nullptr,
+				&imageAvailableSemaphore));
+			Posit(!vkCreateSemaphore(
+				instance,
+				&semaphoreInfo,
+				nullptr,
+				&renderFinishedSemaphore));
 		}
 
 		TD::~TD() {
+			vkDestroySemaphore(instance, renderFinishedSemaphore, nullptr);
+			vkDestroySemaphore(instance, imageAvailableSemaphore, nullptr);
 			vkDestroyCommandPool(instance, commandPool, nullptr);
 			for (auto f : framebuffers) {
 				vkDestroyFramebuffer(instance, f, nullptr);
