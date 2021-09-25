@@ -30,13 +30,21 @@
 namespace TB {
 	namespace VK {
 
-		// Vulkan版基本クラス
+		/***** Vulkan版基本クラス
+		 * Vulkanの論理面が集約されている
+		 * 神クラスとか思うかも知れないが分けても使うのが面倒になるだけだろう
+		 */
 		struct TD : public TB::TD {
 			struct Shaders {
 				char* vertex;
 				char* fragment;
 			};
 
+			/***** RenderPass
+			 * 指定したコマンドバッファとフレームバッファのセットにコマンドを
+			 * 書き込むためのインフラで、Drawするとコマンドが書き込まれる
+			 * TODO:コマンドバッファ、フレームバッファはtdから取得できるはず
+			 */
 			struct RenderPass {
 				RenderPass() = delete;
 				RenderPass(TD&, VkFramebuffer, VkCommandBuffer);
@@ -93,14 +101,15 @@ namespace TB {
 		private:
 		};
 
+
+
 		// X窓フレームバッファ版TD
-		struct XFBTD : public TD {
-			XFBTD(
-				unsigned width,
+		struct XTD : public TD {
+			XTD(unsigned width,
 				unsigned height,
 				const M44& proj,
 				const Shaders* shaders = 0);
-			~XFBTD();
+			~XTD();
 
 		private:
 			static Base::Extension<VkInstance> instanceExtensions;

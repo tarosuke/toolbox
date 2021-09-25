@@ -29,4 +29,17 @@ namespace TB {
 			{0, 0, far / far - near, 1},
 			{0, 0, near * far / (near - far), 0}});
 	}
+
+
+	void TD::Run() {
+		const nsec start;
+		keep = true;
+		for (nsec ns; keep;) {
+			Tick(timestamp);
+			nsec nns;
+			nns -= start;
+			timestamp.delta = nns - timestamp.uptime;
+			timestamp.uptime = nns;
+		}
+	}
 }

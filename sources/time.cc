@@ -17,32 +17,14 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#pragma once
-#include "toolbox/type.h"
-#include <time.h>
+#include <toolbox/time.h>
 
 
 
 namespace TB {
-
-	struct TimeBase : public Type<u64> {
-		TimeBase();
-
-	protected:
-		TimeBase(u64 ns) : Type<u64>(ns){};
-		TimeBase(const Type<u64>& t) : Type<u64>(t){};
-	};
-
-	template <unsigned S> struct Time : public TimeBase {
-		Time(){};
-		Time(u64 init) : TimeBase(init * S){};
-		Time(const Type<u64>& t) : TimeBase(t){};
-		operator u64() const { return body / S; };
-	};
-
-	using sec = Time<1000000000>;
-	using msec = Time<1000000>;
-	using usec = Time<1000>;
-	using nsec = Time<1>;
-
+	TimeBase::TimeBase() {
+		timespec ts; //<-こいつを使いたくないがためだけに作った
+		clock_gettime(CLOCK_BOOTTIME, &ts);
+		body = nsec(ts.tv_nsec) + sec(ts.tv_sec);
+	}
 }

@@ -21,6 +21,8 @@
 #include <toolbox/container/list.h>
 #include <toolbox/geometry/matrix.h>
 #include <toolbox/geometry/spread.h>
+#include <toolbox/type.h>
+#include <toolbox/time.h>
 
 
 
@@ -39,6 +41,12 @@ namespace TB {
 			virtual bool IsTransparent() { return true; };
 		};
 
+		// タイムスタンプ
+		struct Timestamp {
+			Timestamp() : uptime(0),delta(1){};
+			nsec uptime;
+			nsec delta;
+		};
 
 		void AddHead(Object& o) { head.Add(o); };
 		void AddExternal(Object& o) { external.Add(o); };
@@ -47,14 +55,21 @@ namespace TB {
 
 		void Draw(const M44& view);
 
+		void Run();
+		virtual void Tick(const Timestamp&){};
+
 		virtual ~TD(){};
 
 	protected:
 		TD() = delete;
 		TD(const M44& projectile) : projectile(projectile){};
+		void Quit() { keep = false; };
 
 	private:
 		const M44 projectile;
+		bool keep;
+
+		Timestamp timestamp;
 
 		struct Target {
 			Target() : modified(false){};

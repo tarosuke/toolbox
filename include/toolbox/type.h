@@ -32,7 +32,28 @@ namespace TB {
 			body = t;
 			return body;
 		};
-		operator T&&() { return body; };
+		operator T&() { return body; };
+
+		Type operator+(const Type& t) const { return Type(body + t.body); };
+		Type operator-(const Type& t) const { return Type(body - t.body); };
+		Type operator+=(const Type& t) {
+			body += t.body;
+			return *this;
+		};
+		Type operator-=(const Type& t) {
+			body -= t.body;
+			return *this;
+		};
+		template <typename U> Type operator*(U& t) { return Type(body * t); };
+		template <typename U> Type operator*=(const U& t) {
+			body *= t;
+			return *this;
+		};
+		template <typename U> Type operator/(U& t) { return Type(body / t); };
+		template <typename U> Type operator/=(const U& t) {
+			body /= t;
+			return *this;
+		};
 
 	protected:
 		T body;

@@ -29,7 +29,7 @@ namespace TB {
 	namespace VK {
 
 
-		XFBTD::XFBTD(
+		XTD::XTD(
 			unsigned width,
 			unsigned height,
 			const M44& proj,
@@ -130,7 +130,7 @@ namespace TB {
 			Init();
 		}
 
-		void XFBTD::FillFramebuffers(std::vector<VkFramebuffer>& fb) {
+		void XTD::FillFramebuffers(std::vector<VkFramebuffer>& fb) {
 			fb.resize(swapchainImageViews.size());
 			for (unsigned n(0); n < fb.size(); ++n) {
 				VkImageView attachments[] = {swapchainImageViews[n]};
@@ -154,7 +154,7 @@ namespace TB {
 		}
 
 
-		XFBTD::~XFBTD() {
+		XTD::~XTD() {
 			vkDeviceWaitIdle(instance);
 
 			for (auto imageView : swapchainImageViews) {
@@ -164,10 +164,10 @@ namespace TB {
 			vkDestroySurfaceKHR(instance, surface, 0);
 		}
 
-		Base::Extension<VkInstance> XFBTD::instanceExtensions(
+		Base::Extension<VkInstance> XTD::instanceExtensions(
 			{VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
 			 VK_KHR_SURFACE_EXTENSION_NAME});
 		Base::Extension<VkDevice>
-			XFBTD::driverExtensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME});
+			XTD::driverExtensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME});
 	}
 }
