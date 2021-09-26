@@ -27,7 +27,7 @@ namespace TB {
 	namespace VK {
 
 		TD::TD(const M44& proj, const Shaders* shaders)
-			: ::TB::TD(proj),
+			: projectile(proj),
 			  vertexShader(
 				  shaders && (*shaders).vertex ? (*shaders).vertex : 0),
 			  fragmentShader(
@@ -261,6 +261,8 @@ namespace TB {
 				&renderFinishedSemaphore));
 		}
 
+
+
 		TD::~TD() {
 			vkDestroySemaphore(instance, renderFinishedSemaphore, nullptr);
 			vkDestroySemaphore(instance, imageAvailableSemaphore, nullptr);
@@ -298,9 +300,9 @@ namespace TB {
 				VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
 		};
 
-		TD::RenderPass::RenderPass(
-			TD& td, VkFramebuffer framebuffer, VkCommandBuffer commandbuffer)
-			: td(td), fb(framebuffer), cb(commandbuffer) {
+		TD::RenderPass::RenderPass(TD& td)
+			: td(td), fb(td.framebuffers[td.imageIndex]),
+			  cb(td.commandBuffers[td.commandIndex]) {
 			VkRenderPassBeginInfo renderPassInfo{};
 			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 			renderPassInfo.renderPass = td.renderPass;

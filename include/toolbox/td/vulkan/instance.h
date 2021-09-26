@@ -94,6 +94,7 @@ namespace TB {
 			unsigned PhysicalFamilyIndex() {
 				return Base::GetInstance().physicalDeviceIndex;
 			};
+			operator VkQueue() { return Base::GetInstance().queue; };
 		};
 	}
 }

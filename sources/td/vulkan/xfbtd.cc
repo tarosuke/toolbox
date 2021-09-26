@@ -153,6 +153,35 @@ namespace TB {
 			}
 		}
 
+		void XTD::Prepare() {
+			// imageIndex, commandIndexを更新
+			vkAcquireNextImageKHR(
+				instance,
+				swapchain,
+				UINT64_MAX,
+				imageAvailableSemaphore,
+				VK_NULL_HANDLE,
+				&imageIndex);
+		}
+
+		void XTD::Draw(const M44& view) {
+			// 表示
+			VkPresentInfoKHR presentInfo{};
+			presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+			presentInfo.waitSemaphoreCount = 0;
+			presentInfo.pWaitSemaphores = nullptr;
+
+			VkSwapchainKHR swapChains[] = {swapchain};
+			presentInfo.swapchainCount = 1;
+			presentInfo.pSwapchains = swapChains;
+			presentInfo.pImageIndices = &imageIndex;
+
+			presentInfo.pResults = nullptr; // Optional
+
+			vkQueuePresentKHR(instance, &presentInfo);
+			vkQueueWaitIdle(instance);
+		}
 
 		XTD::~XTD() {
 			vkDeviceWaitIdle(instance);

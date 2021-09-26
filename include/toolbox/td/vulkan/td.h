@@ -43,11 +43,10 @@ namespace TB {
 			/***** RenderPass
 			 * 指定したコマンドバッファとフレームバッファのセットにコマンドを
 			 * 書き込むためのインフラで、Drawするとコマンドが書き込まれる
-			 * TODO:コマンドバッファ、フレームバッファはtdから取得できるはず
 			 */
 			struct RenderPass {
 				RenderPass() = delete;
-				RenderPass(TD&, VkFramebuffer, VkCommandBuffer);
+				RenderPass(TD&);
 				~RenderPass();
 				void Draw(
 					unsigned vertexIndex,
@@ -66,10 +65,23 @@ namespace TB {
 			VkFormat format;
 			VkExtent2D extent;
 			VkRenderPass renderPass;
+
+			const M44 projectile;
+
 			TD(const M44& proj, const Shaders* shaders = 0);
 			~TD();
 			void Init();
 			virtual void FillFramebuffers(std::vector<VkFramebuffer>&) = 0;
+
+			// 描画処理
+			VkSemaphore imageAvailableSemaphore;
+			VkSemaphore renderFinishedSemaphore;
+			VkSemaphore signalSemaphore;
+
+			unsigned imageIndex; // アクティブなフレームバッファ
+			unsigned commandIndex; // アクティブなコマンドバッファ
+			// void Prepare() override;
+			// void Draw(const M44&) final;
 
 		private:
 			VertexShader vertexShader;
@@ -80,9 +92,6 @@ namespace TB {
 			std::vector<VkFramebuffer> framebuffers;
 			VkCommandPool commandPool;
 			std::vector<VkCommandBuffer> commandBuffers;
-
-			VkSemaphore imageAvailableSemaphore;
-			VkSemaphore renderFinishedSemaphore;
 
 			static const VkPipelineColorBlendAttachmentState opaqueBlend;
 			static const VkPipelineColorBlendAttachmentState alphaBlend;
@@ -123,6 +132,8 @@ namespace TB {
 			VkSurfaceCapabilitiesKHR capabilities;
 
 			void FillFramebuffers(std::vector<VkFramebuffer>&) final;
+			void Prepare() final;
+			void Draw(const M44&) final;
 		};
 	};
 }

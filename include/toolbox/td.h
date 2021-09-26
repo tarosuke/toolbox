@@ -53,20 +53,24 @@ namespace TB {
 		void AddScenery(Object& o) { scenery.Add(o); };
 
 
-		void Draw(const M44& view);
-
 		void Run();
-		virtual void Tick(const Timestamp&){};
 
-		virtual ~TD(){};
 
 	protected:
-		TD() = delete;
-		TD(const M44& projectile) : projectile(projectile){};
+		M44 view;
+
+		TD(){};
+		virtual ~TD(){};
 		void Quit() { keep = false; };
 
+		// 周回処理中の定形処理
+		virtual void Prepare(){}; // 描画先の準備
+		virtual void Tick(const Timestamp&){}; // 描画以外の準備
+		virtual void Draw(const M44& view) = 0; // 描画、出力
+
+		// オブジェクトの再描画
+
 	private:
-		const M44 projectile;
 		bool keep;
 
 		Timestamp timestamp;

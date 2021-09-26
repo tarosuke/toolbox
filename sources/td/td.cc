@@ -35,11 +35,18 @@ namespace TB {
 		const nsec start;
 		keep = true;
 		for (nsec ns; keep;) {
+			// 描画準備(フレームバッファやコマンドバッファの確定みたいな)
+			Prepare();
+
+			// 周回処理(必要ならコマンドバッファを更新)
 			nsec nns;
 			nns -= start;
 			timestamp.delta = nns - timestamp.uptime;
 			timestamp.uptime = nns;
 			Tick(timestamp);
+
+			// 描画
+			Draw(view);
 		}
 	}
 }
