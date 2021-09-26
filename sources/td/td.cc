@@ -35,11 +35,11 @@ namespace TB {
 		const nsec start;
 		keep = true;
 		for (nsec ns; keep;) {
-			Tick(timestamp);
 			nsec nns;
 			nns -= start;
 			timestamp.delta = nns - timestamp.uptime;
 			timestamp.uptime = nns;
+			Tick(timestamp);
 		}
 	}
 }

@@ -43,7 +43,7 @@ namespace TB {
 
 		// タイムスタンプ
 		struct Timestamp {
-			Timestamp() : uptime(0),delta(1){};
+			Timestamp() : delta(1){};
 			nsec uptime;
 			nsec delta;
 		};
