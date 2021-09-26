@@ -302,7 +302,7 @@ namespace TB {
 
 		TD::RenderPass::RenderPass(TD& td)
 			: td(td), fb(td.framebuffers[td.imageIndex]),
-			  cb(td.commandBuffers[td.commandIndex]) {
+			  cb(td.commandBuffers[td.imageIndex]) {
 			VkRenderPassBeginInfo renderPassInfo{};
 			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 			renderPassInfo.renderPass = td.renderPass;
@@ -335,5 +335,8 @@ namespace TB {
 			unsigned firstInstance) {
 			vkCmdDraw(cb, vertexes, instances, firstVertex, firstInstance);
 		}
+
+
+		void TD::Draw() { RenderPass(*this); }
 	}
 }

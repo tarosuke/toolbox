@@ -76,12 +76,13 @@ namespace TB {
 			// 描画処理
 			VkSemaphore imageAvailableSemaphore;
 			VkSemaphore renderFinishedSemaphore;
-			VkSemaphore signalSemaphore;
 
 			unsigned imageIndex; // アクティブなフレームバッファ
 			unsigned commandIndex; // アクティブなコマンドバッファ
 			// void Prepare() override;
 			// void Draw(const M44&) final;
+
+			std::vector<VkCommandBuffer> commandBuffers;
 
 		private:
 			VertexShader vertexShader;
@@ -91,10 +92,11 @@ namespace TB {
 			VkPipeline graphicsPipeline;
 			std::vector<VkFramebuffer> framebuffers;
 			VkCommandPool commandPool;
-			std::vector<VkCommandBuffer> commandBuffers;
 
 			static const VkPipelineColorBlendAttachmentState opaqueBlend;
 			static const VkPipelineColorBlendAttachmentState alphaBlend;
+
+			void Draw() final;
 		};
 
 

@@ -45,6 +45,9 @@ namespace TB {
 			timestamp.uptime = nns;
 			Tick(timestamp);
 
+			// コマンドバッファ更新(仮)
+			Draw();
+
 			// 描画
 			Draw(view);
 		}

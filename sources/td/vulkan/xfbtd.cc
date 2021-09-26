@@ -165,6 +165,23 @@ namespace TB {
 		}
 
 		void XTD::Draw(const M44& view) {
+			// 描画
+			VkSubmitInfo submitInfo{};
+			submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+			VkSemaphore waitSemaphores[] = {imageAvailableSemaphore};
+			VkPipelineStageFlags waitStages[] = {
+				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+			submitInfo.waitSemaphoreCount = 1;
+			submitInfo.pWaitSemaphores = waitSemaphores;
+			submitInfo.pWaitDstStageMask = waitStages;
+			submitInfo.commandBufferCount = 1;
+			submitInfo.pCommandBuffers = &commandBuffers[imageIndex];
+			VkSemaphore signalSemaphores[] = {renderFinishedSemaphore};
+			submitInfo.signalSemaphoreCount = 1;
+			submitInfo.pSignalSemaphores = signalSemaphores;
+			Posit(!vkQueueSubmit(instance, 1, &submitInfo, VK_NULL_HANDLE));
+
 			// 表示
 			VkPresentInfoKHR presentInfo{};
 			presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
