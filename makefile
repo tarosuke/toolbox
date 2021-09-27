@@ -143,7 +143,6 @@ testTargets := $(addsuffix .test, $(tmods))
 %.test : %
 	@echo $<
 	@AUTO_TEST=1 $<
-	@touch $@
 
 test: $(testTargets)
 
