@@ -22,7 +22,7 @@
 
 
 
-#define _THROW_ARG(f, l, c) f ":" #l ":: " #c
+#define _THROW_ARG(f, l, c) f ":" #l ":: fail: Posit failed - " #c
 #define THROW_ARG(f, l, c) _THROW_ARG(f, l, c)
 #define THROW throw THROW_ARG(__FILE__, __LINE__, )
 
