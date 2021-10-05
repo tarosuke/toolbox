@@ -155,13 +155,13 @@ namespace TB {
 
 		VkFramebuffer XTD::NextFramebuffer() {
 			// imageIndex, commandIndexを更新
-			vkAcquireNextImageKHR(
+			Posit(!vkAcquireNextImageKHR(
 				instance,
 				swapchain,
 				UINT64_MAX,
 				imageAvailableSemaphore,
 				VK_NULL_HANDLE,
-				&frameIndex);
+				&frameIndex));
 			return framebuffers[frameIndex];
 		}
 

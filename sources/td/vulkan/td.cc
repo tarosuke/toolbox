@@ -296,8 +296,9 @@ namespace TB {
 			: td(td), fb(fb), cb(td.commandBuffer) {
 			VkCommandBufferBeginInfo beginInfo{};
 			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-			beginInfo.flags = 0; // Optional
-			beginInfo.pInheritanceInfo = nullptr; // Optional
+			beginInfo.flags = 0;
+			// VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+			beginInfo.pInheritanceInfo = nullptr;
 
 			Posit(!vkBeginCommandBuffer(td.commandBuffer, &beginInfo));
 
@@ -309,7 +310,7 @@ namespace TB {
 			renderPassInfo.renderArea.offset = {0, 0};
 			renderPassInfo.renderArea.extent = td.extent;
 
-			VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+			VkClearValue clearColor = {{{.0f, 0.0f, 0.0f, 1.0f}}};
 			renderPassInfo.clearValueCount = 1;
 			renderPassInfo.pClearValues = &clearColor;
 
