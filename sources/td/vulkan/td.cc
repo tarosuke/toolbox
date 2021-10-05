@@ -347,19 +347,16 @@ namespace TB {
 			redraw = true; // NOTE:描画内容を作るまでの仮設定
 			Posit(redraw); //描画するものがない
 			for (nsec ns; keep;) {
-				RenderPass rp(*this, NextFramebuffer());
+				{
+					RenderPass rp(*this, NextFramebuffer());
 
-
-
-				// 描画準備(フレームバッファやコマンドバッファの確定みたいな)
-				PrepareFrame();
-
-				// 必要であれば再描画
-				if (redraw) {
-					for (auto t : targets) {
-						(*t).Draw();
+					// 必要であれば再描画
+					if (redraw) {
+						for (auto t : targets) {
+							(*t).Draw();
+						}
+						redraw = false;
 					}
-					redraw = false;
 				}
 
 				// 描画

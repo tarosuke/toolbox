@@ -54,7 +54,6 @@ namespace TB {
 		void Quit() { keep = false; };
 
 		// 周回処理中の定形処理
-		virtual void PrepareFrame(){}; // 描画先の準備
 		virtual void Tick(const Timestamp&){}; // 描画以外の準備
 		virtual void Draw(const M44& view) = 0; // 描画、出力
 

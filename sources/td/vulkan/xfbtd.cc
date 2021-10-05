@@ -128,6 +128,9 @@ namespace TB {
 					&swapchainImageViews[n]));
 			}
 
+			// RenderPassなどを作ってくる
+			Init();
+
 			framebuffers.resize(swapchainImageViews.size());
 			for (unsigned n(0); n < framebuffers.size(); ++n) {
 				VkImageView attachments[] = {swapchainImageViews[n]};
@@ -148,8 +151,6 @@ namespace TB {
 					nullptr,
 					&framebuffers[n]));
 			}
-
-			Init();
 		}
 
 		VkFramebuffer XTD::NextFramebuffer() {
