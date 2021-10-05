@@ -34,13 +34,6 @@ namespace TB {
 
 		static M44 Frustum(float width, float height, float near, float far);
 
-
-		// 描画物(頂点バッファ＋テクスチャ)
-		struct Object : public List<Object>::Node {
-			virtual void Draw(/*未定*/) = 0;
-			virtual bool IsTransparent() { return true; };
-		};
-
 		// タイムスタンプ
 		struct Timestamp {
 			Timestamp() : delta(1){};
@@ -48,47 +41,23 @@ namespace TB {
 			nsec delta;
 		};
 
-		void AddHead(Object& o) { head.Add(o); };
-		void AddExternal(Object& o) { external.Add(o); };
-		void AddScenery(Object& o) { scenery.Add(o); };
-
-
-		void Run();
-
-
 	protected:
-		M44 view;
+		const M44 projectile;
 
-		TD(){};
+		Timestamp timestamp;
+		bool keep;
+		bool redraw;
+
+		TD() = delete;
+		TD(const M44& p) : projectile(p), redraw(false){};
 		virtual ~TD(){};
 		void Quit() { keep = false; };
 
 		// 周回処理中の定形処理
-		virtual void Prepare(){}; // 描画先の準備
+		virtual void PrepareFrame(){}; // 描画先の準備
 		virtual void Tick(const Timestamp&){}; // 描画以外の準備
-		virtual void Draw() = 0; //コマンドバッファ更新
 		virtual void Draw(const M44& view) = 0; // 描画、出力
 
-		// オブジェクトの再描画
-
 	private:
-		bool keep;
-
-		Timestamp timestamp;
-
-		struct Target {
-			Target() : modified(false){};
-			void Add(Object& o) {
-				(o.IsTransparent() ? transparent : opaque).Add(o);
-				modified = true;
-			};
-			void DrawOpaque() { opaque.Foreach(&Object::Draw); };
-			void DrawTransparent() { transparent.Reveach(&Object::Draw); };
-
-		private:
-			List<Object> opaque;
-			List<Object> transparent;
-			bool modified; //コマンド再生成が必要
-		} head, external, scenery;
 	};
 }

@@ -27,7 +27,7 @@ namespace TB {
 	namespace VK {
 
 		TD::TD(const M44& proj, const Shaders* shaders)
-			: projectile(proj),
+			: TB::TD(proj),
 			  vertexShader(
 				  shaders && (*shaders).vertex ? (*shaders).vertex : 0),
 			  fragmentShader(
@@ -220,9 +220,6 @@ namespace TB {
 				nullptr,
 				&graphicsPipeline));
 
-
-			FillFramebuffers(framebuffers);
-
 			/***** コマンドバッファ関連
 			 */
 			VkCommandPoolCreateInfo poolInfo{};
@@ -235,17 +232,15 @@ namespace TB {
 				nullptr,
 				&commandPool));
 
-			commandBuffers.resize(framebuffers.size());
 			VkCommandBufferAllocateInfo allocInfo{};
 			allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 			allocInfo.commandPool = commandPool;
 			allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-			allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+			allocInfo.commandBufferCount = 1;
 			Posit(!vkAllocateCommandBuffers(
 				instance,
 				&allocInfo,
-				commandBuffers.data()));
-
+				&commandBuffer));
 
 			VkSemaphoreCreateInfo semaphoreInfo{};
 			semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -267,9 +262,6 @@ namespace TB {
 			vkDestroySemaphore(instance, renderFinishedSemaphore, nullptr);
 			vkDestroySemaphore(instance, imageAvailableSemaphore, nullptr);
 			vkDestroyCommandPool(instance, commandPool, nullptr);
-			for (auto f : framebuffers) {
-				vkDestroyFramebuffer(instance, f, nullptr);
-			}
 			vkDestroyPipeline(instance, graphicsPipeline, nullptr);
 			vkDestroyPipelineLayout(instance, pipelineLayout, nullptr);
 			vkDestroyRenderPass(instance, renderPass, nullptr);
@@ -300,9 +292,15 @@ namespace TB {
 				VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
 		};
 
-		TD::RenderPass::RenderPass(TD& td)
-			: td(td), fb(td.framebuffers[td.imageIndex]),
-			  cb(td.commandBuffers[td.imageIndex]) {
+		TD::RenderPass::RenderPass(TD& td, VkFramebuffer fb)
+			: td(td), fb(fb), cb(td.commandBuffer) {
+			VkCommandBufferBeginInfo beginInfo{};
+			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+			beginInfo.flags = 0; // Optional
+			beginInfo.pInheritanceInfo = nullptr; // Optional
+
+			Posit(!vkBeginCommandBuffer(td.commandBuffer, &beginInfo));
+
 			VkRenderPassBeginInfo renderPassInfo{};
 			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 			renderPassInfo.renderPass = td.renderPass;
@@ -326,7 +324,10 @@ namespace TB {
 				td.graphicsPipeline);
 		}
 
-		TD::RenderPass::~RenderPass() { vkCmdEndRenderPass(cb); }
+		TD::RenderPass::~RenderPass() {
+			vkCmdEndRenderPass(cb);
+			vkEndCommandBuffer(td.commandBuffer);
+		}
 
 		void TD::RenderPass::Draw(
 			unsigned firstVertex,
@@ -337,6 +338,43 @@ namespace TB {
 		}
 
 
-		void TD::Draw() { RenderPass(*this); }
+
+		void TD::Cyclic() {
+			Target* const targets[] = {&head, &external, &scenery};
+
+			const nsec start;
+			keep = true;
+			redraw = true; // NOTE:描画内容を作るまでの仮設定
+			Posit(redraw); //描画するものがない
+			for (nsec ns; keep;) {
+				RenderPass rp(*this, NextFramebuffer());
+
+
+
+				// 描画準備(フレームバッファやコマンドバッファの確定みたいな)
+				PrepareFrame();
+
+				// 必要であれば再描画
+				if (redraw) {
+					for (auto t : targets) {
+						(*t).Draw();
+					}
+					redraw = false;
+				}
+
+				// 描画
+				Draw(view);
+
+				// 周回処理(必要ならコマンドバッファ更新リクエスト)
+				nsec nns;
+				nns -= start;
+				timestamp.delta = nns - timestamp.uptime;
+				timestamp.uptime = nns;
+				Tick(timestamp);
+			}
+		}
+
+
+
 	}
 }
