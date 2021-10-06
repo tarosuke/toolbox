@@ -300,7 +300,7 @@ namespace TB {
 			// VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 			beginInfo.pInheritanceInfo = nullptr;
 
-			Posit(!vkBeginCommandBuffer(td.commandBuffer, &beginInfo));
+			Posit(!vkBeginCommandBuffer(cb, &beginInfo));
 
 			VkRenderPassBeginInfo renderPassInfo{};
 			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -327,7 +327,7 @@ namespace TB {
 
 		TD::RenderPass::~RenderPass() {
 			vkCmdEndRenderPass(cb);
-			vkEndCommandBuffer(td.commandBuffer);
+			vkEndCommandBuffer(cb);
 		}
 
 		void TD::RenderPass::Draw(
@@ -349,10 +349,9 @@ namespace TB {
 			Posit(redraw); //描画するものがない
 			for (nsec ns; keep;) {
 				{
-					RenderPass rp(*this, NextFramebuffer());
-
 					// 必要であれば再描画
 					if (redraw) {
+						RenderPass rp(*this, NextFramebuffer());
 						for (auto t : targets) {
 							(*t).Draw();
 						}
