@@ -178,16 +178,16 @@ namespace TB {
 						0.0f, // Optional
 					},
 			};
-			VkDynamicState dynamicStates[] = {
-				VK_DYNAMIC_STATE_VIEWPORT,
-				VK_DYNAMIC_STATE_LINE_WIDTH};
-			VkPipelineDynamicStateCreateInfo dynamicState{
-				.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
-				.pNext = 0,
-				.flags = 0,
-				.dynamicStateCount = 2,
-				.pDynamicStates = dynamicStates,
-			};
+			// VkDynamicState dynamicStates[] = {
+			// 	VK_DYNAMIC_STATE_VIEWPORT,
+			// 	VK_DYNAMIC_STATE_LINE_WIDTH};
+			// VkPipelineDynamicStateCreateInfo dynamicState{
+			// 	.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+			// 	.pNext = 0,
+			// 	.flags = 0,
+			// 	.dynamicStateCount = 0,
+			// 	.pDynamicStates = dynamicStates,
+			// };
 			VkGraphicsPipelineCreateInfo pipelineInfo{
 				.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
 				.pNext = 0,
@@ -202,7 +202,7 @@ namespace TB {
 				.pMultisampleState = &multisampling,
 				.pDepthStencilState = nullptr, // Optional
 				.pColorBlendState = &colorBlending,
-				.pDynamicState = &dynamicState, // Optional
+				.pDynamicState = 0, //&dynamicState, // Optional
 
 				.layout = pipelineLayout,
 
@@ -356,6 +356,7 @@ namespace TB {
 						for (auto t : targets) {
 							(*t).Draw();
 						}
+						rp.Draw(0, 3);
 						redraw = false;
 					}
 				}
