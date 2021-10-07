@@ -127,12 +127,12 @@ namespace TB {
 					nullptr,
 					&swapchainImageViews[n]));
 			}
-			Init();
-		}
 
-		void XTD::FillFramebuffers(std::vector<VkFramebuffer>& fb) {
-			fb.resize(swapchainImageViews.size());
-			for (unsigned n(0); n < fb.size(); ++n) {
+			// RenderPassなどを作ってくる
+			Init();
+
+			framebuffers.resize(swapchainImageViews.size());
+			for (unsigned n(0); n < framebuffers.size(); ++n) {
 				VkImageView attachments[] = {swapchainImageViews[n]};
 
 				VkFramebufferCreateInfo framebufferInfo{};
@@ -149,19 +149,20 @@ namespace TB {
 					instance,
 					&framebufferInfo,
 					nullptr,
-					&fb[n]));
+					&framebuffers[n]));
 			}
 		}
 
-		void XTD::Prepare() {
+		VkFramebuffer XTD::NextFramebuffer() {
 			// imageIndex, commandIndexを更新
-			vkAcquireNextImageKHR(
+			Posit(!vkAcquireNextImageKHR(
 				instance,
 				swapchain,
 				UINT64_MAX,
 				imageAvailableSemaphore,
 				VK_NULL_HANDLE,
-				&imageIndex);
+				&frameIndex));
+			return framebuffers[frameIndex];
 		}
 
 		void XTD::Draw(const M44& view) {
@@ -176,7 +177,7 @@ namespace TB {
 			submitInfo.pWaitSemaphores = waitSemaphores;
 			submitInfo.pWaitDstStageMask = waitStages;
 			submitInfo.commandBufferCount = 1;
-			submitInfo.pCommandBuffers = &commandBuffers[imageIndex];
+			submitInfo.pCommandBuffers = &commandBuffer;
 			VkSemaphore signalSemaphores[] = {renderFinishedSemaphore};
 			submitInfo.signalSemaphoreCount = 1;
 			submitInfo.pSignalSemaphores = signalSemaphores;
@@ -186,23 +187,26 @@ namespace TB {
 			VkPresentInfoKHR presentInfo{};
 			presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
-			presentInfo.waitSemaphoreCount = 0;
-			presentInfo.pWaitSemaphores = nullptr;
+			presentInfo.waitSemaphoreCount = 1;
+			presentInfo.pWaitSemaphores = signalSemaphores;
 
 			VkSwapchainKHR swapChains[] = {swapchain};
 			presentInfo.swapchainCount = 1;
 			presentInfo.pSwapchains = swapChains;
-			presentInfo.pImageIndices = &imageIndex;
+			presentInfo.pImageIndices = &frameIndex;
 
 			presentInfo.pResults = nullptr; // Optional
 
-			vkQueuePresentKHR(instance, &presentInfo);
-			vkQueueWaitIdle(instance);
+			Posit(!vkQueuePresentKHR(instance, &presentInfo));
+			Posit(!vkQueueWaitIdle(instance));
 		}
 
 		XTD::~XTD() {
 			vkDeviceWaitIdle(instance);
 
+			for (auto f : framebuffers) {
+				vkDestroyFramebuffer(instance, f, nullptr);
+			}
 			for (auto imageView : swapchainImageViews) {
 				vkDestroyImageView(instance, imageView, nullptr);
 			}

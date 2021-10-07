@@ -40,13 +40,65 @@ namespace TB {
 				char* fragment;
 			};
 
+			/***** 描画物のインターフェイス
+			 */
+			struct Object : public List<Object>::Node {
+				virtual void Draw() = 0;
+				virtual bool IsTransparent() { return false; };
+			};
+
+			// 物体の登録(登録後は再描画)
+			void AddHead(Object& o) {
+				head.Add(o);
+				redraw = true;
+			};
+			void AddExternal(Object& o) {
+				external.Add(o);
+				redraw = true;
+			};
+			void AddScenery(Object& o) {
+				scenery.Add(o);
+				redraw = true;
+			};
+
+
+			void Cyclic();
+
+
+		protected:
+			Instance instance;
+			VkFormat format;
+			VkExtent2D extent;
+			VkRenderPass renderPass;
+
+			TD(const M44& proj, const Shaders* shaders = 0);
+			~TD();
+			void Init();
+
+			// 描画処理
+			VkSemaphore imageAvailableSemaphore;
+			VkSemaphore renderFinishedSemaphore;
+
+			unsigned commandIndex; // アクティブなコマンドバッファ
+			// void Prepare() override;
+			// void Draw(const M44&) final;
+
+			VkCommandBuffer commandBuffer;
+
+
+			virtual VkFramebuffer NextFramebuffer() = 0;
+
+		private:
+			M44 view;
+			M44 model;
+
 			/***** RenderPass
 			 * 指定したコマンドバッファとフレームバッファのセットにコマンドを
 			 * 書き込むためのインフラで、Drawするとコマンドが書き込まれる
 			 */
 			struct RenderPass {
 				RenderPass() = delete;
-				RenderPass(TD&);
+				RenderPass(TD&, VkFramebuffer);
 				~RenderPass();
 				void Draw(
 					unsigned vertexIndex,
@@ -60,43 +112,38 @@ namespace TB {
 				VkCommandBuffer cb;
 			};
 
-		protected:
-			Instance instance;
-			VkFormat format;
-			VkExtent2D extent;
-			VkRenderPass renderPass;
 
-			const M44 projectile;
+			/***** ブレンド方法
+			 */
+			static const VkPipelineColorBlendAttachmentState opaqueBlend;
+			static const VkPipelineColorBlendAttachmentState alphaBlend;
 
-			TD(const M44& proj, const Shaders* shaders = 0);
-			~TD();
-			void Init();
-			virtual void FillFramebuffers(std::vector<VkFramebuffer>&) = 0;
-
-			// 描画処理
-			VkSemaphore imageAvailableSemaphore;
-			VkSemaphore renderFinishedSemaphore;
-
-			unsigned imageIndex; // アクティブなフレームバッファ
-			unsigned commandIndex; // アクティブなコマンドバッファ
-			// void Prepare() override;
-			// void Draw(const M44&) final;
-
-			std::vector<VkCommandBuffer> commandBuffers;
-
-		private:
+			/***** シェーダ他
+			 */
 			VertexShader vertexShader;
 			FragmentShader fragmentShader;
 
 			VkPipelineLayout pipelineLayout;
 			VkPipeline graphicsPipeline;
-			std::vector<VkFramebuffer> framebuffers;
 			VkCommandPool commandPool;
 
-			static const VkPipelineColorBlendAttachmentState opaqueBlend;
-			static const VkPipelineColorBlendAttachmentState alphaBlend;
 
-			void Draw() final;
+			/***** オブジェクトリスト
+			 */
+			struct Target {
+				Target() : modified(false){};
+				void Add(Object& o) {
+					(o.IsTransparent() ? transparent : opaque).Add(o);
+					modified = true;
+				};
+				void Draw() { opaque.Foreach(&Object::Draw); };
+				void Traw() { transparent.Reveach(&Object::Draw); };
+
+			private:
+				List<Object> opaque;
+				List<Object> transparent;
+				bool modified; //コマンド再生成が必要
+			} head, external, scenery;
 		};
 
 
@@ -132,9 +179,10 @@ namespace TB {
 			std::vector<VkImage> swapchainImages;
 			std::vector<VkImageView> swapchainImageViews;
 			VkSurfaceCapabilitiesKHR capabilities;
+			std::vector<VkFramebuffer> framebuffers;
+			uint32_t frameIndex;
 
-			void FillFramebuffers(std::vector<VkFramebuffer>&) final;
-			void Prepare() final;
+			VkFramebuffer NextFramebuffer() final;
 			void Draw(const M44&) final;
 		};
 	};

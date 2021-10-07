@@ -17,6 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <toolbox/td.h>
+#include <toolbox/exception.h>
 
 
 
@@ -31,25 +32,4 @@ namespace TB {
 	}
 
 
-	void TD::Run() {
-		const nsec start;
-		keep = true;
-		for (nsec ns; keep;) {
-			// 描画準備(フレームバッファやコマンドバッファの確定みたいな)
-			Prepare();
-
-			// 周回処理(必要ならコマンドバッファを更新)
-			nsec nns;
-			nns -= start;
-			timestamp.delta = nns - timestamp.uptime;
-			timestamp.uptime = nns;
-			Tick(timestamp);
-
-			// コマンドバッファ更新(仮)
-			Draw();
-
-			// 描画
-			Draw(view);
-		}
-	}
 }
