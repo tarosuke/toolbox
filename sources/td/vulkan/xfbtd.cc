@@ -187,8 +187,8 @@ namespace TB {
 			VkPresentInfoKHR presentInfo{};
 			presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
-			presentInfo.waitSemaphoreCount = 0;
-			presentInfo.pWaitSemaphores = nullptr;
+			presentInfo.waitSemaphoreCount = 1;
+			presentInfo.pWaitSemaphores = signalSemaphores;
 
 			VkSwapchainKHR swapChains[] = {swapchain};
 			presentInfo.swapchainCount = 1;
