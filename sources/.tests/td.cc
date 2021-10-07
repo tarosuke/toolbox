@@ -15,7 +15,7 @@ int main() {
 			TD(unsigned w, unsigned h, const TB::TD::M44& m) : XTD(w, h, m){};
 			void Tick(const Timestamp& tick) {
 				if (TB::sec(5) < tick.uptime) {
-					Quit();
+					// Quit();
 				}
 			};
 
