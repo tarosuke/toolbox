@@ -7,7 +7,7 @@
 
 
 int main() {
-	// ManualTest;
+	ManualTest;
 
 	try {
 		// 初期設定
