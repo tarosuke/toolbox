@@ -349,10 +349,11 @@ namespace TB {
 			redraw = true; // NOTE:描画内容を作るまでの仮設定
 			Posit(redraw); //描画するものがない
 			for (nsec ns; keep;) {
+				VkFramebuffer f(NextFramebuffer());
 				{
 					// 必要であれば再描画
 					if (redraw) {
-						RenderPass rp(*this, NextFramebuffer());
+						RenderPass rp(*this, f);
 						for (auto t : targets) {
 							(*t).Draw();
 						}
