@@ -311,7 +311,7 @@ namespace TB {
 			renderPassInfo.renderArea.offset = {0, 0};
 			renderPassInfo.renderArea.extent = td.extent;
 
-			VkClearValue clearColor = {{{.0f, 0.0f, 0.0f, 1.0f}}};
+			VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
 			renderPassInfo.clearValueCount = 1;
 			renderPassInfo.pClearValues = &clearColor;
 
@@ -349,10 +349,11 @@ namespace TB {
 			redraw = true; // NOTE:描画内容を作るまでの仮設定
 			Posit(redraw); //描画するものがない
 			for (nsec ns; keep;) {
+				VkFramebuffer f(NextFramebuffer());
 				{
 					// 必要であれば再描画
 					if (redraw) {
-						RenderPass rp(*this, NextFramebuffer());
+						RenderPass rp(*this, f);
 						for (auto t : targets) {
 							(*t).Draw();
 						}
