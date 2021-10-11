@@ -358,7 +358,7 @@ namespace TB {
 							(*t).Draw();
 						}
 						rp.Draw(0, 3);
-						redraw = false;
+						// redraw = false;
 					}
 				}
 
