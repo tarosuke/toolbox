@@ -11,15 +11,15 @@
 MAKECMDGOALS ?= RELEASE
 ifeq ($(MAKECMDGOALS), RELEASE)
 TARGETDIR := RELEASE
-COPTS := -O3 -DNDEBUG -Wno-stringop-overflow
+COPTS += -O3 -DNDEBUG -Wno-stringop-overflow
 endif
 ifeq ($(MAKECMDGOALS), DEBUG)
 TARGETDIR := DEBUG
-COPTS := -O0 -g
+COPTS += -O0 -g
 endif
 ifeq ($(MAKECMDGOALS), COVERAGE)
 TARGETDIR := COVERAGE
-COPTS := -g -coverage
+COPTS += -g -coverage
 endif
 
 COPTS += -Wall -Werror -Iinclude
@@ -46,7 +46,7 @@ objs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(mods)))
 deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
 
 # オブジェクトファイルの分類
-testPlaces := $(TARGETDIR)/.mtests/% $(TARGETDIR)/.tests/%
+testPlaces := $(TARGETDIR)/.tests/%
 nobjs := $(filter-out $(testPlaces), $(objs))
 tobjs := $(filter $(testPlaces), $(objs))
 tmods := $(addprefix $(TARGETDIR)/, $(filter .tests/%, $(mods)))
@@ -97,13 +97,12 @@ $(TARGETDIR)/$(target): makefile $(nobjs)
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
 	@ar rc $@ $(nobjs)
-else
-	@echo " LD $@"
-	@gcc -o $(executable) $(nobjs) $(EXLIBS)
-endif
 	@rm -f $(target)
 	@ln -s $(TARGETDIR)/$(target) $(target)
-
+else
+	@echo " LD $@"
+	@gcc -o $(TARGETDIR)/$(target) $(nobjs) $(EXLIBS)
+endif
 
 clean:
 	rm -rf RELEASE DEBUG COVERAGE .builds *.gcov
