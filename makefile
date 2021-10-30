@@ -33,6 +33,11 @@ EXLIBS += -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgco
 target ?= $(shell echo $$PWD | sed s!.*/!! )
 
 
+# targetがtoolbox.aでないのでtoolbox/includeをincludeパスに追加
+ifneq ($(target)),toolbox.a)
+COPTS += -Itoolbox/include
+endif
+
 
 
 ############################################################ FILE RECOGNITIONS
