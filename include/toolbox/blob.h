@@ -1,5 +1,5 @@
 /************************************************************************ BLOB
- *  Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+ *  Copyright (C) 2021,2022 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -42,3 +42,5 @@
 	extern const char BlobStart(path)[];                                       \
 	extern const char BlobEnd(path)[];                                         \
 	extern const char BlobSize(path)[];
+#define Blob(path)                                                             \
+	{ BlobStart(path), BlobEnd(path) }
