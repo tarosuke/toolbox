@@ -24,9 +24,18 @@
 
 
 namespace TB {
-	TimeBase::TimeBase() {
+	void TimeBase::Update() {
 		timespec ts; //<-こいつを使いたくないがためだけに作った
 		clock_gettime(CLOCK_BOOTTIME, &ts);
-		body = nsec(ts.tv_nsec) + sec(ts.tv_sec);
+		*this = (u64)(nsec(ts.tv_nsec) + sec(ts.tv_sec));
+	}
+
+
+	void Timestamp::Update() {
+		nsec nns;
+		nns.Update();
+		nns -= start;
+		delta = nns - uptime;
+		uptime = nns;
 	}
 }

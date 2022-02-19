@@ -1,6 +1,6 @@
 /************************************************************************* time
  * 時間関係のインフラ
- * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2021, 2022 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,18 +25,21 @@
 namespace TB {
 
 	struct TimeBase : public Type<u64> {
-		TimeBase();
+		TimeBase(){};
+		void Update(); // 現在時刻取得
 
 	protected:
 		TimeBase(u64 ns) : Type<u64>(ns){};
-		TimeBase(const Type<u64>& t) : Type<u64>(t){};
 	};
 
 	template <unsigned S> struct Time : public TimeBase {
 		Time(){};
 		Time(u64 init) : TimeBase(init * S){};
-		Time(const Type<u64>& t) : TimeBase(t){};
 		operator u64() const { return body / S; };
+		const Time& operator=(const ::TB::Type<u64>& t) {
+			*this = t;
+			return *this;
+		};
 	};
 
 	using sec = Time<1000000000>;
@@ -44,4 +47,15 @@ namespace TB {
 	using usec = Time<1000>;
 	using nsec = Time<1>;
 
+
+	// タイムスタンプ管理
+	struct Timestamp {
+		Timestamp() : uptime(1), delta(1){};
+		void Update();
+		nsec uptime;
+		nsec delta;
+
+	private:
+		nsec start;
+	};
 }
