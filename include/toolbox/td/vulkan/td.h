@@ -36,7 +36,7 @@ namespace TB {
 		 * 神クラスとか思うかも知れないが分けても使うのが面倒になるだけだろう
 		 */
 		struct TD : public TB::TD {
-			struct Shaders {
+			struct Layer {
 				char* vertex;
 				char* fragment;
 			};
@@ -72,7 +72,7 @@ namespace TB {
 			VkExtent2D extent;
 			VkRenderPass renderPass;
 
-			TD(const M44& proj, const Shaders* shaders = 0);
+			TD(const M44& proj, const Layer* shaders = 0);
 			~TD();
 			void Init();
 
@@ -152,7 +152,7 @@ namespace TB {
 		// フレームバッファ版TD
 		struct FBTD : public TD {
 			FBTD(
-				const M44& proj, const S2& viewport, const Shaders* shaders = 0)
+				const M44& proj, const S2& viewport, const Layer* shaders = 0)
 				: TD(proj, shaders) {
 				extent = {viewport[0], viewport[1]};
 			};
@@ -167,7 +167,7 @@ namespace TB {
 			XTD(unsigned width,
 				unsigned height,
 				const M44& proj,
-				const Shaders* shaders = 0);
+				const Layer* shaders = 0);
 			~XTD();
 
 		private:

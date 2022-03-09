@@ -26,7 +26,7 @@
 namespace TB {
 	namespace VK {
 
-		TD::TD(const M44& proj, const Shaders* shaders)
+		TD::TD(const M44& proj, const Layer* shaders)
 			: TB::TD(proj),
 			  vertexShader(
 				  shaders && (*shaders).vertex ? (*shaders).vertex : 0),

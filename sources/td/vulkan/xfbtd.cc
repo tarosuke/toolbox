@@ -33,7 +33,7 @@ namespace TB {
 			unsigned width,
 			unsigned height,
 			const M44& proj,
-			const Shaders* shaders)
+			const Layer* shaders)
 			: TD(proj, shaders), window(width, height) {
 			auto attr(window.GetAttributes());
 
