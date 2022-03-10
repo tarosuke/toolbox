@@ -34,7 +34,7 @@ namespace TB {
 				  shaders && (*shaders).fragment ? (*shaders).fragment : 0) {}
 
 
-		void TD::Init() {
+		void TD::BuildPipeline(VkExtent2D extent) {
 			/***** フレームバッファまで
 			 */
 			VkPipelineLayoutCreateInfo info{
@@ -219,7 +219,8 @@ namespace TB {
 				&pipelineInfo,
 				nullptr,
 				&graphicsPipeline));
-
+		}
+		void TD::BuildCommanBuffer() {
 			/***** コマンドバッファ関連
 			 */
 			VkCommandPoolCreateInfo poolInfo{};

@@ -74,7 +74,12 @@ namespace TB {
 
 			TD(const M44& proj, const Layer* shaders = 0);
 			~TD();
-			void Init();
+			void Init() {
+				BuildPipeline(extent);
+				BuildCommanBuffer();
+			};
+			void BuildPipeline(VkExtent2D);
+			void BuildCommanBuffer();
 
 			// 描画処理
 			VkSemaphore imageAvailableSemaphore;
@@ -126,6 +131,7 @@ namespace TB {
 
 			VkPipelineLayout pipelineLayout;
 			VkPipeline graphicsPipeline;
+
 			VkCommandPool commandPool;
 
 
@@ -151,8 +157,7 @@ namespace TB {
 
 		// フレームバッファ版TD
 		struct FBTD : public TD {
-			FBTD(
-				const M44& proj, const S2& viewport, const Layer* shaders = 0)
+			FBTD(const M44& proj, const S2& viewport, const Layer* shaders = 0)
 				: TD(proj, shaders) {
 				extent = {viewport[0], viewport[1]};
 			};
