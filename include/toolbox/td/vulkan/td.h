@@ -98,14 +98,14 @@ namespace TB {
 			M44 view;
 			M44 model;
 
-			/***** RenderPass
+			/***** Binder
 			 * 指定したコマンドバッファとフレームバッファのセットにコマンドを
 			 * 書き込むためのインフラで、Drawするとコマンドが書き込まれる
 			 */
-			struct RenderPass {
-				RenderPass() = delete;
-				RenderPass(TD&, VkFramebuffer);
-				~RenderPass();
+			struct Binder {
+				Binder() = delete;
+				Binder(TD&, VkFramebuffer);
+				~Binder();
 				void Draw(
 					unsigned vertexIndex,
 					unsigned vertexes,
