@@ -75,9 +75,11 @@ namespace TB {
 			TD(const M44& proj);
 			~TD();
 			void Init() {
+				BuildRenderPass();
 				BuildPipeline(extent);
 				BuildCommanBuffer();
 			};
+			void BuildRenderPass();
 			void BuildPipeline(VkExtent2D);
 			void BuildCommanBuffer();
 
@@ -168,9 +170,7 @@ namespace TB {
 
 		// X窓フレームバッファ版TD
 		struct XTD : public TD {
-			XTD(unsigned width,
-				unsigned height,
-				const M44& proj);
+			XTD(unsigned width, unsigned height, const M44& proj);
 			~XTD();
 
 		private:

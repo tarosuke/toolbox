@@ -30,25 +30,7 @@ namespace TB {
 			: TB::TD(proj), vertexShader(0), fragmentShader(0) {}
 
 
-		void TD::BuildPipeline(VkExtent2D extent) {
-			/***** フレームバッファまで
-			 */
-			VkPipelineLayoutCreateInfo info{
-				.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-				.pNext = 0,
-				.flags = 0,
-				.setLayoutCount = 0, // Optional
-				.pSetLayouts = nullptr, // Optional
-				.pushConstantRangeCount = 0, // Optional
-				.pPushConstantRanges = nullptr, // Optional
-			};
-			Posit(!vkCreatePipelineLayout(
-				instance,
-				&info,
-				nullptr,
-				&pipelineLayout));
-
-
+		void TD::BuildRenderPass() {
 			VkAttachmentDescription colorAttachment{
 				.flags = 0,
 				.format = format,
@@ -84,7 +66,25 @@ namespace TB {
 				&renderPassInfo,
 				nullptr,
 				&renderPass));
+		}
 
+		void TD::BuildPipeline(VkExtent2D extent) {
+			/***** フレームバッファまで
+			 */
+			VkPipelineLayoutCreateInfo info{
+				.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+				.pNext = 0,
+				.flags = 0,
+				.setLayoutCount = 0, // Optional
+				.pSetLayouts = nullptr, // Optional
+				.pushConstantRangeCount = 0, // Optional
+				.pPushConstantRanges = nullptr, // Optional
+			};
+			Posit(!vkCreatePipelineLayout(
+				instance,
+				&info,
+				nullptr,
+				&pipelineLayout));
 
 			VkPipelineShaderStageCreateInfo shaderStages[] = {
 				vertexShader,
