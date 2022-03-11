@@ -1,5 +1,5 @@
 /********************************************************** 3D -> ThreeD -> TD
- *  Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+ *  Copyright (C) 2021,2022 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,12 +26,8 @@
 namespace TB {
 	namespace VK {
 
-		TD::TD(const M44& proj, const Layer* shaders)
-			: TB::TD(proj),
-			  vertexShader(
-				  shaders && (*shaders).vertex ? (*shaders).vertex : 0),
-			  fragmentShader(
-				  shaders && (*shaders).fragment ? (*shaders).fragment : 0) {}
+		TD::TD(const M44& proj)
+			: TB::TD(proj), vertexShader(0), fragmentShader(0) {}
 
 
 		void TD::BuildPipeline(VkExtent2D extent) {

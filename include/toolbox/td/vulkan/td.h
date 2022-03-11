@@ -1,5 +1,5 @@
 /********************************************************** 3D -> ThreeD -> TD
- *  Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+ *  Copyright (C) 2021, 2022 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -72,7 +72,7 @@ namespace TB {
 			VkExtent2D extent;
 			VkRenderPass renderPass;
 
-			TD(const M44& proj, const Layer* shaders = 0);
+			TD(const M44& proj);
 			~TD();
 			void Init() {
 				BuildPipeline(extent);
@@ -157,8 +157,7 @@ namespace TB {
 
 		// フレームバッファ版TD
 		struct FBTD : public TD {
-			FBTD(const M44& proj, const S2& viewport, const Layer* shaders = 0)
-				: TD(proj, shaders) {
+			FBTD(const M44& proj, const S2& viewport) : TD(proj) {
 				extent = {viewport[0], viewport[1]};
 			};
 
@@ -171,8 +170,7 @@ namespace TB {
 		struct XTD : public TD {
 			XTD(unsigned width,
 				unsigned height,
-				const M44& proj,
-				const Layer* shaders = 0);
+				const M44& proj);
 			~XTD();
 
 		private:
