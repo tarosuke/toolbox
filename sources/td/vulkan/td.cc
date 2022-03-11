@@ -26,8 +26,7 @@
 namespace TB {
 	namespace VK {
 
-		TD::TD(const M44& proj)
-			: TB::TD(proj), vertexShader(0), fragmentShader(0) {}
+		TD::TD(const M44& proj) : TB::TD(proj) {}
 
 
 		void TD::BuildRenderPass() {
@@ -68,7 +67,8 @@ namespace TB {
 				&renderPass));
 		}
 
-		void TD::BuildPipeline(VkExtent2D extent) {
+		void
+		TD::Layer::BuildPipeline(VkExtent2D extent, VkRenderPass renderPass) {
 			/***** フレームバッファまで
 			 */
 			VkPipelineLayoutCreateInfo info{
@@ -254,13 +254,16 @@ namespace TB {
 		}
 
 
+		TD::Layer::~Layer() {
+			vkDestroyPipeline(instance, graphicsPipeline, nullptr);
+			vkDestroyPipelineLayout(instance, pipelineLayout, nullptr);
+		}
+
 
 		TD::~TD() {
 			vkDestroySemaphore(instance, renderFinishedSemaphore, nullptr);
 			vkDestroySemaphore(instance, imageAvailableSemaphore, nullptr);
 			vkDestroyCommandPool(instance, commandPool, nullptr);
-			vkDestroyPipeline(instance, graphicsPipeline, nullptr);
-			vkDestroyPipelineLayout(instance, pipelineLayout, nullptr);
 			vkDestroyRenderPass(instance, renderPass, nullptr);
 		}
 
@@ -289,7 +292,7 @@ namespace TB {
 				VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
 		};
 
-		TD::Binder::Binder(TD& td, VkFramebuffer fb)
+		TD::Binder::Binder(TD& td, VkFramebuffer fb, Layer& layer)
 			: td(td), fb(fb), cb(td.commandBuffer) {
 			VkCommandBufferBeginInfo beginInfo{};
 			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -317,10 +320,7 @@ namespace TB {
 				&renderPassInfo,
 				VK_SUBPASS_CONTENTS_INLINE);
 
-			vkCmdBindPipeline(
-				cb,
-				VK_PIPELINE_BIND_POINT_GRAPHICS,
-				td.graphicsPipeline);
+			vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, layer);
 		}
 
 		TD::Binder::~Binder() {
@@ -350,7 +350,7 @@ namespace TB {
 				{
 					// 必要であれば再描画
 					if (redraw) {
-						Binder rp(*this, f);
+						Binder rp(*this, f, layer);
 						for (auto t : targets) {
 							(*t).Draw();
 						}

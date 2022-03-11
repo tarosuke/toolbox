@@ -37,9 +37,20 @@ namespace TB {
 		 */
 		struct TD : public TB::TD {
 			struct Layer {
-				char* vertex;
-				char* fragment;
-			};
+				Layer() = default;
+				void BuildPipeline(VkExtent2D, VkRenderPass);
+				~Layer();
+
+				operator VkPipeline&() { return graphicsPipeline; };
+
+			private:
+				Instance instance;
+				VertexShader vertexShader;
+				FragmentShader fragmentShader;
+
+				VkPipelineLayout pipelineLayout;
+				VkPipeline graphicsPipeline;
+			} layer;
 
 			/***** 描画物のインターフェイス
 			 */
@@ -76,11 +87,10 @@ namespace TB {
 			~TD();
 			void Init() {
 				BuildRenderPass();
-				BuildPipeline(extent);
+				layer.BuildPipeline(extent, renderPass);
 				BuildCommanBuffer();
 			};
 			void BuildRenderPass();
-			void BuildPipeline(VkExtent2D);
 			void BuildCommanBuffer();
 
 			// 描画処理
@@ -106,7 +116,7 @@ namespace TB {
 			 */
 			struct Binder {
 				Binder() = delete;
-				Binder(TD&, VkFramebuffer);
+				Binder(TD&, VkFramebuffer, Layer&);
 				~Binder();
 				void Draw(
 					unsigned vertexIndex,
@@ -126,14 +136,8 @@ namespace TB {
 			static const VkPipelineColorBlendAttachmentState opaqueBlend;
 			static const VkPipelineColorBlendAttachmentState alphaBlend;
 
-			/***** シェーダ他
+			/***** コマンド他
 			 */
-			VertexShader vertexShader;
-			FragmentShader fragmentShader;
-
-			VkPipelineLayout pipelineLayout;
-			VkPipeline graphicsPipeline;
-
 			VkCommandPool commandPool;
 
 
