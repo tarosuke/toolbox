@@ -192,7 +192,7 @@ namespace TB {
 			Posit(redraw); //描画するものがない
 			for (nsec ns; keep;) {
 				VkFramebuffer f(NextFramebuffer());
-				{
+				for (auto&& layer : layers) {
 					// 必要であれば再描画
 					if (redraw) {
 						Binder rp(*this, f, layer);

@@ -23,8 +23,7 @@
 
 namespace TB {
 	namespace VK {
-		void
-		TD::Layer::BuildPipeline(VkExtent2D extent, VkRenderPass renderPass) {
+		TD::Layer::Layer(VkExtent2D extent, VkRenderPass renderPass) {
 			/***** フレームバッファまで
 			 */
 			VkPipelineLayoutCreateInfo info{

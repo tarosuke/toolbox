@@ -26,6 +26,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include <vector>
+
 
 
 namespace TB {
@@ -37,8 +39,8 @@ namespace TB {
 		 */
 		struct TD : public TB::TD {
 			struct Layer {
-				Layer() = default;
-				void BuildPipeline(VkExtent2D, VkRenderPass);
+				Layer() = delete;
+				Layer(VkExtent2D, VkRenderPass);
 				~Layer();
 
 				operator VkPipeline&() { return graphicsPipeline; };
@@ -50,7 +52,8 @@ namespace TB {
 
 				VkPipelineLayout pipelineLayout;
 				VkPipeline graphicsPipeline;
-			} layer;
+			};
+			std::vector<Layer> layers;
 
 			/***** 描画物のインターフェイス
 			 */
@@ -87,7 +90,7 @@ namespace TB {
 			~TD();
 			void Init() {
 				BuildRenderPass();
-				layer.BuildPipeline(extent, renderPass);
+				layers.emplace_back(extent, renderPass);
 				BuildCommanBuffer();
 			};
 			void BuildRenderPass();
