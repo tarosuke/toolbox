@@ -38,22 +38,34 @@ namespace TB {
 		 * 神クラスとか思うかも知れないが分けても使うのが面倒になるだけだろう
 		 */
 		struct TD : public TB::TD {
-			struct Layer {
+			struct Layer : public TB::List<Layer>::Node {
+				struct Def {
+					std::vector<Shader::Def> shaderDefs;
+				};
+
 				Layer() = delete;
-				Layer(VkExtent2D, VkRenderPass);
+				Layer(
+					VkExtent2D, VkRenderPass, const std::vector<Shader::Def>&);
 				~Layer();
 
 				operator VkPipeline&() { return graphicsPipeline; };
 
+				static void NewLayers(
+					TB::List<Layer>& storeTo,
+					VkExtent2D,
+					VkRenderPass,
+					const std::vector<Def>* = 0);
+
 			private:
 				Instance instance;
-				VertexShader vertexShader;
-				FragmentShader fragmentShader;
+				TB::List<Shader> shaders;
 
 				VkPipelineLayout pipelineLayout;
 				VkPipeline graphicsPipeline;
+
+				static const std::vector<Def> defaultLayerDefs;
 			};
-			std::vector<Layer> layers;
+			TB::List<Layer> layers;
 
 			/***** 描画物のインターフェイス
 			 */
@@ -90,7 +102,7 @@ namespace TB {
 			~TD();
 			void Init() {
 				BuildRenderPass();
-				layers.emplace_back(extent, renderPass);
+				Layer::NewLayers(layers, extent, renderPass);
 				BuildCommanBuffer();
 			};
 			void BuildRenderPass();

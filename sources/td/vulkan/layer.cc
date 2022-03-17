@@ -18,12 +18,62 @@
  */
 #include <toolbox/td/vulkan/td.h>
 #include <toolbox/exception.h>
+#include <toolbox/blob.h>
+
+
+#define vertPath td_vulkan_test_vert_spv
+#define fragPath td_vulkan_test_frag_spv
+
+BlobDeclare(vertPath);
+BlobDeclare(fragPath);
 
 
 
 namespace TB {
 	namespace VK {
-		TD::Layer::Layer(VkExtent2D extent, VkRenderPass renderPass) {
+
+		/***** デフォルトのレイヤ定義
+		 */
+		const std::vector<TD::Layer::Def> TD::Layer::defaultLayerDefs = {
+			// scenery
+			{{{VK_SHADER_STAGE_VERTEX_BIT, Blob(vertPath)},
+			  {VK_SHADER_STAGE_FRAGMENT_BIT, Blob(fragPath)}}},
+		};
+
+
+
+		/***** defsに従いレイヤをまとめて生成
+		 * defsが0のときはデフォルトで
+		 */
+		void TD::Layer::NewLayers(
+			TB::List<Layer>& storeTo,
+			VkExtent2D extent,
+			VkRenderPass renderPass,
+			const std::vector<Def>* defs) {
+			// Layerの生成
+			for (auto&& d : defs ? *defs : defaultLayerDefs) {
+				auto const l(new Layer(extent, renderPass, d.shaderDefs));
+				Posit(l);
+				storeTo.Add(*l);
+			}
+		};
+
+
+		TD::Layer::Layer(
+			VkExtent2D extent,
+			VkRenderPass renderPass,
+			const std::vector<Shader::Def>& defs)
+			: Node(true) {
+			/***** シェーダ生成
+			 */
+			std::vector<VkPipelineShaderStageCreateInfo> shadersInfo;
+			for (auto&& d : defs) {
+				Shader* const s(new Shader(d));
+				Posit(s);
+				shaders.Add(*s);
+				shadersInfo.push_back(*s);
+			}
+
 			/***** フレームバッファまで
 			 */
 			VkPipelineLayoutCreateInfo info{
@@ -41,10 +91,6 @@ namespace TB {
 				nullptr,
 				&pipelineLayout));
 
-			VkPipelineShaderStageCreateInfo shaderStages[] = {
-				vertexShader,
-				fragmentShader,
-			};
 			VkPipelineVertexInputStateCreateInfo vertexInputInfo{
 				.sType =
 					VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
@@ -143,8 +189,8 @@ namespace TB {
 				.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
 				.pNext = 0,
 				.flags = 0,
-				.stageCount = 2,
-				.pStages = shaderStages,
+				.stageCount = (unsigned)shadersInfo.size(),
+				.pStages = shadersInfo.data(),
 
 				.pVertexInputState = &vertexInputInfo,
 				.pInputAssemblyState = &inputAssembly,

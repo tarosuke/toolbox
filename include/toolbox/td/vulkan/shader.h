@@ -1,5 +1,5 @@
 /********************************************************** 3D -> ThreeD -> TD
- *  Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+ *  Copyright (C) 2021, 2022 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
 #pragma once
 #include <toolbox/type.h>
 #include <toolbox/td/vulkan/instance.h>
+#include <toolbox/container/list.h>
 
 #include <vulkan/vulkan.h>
 
@@ -27,16 +28,25 @@
 namespace TB {
 	namespace VK {
 
-		struct Shader {
+		struct Shader : public TB::List<Shader>::Node {
+			struct Def {
+				VkShaderStageFlagBits stage;
+				struct {
+					const char* start; // 開始位置
+					const char* end; // 終了位置
+				};
+			};
+
 			Shader() = delete;
 			Shader(
 				VkShaderStageFlagBits stage,
 				const char* path,
 				const char* end = 0);
+			Shader(const Def& def) : Shader(def.stage, def.start, def.end){};
 			~Shader();
 
-			operator VkShaderModule() { return shaderModule; };
-			operator const VkPipelineShaderStageCreateInfo&() {
+			operator VkShaderModule() const { return shaderModule; };
+			operator const VkPipelineShaderStageCreateInfo&() const {
 				return stageInfo;
 			};
 
@@ -44,12 +54,6 @@ namespace TB {
 			Instance instance;
 			VkShaderModule shaderModule;
 			VkPipelineShaderStageCreateInfo stageInfo;
-		};
-		struct VertexShader : public Shader {
-			VertexShader(const char* path = 0);
-		};
-		struct FragmentShader : public Shader {
-			FragmentShader(const char* path = 0);
 		};
 
 	}

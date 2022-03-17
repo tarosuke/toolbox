@@ -1,5 +1,5 @@
 /********************************************************** 3D -> ThreeD -> TD
- *  Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+ *  Copyright (C) 2021, 2022 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,34 +18,15 @@
  */
 #include <toolbox/td/vulkan/shader.h>
 #include <toolbox/exception.h>
-#include <toolbox/blob.h>
 
-
-#define vertPath td_vulkan_test_vert_spv
-#define fragPath td_vulkan_test_frag_spv
-
-BlobDeclare(vertPath);
-BlobDeclare(fragPath);
 
 
 namespace TB {
 	namespace VK {
 
-		VertexShader::VertexShader(const char* path)
-			: Shader(
-				  VK_SHADER_STAGE_VERTEX_BIT,
-				  path ? path : BlobStart(vertPath),
-				  path ? 0 : BlobEnd(vertPath)){};
-
-		FragmentShader::FragmentShader(const char* path)
-			: Shader(
-				  VK_SHADER_STAGE_FRAGMENT_BIT,
-				  path ? path : BlobStart(fragPath),
-				  path ? 0 : BlobEnd(fragPath)){};
-
 		Shader::Shader(
 			VkShaderStageFlagBits stage, const char* start, const char* end)
-			: stageInfo{} {
+			: Node(true), stageInfo{} {
 			VkShaderModuleCreateInfo ci{
 				.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
 				.pNext = 0,
