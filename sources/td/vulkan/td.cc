@@ -182,6 +182,15 @@ namespace TB {
 		}
 
 
+		TD::Layer* TD::FindLayer(const char* name) {
+			for (auto&& l : layers) {
+				if (l->Name() == name) {
+					return l;
+				}
+			}
+			return 0;
+		}
+
 
 		void TD::Cyclic() {
 			Target* const targets[] = {&head, &external, &scenery};

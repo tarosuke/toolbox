@@ -35,8 +35,8 @@ namespace TB {
 		/***** デフォルトのレイヤ定義
 		 */
 		const std::vector<TD::Layer::Def> TD::Layer::defaultLayerDefs = {
-			// scenery
-			{{{VK_SHADER_STAGE_VERTEX_BIT, Blob(vertPath)},
+			{"scenery",
+			 {{VK_SHADER_STAGE_VERTEX_BIT, Blob(vertPath)},
 			  {VK_SHADER_STAGE_FRAGMENT_BIT, Blob(fragPath)}}},
 		};
 
@@ -52,22 +52,19 @@ namespace TB {
 			const std::vector<Def>* defs) {
 			// Layerの生成
 			for (auto&& d : defs ? *defs : defaultLayerDefs) {
-				auto const l(new Layer(extent, renderPass, d.shaderDefs));
+				auto const l(new Layer(extent, renderPass, d));
 				Posit(l);
 				storeTo.Add(*l);
 			}
 		};
 
-
 		TD::Layer::Layer(
-			VkExtent2D extent,
-			VkRenderPass renderPass,
-			const std::vector<Shader::Def>& defs)
-			: Node(true) {
+			VkExtent2D extent, VkRenderPass renderPass, const Def& def)
+			: Node(true), name(def.name) {
 			/***** シェーダ生成
 			 */
 			std::vector<VkPipelineShaderStageCreateInfo> shadersInfo;
-			for (auto&& d : defs) {
+			for (auto&& d : def.shaderDefs) {
 				Shader* const s(new Shader(d));
 				Posit(s);
 				shaders.Add(*s);

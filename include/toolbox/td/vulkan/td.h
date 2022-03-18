@@ -23,6 +23,7 @@
 #include <toolbox/td/vulkan/instance.h>
 #include <toolbox/td/vulkan/shader.h>
 #include <toolbox/geometry/spread.h>
+#include <toolbox/string.h>
 
 #include <vulkan/vulkan.h>
 
@@ -40,12 +41,12 @@ namespace TB {
 		struct TD : public TB::TD {
 			struct Layer : public TB::List<Layer>::Node {
 				struct Def {
+					const char* name;
 					std::vector<Shader::Def> shaderDefs;
 				};
 
 				Layer() = delete;
-				Layer(
-					VkExtent2D, VkRenderPass, const std::vector<Shader::Def>&);
+				Layer(VkExtent2D, VkRenderPass, const Def&);
 				~Layer();
 
 				operator VkPipeline&() { return graphicsPipeline; };
@@ -55,15 +56,17 @@ namespace TB {
 					VkExtent2D,
 					VkRenderPass,
 					const std::vector<Def>* = 0);
+				const TB::String& Name() { return name; };
 
 			private:
+				static const std::vector<Def> defaultLayerDefs;
 				Instance instance;
 				TB::List<Shader> shaders;
 
 				VkPipelineLayout pipelineLayout;
 				VkPipeline graphicsPipeline;
 
-				static const std::vector<Def> defaultLayerDefs;
+				const TB::String name;
 			};
 			TB::List<Layer> layers;
 
@@ -89,6 +92,14 @@ namespace TB {
 			};
 
 
+			/***** 名前でレイヤを探す
+			 */
+			Layer* FindLayer(const char* name);
+
+
+			/***** 周回処理
+			 * NOTE: ::TDへ移動予定
+			 */
 			void Cyclic();
 
 

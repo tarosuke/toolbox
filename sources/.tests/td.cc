@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <assert.h>
 
 
 
@@ -23,6 +24,10 @@ int main() {
 		} td(200, 200, TB::TD::Frustum(0.01, 0.01, 0.01, 100000));
 
 		// ここいらでオブジェクトをtdへ登録
+		auto* const layer(td.FindLayer("scenery"));
+		assert(layer);
+
+
 		// TB::VK::TD::Object object;
 		// td.AddScenery(object);
 
