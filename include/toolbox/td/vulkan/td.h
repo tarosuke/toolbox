@@ -23,6 +23,7 @@
 #include <toolbox/td/vulkan/instance.h>
 #include <toolbox/td/vulkan/shader.h>
 #include <toolbox/geometry/spread.h>
+#include <toolbox/string.h>
 
 #include <vulkan/vulkan.h>
 
@@ -38,14 +39,24 @@ namespace TB {
 		 * 神クラスとか思うかも知れないが分けても使うのが面倒になるだけだろう
 		 */
 		struct TD : public TB::TD {
+			/***** 描画物のインターフェイス
+			 */
+			struct Object : public List<Object>::Node {
+				virtual void Draw(){};
+				virtual bool IsTransparent() { return false; };
+			};
+
+			/***** 描画レイヤ
+			 * 実質的にShaderとObjectのセット
+			 */
 			struct Layer : public TB::List<Layer>::Node {
 				struct Def {
+					const char* name;
 					std::vector<Shader::Def> shaderDefs;
 				};
 
 				Layer() = delete;
-				Layer(
-					VkExtent2D, VkRenderPass, const std::vector<Shader::Def>&);
+				Layer(VkExtent2D, VkRenderPass, const Def&);
 				~Layer();
 
 				operator VkPipeline&() { return graphicsPipeline; };
@@ -55,40 +66,35 @@ namespace TB {
 					VkExtent2D,
 					VkRenderPass,
 					const std::vector<Def>* = 0);
+				const TB::String& Name() { return name; };
+
+				void Add(Object& o) { objects.Add(o); };
+				void Draw(){};
 
 			private:
+				static const std::vector<Def> defaultLayerDefs;
 				Instance instance;
 				TB::List<Shader> shaders;
 
 				VkPipelineLayout pipelineLayout;
 				VkPipeline graphicsPipeline;
 
-				static const std::vector<Def> defaultLayerDefs;
+				const TB::String name;
+
+				TB::List<Object> objects;
 			};
 			TB::List<Layer> layers;
 
-			/***** 描画物のインターフェイス
+
+
+			/***** 名前でレイヤを探す
 			 */
-			struct Object : public List<Object>::Node {
-				virtual void Draw() = 0;
-				virtual bool IsTransparent() { return false; };
-			};
-
-			// 物体の登録(登録後は再描画)
-			void AddHead(Object& o) {
-				head.Add(o);
-				redraw = true;
-			};
-			void AddExternal(Object& o) {
-				external.Add(o);
-				redraw = true;
-			};
-			void AddScenery(Object& o) {
-				scenery.Add(o);
-				redraw = true;
-			};
+			Layer& FindLayer(const char* name);
 
 
+			/***** 周回処理
+			 * NOTE: ::TDへ移動予定
+			 */
 			void Cyclic();
 
 
@@ -154,24 +160,6 @@ namespace TB {
 			/***** コマンド他
 			 */
 			VkCommandPool commandPool;
-
-
-			/***** オブジェクトリスト
-			 */
-			struct Target {
-				Target() : modified(false){};
-				void Add(Object& o) {
-					(o.IsTransparent() ? transparent : opaque).Add(o);
-					modified = true;
-				};
-				void Draw() { opaque.Foreach(&Object::Draw); };
-				void Traw() { transparent.Reveach(&Object::Draw); };
-
-			private:
-				List<Object> opaque;
-				List<Object> transparent;
-				bool modified; //コマンド再生成が必要
-			} head, external, scenery;
 		};
 
 

@@ -23,7 +23,11 @@ int main() {
 		} td(200, 200, TB::TD::Frustum(0.01, 0.01, 0.01, 100000));
 
 		// ここいらでオブジェクトをtdへ登録
-		// TB::VK::TD::Object object;
+		auto& layer(td.FindLayer("scenery"));
+		TB::VK::TD::Object object;
+		layer.Add(object);
+
+
 		// td.AddScenery(object);
 
 		// 周回処理
