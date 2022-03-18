@@ -39,6 +39,16 @@ namespace TB {
 		 * 神クラスとか思うかも知れないが分けても使うのが面倒になるだけだろう
 		 */
 		struct TD : public TB::TD {
+			/***** 描画物のインターフェイス
+			 */
+			struct Object : public List<Object>::Node {
+				virtual void Draw(){};
+				virtual bool IsTransparent() { return false; };
+			};
+
+			/***** 描画レイヤ
+			 * 実質的にShaderとObjectのセット
+			 */
 			struct Layer : public TB::List<Layer>::Node {
 				struct Def {
 					const char* name;
@@ -58,6 +68,8 @@ namespace TB {
 					const std::vector<Def>* = 0);
 				const TB::String& Name() { return name; };
 
+				void Add(Object& o) { objects.Add(o); };
+
 			private:
 				static const std::vector<Def> defaultLayerDefs;
 				Instance instance;
@@ -67,34 +79,16 @@ namespace TB {
 				VkPipeline graphicsPipeline;
 
 				const TB::String name;
+
+				TB::List<Object> objects;
 			};
 			TB::List<Layer> layers;
 
-			/***** 描画物のインターフェイス
-			 */
-			struct Object : public List<Object>::Node {
-				virtual void Draw() = 0;
-				virtual bool IsTransparent() { return false; };
-			};
-
-			// 物体の登録(登録後は再描画)
-			void AddHead(Object& o) {
-				head.Add(o);
-				redraw = true;
-			};
-			void AddExternal(Object& o) {
-				external.Add(o);
-				redraw = true;
-			};
-			void AddScenery(Object& o) {
-				scenery.Add(o);
-				redraw = true;
-			};
 
 
 			/***** 名前でレイヤを探す
 			 */
-			Layer* FindLayer(const char* name);
+			Layer& FindLayer(const char* name);
 
 
 			/***** 周回処理

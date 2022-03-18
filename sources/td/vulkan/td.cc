@@ -182,13 +182,13 @@ namespace TB {
 		}
 
 
-		TD::Layer* TD::FindLayer(const char* name) {
+		TD::Layer& TD::FindLayer(const char* name) {
 			for (auto&& l : layers) {
 				if (l->Name() == name) {
-					return l;
+					return *l;
 				}
 			}
-			return 0;
+			Posit(false);
 		}
 
 
