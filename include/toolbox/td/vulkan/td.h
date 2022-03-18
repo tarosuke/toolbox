@@ -69,6 +69,7 @@ namespace TB {
 				const TB::String& Name() { return name; };
 
 				void Add(Object& o) { objects.Add(o); };
+				void Draw(){};
 
 			private:
 				static const std::vector<Def> defaultLayerDefs;
@@ -159,24 +160,6 @@ namespace TB {
 			/***** コマンド他
 			 */
 			VkCommandPool commandPool;
-
-
-			/***** オブジェクトリスト
-			 */
-			struct Target {
-				Target() : modified(false){};
-				void Add(Object& o) {
-					(o.IsTransparent() ? transparent : opaque).Add(o);
-					modified = true;
-				};
-				void Draw() { opaque.Foreach(&Object::Draw); };
-				void Traw() { transparent.Reveach(&Object::Draw); };
-
-			private:
-				List<Object> opaque;
-				List<Object> transparent;
-				bool modified; //コマンド再生成が必要
-			} head, external, scenery;
 		};
 
 

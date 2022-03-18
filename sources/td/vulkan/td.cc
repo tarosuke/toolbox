@@ -193,8 +193,6 @@ namespace TB {
 
 
 		void TD::Cyclic() {
-			Target* const targets[] = {&head, &external, &scenery};
-
 			const nsec start;
 			keep = true;
 			redraw = true; // NOTE:描画内容を作るまでの仮設定
@@ -205,9 +203,7 @@ namespace TB {
 					// 必要であれば再描画
 					if (redraw) {
 						Binder rp(*this, f, *layer);
-						for (auto t : targets) {
-							(*t).Draw();
-						}
+						layer->Draw();
 						rp.Draw(0, 3);
 						// redraw = false;
 					}
