@@ -46,10 +46,9 @@ namespace TB {
 
 		Timestamp timestamp;
 		bool keep;
-		bool redraw;
 
 		TD() = delete;
-		TD(const M44& p) : projectile(p), redraw(false){};
+		TD(const M44& p) : projectile(p), keep(true){};
 		virtual ~TD(){};
 		void Quit() { keep = false; };
 

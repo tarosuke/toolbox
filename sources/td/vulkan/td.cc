@@ -194,19 +194,12 @@ namespace TB {
 
 		void TD::Cyclic() {
 			const nsec start;
-			keep = true;
-			redraw = true; // NOTE:描画内容を作るまでの仮設定
-			Posit(redraw); //描画するものがない
 			for (nsec ns; keep;) {
 				VkFramebuffer f(NextFramebuffer());
 				for (auto layer : layers) {
-					// 必要であれば再描画
-					if (redraw) {
-						Binder rp(*this, f, *layer);
-						layer->Draw();
-						rp.Draw(0, 3);
-						// redraw = false;
-					}
+					Binder rp(*this, f, *layer);
+					layer->Draw();
+					rp.Draw(0, 3);
 				}
 
 				// 描画
