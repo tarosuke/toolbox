@@ -92,6 +92,7 @@ namespace TB {
 				const TB::String& Name() { return name; };
 
 				void Add(Object& o) { objects.Add(o); };
+				void Insert(Object& o) { objects.Insert(o); };
 				void Draw(VkCommandBuffer&);
 
 			private:
