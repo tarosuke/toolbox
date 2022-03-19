@@ -17,18 +17,81 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <toolbox/td/vulkan/td.h>
+#include <toolbox/exception.h>
+
+#include <assert.h>
 
 
 
 namespace TB {
 	namespace VK {
 
-		TD::StaticObject::StaticObject(
-			const std::vector<Vertex>& vertexes,
-			const std::vector<unsigned>& indexes)
-			: nVertex(vertexes.size()) {}
+		unsigned TD::StaticObject::FindMemoryType(
+			unsigned filter, VkMemoryPropertyFlags properties) {
+			VkPhysicalDeviceMemoryProperties memProperties;
+			vkGetPhysicalDeviceMemoryProperties(instance, &memProperties);
+			for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+				if (filter & (1 << i) &&
+					(memProperties.memoryTypes[i].propertyFlags & properties) ==
+						properties) {
+					return i;
+				}
+			}
+			Posit(false);
+		}
 
-		TD::StaticObject::~StaticObject() {}
+
+		TD::StaticObject::StaticObject(
+			const std::vector<Vertex>& vertices,
+			const std::vector<unsigned>& indexes)
+			: nVertex(vertices.size()) {
+			// 頂点バッファ確保
+			VkBufferCreateInfo bufferInfo{
+				.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+				.size = sizeof(vertices[0]) * vertices.size(),
+				.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+				.sharingMode = VK_SHARING_MODE_EXCLUSIVE};
+
+			Posit(
+				!vkCreateBuffer(instance, &bufferInfo, nullptr, &vertexBuffer));
+
+			VkMemoryRequirements memRequirements;
+			vkGetBufferMemoryRequirements(
+				instance,
+				vertexBuffer,
+				&memRequirements);
+
+			VkMemoryAllocateInfo allocInfo{
+				.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+				.allocationSize = vertices.size() * sizeof(Vertex),
+				.memoryTypeIndex = FindMemoryType(
+					memRequirements.memoryTypeBits,
+					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+						VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)};
+
+			Posit(!vkAllocateMemory(
+				instance,
+				&allocInfo,
+				nullptr,
+				&vertexBufferMemory));
+
+			// 頂点転送
+			void* data;
+			Posit(!vkMapMemory(
+				instance,
+				vertexBufferMemory,
+				0,
+				bufferInfo.size,
+				0,
+				&data));
+			memcpy(data, vertices.data(), (size_t)bufferInfo.size);
+			vkUnmapMemory(instance, vertexBufferMemory);
+		}
+
+		TD::StaticObject::~StaticObject() {
+			vkDestroyBuffer(instance, vertexBuffer, nullptr);
+			vkFreeMemory(instance, vertexBufferMemory, nullptr);
+		}
 
 		void TD::StaticObject::Draw(VkCommandBuffer& cb) {
 			vkCmdDraw(cb, nVertex, 1, 0, 1);

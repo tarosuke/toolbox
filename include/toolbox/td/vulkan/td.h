@@ -36,7 +36,6 @@ namespace TB {
 
 		/***** Vulkan版基本クラス
 		 * Vulkanの論理面が集約されている
-		 * 神クラスとか思うかも知れないが分けても使うのが面倒になるだけだろう
 		 */
 		struct TD : public TB::TD {
 			/***** 描画物のインターフェイス
@@ -66,7 +65,13 @@ namespace TB {
 				void Draw(VkCommandBuffer&) override;
 
 			private:
+				Instance instance;
 				const unsigned nVertex;
+				VkBuffer vertexBuffer;
+				VkDeviceMemory vertexBufferMemory;
+
+				unsigned FindMemoryType(
+					unsigned filter, VkMemoryPropertyFlags properties);
 			};
 
 			/***** 描画レイヤ
