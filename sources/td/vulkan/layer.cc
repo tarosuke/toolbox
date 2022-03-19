@@ -35,9 +35,22 @@ namespace TB {
 		/***** デフォルトのレイヤ定義
 		 */
 		const std::vector<TD::Layer::Def> TD::Layer::defaultLayerDefs = {
-			{"scenery",
-			 {{VK_SHADER_STAGE_VERTEX_BIT, Blob(vertPath)},
-			  {VK_SHADER_STAGE_FRAGMENT_BIT, Blob(fragPath)}}},
+			{
+				"scenery",
+				{{VK_SHADER_STAGE_VERTEX_BIT, Blob(vertPath)},
+				 {VK_SHADER_STAGE_FRAGMENT_BIT, Blob(fragPath)}},
+				{{.binding = 0,
+				  .stride = sizeof(TD::StaticObject::Vertex),
+				  .inputRate = VK_VERTEX_INPUT_RATE_VERTEX}},
+				{{.location = 0,
+				  .binding = 0,
+				  .format = VK_FORMAT_R32G32B32_SFLOAT,
+				  .offset = offsetof(TD::StaticObject::Vertex, pos)},
+				 {.location = 1,
+				  .binding = 0,
+				  .format = VK_FORMAT_R32G32_SFLOAT,
+				  .offset = offsetof(TD::StaticObject::Vertex, texCoord)}},
+			},
 		};
 
 
@@ -93,10 +106,13 @@ namespace TB {
 					VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 				.pNext = 0,
 				.flags = 0,
-				.vertexBindingDescriptionCount = 0,
-				.pVertexBindingDescriptions = nullptr, // Optional
-				.vertexAttributeDescriptionCount = 0,
-				.pVertexAttributeDescriptions = nullptr, // Optional
+				.vertexBindingDescriptionCount =
+					(unsigned)def.bindingDescriptions.size(),
+				.pVertexBindingDescriptions = def.bindingDescriptions.data(),
+				.vertexAttributeDescriptionCount =
+					(unsigned)def.attributeDescriptions.size(),
+				.pVertexAttributeDescriptions =
+					def.attributeDescriptions.data(),
 			};
 			VkPipelineInputAssemblyStateCreateInfo inputAssembly{
 				.sType =

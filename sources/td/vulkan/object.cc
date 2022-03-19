@@ -46,11 +46,13 @@ namespace TB {
 			const std::vector<unsigned>& indexes)
 			: nVertex(vertices.size()) {
 			// 頂点バッファ確保
-			VkBufferCreateInfo bufferInfo{
+			VkBufferCreateInfo bufferInfo {
 				.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+				.flags = VK_BUFFER_CREATE_SPARSE_BINDING_BIT,
 				.size = sizeof(vertices[0]) * vertices.size(),
 				.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-				.sharingMode = VK_SHARING_MODE_EXCLUSIVE};
+				.sharingMode = VK_SHARING_MODE_EXCLUSIVE
+			};
 
 			Posit(
 				!vkCreateBuffer(instance, &bufferInfo, nullptr, &vertexBuffer));
@@ -94,6 +96,9 @@ namespace TB {
 		}
 
 		void TD::StaticObject::Draw(VkCommandBuffer& cb) {
+			VkBuffer vertexBuffers[] = {vertexBuffer};
+			VkDeviceSize offsets[] = {0};
+			vkCmdBindVertexBuffers(cb, 0, 1, vertexBuffers, offsets);
 			vkCmdDraw(cb, nVertex, 1, 0, 1);
 		}
 	}

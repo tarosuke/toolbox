@@ -81,6 +81,10 @@ namespace TB {
 				struct Def {
 					const char* name;
 					std::vector<Shader::Def> shaderDefs;
+					std::vector<VkVertexInputBindingDescription>
+						bindingDescriptions;
+					std::vector<VkVertexInputAttributeDescription>
+						attributeDescriptions;
 				};
 
 				Layer() = delete;

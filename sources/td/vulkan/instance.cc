@@ -130,6 +130,9 @@ namespace TB {
 			}
 
 			// 拡張リストの収集
+			static const VkPhysicalDeviceFeatures features{
+				.sparseBinding = 1,
+			};
 			std::vector<const char*> extensionNames;
 			Extension<VkDevice>::GetExtensions(extensionNames);
 			const VkDeviceCreateInfo createInfo = {
@@ -142,7 +145,7 @@ namespace TB {
 				.ppEnabledLayerNames = layers.data(),
 				.enabledExtensionCount = (unsigned)extensionNames.size(),
 				.ppEnabledExtensionNames = extensionNames.data(),
-				.pEnabledFeatures = NULL,
+				.pEnabledFeatures = &features,
 			};
 			Posit(!vkCreateDevice(
 				physicalDevices[physicalDeviceIndex],
