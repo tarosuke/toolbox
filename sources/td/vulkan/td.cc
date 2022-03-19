@@ -137,7 +137,7 @@ namespace TB {
 				VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
 		};
 
-		TD::Binder::Binder(TD& td, VkFramebuffer fb, Layer& layer)
+		TD::RenderPass::RenderPass(TD& td, VkFramebuffer fb, Layer& layer)
 			: td(td), fb(fb), cb(td.commandBuffer) {
 			VkCommandBufferBeginInfo beginInfo{};
 			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -168,17 +168,9 @@ namespace TB {
 			vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, layer);
 		}
 
-		TD::Binder::~Binder() {
+		TD::RenderPass::~RenderPass() {
 			vkCmdEndRenderPass(cb);
 			vkEndCommandBuffer(cb);
-		}
-
-		void TD::Binder::Draw(
-			unsigned firstVertex,
-			unsigned vertexes,
-			unsigned instances,
-			unsigned firstInstance) {
-			vkCmdDraw(cb, vertexes, instances, firstVertex, firstInstance);
 		}
 
 
@@ -197,9 +189,8 @@ namespace TB {
 			for (nsec ns; keep;) {
 				VkFramebuffer f(NextFramebuffer());
 				for (auto layer : layers) {
-					Binder rp(*this, f, *layer);
-					layer->Draw();
-					rp.Draw(0, 3);
+					RenderPass rp(*this, f, *layer);
+					layer->Draw(rp);
 				}
 
 				// 描画
