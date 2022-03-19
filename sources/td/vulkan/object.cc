@@ -1,5 +1,5 @@
 /********************************************************** 3D -> ThreeD -> TD
- *  Copyright (C) 2021, 2022 tarosuke<webmaster@tarosuke.net>
+ *  Copyright (C) 2022 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,9 +25,13 @@ namespace TB {
 
 		TD::StaticObject::StaticObject(
 			const std::vector<Vertex>& vertexes,
-			const std::vector<unsigned>& indexes) {}
+			const std::vector<unsigned>& indexes)
+			: nVertex(vertexes.size()) {}
 
 		TD::StaticObject::~StaticObject() {}
 
+		void TD::StaticObject::Draw(VkCommandBuffer& cb) {
+			vkCmdDraw(cb, nVertex, 1, 0, 1);
+		}
 	}
 }

@@ -222,7 +222,7 @@ namespace TB {
 
 		void TD::Layer::Draw(VkCommandBuffer& cb) {
 			for (auto o : objects) {
-				o->Draw();
+				o->Draw(cb);
 			}
 		}
 	}
