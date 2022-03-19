@@ -220,5 +220,10 @@ namespace TB {
 			vkDestroyPipelineLayout(instance, pipelineLayout, nullptr);
 		}
 
+		void TD::Layer::Draw(VkCommandBuffer& cb) {
+			for (auto o : objects) {
+				o->Draw();
+			}
+		}
 	}
 }

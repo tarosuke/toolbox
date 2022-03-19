@@ -198,7 +198,7 @@ namespace TB {
 				VkFramebuffer f(NextFramebuffer());
 				for (auto layer : layers) {
 					Binder rp(*this, f, *layer);
-					layer->Draw();
+					layer->Draw(rp);
 					rp.Draw(0, 3);
 				}
 

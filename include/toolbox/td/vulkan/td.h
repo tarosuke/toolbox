@@ -42,8 +42,28 @@ namespace TB {
 			/***** 描画物のインターフェイス
 			 */
 			struct Object : public List<Object>::Node {
-				virtual void Draw(){};
+				virtual void Draw() = 0;
 				virtual bool IsTransparent() { return false; };
+			};
+
+			struct StaticObject : public Object {
+				struct Vertex {
+					struct {
+						float x;
+						float y;
+						float z;
+					} pos;
+					struct {
+						float u;
+						float v;
+					} texCoord;
+				};
+
+				StaticObject(
+					const std::vector<Vertex>&, const std::vector<unsigned>&);
+				~StaticObject();
+
+				void Draw() override{};
 			};
 
 			/***** 描画レイヤ
@@ -69,7 +89,7 @@ namespace TB {
 				const TB::String& Name() { return name; };
 
 				void Add(Object& o) { objects.Add(o); };
-				void Draw(){};
+				void Draw(VkCommandBuffer&);
 
 			private:
 				static const std::vector<Def> defaultLayerDefs;
@@ -139,6 +159,7 @@ namespace TB {
 				Binder() = delete;
 				Binder(TD&, VkFramebuffer, Layer&);
 				~Binder();
+				operator VkCommandBuffer&() { return cb; };
 				void Draw(
 					unsigned vertexIndex,
 					unsigned vertexes,
