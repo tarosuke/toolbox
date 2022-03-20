@@ -36,7 +36,6 @@ namespace TB {
 
 		/***** Vulkan版基本クラス
 		 * Vulkanの論理面が集約されている
-		 * 神クラスとか思うかも知れないが分けても使うのが面倒になるだけだろう
 		 */
 		struct TD : public TB::TD {
 			/***** 描画物のインターフェイス
@@ -52,10 +51,12 @@ namespace TB {
 						float x;
 						float y;
 						float z;
+						unsigned : 32;
 					} pos;
 					struct {
 						float u;
 						float v;
+						unsigned : 32;
 					} texCoord;
 				};
 
@@ -66,7 +67,13 @@ namespace TB {
 				void Draw(VkCommandBuffer&) override;
 
 			private:
+				Instance instance;
 				const unsigned nVertex;
+				VkBuffer vertexBuffer;
+				VkDeviceMemory vertexBufferMemory;
+
+				unsigned FindMemoryType(
+					unsigned filter, VkMemoryPropertyFlags properties);
 			};
 
 			/***** 描画レイヤ
@@ -76,6 +83,10 @@ namespace TB {
 				struct Def {
 					const char* name;
 					std::vector<Shader::Def> shaderDefs;
+					std::vector<VkVertexInputBindingDescription>
+						bindingDescriptions;
+					std::vector<VkVertexInputAttributeDescription>
+						attributeDescriptions;
 				};
 
 				Layer() = delete;
