@@ -51,10 +51,12 @@ namespace TB {
 						float x;
 						float y;
 						float z;
+						unsigned : 32;
 					} pos;
 					struct {
 						float u;
 						float v;
+						unsigned : 32;
 					} texCoord;
 				};
 

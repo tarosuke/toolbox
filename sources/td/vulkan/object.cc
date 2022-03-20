@@ -46,13 +46,12 @@ namespace TB {
 			const std::vector<unsigned>& indexes)
 			: nVertex(vertices.size()) {
 			// 頂点バッファ確保
-			VkBufferCreateInfo bufferInfo {
+			VkBufferCreateInfo bufferInfo{
 				.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-				.flags = VK_BUFFER_CREATE_SPARSE_BINDING_BIT,
+				.flags = 0, // VK_BUFFER_CREATE_SPARSE_BINDING_BIT,
 				.size = sizeof(vertices[0]) * vertices.size(),
 				.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-				.sharingMode = VK_SHARING_MODE_EXCLUSIVE
-			};
+				.sharingMode = VK_SHARING_MODE_EXCLUSIVE};
 
 			Posit(
 				!vkCreateBuffer(instance, &bufferInfo, nullptr, &vertexBuffer));
@@ -70,12 +69,16 @@ namespace TB {
 					memRequirements.memoryTypeBits,
 					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
 						VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)};
-
 			Posit(!vkAllocateMemory(
 				instance,
 				&allocInfo,
 				nullptr,
 				&vertexBufferMemory));
+			Posit(!vkBindBufferMemory(
+				instance,
+				vertexBuffer,
+				vertexBufferMemory,
+				0));
 
 			// 頂点転送
 			void* data;
