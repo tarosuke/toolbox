@@ -1,6 +1,8 @@
 #version 450
+#extension GL_EXT_debug_printf : enable
 
 layout(location = 0) in vec3 inPosition;
+layout(location = 1) in vec2 texCoord;
 
 layout(location = 0) out vec3 fragColor;
 
@@ -20,6 +22,7 @@ void main() {
 #if 0
     gl_Position = vec4(positions[gl_VertexIndex], 0.0, 1.0);
 #else
+    debugPrintfEXT("inPosition: %v3f\n", inPosition);
     gl_Position = vec4(inPosition, 1.0);
 #endif
     fragColor = colors[gl_VertexIndex];

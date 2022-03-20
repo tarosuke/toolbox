@@ -30,11 +30,7 @@ namespace TB {
 
 		Base* Base::singleton(0);
 
-#ifdef NDEBUG
 		std::vector<const char*> Base::layers;
-#else
-		std::vector<const char*> Base::layers{"VK_LAYER_KHRONOS_validation"};
-#endif
 
 		Base::Base()
 			: instance(MakeInstance()), presentFamilyIndex(0),
@@ -50,6 +46,8 @@ namespace TB {
 			std::vector<const char*> extensionNames;
 			Extension<VkInstance>::GetExtensions(extensionNames);
 #ifndef NDEBUG
+			layers.push_back("VK_LAYER_KHRONOS_validation");
+
 			extensionNames.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
 #endif
 
@@ -134,6 +132,10 @@ namespace TB {
 				.sparseBinding = 1,
 			};
 			std::vector<const char*> extensionNames;
+#ifndef NDEBUG
+			extensionNames.push_back(
+				VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME);
+#endif
 			Extension<VkDevice>::GetExtensions(extensionNames);
 			const VkDeviceCreateInfo createInfo = {
 				.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
