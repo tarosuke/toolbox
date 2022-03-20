@@ -21,8 +21,8 @@
 #include <toolbox/blob.h>
 
 
-#define vertPath td_vulkan_test_vert_spv
-#define fragPath td_vulkan_test_frag_spv
+#define vertPath td_vulkan_scenery_vert_spv
+#define fragPath td_vulkan_scenery_frag_spv
 
 BlobDeclare(vertPath);
 BlobDeclare(fragPath);
