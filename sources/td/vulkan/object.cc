@@ -28,7 +28,7 @@ namespace TB {
 
 		TD::Layer::Object::Object(
 			const std::vector<Vertex>& vertices,
-			const std::vector<unsigned>& indexes)
+			const std::vector<u16>& indexes)
 			: nVertex(vertices.size()),
 			  vertexBuffer(
 				  vertices,

@@ -13,6 +13,7 @@ vec3 colors[3] = vec3[](
 );
 
 void main() {
+    // debugPrintfEXT("tex: %v2f", texCoord);
     gl_Position = vec4(inPosition, 1.0);
     fragColor = colors[gl_VertexIndex];
 }

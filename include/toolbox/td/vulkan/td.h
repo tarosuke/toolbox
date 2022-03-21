@@ -68,9 +68,7 @@ namespace TB {
 						} texCoord;
 					};
 
-					Object(
-						const std::vector<Vertex>&,
-						const std::vector<unsigned>&);
+					Object(const std::vector<Vertex>&, const std::vector<u16>&);
 					~Object();
 
 					void Draw(VkCommandBuffer&);
