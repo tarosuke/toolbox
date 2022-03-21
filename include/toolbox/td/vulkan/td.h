@@ -38,44 +38,6 @@ namespace TB {
 		 * Vulkanの論理面が集約されている
 		 */
 		struct TD : public TB::TD {
-			/***** 描画物のインターフェイス
-			 */
-			struct Object : public List<Object>::Node {
-				virtual void Draw(VkCommandBuffer&) = 0;
-				virtual bool IsTransparent() { return false; };
-			};
-
-			struct StaticObject : public Object {
-				struct Vertex {
-					struct {
-						float x;
-						float y;
-						float z;
-						unsigned : 32;
-					} pos;
-					struct {
-						float u;
-						float v;
-						unsigned : 32;
-					} texCoord;
-				};
-
-				StaticObject(
-					const std::vector<Vertex>&, const std::vector<unsigned>&);
-				~StaticObject();
-
-				void Draw(VkCommandBuffer&) override;
-
-			private:
-				Instance instance;
-				const unsigned nVertex;
-				VkBuffer vertexBuffer;
-				VkDeviceMemory vertexBufferMemory;
-
-				unsigned FindMemoryType(
-					unsigned filter, VkMemoryPropertyFlags properties);
-			};
-
 			/***** 描画レイヤ
 			 * 実質的にShaderとObjectのセット
 			 */
@@ -88,6 +50,41 @@ namespace TB {
 					std::vector<VkVertexInputAttributeDescription>
 						attributeDescriptions;
 				};
+
+				/***** 描画物
+				 */
+				struct Object : public TB::List<Object>::Node {
+					struct Vertex {
+						struct {
+							float x;
+							float y;
+							float z;
+							unsigned : 32;
+						} pos;
+						struct {
+							float u;
+							float v;
+							unsigned : 32;
+						} texCoord;
+					};
+
+					Object(
+						const std::vector<Vertex>&,
+						const std::vector<unsigned>&);
+					~Object();
+
+					void Draw(VkCommandBuffer&);
+
+				private:
+					Instance instance;
+					const unsigned nVertex;
+					VkBuffer vertexBuffer;
+					VkDeviceMemory vertexBufferMemory;
+
+					unsigned FindMemoryType(
+						unsigned filter, VkMemoryPropertyFlags properties);
+				};
+
 
 				Layer() = delete;
 				Layer(VkExtent2D, VkRenderPass, const Def&);
