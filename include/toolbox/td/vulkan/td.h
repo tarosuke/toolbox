@@ -79,6 +79,8 @@ namespace TB {
 					const unsigned nVertex;
 					VkBuffer vertexBuffer;
 					VkDeviceMemory vertexBufferMemory;
+					VkBuffer indexBuffer;
+					VkDeviceMemory indexBufferMemory;
 
 					unsigned FindMemoryType(
 						unsigned filter, VkMemoryPropertyFlags properties);
