@@ -79,6 +79,7 @@ namespace TB {
 					const unsigned nVertex;
 					Instance instance;
 					Buffer vertexBuffer;
+					Buffer indexBuffer;
 				};
 
 
