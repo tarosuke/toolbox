@@ -16,17 +16,20 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#pragma once
-
-#include <stdexcept>
-
+#include <toolbox/td.h>
+#include <toolbox/exception.h>
 
 
-#define _THROW_ARG(f, l, c) f ":" #l ":: fail: Posit failed - " #c
-#define THROW_ARG(f, l, c) _THROW_ARG(f, l, c)
-#define THROW throw THROW_ARG(__FILE__, __LINE__, )
 
-#define Posit(c)                                                               \
-	if (!c) {                                                                  \
-		throw THROW_ARG(__FILE__, __LINE__, c);                                \
+namespace TB {
+
+	TD::M44 TD::Frustum(float width, float height, float near, float far) {
+		return M44((const float[4][4]){
+			{2 * near / width, 0, 0, 0},
+			{0, 2 * near / height, 0, 0},
+			{0, 0, far / far - near, 1},
+			{0, 0, near * far / (near - far), 0}});
 	}
+
+
+}

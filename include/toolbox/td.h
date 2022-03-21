@@ -18,15 +18,44 @@
  */
 #pragma once
 
-#include <stdexcept>
+#include <toolbox/container/list.h>
+#include <toolbox/geometry/matrix.h>
+#include <toolbox/geometry/spread.h>
+#include <toolbox/type.h>
+#include <toolbox/time.h>
 
 
 
-#define _THROW_ARG(f, l, c) f ":" #l ":: fail: Posit failed - " #c
-#define THROW_ARG(f, l, c) _THROW_ARG(f, l, c)
-#define THROW throw THROW_ARG(__FILE__, __LINE__, )
+namespace TB {
 
-#define Posit(c)                                                               \
-	if (!c) {                                                                  \
-		throw THROW_ARG(__FILE__, __LINE__, c);                                \
-	}
+	struct TD {
+		using M44 = Matrix<4, 4, float>;
+		using S2 = Spread<2, unsigned>;
+
+		static M44 Frustum(float width, float height, float near, float far);
+
+		// タイムスタンプ
+		struct Timestamp {
+			Timestamp() : delta(1){};
+			nsec uptime;
+			nsec delta;
+		};
+
+	protected:
+		const M44 projectile;
+
+		Timestamp timestamp;
+		bool keep;
+
+		TD() = delete;
+		TD(const M44& p) : projectile(p), keep(true){};
+		virtual ~TD(){};
+		void Quit() { keep = false; };
+
+		// 周回処理中の定形処理
+		virtual void Tick(const Timestamp&){}; // 描画以外の準備
+		virtual void Draw(const M44& view) = 0; // 描画、出力
+
+	private:
+	};
+}

@@ -38,7 +38,7 @@
 		if ((A) != (B)) {                                                      \
 			fprintf(                                                           \
 				stderr,                                                        \
-				"%s:%u:: info: %s != %s\n",                                    \
+				"%s:%u:: info: %s != %s.\n",                                   \
 				__FILE__,                                                      \
 				__LINE__,                                                      \
 				(const char*)TB::String(A),                                    \

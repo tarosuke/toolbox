@@ -1,5 +1,6 @@
-/********************************************************** 3D -> ThreeD -> TD
- *  Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+/************************************************************************* time
+ * 時間関係のインフラ
+ * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,17 +17,25 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#pragma once
+#include <toolbox/time.h>
 
-#include <stdexcept>
+#include <time.h>
 
 
 
-#define _THROW_ARG(f, l, c) f ":" #l ":: fail: Posit failed - " #c
-#define THROW_ARG(f, l, c) _THROW_ARG(f, l, c)
-#define THROW throw THROW_ARG(__FILE__, __LINE__, )
-
-#define Posit(c)                                                               \
-	if (!c) {                                                                  \
-		throw THROW_ARG(__FILE__, __LINE__, c);                                \
+namespace TB {
+	void nsec::Update() {
+		timespec ts;
+		clock_gettime(CLOCK_BOOTTIME, &ts);
+		*this = (nsec(ts.tv_nsec) + sec(ts.tv_sec));
 	}
+
+
+	void Timestamp::Update() {
+		nsec nns;
+		nns.Update();
+		nns -= start;
+		delta = nns - uptime;
+		uptime = nns;
+	}
+}

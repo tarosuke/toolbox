@@ -22,21 +22,21 @@
 
 
 
-namespace TB{
+namespace TB {
 
 	template <unsigned COL, unsigned ROW, typename T> class Matrix {
 	public:
 		Matrix(){};
 
 		// 配列として扱う
-		operator T*(){ return raw; };
-		operator T const*() const { return raw; };
-		T* operator[](unsigned r){ return m[r]; };
+		operator T*() { return raw; };
+		operator T const *() const { return raw; };
+		T* operator[](unsigned r) { return m[r]; };
 		const T* operator[](unsigned r) const { return m[r]; };
 
 		// 代入とコピーコンストラクタ
 		template <typename U> const Matrix& operator=(const U (&o)[ROW][COL]) {
-			for (unsigned r(0); 0 < ROW; ++r) {
+			for (unsigned r(0); r < ROW; ++r) {
 				for (unsigned c(0); c < COL; ++c) {
 					m[r][c] = (T)o[r][c];
 				}
@@ -65,26 +65,26 @@ namespace TB{
 		};
 		bool operator!=(const Matrix& o) { return !(*this == o); };
 
-		void Identity(){
-			for(unsigned n(0); n < ROW * COL; ++n){
+		void Identity() {
+			for (unsigned n(0); n < ROW * COL; ++n) {
 				raw[n] = 0;
 			}
-			for(unsigned n(0); n < ROW && n < COL; ++n){
+			for (unsigned n(0); n < ROW && n < COL; ++n) {
 				m[n][n] = 1;
 			}
 		};
 		void Transpose(const T (&o)[COL][ROW]) {
 			T* d(raw);
-			for(unsigned x(0); x < COL; ++x){
-				for(unsigned y(0); y < ROW; ++y){
+			for (unsigned x(0); x < COL; ++x) {
+				for (unsigned y(0); y < ROW; ++y) {
 					*d++ = o[y][x];
 				}
 			}
 		};
 		void TransposeAffine(const T (&o)[COL - 1][ROW]) {
 			T* d(raw);
-			for(unsigned x(0); x < ROW; ++x){
-				for(unsigned y(0); y < COL - 1; ++y){
+			for (unsigned x(0); x < ROW; ++x) {
+				for (unsigned y(0); y < COL - 1; ++y) {
 					*d++ = o[y][x];
 				}
 				*d++ = 0;
@@ -93,15 +93,15 @@ namespace TB{
 		};
 
 		void Invert();
-		void InvertAffine(){ Invert(); };
+		void InvertAffine() { Invert(); };
 
 		// ROW行COL列×COL行C列 = ROW行C列
 		template <unsigned C>
 		Matrix<C, ROW, T> operator*(const Matrix<C, COL, T>& o) const {
 			Matrix<C, ROW, T> rv;
 
-			for(unsigned r(0); r < ROW; ++r){
-				for(unsigned c(0); c < C; ++c){
+			for (unsigned r(0); r < ROW; ++r) {
+				for (unsigned c(0); c < C; ++c) {
 					auto& t(rv[r][c]);
 					t = 0;
 					for (unsigned n(0); n < COL; ++n) {
@@ -127,7 +127,7 @@ namespace TB{
 		};
 
 	private:
-		union{
+		union {
 			T raw[COL * ROW];
 			T m[ROW][COL];
 		};

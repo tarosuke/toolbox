@@ -8,11 +8,12 @@
 
 
 
-namespace TB{
+namespace TB {
 
 	template <class T, class L = Lock::NullLock> class List : public L {
 		List(const List&);
 		void operator=(const List&);
+
 	public:
 		//このリストのためのKey(このリストを初期値にして作る)
 		using Key = Lock::Key<L>;
@@ -25,48 +26,53 @@ namespace TB{
 		 * NotifyListDeletedのデフォルトは「何もしない」なので、
 		 * Listが主参照であるならNotifyListDeletedで自身をdeleteする必要がある
 		 */
-		class Node{
+		class Node {
 			friend class List;
 			friend class I;
 			friend class itor;
 			Node(const Node&);
 			void operator=(const Node&);
+
 		public:
-			virtual ~Node(){ Detach(); };
+			virtual ~Node() { Detach(); };
+
 		protected:
-			Node(bool deleteWithList=false) :
-				prev(this), next(this), deleteWithList(deleteWithList){};
-			virtual void NotifyListDeleted(){
-				if(deleteWithList){ delete this; } };
+			Node(bool dwl = false)
+				: prev(this), next(this), deleteWithList(dwl){};
+			virtual void NotifyListDeleted() {
+				if (deleteWithList) {
+					delete this;
+				}
+			};
+
 		private:
 			Node* prev;
 			Node* next;
 			const bool deleteWithList;
+
 		protected:
-			void Insert(Node& n){
-				if(prev != this){
+			void Insert(Node& n) {
+				if (prev != this) {
 					Detach();
 				}
 				prev = n.prev;
 				next = &n;
 				(*prev).next = n.prev = this;
 			};
-			void Attach(Node& n){
-				if(prev != this){
+			void Attach(Node& n) {
+				if (prev != this) {
 					Detach();
 				}
 				next = n.next;
 				prev = &n;
 				(*next).prev = n.next = this;
 			};
-			void Detach(){
+			void Detach() {
 				(*prev).next = next;
 				(*next).prev = prev;
 				prev = next = this;
 			};
-			operator T*(){
-				return dynamic_cast<T*>(this);
-			};
+			operator T*() { return dynamic_cast<T*>(this); };
 		};
 
 		/** 反復子
@@ -83,88 +89,79 @@ namespace TB{
 		 * 反復子が指している要素をリストから外しても正常動作するようになっている。
 		 * NOTE:反復子が有効な状態で要素を追加するときは反復子のInsert、Addを使うこと
 		 */
-		class I{
+		class I {
 		public:
 			// Javaスタイル反復子
-			I(List& l) :
-				key(l),
-				node(&l.anchor),
-				prev((*node).prev),
-				next((*node).next){};
-			// C++スタイル反復子
-			I(Node& i)
-				: key(i.key), node(&i.node), prev((*node).prev),
+			I(List& l)
+				: key(l), node(&l.anchor), prev((*node).prev),
 				  next((*node).next){};
-
-			operator T*(){
-				return *node;
-			};
-			T* operator++(){
+			operator T*() { return *node; };
+			T* operator++() {
 				node = next;
 				Prepare();
 				return *node;
 			};
-			T* operator--(){
+			T* operator--() {
 				node = prev;
 				Prepare();
 				return *node;
 			};
-			void Insert(Node& n){
+			void Insert(Node& n) {
 				n.Insert(*node);
 				Prepare();
 			};
-			void Add(Node& n){
+			void Add(Node& n) {
 				n.Attach(*node);
 				Prepare();
 			};
+
 		private:
 			Key key;
 			Node* node;
 			Node* prev;
 			Node* next;
 
-			void Prepare(){
+			void Prepare() {
 				prev = (*node).prev;
 				next = (*node).next;
 			};
-
 		};
 
 		/** コールバックによる反復
 		 */
-		template<typename U> T* Foreach(bool (T::*handler)(U&), U& param){
-			for(I i(*this); ++i;){
-				if(((*i).*handler)(param)){
+		template <typename U> T* Foreach(bool (T::*handler)(U&), U& param) {
+			for (I i(*this); ++i;) {
+				if (((*i).*handler)(param)) {
 					return i;
 				}
 			}
 			return 0;
 		};
-		template<typename U> void Foreach(void (T::*handler)(U&), U& param){
-			for(I i(*this); ++i;){
+		template <typename U> void Foreach(void (T::*handler)(U&), U& param) {
+			for (I i(*this); ++i;) {
 				((*i).*handler)(param);
 			}
 		};
-		void Foreach(void (T::*handler)()){
-			for(I i(*this); ++i;){
+		void Foreach(void (T::*handler)()) {
+			for (I i(*this); ++i;) {
 				((*i).*handler)();
 			}
 		}
-		template<typename U> T* Reveach(bool (T::*handler)(U&), U& param){
-			for(I i(*this); --i;){
-				if(((*i).*handler)(param)){
+		template <typename U> T* Reveach(bool (T::*handler)(U&), U& param) {
+			for (I i(*this); --i;) {
+				if (((*i).*handler)(param)) {
 					return i;
 				}
 			}
 			return 0;
 		};
-		template<typename U> void Reveach(void (T::*handler)(U&), U& param){
-			for(I i(*this); --i;){
+		template <typename U> void Reveach(void (T::*handler)(U&), U& param) {
+			for (I i(*this); --i;) {
 				((*i).*handler)(param);
 			}
 		};
-		void Reveach(void (T::*handler)()){
-			for(I i(*this); --i;){
+		void Reveach(void (T::*handler)()) {
+			for (I i(*this); --i;) {
 				((*i).*handler)();
 			}
 		};
@@ -175,9 +172,9 @@ namespace TB{
 		 * Tにはキーに対応した型の==演算子が必要
 		 * なお、シリアルサーチなのでO(n)、つまり遅い
 		 */
-		template<typename K> T* operator[](K& key){
-			for(I i(*this); ++i;){
-				if((*i) == key){
+		template <typename K> T* operator[](K& key) {
+			for (I i(*this); ++i;) {
+				if ((*i) == key) {
 					return i;
 				}
 			}
@@ -186,46 +183,38 @@ namespace TB{
 
 		/**要素の操作
 		 */
-		void Add(Key&, Node& n){
-			n.Insert(anchor);
-		};
-		void Add(Node& n){
+		void Add(Key&, Node& n) { n.Insert(anchor); };
+		void Add(Node& n) {
 			Key k(*this);
 			Add(k, n);
 		};
-		void Insert(Key&, Node& n){
-			n.Attach(anchor);
-		};
-		void Insert(Node& n){
+		void Insert(Key&, Node& n) { n.Attach(anchor); };
+		void Insert(Node& n) {
 			Key k(*this);
 			Insert(k, n);
 		};
-		T* Top(Key&){
-			return dynamic_cast<T*>(anchor.next);
-		};
-		T* Bottom(Key&){
-			return dynamic_cast<T*>(anchor.prev);
-		};
+		T* Top(Key&) { return dynamic_cast<T*>(anchor.next); };
+		T* Bottom(Key&) { return dynamic_cast<T*>(anchor.prev); };
 
-		T* Get(Key&){
+		T* Get(Key&) {
 			Node* const tn(anchor.next);
-			if(tn != &anchor){
+			if (tn != &anchor) {
 				(*tn).Detach();
 				return dynamic_cast<T*>(tn);
 			}
 			return 0;
 		};
-		T* Get(){
+		T* Get() {
 			Key key(*this);
 			return Get(key);
 		};
 
 		//コンストラクタ／デストラクタ
 		List(){};
-		~List(){
-			while(anchor.next != &anchor){
+		~List() {
+			while (anchor.next != &anchor) {
 				Node* const n(anchor.next);
-				if(n == &anchor){
+				if (n == &anchor) {
 					continue;
 				}
 				(*n).Detach();
@@ -233,9 +222,27 @@ namespace TB{
 			}
 		};
 
-		// C++スタイル反復子生成
-		static I begin(List& list) { return I(list.ancher.next); };
-		static I end(List& list) { return I(list.ancher); };
+		// C++スタイル反復子
+		struct itor {
+			itor(Node& n) : node(&n){};
+			T* operator*() { return dynamic_cast<T*>(node); };
+			bool operator==(const itor& t) const { return node == t.node; };
+			bool operator!=(const itor& t) const { return node != t.node; };
+			itor operator++() {
+				itor i(*node);
+				node = (*node).next;
+				return i;
+			};
+			itor operator++(int) {
+				node = (*node).noxt;
+				return *this;
+			};
+
+		private:
+			Node* node;
+		};
+		itor begin() { return itor(*anchor.next); };
+		itor end() { return itor(anchor); };
 
 	private:
 		Node anchor;

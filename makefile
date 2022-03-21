@@ -11,22 +11,30 @@
 MAKECMDGOALS ?= RELEASE
 ifeq ($(MAKECMDGOALS), RELEASE)
 TARGETDIR := RELEASE
-COPTS += -O3 -DNDEBUG -Wno-stringop-overflow
+COPTS := -O3 -DNDEBUG -Wno-stringop-overflow -DVK_USE_PLATFORM_XLIB_KHR
 endif
 ifeq ($(MAKECMDGOALS), DEBUG)
 TARGETDIR := DEBUG
-COPTS += -O0 -g
+COPTS := -O0 -g3 -DVK_USE_PLATFORM_XLIB_KHR
+
 endif
 ifeq ($(MAKECMDGOALS), COVERAGE)
 TARGETDIR := COVERAGE
-COPTS += -g -coverage
+COPTS := -g -coverage -DVK_USE_PLATFORM_XLIB_KHR
 endif
 
-COPTS += -Wall -Werror -Iinclude
+COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
 CCOPTS += $(COPTS) -std=c++11
 
-EXLIBS += -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov
+EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov -lvulkan
 
+files := $(subst sources/,, $(shell find sources -type f))
+srcs := $(filter $(suffixes), $(files))
+spvs := $(filter %.frag %.vert, $(files))
+sbins:= $(addprefix .builds/, $(addsuffix .spv, $(spvs)))
+mods := $(filter-out tests/%, $(basename $(srcs)))
+objs := $(addprefix .builds/, $(addsuffix .o, $(mods) $(spvs)))
+deps := $(addprefix .builds/, $(addsuffix .dep, $(mods)))
 
 
 -include target.make
@@ -44,9 +52,11 @@ endif
 
 suffixes := %.c %.cc %.glsl
 
-files := $(subst sources/,, $(shell find sources -type f))
+files:= $(subst sources/,, $(shell find sources -type f))
 srcs := $(filter $(suffixes), $(files))
-mods := $(basename $(srcs))
+ssrcs:= $(filter %.frag %.vert, $(files))
+spvs := $(addsuffix .spv, $(ssrcs)),
+mods := $(basename $(srcs) $(spvs))
 objs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(mods)))
 deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
 
@@ -94,6 +104,22 @@ $(TARGETDIR)/%.dep : sources/%.c makefile
 	@mkdir -p $(dir $@)
 	@$(CPP) $(COPTS) -MM $< >> $@
 
+# Vulkan shaders
+.PRECIOUS: $(addprefix $(TARGETDIR)/, $(spvs))
+
+$(TARGETDIR)/%.frag.spv : sources/%.frag makefile
+	@echo " GLSLC $@"
+	@glslc $< -o $@
+
+$(TARGETDIR)/%.vert.spv : sources/%.vert makefile
+	@echo " GLSLC $@"
+	@glslc $< -o $@
+
+$(TARGETDIR)/%.o : $(TARGETDIR)/%.spv makefile
+	@echo " OBJCOPY $@"
+	@mkdir -p $(dir $@)
+	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
+
 
 
 ############################################################### RULES & TARGET
@@ -116,9 +142,14 @@ $(tmods) : $(tobjs) $(TARGETDIR)/$(target)
 	@echo " LD $@"
 	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS)
 
-test:  $(tmods)
-	@$(shell for m in $(tmods); do AUTO_TEST=1 $$m; done)
-	@echo "** TEST DONE."
+testTargets := $(addsuffix .test, $(tmods))
+
+%.test : %
+	@echo $<
+	@AUTO_TEST=1 $<
+
+test: $(testTargets)
+
 
 RELEASE: RELEASE/$(target) test
 
