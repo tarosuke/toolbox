@@ -45,42 +45,34 @@ namespace TB {
 		Buffer::Buffer(
 			const void* orgData,
 			unsigned size,
-			VkBufferUsageFlagBits usage,
-			VkSharingMode) {
+			VkBufferUsageFlags usage,
+			VkMemoryPropertyFlags propertyFlags,
+			VkSharingMode shareMode) {
 
 			VkBufferCreateInfo bufferInfo{
 				.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
 				.flags = 0,
 				.size = size,
 				.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-				.sharingMode = VK_SHARING_MODE_EXCLUSIVE};
+				.sharingMode = shareMode};
 
-			Posit(
-				!vkCreateBuffer(instance, &bufferInfo, nullptr, &buffer));
+			Posit(!vkCreateBuffer(instance, &bufferInfo, nullptr, &buffer));
 
 			VkMemoryRequirements memRequirements;
-			vkGetBufferMemoryRequirements(
-				instance,
-				buffer,
-				&memRequirements);
+			vkGetBufferMemoryRequirements(instance, buffer, &memRequirements);
 
 			VkMemoryAllocateInfo allocInfo{
 				.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
 				.allocationSize = size,
 				.memoryTypeIndex = FindMemoryType(
 					memRequirements.memoryTypeBits,
-					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-						VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)};
+					propertyFlags)};
 			Posit(!vkAllocateMemory(
 				instance,
 				&allocInfo,
 				nullptr,
 				&deviceMemory));
-			Posit(!vkBindBufferMemory(
-				instance,
-				buffer,
-				deviceMemory,
-				0));
+			Posit(!vkBindBufferMemory(instance, buffer, deviceMemory, 0));
 
 			// 頂点転送
 			void* data;

@@ -22,6 +22,7 @@
 #include <toolbox/td/x.h>
 #include <toolbox/td/vulkan/instance.h>
 #include <toolbox/td/vulkan/shader.h>
+#include <toolbox/td/vulkan/buffer.h>
 #include <toolbox/geometry/spread.h>
 #include <toolbox/string.h>
 
@@ -75,15 +76,9 @@ namespace TB {
 					void Draw(VkCommandBuffer&);
 
 				private:
-					Instance instance;
 					const unsigned nVertex;
-					VkBuffer vertexBuffer;
-					VkDeviceMemory vertexBufferMemory;
-					VkBuffer indexBuffer;
-					VkDeviceMemory indexBufferMemory;
-
-					unsigned FindMemoryType(
-						unsigned filter, VkMemoryPropertyFlags properties);
+					Instance instance;
+					Buffer vertexBuffer;
 				};
 
 

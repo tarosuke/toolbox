@@ -29,18 +29,28 @@ namespace TB {
 	namespace VK {
 
 		struct Buffer {
+			Buffer() = delete;
+			Buffer(const Buffer&) = delete;
+			void operator=(const Buffer&) = delete;
+
 			Buffer(
 				const void*,
 				unsigned,
-				VkBufferUsageFlagBits usage,
+				VkBufferUsageFlags,
+				VkMemoryPropertyFlags,
 				VkSharingMode = VK_SHARING_MODE_EXCLUSIVE);
 
 			template <typename T> Buffer(
 				const std::vector<T>& data,
-				VkBufferUsageFlagBits usage,
+				VkBufferUsageFlags usage,
+				VkMemoryPropertyFlags propertyFlags,
 				VkSharingMode shareMode = VK_SHARING_MODE_EXCLUSIVE)
 				: Buffer(
-					  data.data(), sizeof(T) * data.size(), usage, shareMode){};
+					  data.data(),
+					  sizeof(T) * data.size(),
+					  usage,
+					  propertyFlags,
+					  shareMode){};
 			~Buffer();
 
 			operator VkBuffer() { return buffer; };
