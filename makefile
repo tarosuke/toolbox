@@ -41,6 +41,11 @@ deps := $(addprefix .builds/, $(addsuffix .dep, $(mods)))
 target ?= $(shell echo $$PWD | sed s!.*/!! )
 
 
+# targetがtoolbox.aでないのでtoolbox/includeをincludeパスに追加
+ifneq ($(target)),toolbox.a)
+COPTS += -Itoolbox/include
+endif
+
 
 
 ############################################################ FILE RECOGNITIONS
@@ -56,7 +61,7 @@ objs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(mods)))
 deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
 
 # オブジェクトファイルの分類
-testPlaces := $(TARGETDIR)/.mtests/% $(TARGETDIR)/.tests/%
+testPlaces := $(TARGETDIR)/.tests/%
 nobjs := $(filter-out $(testPlaces), $(objs))
 tobjs := $(filter $(testPlaces), $(objs))
 tmods := $(addprefix $(TARGETDIR)/, $(filter .tests/%, $(mods)))
@@ -123,13 +128,12 @@ $(TARGETDIR)/$(target): makefile $(nobjs)
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
 	@ar rc $@ $(nobjs)
-else
-	@echo " LD $@"
-	@gcc -o $(executable) $(nobjs) $(EXLIBS)
-endif
 	@rm -f $(target)
 	@ln -s $(TARGETDIR)/$(target) $(target)
-
+else
+	@echo " LD $@"
+	@gcc -o $(TARGETDIR)/$(target) $(nobjs) $(EXLIBS)
+endif
 
 clean:
 	rm -rf RELEASE DEBUG COVERAGE .builds *.gcov
