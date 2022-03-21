@@ -28,7 +28,7 @@ namespace TB {
 	public:
 		Type() = default;
 		Type(const T& t) : body(t){};
-		T& operator=(const T& t) {
+		const T& operator=(const T& t) {
 			body = t;
 			return body;
 		};
@@ -44,15 +44,32 @@ namespace TB {
 			body -= t.body;
 			return *this;
 		};
-		template <typename U> Type operator*(U& t) { return Type(body * t); };
+		template <typename U> Type operator*(U& t) const {
+			return Type(body * t);
+		};
 		template <typename U> Type operator*=(const U& t) {
 			body *= t;
 			return *this;
 		};
-		template <typename U> Type operator/(U& t) { return Type(body / t); };
+		template <typename U> Type operator/(U& t) const {
+			return Type(body / t);
+		};
 		template <typename U> Type operator/=(const U& t) {
 			body /= t;
 			return *this;
+		};
+
+		template <typename U> bool operator<(U& t) const {
+			return body < t.body;
+		};
+		template <typename U> bool operator<=(U& t) const {
+			return body <= t.body;
+		};
+		template <typename U> bool operator>(U& t) const {
+			return body > t.body;
+		};
+		template <typename U> bool operator>=(U& t) const {
+			return body >= t.body;
 		};
 
 	protected:
