@@ -24,10 +24,10 @@
 
 
 namespace TB {
-	void TimeBase::Update() {
-		timespec ts; //<-こいつを使いたくないがためだけに作った
+	void nsec::Update() {
+		timespec ts;
 		clock_gettime(CLOCK_BOOTTIME, &ts);
-		*this = (u64)(nsec(ts.tv_nsec) + sec(ts.tv_sec));
+		*this = (nsec(ts.tv_nsec) + sec(ts.tv_sec));
 	}
 
 

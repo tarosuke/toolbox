@@ -26,7 +26,7 @@
 namespace TB {
 	namespace VK {
 
-		unsigned TD::StaticObject::FindMemoryType(
+		unsigned TD::Layer::Object::FindMemoryType(
 			unsigned filter, VkMemoryPropertyFlags properties) {
 			VkPhysicalDeviceMemoryProperties memProperties;
 			vkGetPhysicalDeviceMemoryProperties(instance, &memProperties);
@@ -41,7 +41,7 @@ namespace TB {
 		}
 
 
-		TD::StaticObject::StaticObject(
+		TD::Layer::Object::Object(
 			const std::vector<Vertex>& vertices,
 			const std::vector<unsigned>& indexes)
 			: nVertex(vertices.size()) {
@@ -93,12 +93,12 @@ namespace TB {
 			vkUnmapMemory(instance, vertexBufferMemory);
 		}
 
-		TD::StaticObject::~StaticObject() {
+		TD::Layer::Object::~Object() {
 			vkDestroyBuffer(instance, vertexBuffer, nullptr);
 			vkFreeMemory(instance, vertexBufferMemory, nullptr);
 		}
 
-		void TD::StaticObject::Draw(VkCommandBuffer& cb) {
+		void TD::Layer::Object::Draw(VkCommandBuffer& cb) {
 			VkBuffer vertexBuffers[] = {vertexBuffer};
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(cb, 0, 1, vertexBuffers, offsets);

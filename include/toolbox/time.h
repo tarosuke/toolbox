@@ -24,28 +24,29 @@
 
 namespace TB {
 
-	struct TimeBase : public Type<u64> {
-		TimeBase(){};
-		void Update(); // 現在時刻取得
-
-	protected:
-		TimeBase(u64 ns) : Type<u64>(ns){};
-	};
-
-	template <unsigned S> struct Time : public TimeBase {
-		Time(){};
-		Time(u64 init) : TimeBase(init * S){};
-		operator u64() const { return body / S; };
-		const Time& operator=(const ::TB::Type<u64>& t) {
-			*this = t;
+	/***** 時間関連クラスの基本
+	 * 正直なところ、これらのクラスを作ったのはtimespecを直接触りたくないから。
+	 * 十進ベースでバッチイことこの上ない。
+	 */
+	struct nsec : public Type<u64> {
+		nsec() { Update(); };
+		nsec(u64 o) : Type(o){};
+		const nsec& operator=(const Type<u64>& t) {
+			*(Type<u64>*)this = t;
 			return *this;
 		};
+		void Update();
+	};
+
+	template <unsigned S> struct Time : nsec {
+		Time(){};
+		Time(u64 init) : nsec(init * S){};
+		operator u64() const { return body / S; };
 	};
 
 	using sec = Time<1000000000>;
 	using msec = Time<1000000>;
 	using usec = Time<1000>;
-	using nsec = Time<1>;
 
 
 	// タイムスタンプ管理

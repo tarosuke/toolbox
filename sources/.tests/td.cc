@@ -24,7 +24,7 @@ int main() {
 
 		// ここいらでオブジェクトをtdへ登録
 		auto& layer(td.FindLayer("scenery"));
-		TB::VK::TD::StaticObject object(
+		TB::VK::TD::Layer::Object object(
 			{{{0.0f, -0.5f, 1.0f}, {1.0f, 0.0f}},
 			 {{0.5f, 0.5f, 1.0f}, {0.0f, 1.0f}},
 			 {{-0.5f, 0.5f, 1.0f}, {0.0f, 0.0f}}},
