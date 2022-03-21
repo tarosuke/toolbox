@@ -53,7 +53,7 @@ namespace TB {
 				.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
 				.flags = 0,
 				.size = size,
-				.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+				.usage = usage,
 				.sharingMode = shareMode};
 
 			Posit(!vkCreateBuffer(instance, &bufferInfo, nullptr, &buffer));

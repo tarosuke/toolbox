@@ -75,6 +75,7 @@ namespace TB {
 
 				private:
 					const unsigned nVertex;
+					const unsigned nIndex;
 					Instance instance;
 					Buffer vertexBuffer;
 					Buffer indexBuffer;

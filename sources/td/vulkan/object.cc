@@ -29,7 +29,7 @@ namespace TB {
 		TD::Layer::Object::Object(
 			const std::vector<Vertex>& vertices,
 			const std::vector<u16>& indexes)
-			: nVertex(vertices.size()),
+			: nVertex(vertices.size()), nIndex(indexes.size()),
 			  vertexBuffer(
 				  vertices,
 				  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
@@ -47,7 +47,8 @@ namespace TB {
 			VkBuffer vertexBuffers[] = {vertexBuffer};
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(cb, 0, 1, vertexBuffers, offsets);
-			vkCmdDraw(cb, nVertex, 1, 0, 1);
+			vkCmdBindIndexBuffer(cb, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+			vkCmdDrawIndexed(cb, nIndex, 1, 0, 0, 0);
 		}
 	}
 }
