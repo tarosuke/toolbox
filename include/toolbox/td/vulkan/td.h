@@ -22,6 +22,7 @@
 #include <toolbox/td/x.h>
 #include <toolbox/td/vulkan/instance.h>
 #include <toolbox/td/vulkan/shader.h>
+#include <toolbox/td/vulkan/buffer.h>
 #include <toolbox/geometry/spread.h>
 #include <toolbox/string.h>
 
@@ -67,21 +68,17 @@ namespace TB {
 						} texCoord;
 					};
 
-					Object(
-						const std::vector<Vertex>&,
-						const std::vector<unsigned>&);
+					Object(const std::vector<Vertex>&, const std::vector<u16>&);
 					~Object();
 
 					void Draw(VkCommandBuffer&);
 
 				private:
-					Instance instance;
 					const unsigned nVertex;
-					VkBuffer vertexBuffer;
-					VkDeviceMemory vertexBufferMemory;
-
-					unsigned FindMemoryType(
-						unsigned filter, VkMemoryPropertyFlags properties);
+					const unsigned nIndex;
+					Instance instance;
+					Buffer vertexBuffer;
+					Buffer indexBuffer;
 				};
 
 
