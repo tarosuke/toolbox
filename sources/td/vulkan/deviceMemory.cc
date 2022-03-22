@@ -16,17 +16,55 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#include <toolbox/td/vulkan/deviceMemory.h>
 #include <toolbox/exception.h>
-#include <toolbox/td/vulkan/buffer.h>
-
-#include <string.h>
 
 
 
 namespace TB {
 	namespace VK {
 
-		unsigned Buffer::FindMemoryType(
+
+		DeviceMemory::DeviceMemory(
+			u32 size, VkBuffer buffer, VkMemoryPropertyFlags propertyFlags) {
+			VkMemoryRequirements memRequirements;
+			vkGetBufferMemoryRequirements(instance, buffer, &memRequirements);
+
+			VkMemoryAllocateInfo allocInfo{
+				.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+				.allocationSize = size,
+				.memoryTypeIndex = FindMemoryType(
+					memRequirements.memoryTypeBits,
+					propertyFlags)};
+			Posit(!vkAllocateMemory(
+				instance,
+				&allocInfo,
+				nullptr,
+				&deviceMemory));
+		}
+		DeviceMemory::DeviceMemory(
+			u32 size, VkImage image, VkMemoryPropertyFlags propertyFlags) {
+			VkMemoryRequirements memRequirements;
+			vkGetImageMemoryRequirements(instance, image, &memRequirements);
+
+			VkMemoryAllocateInfo allocInfo{
+				.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+				.allocationSize = size,
+				.memoryTypeIndex = FindMemoryType(
+					memRequirements.memoryTypeBits,
+					propertyFlags)};
+			Posit(!vkAllocateMemory(
+				instance,
+				&allocInfo,
+				nullptr,
+				&deviceMemory));
+		}
+
+		DeviceMemory::~DeviceMemory() {
+			vkFreeMemory(instance, deviceMemory, nullptr);
+		}
+
+		unsigned DeviceMemory::FindMemoryType(
 			unsigned filter, VkMemoryPropertyFlags properties) {
 			VkPhysicalDeviceMemoryProperties memProperties;
 			vkGetPhysicalDeviceMemoryProperties(instance, &memProperties);
@@ -40,38 +78,5 @@ namespace TB {
 			Posit(false);
 		}
 
-
-		Buffer::B::B(
-			unsigned size, VkBufferUsageFlags usage, VkSharingMode shareMode) {
-			VkBufferCreateInfo bufferInfo{
-				.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-				.flags = 0,
-				.size = size,
-				.usage = usage,
-				.sharingMode = shareMode};
-
-			Posit(!vkCreateBuffer(instance, &bufferInfo, nullptr, &buffer));
-		}
-		Buffer::B::~B() { vkDestroyBuffer(instance, buffer, nullptr); }
-
-
-		Buffer::Buffer(
-			const void* orgData,
-			unsigned size,
-			VkBufferUsageFlags usage,
-			VkMemoryPropertyFlags propertyFlags,
-			VkSharingMode shareMode)
-			: buffer(size, usage, shareMode),
-			  deviceMemory(size, buffer, propertyFlags) {
-			Posit(!vkBindBufferMemory(instance, buffer, deviceMemory, 0));
-
-			// 頂点転送
-			void* data;
-			Posit(!vkMapMemory(instance, deviceMemory, 0, size, 0, &data));
-			memcpy(data, orgData, size);
-			vkUnmapMemory(instance, deviceMemory);
-		}
-
-		Buffer::~Buffer() {}
 	}
 }

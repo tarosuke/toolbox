@@ -18,6 +18,7 @@
  */
 #pragma once
 #include <toolbox/td/vulkan/instance.h>
+#include <toolbox/td/vulkan/deviceMemory.h>
 
 #include <vulkan/vulkan.h>
 
@@ -71,7 +72,7 @@ namespace TB {
 			} buffer;
 
 			Instance instance;
-			VkDeviceMemory deviceMemory;
+			DeviceMemory deviceMemory;
 
 			unsigned FindMemoryType(unsigned, VkMemoryPropertyFlags);
 		};
