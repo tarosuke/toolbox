@@ -35,7 +35,7 @@ namespace TB {
 
 			Buffer(
 				const void*,
-				unsigned,
+				unsigned size,
 				VkBufferUsageFlags,
 				VkMemoryPropertyFlags,
 				VkSharingMode = VK_SHARING_MODE_EXCLUSIVE);
@@ -62,6 +62,24 @@ namespace TB {
 			VkDeviceMemory deviceMemory;
 
 			unsigned FindMemoryType(unsigned, VkMemoryPropertyFlags);
+		};
+
+		struct VertexBuffer : public Buffer {
+			template <typename T> VertexBuffer(const std::vector<T>& data)
+				: Buffer(
+					  data,
+					  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+					  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+						  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT){};
+		};
+
+		struct IndexBuffer : public Buffer {
+			template <typename T> IndexBuffer(const std::vector<T>& data)
+				: Buffer(
+					  data,
+					  VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+					  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+						  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT){};
 		};
 	}
 }

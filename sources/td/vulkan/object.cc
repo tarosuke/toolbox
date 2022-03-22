@@ -30,16 +30,7 @@ namespace TB {
 			const std::vector<Vertex>& vertices,
 			const std::vector<u16>& indexes)
 			: nVertex(vertices.size()), nIndex(indexes.size()),
-			  vertexBuffer(
-				  vertices,
-				  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-				  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-					  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
-			  indexBuffer(
-				  indexes,
-				  VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-				  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-					  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) {}
+			  vertexBuffer(vertices), indexBuffer(indexes) {}
 
 		TD::Layer::Object::~Object() {}
 

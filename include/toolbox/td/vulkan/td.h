@@ -25,6 +25,7 @@
 #include <toolbox/td/vulkan/buffer.h>
 #include <toolbox/geometry/spread.h>
 #include <toolbox/string.h>
+#include <toolbox/canvas.h>
 
 #include <vulkan/vulkan.h>
 
@@ -77,8 +78,8 @@ namespace TB {
 					const unsigned nVertex;
 					const unsigned nIndex;
 					Instance instance;
-					Buffer vertexBuffer;
-					Buffer indexBuffer;
+					VertexBuffer vertexBuffer;
+					IndexBuffer indexBuffer;
 				};
 
 
