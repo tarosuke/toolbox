@@ -42,13 +42,8 @@ namespace TB {
 		}
 
 
-		Buffer::Buffer(
-			const void* orgData,
-			unsigned size,
-			VkBufferUsageFlags usage,
-			VkMemoryPropertyFlags propertyFlags,
-			VkSharingMode shareMode) {
-
+		Buffer::B::B(
+			unsigned size, VkBufferUsageFlags usage, VkSharingMode shareMode) {
 			VkBufferCreateInfo bufferInfo{
 				.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
 				.flags = 0,
@@ -57,6 +52,17 @@ namespace TB {
 				.sharingMode = shareMode};
 
 			Posit(!vkCreateBuffer(instance, &bufferInfo, nullptr, &buffer));
+		}
+		Buffer::B::~B() { vkDestroyBuffer(instance, buffer, nullptr); }
+
+
+		Buffer::Buffer(
+			const void* orgData,
+			unsigned size,
+			VkBufferUsageFlags usage,
+			VkMemoryPropertyFlags propertyFlags,
+			VkSharingMode shareMode)
+			: buffer(size, usage, shareMode) {
 
 			VkMemoryRequirements memRequirements;
 			vkGetBufferMemoryRequirements(instance, buffer, &memRequirements);
@@ -76,20 +82,11 @@ namespace TB {
 
 			// 頂点転送
 			void* data;
-			Posit(!vkMapMemory(
-				instance,
-				deviceMemory,
-				0,
-				bufferInfo.size,
-				0,
-				&data));
-			memcpy(data, orgData, (size_t)bufferInfo.size);
+			Posit(!vkMapMemory(instance, deviceMemory, 0, size, 0, &data));
+			memcpy(data, orgData, size);
 			vkUnmapMemory(instance, deviceMemory);
 		}
 
-		Buffer::~Buffer() {
-			vkDestroyBuffer(instance, buffer, nullptr);
-			vkFreeMemory(instance, deviceMemory, nullptr);
-		}
+		Buffer::~Buffer() { vkFreeMemory(instance, deviceMemory, nullptr); }
 	}
 }

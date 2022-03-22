@@ -57,8 +57,20 @@ namespace TB {
 			operator VkDeviceMemory() { return deviceMemory; };
 
 		private:
+			struct B {
+				B(unsigned size,
+				  VkBufferUsageFlags usage,
+				  VkSharingMode shareMode);
+				~B();
+
+				operator VkBuffer() { return buffer; };
+
+			private:
+				Instance instance;
+				VkBuffer buffer;
+			} buffer;
+
 			Instance instance;
-			VkBuffer buffer;
 			VkDeviceMemory deviceMemory;
 
 			unsigned FindMemoryType(unsigned, VkMemoryPropertyFlags);
