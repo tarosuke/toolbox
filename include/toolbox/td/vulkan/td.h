@@ -23,6 +23,7 @@
 #include <toolbox/td/vulkan/instance.h>
 #include <toolbox/td/vulkan/shader.h>
 #include <toolbox/td/vulkan/buffer.h>
+#include <toolbox/td/vulkan/texture.h>
 #include <toolbox/geometry/spread.h>
 #include <toolbox/string.h>
 #include <toolbox/canvas.h>
@@ -80,6 +81,7 @@ namespace TB {
 					Instance instance;
 					VertexBuffer vertexBuffer;
 					IndexBuffer indexBuffer;
+					Texture texture;
 				};
 
 

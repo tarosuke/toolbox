@@ -24,7 +24,19 @@
 namespace TB {
 	namespace VK {
 
-		Texture::Texture(u32 width, u32 height, void* data) {
+		Texture::Texture(u32 width, u32 height, void* data)
+			: textureImage(MakeImage(width, height)),
+			  textureImageMemory(
+				  width * height * 4,
+				  textureImage,
+				  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
+					  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) {
+			vkBindImageMemory(instance, textureImage, textureImageMemory, 0);
+		}
+
+		Texture::~Texture() { vkDestroyImage(instance, textureImage, 0); }
+
+		VkImage Texture::MakeImage(u32 width, u32 height) {
 			VkImageCreateInfo imageInfo{
 				.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 				.flags = 0, // SPARSEが可能
@@ -43,7 +55,9 @@ namespace TB {
 						 VK_IMAGE_USAGE_SAMPLED_BIT,
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED};
-			Posit(!vkCreateImage(instance, &imageInfo, nullptr, &textureImage));
+			VkImage image;
+			Posit(!vkCreateImage(instance, &imageInfo, nullptr, &image));
+			return image;
 		}
 	}
 }

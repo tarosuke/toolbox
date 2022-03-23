@@ -18,6 +18,7 @@
  */
 #pragma once
 #include <toolbox/td/vulkan/instance.h>
+#include <toolbox/td/vulkan/deviceMemory.h>
 #include <toolbox/type.h>
 
 #include <vulkan/vulkan.h>
@@ -29,11 +30,14 @@ namespace TB {
 
 		struct Texture {
 			Texture(u32 width, u32 height, void* data);
+			~Texture();
 
 		private:
 			Instance instance;
 			VkImage textureImage;
-			VkDeviceMemory textureImageMemory;
+			DeviceMemory textureImageMemory;
+
+			VkImage MakeImage(u32, u32);
 		};
 	}
 }

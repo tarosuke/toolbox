@@ -30,7 +30,8 @@ namespace TB {
 			const std::vector<Vertex>& vertices,
 			const std::vector<u16>& indexes)
 			: nVertex(vertices.size()), nIndex(indexes.size()),
-			  vertexBuffer(vertices), indexBuffer(indexes) {}
+			  vertexBuffer(vertices), indexBuffer(indexes),
+			  texture(256, 256, 0) {}
 
 		TD::Layer::Object::~Object() {}
 
