@@ -31,8 +31,9 @@ namespace TB {
 			u32 height,
 			const void* data,
 			VkFormat format,
-			VkMemoryPropertyFlags propertyFlags)
-			: image(MakeImage(width, height)),
+			VkMemoryPropertyFlags propertyFlags,
+			VkImageLayout initialLayout)
+			: image(MakeImage(width, height, initialLayout)),
 			  imageMemory(width * height * 4, image, propertyFlags),
 			  size(width * height * 4) {
 			vkBindImageMemory(instance, image, imageMemory, 0);
@@ -71,7 +72,8 @@ namespace TB {
 
 
 
-		VkImage Image::MakeImage(u32 width, u32 height) {
+		VkImage
+		Image::MakeImage(u32 width, u32 height, VkImageLayout initialLayout) {
 			VkImageCreateInfo imageInfo{
 				.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 				.flags = 0, // SPARSEが可能
@@ -89,7 +91,7 @@ namespace TB {
 				.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT |
 						 VK_IMAGE_USAGE_SAMPLED_BIT,
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED};
+				.initialLayout = initialLayout};
 			VkImage image;
 			Posit(!vkCreateImage(instance, &imageInfo, nullptr, &image));
 			return image;
