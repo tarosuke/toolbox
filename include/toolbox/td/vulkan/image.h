@@ -28,9 +28,9 @@
 namespace TB {
 	namespace VK {
 
-		struct Texture {
-			Texture(u32 width, u32 height, void* data);
-			~Texture();
+		struct Image {
+			Image(u32 width, u32 height, void* data);
+			~Image();
 
 		private:
 			Instance instance;

@@ -16,7 +16,7 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <toolbox/td/vulkan/texture.h>
+#include <toolbox/td/vulkan/image.h>
 #include <toolbox/exception.h>
 
 
@@ -24,7 +24,7 @@
 namespace TB {
 	namespace VK {
 
-		Texture::Texture(u32 width, u32 height, void* data)
+		Image::Image(u32 width, u32 height, void* data)
 			: image(MakeImage(width, height)),
 			  imageMemory(
 				  width * height * 4,
@@ -48,12 +48,12 @@ namespace TB {
 			Posit(!vkCreateImageView(instance, &viewInfo, nullptr, &imageView));
 		}
 
-		Texture::~Texture() {
+		Image::~Image() {
 			vkDestroyImageView(instance, imageView, nullptr);
 			vkDestroyImage(instance, image, 0);
 		}
 
-		VkImage Texture::MakeImage(u32 width, u32 height) {
+		VkImage Image::MakeImage(u32 width, u32 height) {
 			VkImageCreateInfo imageInfo{
 				.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 				.flags = 0, // SPARSEが可能
