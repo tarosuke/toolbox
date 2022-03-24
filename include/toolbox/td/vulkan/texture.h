@@ -34,8 +34,9 @@ namespace TB {
 
 		private:
 			Instance instance;
-			VkImage textureImage;
-			DeviceMemory textureImageMemory;
+			VkImage image;
+			DeviceMemory imageMemory;
+			VkImageView imageView;
 
 			VkImage MakeImage(u32, u32);
 		};

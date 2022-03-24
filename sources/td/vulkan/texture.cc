@@ -25,16 +25,33 @@ namespace TB {
 	namespace VK {
 
 		Texture::Texture(u32 width, u32 height, void* data)
-			: textureImage(MakeImage(width, height)),
-			  textureImageMemory(
+			: image(MakeImage(width, height)),
+			  imageMemory(
 				  width * height * 4,
-				  textureImage,
+				  image,
 				  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
 					  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) {
-			vkBindImageMemory(instance, textureImage, textureImageMemory, 0);
+			vkBindImageMemory(instance, image, imageMemory, 0);
+
+			VkImageViewCreateInfo viewInfo{
+				.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+				.image = image,
+				.viewType = VK_IMAGE_VIEW_TYPE_2D,
+				.format = VK_FORMAT_R8G8B8A8_SRGB, // 固定にして簡略化
+				.subresourceRange{
+					.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+					.baseMipLevel = 0,
+					.levelCount = 1,
+					.baseArrayLayer = 0,
+					.layerCount = 1},
+			};
+			Posit(!vkCreateImageView(instance, &viewInfo, nullptr, &imageView));
 		}
 
-		Texture::~Texture() { vkDestroyImage(instance, textureImage, 0); }
+		Texture::~Texture() {
+			vkDestroyImageView(instance, imageView, nullptr);
+			vkDestroyImage(instance, image, 0);
+		}
 
 		VkImage Texture::MakeImage(u32 width, u32 height) {
 			VkImageCreateInfo imageInfo{
