@@ -32,7 +32,6 @@ int main() {
 		layer.Add(object);
 
 
-		// td.AddScenery(object);
 
 		// 周回処理
 		td.Cyclic();

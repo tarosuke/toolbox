@@ -29,16 +29,54 @@ namespace TB {
 	namespace VK {
 
 		struct Image {
-			Image(u32 width, u32 height, void* data);
+			Image(
+				u32 width,
+				u32 height,
+				const void* initialData,
+				VkFormat,
+				VkMemoryPropertyFlags);
 			~Image();
+
+			void Store(const void* data);
 
 		private:
 			Instance instance;
 			VkImage image;
 			DeviceMemory imageMemory;
 			VkImageView imageView;
+			const u32 size;
 
 			VkImage MakeImage(u32, u32);
+		};
+
+		struct ColorImage : public Image {
+			struct Def {
+				u32 width;
+				u32 height;
+				const void* initialData;
+			};
+
+			ColorImage(u32 width, u32 height, const void* initialData)
+				: Image(
+					  width,
+					  height,
+					  initialData,
+					  VK_FORMAT_R8G8B8A8_SRGB,
+					  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
+						  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT){};
+			ColorImage(const Def& def)
+				: ColorImage(def.width, def.height, def.initialData){};
+		};
+
+		struct DepthStencilImage : public Image {
+			DepthStencilImage(u32 width, u32 height)
+				: Image(
+					  width,
+					  height,
+					  0,
+					  VK_FORMAT_D24_UNORM_S8_UINT,
+					  VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT){};
+			void Store(const void*) = delete; //ホストからは書かない
 		};
 	}
 }

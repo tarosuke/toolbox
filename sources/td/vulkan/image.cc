@@ -19,25 +19,29 @@
 #include <toolbox/td/vulkan/image.h>
 #include <toolbox/exception.h>
 
+#include <string.h>
+
 
 
 namespace TB {
 	namespace VK {
 
-		Image::Image(u32 width, u32 height, void* data)
+		Image::Image(
+			u32 width,
+			u32 height,
+			const void* data,
+			VkFormat format,
+			VkMemoryPropertyFlags propertyFlags)
 			: image(MakeImage(width, height)),
-			  imageMemory(
-				  width * height * 4,
-				  image,
-				  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
-					  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) {
+			  imageMemory(width * height * 4, image, propertyFlags),
+			  size(width * height * 4) {
 			vkBindImageMemory(instance, image, imageMemory, 0);
 
 			VkImageViewCreateInfo viewInfo{
 				.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
 				.image = image,
 				.viewType = VK_IMAGE_VIEW_TYPE_2D,
-				.format = VK_FORMAT_R8G8B8A8_SRGB, // 固定にして簡略化
+				.format = format,
 				.subresourceRange{
 					.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
 					.baseMipLevel = 0,
@@ -46,12 +50,26 @@ namespace TB {
 					.layerCount = 1},
 			};
 			Posit(!vkCreateImageView(instance, &viewInfo, nullptr, &imageView));
+
+			// 初期化データがあるならそのデータで初期化
+			if (data) {
+				Store(data);
+			}
 		}
 
 		Image::~Image() {
 			vkDestroyImageView(instance, imageView, nullptr);
 			vkDestroyImage(instance, image, 0);
 		}
+
+		void Image::Store(const void* data) {
+			void* dest;
+			Posit(!vkMapMemory(instance, imageMemory, 0, size, 0, &dest));
+			memcpy(dest, data, size);
+			vkUnmapMemory(instance, imageMemory);
+		}
+
+
 
 		VkImage Image::MakeImage(u32 width, u32 height) {
 			VkImageCreateInfo imageInfo{

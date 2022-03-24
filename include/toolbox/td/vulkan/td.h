@@ -81,7 +81,7 @@ namespace TB {
 					Instance instance;
 					VertexBuffer vertexBuffer;
 					IndexBuffer indexBuffer;
-					Image texture;
+					ColorImage texture;
 				};
 
 
