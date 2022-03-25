@@ -78,12 +78,25 @@ namespace TB {
 
 					void Draw(VkCommandBuffer&);
 
+
+					struct Sampler {
+						Sampler();
+						~Sampler();
+
+						operator VkSampler() { return sampler; };
+
+					private:
+						Instance instance;
+						VkSampler sampler;
+					};
+
 				private:
 					const unsigned nVertex;
 					const unsigned nIndex;
 					Instance instance;
 					VertexBuffer vertexBuffer;
 					IndexBuffer indexBuffer;
+					Sampler sampler;
 					ColorImage texture;
 				};
 
