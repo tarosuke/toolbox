@@ -40,6 +40,10 @@ namespace TB {
 
 			void Store(const void* data);
 
+			operator VkImage() { return image; };
+			operator VkImageView() { return imageView; };
+			operator DeviceMemory&() { return imageMemory; };
+
 		private:
 			Instance instance;
 			VkImage image;
