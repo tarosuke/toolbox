@@ -70,7 +70,10 @@ namespace TB {
 						} texCoord;
 					};
 
-					Object(const std::vector<Vertex>&, const std::vector<u16>&);
+					Object(
+						const std::vector<Vertex>&,
+						const std::vector<u16>&,
+						const ColorImage::Def&);
 					~Object();
 
 					void Draw(VkCommandBuffer&);

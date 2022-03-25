@@ -28,7 +28,8 @@ namespace TB {
 
 		TD::Layer::Object::Object(
 			const std::vector<Vertex>& vertices,
-			const std::vector<u16>& indexes)
+			const std::vector<u16>& indexes,
+			const ColorImage::Def& imageDef)
 			: nVertex(vertices.size()), nIndex(indexes.size()),
 			  vertexBuffer(vertices), indexBuffer(indexes),
 			  texture(256, 256, 0) {}
