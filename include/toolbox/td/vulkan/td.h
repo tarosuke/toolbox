@@ -98,6 +98,7 @@ namespace TB {
 					IndexBuffer indexBuffer;
 					Sampler sampler;
 					ColorImage texture;
+					VkDescriptorImageInfo imageDescInfo;
 				};
 
 

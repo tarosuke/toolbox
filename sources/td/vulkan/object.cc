@@ -32,7 +32,12 @@ namespace TB {
 			const ColorImage::Def& imageDef)
 			: nVertex(vertices.size()), nIndex(indexes.size()),
 			  vertexBuffer(vertices), indexBuffer(indexes),
-			  texture(256, 256, 0) {}
+			  texture(256, 256, 0) {
+			imageDescInfo = {
+				.sampler = sampler,
+				.imageView = texture,
+				.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+		}
 
 		TD::Layer::Object::~Object() {}
 
