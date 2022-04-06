@@ -18,6 +18,7 @@
  */
 #pragma once
 #include <toolbox/td/vulkan/instance.h>
+#include <toolbox/td/vulkan/deviceMemory.h>
 
 #include <vulkan/vulkan.h>
 
@@ -35,7 +36,7 @@ namespace TB {
 
 			Buffer(
 				const void*,
-				unsigned,
+				unsigned size,
 				VkBufferUsageFlags,
 				VkMemoryPropertyFlags,
 				VkSharingMode = VK_SHARING_MODE_EXCLUSIVE);
@@ -57,11 +58,41 @@ namespace TB {
 			operator VkDeviceMemory() { return deviceMemory; };
 
 		private:
+			struct B {
+				B(unsigned size,
+				  VkBufferUsageFlags usage,
+				  VkSharingMode shareMode);
+				~B();
+
+				operator VkBuffer() { return buffer; };
+
+			private:
+				Instance instance;
+				VkBuffer buffer;
+			} buffer;
+
 			Instance instance;
-			VkBuffer buffer;
-			VkDeviceMemory deviceMemory;
+			DeviceMemory deviceMemory;
 
 			unsigned FindMemoryType(unsigned, VkMemoryPropertyFlags);
+		};
+
+		struct VertexBuffer : public Buffer {
+			template <typename T> VertexBuffer(const std::vector<T>& data)
+				: Buffer(
+					  data,
+					  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+					  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+						  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT){};
+		};
+
+		struct IndexBuffer : public Buffer {
+			template <typename T> IndexBuffer(const std::vector<T>& data)
+				: Buffer(
+					  data,
+					  VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+					  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+						  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT){};
 		};
 	}
 }

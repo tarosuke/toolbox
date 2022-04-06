@@ -23,8 +23,10 @@
 #include <toolbox/td/vulkan/instance.h>
 #include <toolbox/td/vulkan/shader.h>
 #include <toolbox/td/vulkan/buffer.h>
+#include <toolbox/td/vulkan/image.h>
 #include <toolbox/geometry/spread.h>
 #include <toolbox/string.h>
+#include <toolbox/canvas.h>
 
 #include <vulkan/vulkan.h>
 
@@ -68,17 +70,35 @@ namespace TB {
 						} texCoord;
 					};
 
-					Object(const std::vector<Vertex>&, const std::vector<u16>&);
+					Object(
+						const std::vector<Vertex>&,
+						const std::vector<u16>&,
+						const ColorImage::Def&);
 					~Object();
 
 					void Draw(VkCommandBuffer&);
+
+
+					struct Sampler {
+						Sampler();
+						~Sampler();
+
+						operator VkSampler() { return sampler; };
+
+					private:
+						Instance instance;
+						VkSampler sampler;
+					};
 
 				private:
 					const unsigned nVertex;
 					const unsigned nIndex;
 					Instance instance;
-					Buffer vertexBuffer;
-					Buffer indexBuffer;
+					VertexBuffer vertexBuffer;
+					IndexBuffer indexBuffer;
+					Sampler sampler;
+					ColorImage texture;
+					VkDescriptorImageInfo imageDescInfo;
 				};
 
 

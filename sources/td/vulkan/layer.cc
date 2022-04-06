@@ -90,8 +90,8 @@ namespace TB {
 				.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
 				.pNext = 0,
 				.flags = 0,
-				.setLayoutCount = 0, // Optional
-				.pSetLayouts = nullptr, // Optional
+				.setLayoutCount = 0, // ↓の数
+				.pSetLayouts = nullptr, // バインドするUniformのレイアウト
 				.pushConstantRangeCount = 0, // Optional
 				.pPushConstantRanges = nullptr, // Optional
 			};

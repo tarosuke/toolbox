@@ -28,18 +28,16 @@ namespace TB {
 
 		TD::Layer::Object::Object(
 			const std::vector<Vertex>& vertices,
-			const std::vector<u16>& indexes)
+			const std::vector<u16>& indexes,
+			const ColorImage::Def& imageDef)
 			: nVertex(vertices.size()), nIndex(indexes.size()),
-			  vertexBuffer(
-				  vertices,
-				  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-				  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-					  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
-			  indexBuffer(
-				  indexes,
-				  VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-				  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-					  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) {}
+			  vertexBuffer(vertices), indexBuffer(indexes),
+			  texture(256, 256, 0) {
+			imageDescInfo = {
+				.sampler = sampler,
+				.imageView = texture,
+				.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+		}
 
 		TD::Layer::Object::~Object() {}
 
@@ -49,6 +47,33 @@ namespace TB {
 			vkCmdBindVertexBuffers(cb, 0, 1, vertexBuffers, offsets);
 			vkCmdBindIndexBuffer(cb, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 			vkCmdDrawIndexed(cb, nIndex, 1, 0, 0, 0);
+		}
+
+
+		TD::Layer::Object::Sampler::Sampler() {
+			VkSamplerCreateInfo samplerInfo{
+				.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+				.magFilter = VK_FILTER_LINEAR,
+				.minFilter = VK_FILTER_LINEAR,
+				.mipmapMode =
+					VK_SAMPLER_MIPMAP_MODE_NEAREST, // VK_SAMPLER_MIPMAP_MODE_LINEAR,
+				.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+				.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+				.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+				.mipLodBias = 0.0f,
+				.anisotropyEnable = VK_FALSE,
+				.compareEnable = VK_FALSE,
+				.compareOp = VK_COMPARE_OP_ALWAYS,
+				.minLod = 0.0f,
+				.maxLod = 0.0f,
+				.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
+				.unnormalizedCoordinates = VK_FALSE,
+			};
+			Posit(!vkCreateSampler(instance, &samplerInfo, nullptr, &sampler));
+		}
+
+		TD::Layer::Object::Sampler::~Sampler() {
+			vkDestroySampler(instance, sampler, nullptr);
 		}
 	}
 }

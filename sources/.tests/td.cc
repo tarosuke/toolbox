@@ -23,16 +23,25 @@ int main() {
 		} td(200, 200, TB::TD::Frustum(0.01, 0.01, 0.01, 100000));
 
 		// ここいらでオブジェクトをtdへ登録
+		static unsigned char texture[16][16][4];
+		for (unsigned v(0); v < 16; ++v) {
+			for (unsigned u(0); u < 16; ++u) {
+				texture[v][u][0] = v * 16 + u;
+				texture[v][u][1] = u * 16 + v;
+				texture[v][u][2] = 127;
+				texture[v][u][3] = 0;
+			}
+		}
 		auto& layer(td.FindLayer("scenery"));
 		TB::VK::TD::Layer::Object object(
 			{{{0.0f, -0.5f, 1.0f}, {1.0f, 0.0f}},
 			 {{0.5f, 0.5f, 1.0f}, {0.0f, 1.0f}},
 			 {{-0.5f, 0.5f, 1.0f}, {0.0f, 0.0f}}},
-			{0, 1, 2});
+			{0, 1, 2},
+			{16, 16, texture});
 		layer.Add(object);
 
 
-		// td.AddScenery(object);
 
 		// 周回処理
 		td.Cyclic();
