@@ -35,7 +35,7 @@ target ?= $(shell echo $$PWD | sed s!.*/!! )
 # targetがlibtoolbox.aでない場合の定義
 ifneq ($(target),libtoolbox.a)
 COPTS += -Itoolbox/include
-$(TARGETDIR)/$(target): toolbox/toolbox.a
+$(TARGETDIR)/$(target): toolbox/libtoolbox.a
 toolbox/libtoolbox.a :
 	make -j -C toolbox $(TARGETDIR)
 endif
@@ -49,7 +49,7 @@ suffixes := %.c %.cc %.glsl
 files:= $(subst sources/,, $(shell find sources -type f))
 srcs := $(filter $(suffixes), $(files))
 ssrcs:= $(filter %.frag %.vert, $(files))
-spvs := $(addsuffix .spv, $(ssrcs)),
+spvs := $(addsuffix .spv, $(ssrcs))
 mods := $(basename $(srcs) $(spvs))
 objs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(mods)))
 deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
@@ -130,6 +130,9 @@ else
 endif
 
 clean:
+	@echo test:$(addsuffix .test, )
+	@echo ssccs:$(ssrcs)
+	@echo spvs:$(spvs)
 	rm -rf RELEASE DEBUG COVERAGE .builds *.gcov
 
 $(tmods) : $(tobjs) $(TARGETDIR)/$(target)
