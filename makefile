@@ -35,10 +35,10 @@ target ?= $(shell echo $$PWD | sed s!.*/!! )
 # targetがlibtoolbox.aでない場合の定義
 ifneq ($(target),libtoolbox.a)
 COPTS += -Itoolbox/include
-$(TARGETDIR)/$(target): toolbox/libtoolbox.a
-toolbox/libtoolbox.a :
+$(TARGETDIR)/$(target): toolbox/$(TARGETDIR)/libtoolbox.a
+toolbox/$(TARGETDIR)/libtoolbox.a :
 	make -j -C toolbox $(TARGETDIR)
-EXLIBS += -Ltoolbox -ltoolbox
+EXLIBS += -Ltoolbox/$(TARGETDIR) -ltoolbox
 endif
 
 
@@ -123,8 +123,6 @@ $(TARGETDIR)/$(target): makefile $(nobjs)
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
 	ar rc $@ $(nobjs)
-	@rm -f $(target)
-	@ln -s $(TARGETDIR)/$(target) $(target)
 else
 	@echo " LD $@"
 	gcc -o $(TARGETDIR)/$(target) $(nobjs) $(EXLIBS)
@@ -132,9 +130,7 @@ endif
 
 clean:
 	@echo test:$(addsuffix .test, )
-	@echo ssccs:$(ssrcs)
-	@echo spvs:$(spvs)
-	rm -rf RELEASE DEBUG COVERAGE .builds *.gcov
+	rm -rf RELEASE DEBUG COVERAGE *.gcov
 	if [ -d toolbox ]; then make -C toolbox clean; fi
 
 $(tmods) : $(tobjs) $(TARGETDIR)/$(target)
