@@ -32,9 +32,12 @@ EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgco
 target ?= $(shell echo $$PWD | sed s!.*/!! )
 
 
-# targetがtoolbox.aでないのでtoolbox/includeをincludeパスに追加
-ifneq ($(target)),toolbox.a)
+# targetがlibtoolbox.aでない場合の定義
+ifneq ($(target),libtoolbox.a)
 COPTS += -Itoolbox/include
+$(TARGETDIR)/$(target): toolbox/toolbox.a
+toolbox/libtoolbox.a :
+	make -j -C toolbox $(TARGETDIR)
 endif
 
 
