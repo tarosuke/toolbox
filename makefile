@@ -38,6 +38,7 @@ COPTS += -Itoolbox/include
 $(TARGETDIR)/$(target): toolbox/libtoolbox.a
 toolbox/libtoolbox.a :
 	make -j -C toolbox $(TARGETDIR)
+EXLIBS += -Ltoolbox -ltoolbox
 endif
 
 
@@ -121,12 +122,12 @@ $(TARGETDIR)/%.o : $(TARGETDIR)/%.spv makefile
 $(TARGETDIR)/$(target): makefile $(nobjs)
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
-	@ar rc $@ $(nobjs)
+	ar rc $@ $(nobjs)
 	@rm -f $(target)
 	@ln -s $(TARGETDIR)/$(target) $(target)
 else
 	@echo " LD $@"
-	@gcc -o $(TARGETDIR)/$(target) $(nobjs) $(EXLIBS)
+	gcc -o $(TARGETDIR)/$(target) $(nobjs) $(EXLIBS)
 endif
 
 clean:
@@ -134,6 +135,7 @@ clean:
 	@echo ssccs:$(ssrcs)
 	@echo spvs:$(spvs)
 	rm -rf RELEASE DEBUG COVERAGE .builds *.gcov
+	if [ -d toolbox ]; then make -C toolbox clean; fi
 
 $(tmods) : $(tobjs) $(TARGETDIR)/$(target)
 	@echo " LD $@"
