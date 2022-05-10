@@ -28,15 +28,6 @@ CCOPTS += $(COPTS) -std=c++11
 
 EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov -lvulkan
 
-files := $(subst sources/,, $(shell find sources -type f))
-srcs := $(filter $(suffixes), $(files))
-spvs := $(filter %.frag %.vert, $(files))
-sbins:= $(addprefix .builds/, $(addsuffix .spv, $(spvs)))
-mods := $(filter-out tests/%, $(basename $(srcs)))
-objs := $(addprefix .builds/, $(addsuffix .o, $(mods) $(spvs)))
-deps := $(addprefix .builds/, $(addsuffix .dep, $(mods)))
-
-
 -include target.make
 target ?= $(shell echo $$PWD | sed s!.*/!! )
 
