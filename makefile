@@ -26,7 +26,7 @@ endif
 COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
 CCOPTS += $(COPTS) -std=c++11
 
-EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov -lvulkan
+EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov -lvulkan -lgdbm
 
 -include target.make
 target ?= $(shell echo $$PWD | sed s!.*/!! )
@@ -75,12 +75,12 @@ vpath %.o $(TARGETDIR)
 $(TARGETDIR)/%.o : sources/%.cc makefile
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
-	@$(CC) $(CCOPTS) -c -o $@ $<
+	@LANG=C $(CC) $(CCOPTS) -c -o $@ $<
 
 $(TARGETDIR)/%.o : sources/%.c makefile
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
-	@${CC} $(COPTS) -c -o $@ $<
+	@LANG=C ${CC} $(COPTS) -c -o $@ $<
 
 $(TARGETDIR)/%.o : sources/%.glsl makefile
 	@echo " OBJCOPY $@"
