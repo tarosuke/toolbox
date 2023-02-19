@@ -26,24 +26,19 @@ endif
 COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
 CCOPTS += $(COPTS) -std=c++11
 
-EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov -lvulkan
-
-files := $(subst sources/,, $(shell find sources -type f))
-srcs := $(filter $(suffixes), $(files))
-spvs := $(filter %.frag %.vert, $(files))
-sbins:= $(addprefix .builds/, $(addsuffix .spv, $(spvs)))
-mods := $(filter-out tests/%, $(basename $(srcs)))
-objs := $(addprefix .builds/, $(addsuffix .o, $(mods) $(spvs)))
-deps := $(addprefix .builds/, $(addsuffix .dep, $(mods)))
-
+EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov -lvulkan -lgdbm
 
 -include target.make
 target ?= $(shell echo $$PWD | sed s!.*/!! )
 
 
-# targetがtoolbox.aでないのでtoolbox/includeをincludeパスに追加
-ifneq ($(target)),toolbox.a)
+# targetがlibtoolbox.aでない場合の定義
+ifneq ($(target),libtoolbox.a)
 COPTS += -Itoolbox/include
+$(TARGETDIR)/$(target): toolbox/$(TARGETDIR)/libtoolbox.a
+toolbox/$(TARGETDIR)/libtoolbox.a :
+	make -j -C toolbox $(TARGETDIR)
+EXLIBS += -Ltoolbox/$(TARGETDIR) -ltoolbox
 endif
 
 
@@ -55,7 +50,7 @@ suffixes := %.c %.cc %.glsl
 files:= $(subst sources/,, $(shell find sources -type f))
 srcs := $(filter $(suffixes), $(files))
 ssrcs:= $(filter %.frag %.vert, $(files))
-spvs := $(addsuffix .spv, $(ssrcs)),
+spvs := $(addsuffix .spv, $(ssrcs))
 mods := $(basename $(srcs) $(spvs))
 objs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(mods)))
 deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
@@ -80,12 +75,12 @@ vpath %.o $(TARGETDIR)
 $(TARGETDIR)/%.o : sources/%.cc makefile
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
-	@$(CC) $(CCOPTS) -c -o $@ $<
+	@LANG=C $(CC) $(CCOPTS) -c -o $@ $<
 
 $(TARGETDIR)/%.o : sources/%.c makefile
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
-	@${CC} $(COPTS) -c -o $@ $<
+	@LANG=C ${CC} $(COPTS) -c -o $@ $<
 
 $(TARGETDIR)/%.o : sources/%.glsl makefile
 	@echo " OBJCOPY $@"
@@ -127,16 +122,16 @@ $(TARGETDIR)/%.o : $(TARGETDIR)/%.spv makefile
 $(TARGETDIR)/$(target): makefile $(nobjs)
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
-	@ar rc $@ $(nobjs)
-	@rm -f $(target)
-	@ln -s $(TARGETDIR)/$(target) $(target)
+	ar rc $@ $(nobjs)
 else
 	@echo " LD $@"
-	@gcc -o $(TARGETDIR)/$(target) $(nobjs) $(EXLIBS)
+	gcc -o $(TARGETDIR)/$(target) $(nobjs) $(EXLIBS)
 endif
 
 clean:
-	rm -rf RELEASE DEBUG COVERAGE .builds *.gcov
+	@echo test:$(addsuffix .test, )
+	rm -rf RELEASE DEBUG COVERAGE *.gcov
+	if [ -d toolbox ]; then make -C toolbox clean; fi
 
 $(tmods) : $(tobjs) $(TARGETDIR)/$(target)
 	@echo " LD $@"
