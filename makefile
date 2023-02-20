@@ -2,7 +2,7 @@
 # 1. ソースを勝手に探して依存関係ファイルを作成
 # 2. ターゲット情報を拾って、なければディレクトリ名を使う
 
-.PHONY : clean test RELEASE DEBUG COVERAGE
+.PHONY : clean test manualTest RELEASE DEBUG COVERAGE
 
 
 
@@ -140,9 +140,14 @@ testTargets := $(addsuffix .test, $(tmods))
 
 %.test : %
 	@echo $<
+ifeq ($(MAKECMDGOALS), manualTest)
+	$<
+else
 	@AUTO_TEST=1 $<
+endif
 
 test: $(testTargets)
+manualTest: $(testTargets)
 
 
 RELEASE: RELEASE/$(target) test
