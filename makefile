@@ -32,8 +32,9 @@ target ?= $(shell echo $$PWD | sed s!.*/!! )
 
 
 # targetがlibtoolbox.aでない場合の定義
+TOOLBOXDIR ?= toolbox
 ifneq ($(target),libtoolbox.a)
-COPTS += -Itoolbox/include
+COPTS += -I$(TOOLBOXDIR)/include
 $(TARGETDIR)/$(target): toolbox/$(TARGETDIR)/libtoolbox.a
 toolbox/$(TARGETDIR)/libtoolbox.a :
 	make -j -C toolbox $(TARGETDIR)
