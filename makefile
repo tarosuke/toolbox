@@ -1,4 +1,4 @@
-#################################################################### makefile
+#################################################################### $(ME)
 # 1. ソースを勝手に探して依存関係ファイルを作成
 # 2. ターゲット情報を拾って、なければディレクトリ名を使う
 
@@ -8,6 +8,7 @@
 
 ############################################################# TARGET & OPTIONS
 
+ME := $(MAKEFILE_LIST)
 MAKECMDGOALS ?= RELEASE
 ifeq ($(MAKECMDGOALS), RELEASE)
 TARGETDIR := RELEASE
@@ -35,10 +36,10 @@ target ?= $(shell echo $$PWD | sed s!.*/!! )
 TOOLBOXDIR ?= toolbox
 ifneq ($(target),libtoolbox.a)
 COPTS += -I$(TOOLBOXDIR)/include
-$(TARGETDIR)/$(target): toolbox/$(TARGETDIR)/libtoolbox.a
-toolbox/$(TARGETDIR)/libtoolbox.a :
-	make -j -C toolbox $(TARGETDIR)
-EXLIBS += -Ltoolbox/$(TARGETDIR) -ltoolbox
+$(TARGETDIR)/$(target): $(TOOLBOXDIR)/$(TARGETDIR)/libtoolbox.a
+$(TOOLBOXDIR)/$(TARGETDIR)/libtoolbox.a :
+	make -j -C $(TOOLBOXDIR) $(TARGETDIR)
+EXLIBS += -L$(TOOLBOXDIR)/$(TARGETDIR) -ltoolbox
 endif
 
 
@@ -72,28 +73,28 @@ endif
 vpath %.o $(TARGETDIR)
 
 
-$(TARGETDIR)/%.o : sources/%.cc makefile
+$(TARGETDIR)/%.o : sources/%.cc $(ME)
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
 	@LANG=C $(CC) $(CCOPTS) -c -o $@ $<
 
-$(TARGETDIR)/%.o : sources/%.c makefile
+$(TARGETDIR)/%.o : sources/%.c $(ME)
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
 	@LANG=C ${CC} $(COPTS) -c -o $@ $<
 
-$(TARGETDIR)/%.o : sources/%.glsl makefile
+$(TARGETDIR)/%.o : sources/%.glsl $(ME)
 	@echo " OBJCOPY $@"
 	@mkdir -p $(dir $@)
 	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
 
-$(TARGETDIR)/%.dep : sources/%.cc makefile
+$(TARGETDIR)/%.dep : sources/%.cc $(ME)
 	@echo " CPP $@"
 	@mkdir -p $(dir $@)
 	@echo -n $(dir $@) > $@
 	@$(CPP) $(CCOPTS) -MM $< >> $@
 
-$(TARGETDIR)/%.dep : sources/%.c makefile
+$(TARGETDIR)/%.dep : sources/%.c $(ME)
 	@echo " CPP $@"
 	@echo -n $(dir $@) > $@
 	@mkdir -p $(dir $@)
@@ -102,15 +103,15 @@ $(TARGETDIR)/%.dep : sources/%.c makefile
 # Vulkan shaders
 .PRECIOUS: $(addprefix $(TARGETDIR)/, $(spvs))
 
-$(TARGETDIR)/%.frag.spv : sources/%.frag makefile
+$(TARGETDIR)/%.frag.spv : sources/%.frag $(ME)
 	@echo " GLSLC $@"
 	@glslc $< -o $@
 
-$(TARGETDIR)/%.vert.spv : sources/%.vert makefile
+$(TARGETDIR)/%.vert.spv : sources/%.vert $(ME)
 	@echo " GLSLC $@"
 	@glslc $< -o $@
 
-$(TARGETDIR)/%.o : $(TARGETDIR)/%.spv makefile
+$(TARGETDIR)/%.o : $(TARGETDIR)/%.spv $(ME)
 	@echo " OBJCOPY $@"
 	@mkdir -p $(dir $@)
 	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
@@ -119,7 +120,7 @@ $(TARGETDIR)/%.o : $(TARGETDIR)/%.spv makefile
 
 ############################################################### RULES & TARGET
 
-$(TARGETDIR)/$(target): makefile $(nobjs)
+$(TARGETDIR)/$(target): $(ME) $(nobjs)
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
 	ar rc $@ $(nobjs)
