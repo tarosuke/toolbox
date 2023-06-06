@@ -1,0 +1,57 @@
+/* Copyright (C) 2023 tarosuke<webmaster@tarosuke.net>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+#pragma once
+
+
+
+namespace TB {
+
+	struct Table {
+		static constexpr unsigned initialEntries = 16;
+
+		struct Node {
+			virtual ~Node();
+
+		protected:
+			Table& table;
+			const unsigned id;
+
+			Node(Table& table) : table(table), id(table.Register(*this)){};
+		};
+
+	protected:
+		Table();
+		~Table();
+
+
+	private:
+		static constexpr unsigned emptyEntry = ~0L;
+
+		union Entry {
+			Node* node;
+			unsigned next;
+		};
+		Entry* table; // 確保された領域
+		unsigned nEntry; // tableに確保されているエントリ数
+		unsigned pool; // プールスタックのトップを指す(emptyEntryなら空)
+
+		unsigned Register(Node&); // 新規エントリに引数を登録してIDを設定する
+		void Unregister(Node&); // エントリを返却する
+	};
+
+}
