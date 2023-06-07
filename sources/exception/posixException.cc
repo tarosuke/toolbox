@@ -23,9 +23,7 @@
 
 
 
-namespace TB{
-	PosixException::PosixException() : err(errno){}
-	PosixException::operator const char*(){
-		return strerror(err);
-	}
+namespace TB {
+	PosixException::PosixException(const char* path, unsigned line)
+		: Exception(strerror(errno), path, line) {}
 }

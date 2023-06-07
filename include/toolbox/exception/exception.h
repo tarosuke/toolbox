@@ -18,11 +18,18 @@
  */
 #pragma once
 
+#include <string>
 
 
-namespace TB{
-	class Exception{
-	public:
-		virtual operator const char*(){ return ""; };
+
+namespace TB {
+	struct Exception {
+		Exception() = delete;
+		Exception(const Exception& e) : message(e.message){};
+		Exception(const char* message, const char* path = 0, unsigned line = 0);
+		operator const char*() { return message.c_str(); };
+
+	protected:
+		std::string message;
 	};
 }

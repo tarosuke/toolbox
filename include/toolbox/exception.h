@@ -18,15 +18,11 @@
  */
 #pragma once
 
-#include <stdexcept>
+#include <toolbox/exception/exception.h>
 
 
-
-#define _THROW_ARG(f, l, c) f ":" #l ":: fail: Posit failed - " #c
-#define THROW_ARG(f, l, c) _THROW_ARG(f, l, c)
-#define THROW throw THROW_ARG(__FILE__, __LINE__, )
 
 #define Posit(c)                                                               \
 	if (!c) {                                                                  \
-		throw THROW_ARG(__FILE__, __LINE__, c);                                \
+		throw TB::Exception("fail: Posit failed - " #c, __FILE__, __LINE__);   \
 	}

@@ -1,4 +1,4 @@
-/** PosixException
+/** Exception
  * Copyright (C) 2019 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
@@ -16,16 +16,16 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#pragma once
-
-#include "exception.h"
+#include <toolbox/exception/exception.h>
 
 
 
 namespace TB {
-	class PosixException : Exception {
-	public:
-		PosixException();
-		PosixException(const char* path = 0, unsigned line = 0);
-	};
+	Exception::Exception(const char* m, const char* p, unsigned l) {
+		if (p) {
+			message += p;
+			message += " : " + std::to_string(l);
+		}
+		message += " :: " + message;
+	}
 }
