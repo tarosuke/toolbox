@@ -21,19 +21,20 @@
 
 #include <toolbox/app.h>
 
+#include <assert.h>
 #include <stdexcept>
 #include <syslog.h>
-#include <assert.h>
 
 
 
 namespace TB {
 
-	const char* App::projectName(0);
+	App* App::instance(0);
+	std::string App::name;
 	TB::Prefs<unsigned> logLevel("--verbose", 1, TB::CommonPrefs::nosave);
 
-	int App::main(App& instance, int argc, const char* argv[]) {
-		projectName = TB::Path::Base(argv[0]);
+	int App::main(int argc, const char* argv[]) {
+		name = TB::Path(argv[0]).LastSegment();
 
 		// syslogを準備する
 		static const int logLevels[] = {LOG_CRIT, LOG_INFO, LOG_DEBUG};
@@ -41,30 +42,34 @@ namespace TB {
 			logLevel = 2;
 		}
 		openlog(0, LOG_CONS, LOG_SYSLOG);
-		syslog(LOG_INFO, projectName);
+		syslog(LOG_INFO, name.c_str());
 
-		//設定ファイルのパスを作る
-		TB::String prefsPath(".");
-		prefsPath << projectName;
+		// 設定ファイルのパスを作る
+		std::string prefsPath(".");
+		prefsPath += name;
 
-		//設定ファイル読み込み／コマンドラインオプション取得
-		TB::CommonPrefs::Keeper prefs(prefsPath, argc, argv);
+		// 設定ファイル読み込み／コマンドラインオプション解読
+		TB::CommonPrefs::Keeper prefs(prefsPath.c_str(), argc, argv);
 
-		//コマンドラインオプションに従ってログレベルを設定
+		// コマンドラインオプションに従ってログレベルを設定
 		const unsigned logMask(LOG_UPTO(logLevels[logLevel]));
 		setlogmask(logMask);
 
 		int rc(0);
 		try {
-			rc = instance.Main();
+			rc = instance->Main();
 		} catch (int returnCode) {
 			rc = returnCode;
 		} catch (std::exception& e) {
 			syslog(LOG_CRIT, e.what());
 		} catch (...) { syslog(LOG_CRIT, "Unknown exception."); }
 
-		instance.Finally();
+		instance->Finally();
 
 		return rc;
 	}
+
 }
+
+
+int main(int argc, const char* argv[]) { return TB::App::main(argc, argv); }

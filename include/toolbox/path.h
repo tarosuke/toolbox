@@ -18,30 +18,32 @@
  */
 #pragma once
 
-#include <toolbox/string.h>
+#include <string>
 
 
 
-namespace TB{
+namespace TB {
 
-	class Path : public String{
+	class Path {
 	public:
+		Path() = default;
+		Path(const char* path) : path(path){};
+		Path(const std::string& path) : path(path){};
 
-		Path() : String(){};
-		Path(const char* path) : String(path){};
+		operator std::string() const { return path; };
+		operator const std::string&() const { return path; };
 
-		const char* BaseName(){ return Base((const char*)*this); };
-		static const char* Base(const char*);
+		/* パスの最後のセグメントを取り出す
+		 * 戻り値はこのインスタンスが変更されるまで有効
+		 * 永続性が必要ならstd::strnigにでもコピーすること
+		 */
+		const char* LastSegment() const;
 
-
-	protected:
-		Path(const String&, const char*);
-		Path(const String&, const String&);
-		Path(const String&, const Path&);
+		// ファイルの存在チェック
+		bool IsFile();
+		bool IsDirectory();
 
 	private:
-		static String StatPath(const String&, const String&);
-		static bool Is(const String&);
+		std::string path;
 	};
-
 }
