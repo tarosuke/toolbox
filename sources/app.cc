@@ -31,7 +31,7 @@ namespace TB {
 
 	App* App::instance(0);
 	std::string App::name;
-	TB::Prefs<unsigned> logLevel("--verbose", 1, TB::CommonPrefs::nosave);
+	TB::Prefs<unsigned> logLevel("--verbose", 1, TB::PrefsBase::nosave);
 
 	int App::main(int argc, const char* argv[]) {
 		name = TB::Path(argv[0]).LastSegment();
@@ -44,12 +44,8 @@ namespace TB {
 		openlog(0, LOG_CONS, LOG_SYSLOG);
 		syslog(LOG_INFO, name.c_str());
 
-		// 設定ファイルのパスを作る
-		std::string prefsPath(".");
-		prefsPath += name;
-
 		// 設定ファイル読み込み／コマンドラインオプション解読
-		TB::CommonPrefs::Keeper prefs(prefsPath.c_str(), argc, argv);
+		TB::PrefsBase::Load(argc, argv);
 
 		// コマンドラインオプションに従ってログレベルを設定
 		const unsigned logMask(LOG_UPTO(logLevels[logLevel]));
@@ -65,6 +61,9 @@ namespace TB {
 		} catch (...) { syslog(LOG_CRIT, "Unknown exception."); }
 
 		instance->Finally();
+
+		// 設定保存
+		TB::PrefsBase::Store();
 
 		return rc;
 	}
