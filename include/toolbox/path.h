@@ -24,14 +24,11 @@
 
 namespace TB {
 
-	class Path {
+	class Path : public std::string {
 	public:
 		Path() = default;
-		Path(const char* path) : path(path){};
-		Path(const std::string& path) : path(path){};
-
-		operator std::string() const { return path; };
-		operator const std::string&() const { return path; };
+		Path(const char* path) : std::string(path){};
+		Path(const std::string& path) : std::string(path){};
 
 		/* パスの最後のセグメントを取り出す
 		 * 戻り値はこのインスタンスが変更されるまで有効
@@ -42,8 +39,5 @@ namespace TB {
 		// ファイルの存在チェック
 		bool IsFile();
 		bool IsDirectory();
-
-	private:
-		std::string path;
 	};
 }

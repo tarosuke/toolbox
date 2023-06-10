@@ -26,14 +26,14 @@ namespace TB {
 
 	bool Path::IsFile() {
 		struct stat statBuff;
-		if (!stat(path.c_str(), &statBuff)) {
+		if (!stat(c_str(), &statBuff)) {
 			return S_ISREG(statBuff.st_mode);
 		}
 		return false;
 	}
 	bool Path::IsDirectory() {
 		struct stat statBuff;
-		if (!stat(path.c_str(), &statBuff)) {
+		if (!stat(c_str(), &statBuff)) {
 			return S_ISDIR(statBuff.st_mode);
 		}
 		return false;
@@ -41,7 +41,7 @@ namespace TB {
 
 
 	const char* Path::LastSegment() const {
-		const char* p(path.c_str());
+		const char* p(c_str());
 		for (const char* q(p); *q;) {
 			if (*q == '/') {
 				p = ++q;
