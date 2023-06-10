@@ -100,16 +100,17 @@ namespace TB {
 		// keyがマッチしたエントリにはLoad
 		for (auto* p(q); p; p = p->next) {
 			if (!strcmp(line, p->key)) {
-				p->Load(v);
+				p->Read(v);
 			}
 		}
 	}
 
-	void PrefsBase::LoadAll(int argc, const char* argv[]) {
+	void PrefsBase::Load(int argc, const char* argv[]) {
 		// パスのセットアップ
+		Path p(argv[0]);
 		path = getenv("HOME");
 		path += "/.";
-		path += argv[0];
+		path += p.LastSegment();
 
 		// 設定ファイルを読む
 		char line[1024];
@@ -157,25 +158,25 @@ namespace TB {
 
 
 
-	/** 型ごとのLoad/Store
+	/** 型ごとのLoad/Write
 	 */
-	template <> void Prefs<int>::Load(const char* v) { sscanf(v, "%d", &body); }
-	template <> void Prefs<unsigned>::Load(const char* v) {
+	template <> void Prefs<int>::Read(const char* v) { sscanf(v, "%d", &body); }
+	template <> void Prefs<unsigned>::Read(const char* v) {
 		sscanf(v, "%u", &body);
 	}
-	template <> void Prefs<long>::Load(const char* v) {
+	template <> void Prefs<long>::Read(const char* v) {
 		sscanf(v, "%ld", &body);
 	}
-	template <> void Prefs<unsigned long>::Load(const char* v) {
+	template <> void Prefs<unsigned long>::Read(const char* v) {
 		sscanf(v, "%lu", &body);
 	}
-	template <> void Prefs<float>::Load(const char* v) {
+	template <> void Prefs<float>::Read(const char* v) {
 		sscanf(v, "%f", &body);
 	}
-	template <> void Prefs<double>::Load(const char* v) {
+	template <> void Prefs<double>::Read(const char* v) {
 		sscanf(v, "%lf", &body);
 	}
-	template <> void Prefs<bool>::Load(const char* v) {
+	template <> void Prefs<bool>::Read(const char* v) {
 		switch (*v) {
 		case 't':
 		case 'T':
@@ -189,39 +190,39 @@ namespace TB {
 			break;
 		}
 	}
-	template <> void Prefs<Vector<3, double>>::Load(const char* v) {
+	template <> void Prefs<Vector<3, double>>::Read(const char* v) {
 		sscanf(v, "%lf %lf %lf", &body[0], &body[1], &body[2]);
 	}
-	template <> void Prefs<Vector<3, float>>::Load(const char* v) {
+	template <> void Prefs<Vector<3, float>>::Read(const char* v) {
 		sscanf(v, "%f %f %f", &body[0], &body[1], &body[2]);
 	}
 
 
-	template <> void Prefs<int>::Store(FILE* f) {
+	template <> void Prefs<int>::Write(FILE* f) {
 		fprintf(f, "%s=%d\n", key, body);
 	}
-	template <> void Prefs<unsigned>::Store(FILE* f) {
+	template <> void Prefs<unsigned>::Write(FILE* f) {
 		fprintf(f, "%s=%u\n", key, body);
 	}
-	template <> void Prefs<long>::Store(FILE* f) {
+	template <> void Prefs<long>::Write(FILE* f) {
 		fprintf(f, "%s=%ld\n", key, body);
 	}
-	template <> void Prefs<unsigned long>::Store(FILE* f) {
+	template <> void Prefs<unsigned long>::Write(FILE* f) {
 		fprintf(f, "%s=%lu\n", key, body);
 	}
-	template <> void Prefs<float>::Store(FILE* f) {
+	template <> void Prefs<float>::Write(FILE* f) {
 		fprintf(f, "%s=%f\n", key, body);
 	}
-	template <> void Prefs<double>::Store(FILE* f) {
+	template <> void Prefs<double>::Write(FILE* f) {
 		fprintf(f, "%s=%lf\n", key, body);
 	}
-	template <> void Prefs<bool>::Store(FILE* f) {
+	template <> void Prefs<bool>::Write(FILE* f) {
 		fprintf(f, "%s=%s\n", key, body ? "true" : "false");
 	}
-	template <> void Prefs<Vector<3, double>>::Store(FILE* f) {
+	template <> void Prefs<Vector<3, double>>::Write(FILE* f) {
 		fprintf(f, "%s=%lf %lf %lf\n", key, body[0], body[1], body[2]);
 	}
-	template <> void Prefs<Vector<3, float>>::Store(FILE* f) {
+	template <> void Prefs<Vector<3, float>>::Write(FILE* f) {
 		fprintf(f, "%s=%f %f %f\n", key, body[0], body[1], body[2]);
 	}
 }

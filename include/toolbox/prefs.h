@@ -51,20 +51,11 @@ namespace TB {
 			nosave,
 		};
 
+		static void Store();
+		static void Load(
+			int argc,
+			const char* argv[]); // 設定を読んでコマンドラインで上書き
 		virtual void Reset() = 0; // 初期値に戻す
-
-		// 設定の読み込みと保存キー
-		struct Keeper {
-			Keeper(const char* name, int argc = 0, const char** argv = 0) {
-				PrefsBase::LoadAll(argc, argv);
-			};
-			~Keeper() { PrefsBase::StoreAll(); };
-			void Store() { PrefsBase::StoreAll(); };
-
-			Keeper() = delete;
-			Keeper(const Keeper&) = delete;
-			void operator=(const Keeper&) = delete;
-		};
 
 	protected:
 		const char* const key;
@@ -73,16 +64,13 @@ namespace TB {
 		PrefsBase(const char* key, Attribute attr);
 		~PrefsBase(){};
 
-		virtual void Load(const char* value) = 0;
-		virtual void Store(FILE*) = 0;
+		virtual void Read(const char* value) = 0;
+		virtual void Write(FILE*) = 0;
 
 	private:
 		static Path path;
 		static PrefsBase* q;
 
-		static void StoreAll();
-		static void LoadAll(
-			int argc, const char* argv[]); // 設定を読んでコマンドラインで上書き
 		static void SetValue(char* line);
 
 		PrefsBase* next;
@@ -114,8 +102,8 @@ namespace TB {
 	protected:
 		T body;
 		T defaultValue;
-		void Load(const char* value) override;
-		void Store(FILE*) override;
+		void Read(const char* value) override;
+		void Write(FILE*) override;
 		void Reset() override { body = defaultValue; };
 	};
 
@@ -129,8 +117,8 @@ namespace TB {
 
 	protected:
 		const char* const defaultValue;
-		void Load(const char* value) override;
-		void Store(FILE*) override;
+		void Read(const char* value) override;
+		void Write(FILE*) override;
 	};
 
 	template <> struct Prefs<std::string> : public PrefsBase,
@@ -144,7 +132,7 @@ namespace TB {
 
 	protected:
 		const char* const defaultValue;
-		void Load(const char* value) override;
-		void Store(FILE*) override;
+		void Read(const char* value) override;
+		void Write(FILE*) override;
 	};
 }
