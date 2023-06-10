@@ -21,211 +21,162 @@
  * くれる便利クラス
  */
 
-#include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <gdbm.h>
+#include <string>
+#include <sys/file.h>
 #include <syslog.h>
-
-#include <toolbox/prefs.h>
+#include <toolbox/exception.h>
 #include <toolbox/geometry/vector.h>
-#include <toolbox/string.h>
+#include <toolbox/prefs.h>
+#include <unistd.h>
 
 
 
-namespace{
-	GDBM_FILE db;
+namespace {
+	struct File {
+		File(const char* path, const char* mode) : file(fopen(path, mode)) {
+			if (!file) {
+				return;
+			}
+
+			// ロック取得
+			const int fd(fileno(file));
+			if (!!flock(fd, LOCK_EX)) {
+				// 何かのエラー
+				fclose(file);
+				file = 0;
+				Posit(false);
+			}
+			// ファイルの変更に備えて先頭に戻しておく
+			lseek(fd, 0, SEEK_SET);
+		};
+		~File() {
+			if (file) {
+				fclose(file);
+			}
+		};
+		operator FILE*() { return file; };
+
+	private:
+		FILE* file;
+	};
 }
 
 
-namespace TB{
+namespace {
+	FILE* Open(const char* path, const char* mode) {
+		FILE* f(fopen(path, "r"));
+		if (f) {
+			// ファイルロックを試みる
+			if (!!flock(fileno(f), LOCK_EX)) {
+				// 何かのエラー
+				fclose(f);
+				f = 0;
+				return 0;
+			}
+			// ファイルの変更に備えて先頭に戻しておく
+			rewind(f);
+		}
+		return f;
+	}
+}
 
-	CommonPrefs* CommonPrefs::q(0);
-	bool CommonPrefs::inited(false);
-	TB::String CommonPrefs::path;
 
-	bool CommonPrefs::Open(){
-		//排他で開く。開けなかったら待ってリトライ。何度かやってみてダメなら諦めて戻る
-		for(unsigned r(0); r < 10; ++r, sleep(r/2 + 1)){
-			if(!!(db = gdbm_open(path, 512, GDBM_WRCREAT, 0600, 0))){
-				//開けたので戻る
-				return true;
+namespace TB {
+
+	TB::Path PrefsBase::path;
+	PrefsBase* PrefsBase::q(0);
+
+	void PrefsBase::SetValue(char* line) {
+		// 行を=でkey/valueに分ける
+		char* v(line);
+		for (; *v && *v != '='; ++v) {}
+		if (*v == '=') {
+			*v++ = 0;
+		}
+
+		// keyがマッチしたエントリにはLoad
+		for (auto* p(q); p; p = p->next) {
+			if (!strcmp(line, p->key)) {
+				p->Load(v);
 			}
 		}
-		syslog(LOG_ERR, "Pref:failed to pen:%s", (const char*)path);
-		return false;
 	}
 
-	void CommonPrefs::Load(const char* name){
-		//名前チェック(指定されていなければ処理なし)
-		if(!name || !*name){
-			q = 0; //Storeも処理なしにするためスタックを壊しておく
-			return;
-		}
+	void PrefsBase::LoadAll(int argc, const char* argv[]) {
+		// パスのセットアップ
+		path = getenv("HOME");
+		path += "/.";
+		path += argv[0];
 
-		//設定の有無をチェック(設定がなければ処理なし)
-		if(!q){ return; }
-
-		//データベースのパス生成
-		const char* const home(getenv("HOME"));
-		path = home ? home : "/root";
-		path << "/";
-		path << name;
-
-		//データベースを開く
-		if(!Open()){
-			//開けなかった
-			return;
-		}
-
-		for(CommonPrefs* i(q); i; i = (*i).next){
-			(*i).Read();
-		}
-
-		//閉じておく
-		gdbm_close(db);
-		db = 0;
-	}
-
-	int CommonPrefs::Parse(int argc, const char** argv){
-		if(!argc || !argv){
-			return 0;
-		}
-
-		for(int n(1); n < argc; ++n){
-			const char* const arg(argv[n]);
-
-			if(arg[0] != '-' && arg[1] != '+'){
-				//解釈できる形式は終了
-				return n;
+		// 設定ファイルを読む
+		char line[1024];
+		FILE* f(Open(path.c_str(), "r"));
+		if (f) {
+			while (!!fgets(line, sizeof(line), f)) {
+				// key/valueを設定
+				SetValue(line);
 			}
+			fclose(f);
+		}
 
-			//キーの取り出し
-			String key(arg);
-			String value;
-			if(arg[1] != '-'){
-				//スイッチオプション(-/+xxx)
-				key = "-";
-				key << &arg[1];
-				value = arg[0] == '+' ? "t" : "f";
-			}else{
-				//値オプション(--xxx yyy)
-				if(argc <= ++n){
-					syslog(LOG_CRIT, "option %s needs parametor", arg);
-					return -1;
+		// コマンドラインを読む
+		for (int n(1); n < argc; ++n) {
+			const char* const a(argv[n]);
+			if (a[0] == '-') {
+				if (a[1] == '-') {
+					// --key=value形式
+					strcpy(line, a);
+					SetValue(line);
+				} else {
+					// -スイッチ形式
+					snprintf(line, sizeof(line), "%s=false", a);
+					SetValue(line);
 				}
-				value = argv[n];
-			}
-
-			//コマンドラインオプションの解釈
-			if(!TB::CommonPrefs::Set(key, value)){
-				syslog(
-					LOG_CRIT,
-					"Unknown option: %s %s",
-					arg,
-					(const char*)value);
-				return -1;
+			} else if (a[0] == '+') {
+				// +スイッチ形式
+				snprintf(line, sizeof(line), "%s=true", a);
+				SetValue(line);
+			} else {
+				// それ以外が現れたら終了
+				return;
 			}
 		}
-
-		return argc;
-	}
-
-	void CommonPrefs::Store(){
-		//設定の有無をチェック(設定がなければ処理なし)
-		if(!q){ return; }
-
-		//データベースを開く
-		if(!Open()){
-			//開けなかった
-			return;
-		}
-
-		for(CommonPrefs* i(q); i; i = (*i).next){
-			(*i).Write();
-		}
-
-		gdbm_close(db);
-		db = 0;
-	}
-
-	CommonPrefs::CommonPrefs(const char* key, Attribute attr) :
-		key(key), keyLen(strlen(key) + 1),attr(attr), deleted(false), dirty(false){
-		//読み込み前ならスタックに自身を追加
-		if(!inited){
-			next = q;
-			q = this;
-		}
-	}
-
-	void CommonPrefs::Read(){
-		datum k{ const_cast<char*>(key), keyLen };
-		datum content(gdbm_fetch(db, k));
-		if(content.dptr){
-			AfterRead(content.dptr, content.dsize);
-			free(content.dptr);
-			dirty = false;
-		}
-	}
-	void CommonPrefs::WriteRecord(const void* d, unsigned l){
-		if(attr == nosave){ return; }
-		datum k = { const_cast<char*>(key), keyLen };
-		if(!deleted){
-			if(dirty){
-				datum content = { (char*)d, (int)l };
-				gdbm_store(db, k, content, GDBM_REPLACE);
-			}
-		}else{
-			gdbm_delete(db, k);
-		}
-	}
-
-	bool CommonPrefs::Set(const char* key, const char* val){
-		//キー探索
-		for(Itor i; i; ++i){
-			if(!strcmp((*i).key, key)){
-				//一致
-				if(val && *val){
-					//値を設定
-					*i = val;
-				}else{
-					(*i).Delete();;
-				}
-
-				//正常終了
-				(*i).Waste();
-				return true;
-			}
-		}
-
-		//キーに一致するエントリなし
-		return false;
 	}
 
 
 
-	/** 型ごとの=演算子
+	PrefsBase::PrefsBase(const char* key, Attribute attr)
+		: key(key), attr(attr) {
+		// スタックに自身を追加
+		next = q;
+		q = this;
+	}
+
+
+
+	/** 型ごとのLoad/Store
 	 */
-	template <> void
-	Prefs<Vector<3, double>>::operator=(const char* v) { // TODO:Vectorへ移動
-		for(unsigned n(0); n < 3; ++n){
-			body[n] = strtod(v, const_cast<char**>(&v));
-		}
-		Undelete();
-		Waste();
+	template <> void Prefs<int>::Load(const char* v) { sscanf(v, "%d", &body); }
+	template <> void Prefs<unsigned>::Load(const char* v) {
+		sscanf(v, "%u", &body);
 	}
-	template<> void Prefs<unsigned>::operator=(const char* v){
-		body = strtoul(v, 0, 10);
-		Undelete();
-		Waste();
+	template <> void Prefs<long>::Load(const char* v) {
+		sscanf(v, "%ld", &body);
 	}
-	template<> void Prefs<float>::operator=(const char* v){
-		body = atof(v);
-		Undelete();
-		Waste();
+	template <> void Prefs<unsigned long>::Load(const char* v) {
+		sscanf(v, "%lu", &body);
 	}
-	template<> void Prefs<bool>::operator=(const char* v){
-		switch(*v){
+	template <> void Prefs<float>::Load(const char* v) {
+		sscanf(v, "%f", &body);
+	}
+	template <> void Prefs<double>::Load(const char* v) {
+		sscanf(v, "%lf", &body);
+	}
+	template <> void Prefs<bool>::Load(const char* v) {
+		switch (*v) {
 		case 't':
 		case 'T':
 		case '1':
@@ -237,9 +188,40 @@ namespace TB{
 			body = false;
 			break;
 		}
-		Undelete();
-		Waste();
+	}
+	template <> void Prefs<Vector<3, double>>::Load(const char* v) {
+		sscanf(v, "%lf %lf %lf", &body[0], &body[1], &body[2]);
+	}
+	template <> void Prefs<Vector<3, float>>::Load(const char* v) {
+		sscanf(v, "%f %f %f", &body[0], &body[1], &body[2]);
 	}
 
 
+	template <> void Prefs<int>::Store(FILE* f) {
+		fprintf(f, "%s=%d\n", key, body);
+	}
+	template <> void Prefs<unsigned>::Store(FILE* f) {
+		fprintf(f, "%s=%u\n", key, body);
+	}
+	template <> void Prefs<long>::Store(FILE* f) {
+		fprintf(f, "%s=%ld\n", key, body);
+	}
+	template <> void Prefs<unsigned long>::Store(FILE* f) {
+		fprintf(f, "%s=%lu\n", key, body);
+	}
+	template <> void Prefs<float>::Store(FILE* f) {
+		fprintf(f, "%s=%f\n", key, body);
+	}
+	template <> void Prefs<double>::Store(FILE* f) {
+		fprintf(f, "%s=%lf\n", key, body);
+	}
+	template <> void Prefs<bool>::Store(FILE* f) {
+		fprintf(f, "%s=%s\n", key, body ? "true" : "false");
+	}
+	template <> void Prefs<Vector<3, double>>::Store(FILE* f) {
+		fprintf(f, "%s=%lf %lf %lf\n", key, body[0], body[1], body[2]);
+	}
+	template <> void Prefs<Vector<3, float>>::Store(FILE* f) {
+		fprintf(f, "%s=%f %f %f\n", key, body[0], body[1], body[2]);
+	}
 }

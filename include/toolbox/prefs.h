@@ -29,108 +29,65 @@
  */
 #pragma once
 
-#include <string.h>
-#include <toolbox/string.h>
+#include <toolbox/path.h>
 
 
 
-namespace TB{
+namespace TB {
 
 	/**
 	 * テンプレートでstaticメンバを作っても型ごとにインスタンスができてしまう
 	 * のでインスタンスを共通化するための親クラス
 	 */
-	class CommonPrefs{
-		CommonPrefs();
-		CommonPrefs(const CommonPrefs&);
-		void operator=(const CommonPrefs&);
+	class PrefsBase {
+		PrefsBase();
+		PrefsBase(const PrefsBase&);
+		void operator=(const PrefsBase&);
+
 	public:
-		//属性値
-		enum Attribute{
+		// 属性値
+		enum Attribute {
 			save,
 			nosave,
 		};
 
-		//設定の読み込みと保存キー
-		class Keeper{
-			Keeper();
-			Keeper(const Keeper&);
-			void operator=(const Keeper&);
-		public:
-			Keeper(const char* name, int argc = 0, const char** argv = 0){
-				CommonPrefs::inited = true;
-				Load(name);
-				Parse(argc, argv);
+		virtual void Reset() = 0; // 初期値に戻す
+
+		// 設定の読み込みと保存キー
+		struct Keeper {
+			Keeper(const char* name, int argc = 0, const char** argv = 0) {
+				PrefsBase::LoadAll(argc, argv);
 			};
-			~Keeper(){
-				CommonPrefs::Store();
-			};
-			void Store(){
-				CommonPrefs::Store();
-			};
+			~Keeper() { PrefsBase::StoreAll(); };
+			void Store() { PrefsBase::StoreAll(); };
+
+			Keeper() = delete;
+			Keeper(const Keeper&) = delete;
+			void operator=(const Keeper&) = delete;
 		};
 
 	protected:
-		CommonPrefs(
-			const char* key,
-			Attribute attr);
-		~CommonPrefs(){};
+		const char* const key;
+		const Attribute attr;
 
-		virtual void operator=(const char*)=0;
-		void Delete(){ deleted = true; }
-		void Undelete(){ deleted = false; }
-		bool IsDeleted() const { return deleted; }
-		void Waste(){ dirty = true; };
+		PrefsBase(const char* key, Attribute attr);
+		~PrefsBase(){};
 
-		virtual void AfterRead(const void*, unsigned)=0;
-		void WriteRecord(const void*, unsigned);
-
-		//拡張用ハンドラ
-		virtual void ExtendedHandler(void* =0){};
+		virtual void Load(const char* value) = 0;
+		virtual void Store(FILE*) = 0;
 
 	private:
-		/** 設定を辿るための反復子
-		 * NOTE:初期化時点で先頭を指しているのでC++式反復子形式(処理後インク
-		 * リメント)で使う
-		 */
-		class Itor{
-			Itor(const Itor&);
-			void operator=(const Itor&);
-		public:
-			Itor() : node(q){};
-			operator CommonPrefs*(){ return node; };
-			void operator++(){ if(node){ node = (*node).next; } };
-		private:
-			CommonPrefs* node;
-		};
+		static Path path;
+		static PrefsBase* q;
 
-		static TB::String path;
+		static void StoreAll();
+		static void LoadAll(
+			int argc, const char* argv[]); // 設定を読んでコマンドラインで上書き
+		static void SetValue(char* line);
 
-		static CommonPrefs* q;
-		static bool inited;
-		CommonPrefs* next;
-
-		const char* const key;
-		const int keyLen;
-		const Attribute attr;
-		bool deleted;
-		bool dirty;
-
-		static bool Open();
-		static void Load(const char*);
-		static void Store();
-
-		//コマンドラインオプションを解釈
-		static int Parse(int argc, const char** argv);
-
-		//文字列による値設定(要するにコマンドラインオプション用)
-		//負の値ならエラー、正の値ならそこから未処理、argc以上なら終了
-		static bool Set(const char* key, const char* value);
-
-
-		void Read();
-		virtual void Write()=0;
+		PrefsBase* next;
 	};
+
 
 	/**
 	 * 型とキー文字列を与えてインスタンスを作るだけで設定になる変数を作れる
@@ -141,108 +98,53 @@ namespace TB{
 	 * ある
 	 * NOTE:処理がmainに入るまでは機能しない
 	 */
-	template<typename T> class Prefs : public CommonPrefs{
-		Prefs();
-		Prefs(const Prefs&);
-		void operator=(const Prefs&);
-	public:
-		Prefs(const char* key, Attribute attr=save) :
-			CommonPrefs(key, attr){};
-		Prefs(const char* key, const T& defaultValue, Attribute attr=save) :
-			CommonPrefs(key, attr),
-			body(defaultValue), defaultValue(defaultValue){};
+	template <typename T> struct Prefs : public PrefsBase {
+		Prefs(const char* key, Attribute attr = save) : PrefsBase(key, attr){};
+		Prefs(const char* key, const T& defaultValue, Attribute attr = save)
+			: PrefsBase(key, attr), body(defaultValue),
+			  defaultValue(defaultValue){};
 		~Prefs(){};
 
-		operator const T&() const { return IsDeleted() ? defaultValue : body; };
-		void operator=(const T& v){ body = v; Undelete(); Waste(); };
-		void operator=(const char* v) override;
+		T operator=(const T& v) {
+			body = v;
+			return body;
+		};
+		operator const T&() { return body; };
 
 	protected:
 		T body;
 		T defaultValue;
-
-	private:
-		void AfterRead(const void* d, unsigned l) final{
-			memcpy(&body, d, l);
-		};
-		void Write() final{
-			WriteRecord(&body, sizeof(body));
-		};
+		void Load(const char* value) override;
+		void Store(FILE*) override;
+		void Reset() override { body = defaultValue; };
 	};
 
-	template<> class Prefs<char*> : public CommonPrefs{
-		Prefs();
-		Prefs(const Prefs&);
-		void operator=(const Prefs&);
-		static const unsigned maxLen = 256;
-	public:
-		Prefs(const char* key, Attribute attr=save) :
-			CommonPrefs(key, attr),
-			defaultValue(0){
-			body[0] = 0;
-		};
-		Prefs(const char* key, const char* defaultValue, Attribute attr=save) :
-			CommonPrefs(key, attr),
-			defaultValue(defaultValue){
-			*this = defaultValue;
-		};
+	template <> struct Prefs<char*> : public PrefsBase, public std::string {
+		Prefs(const char* key, Attribute attr = save)
+			: PrefsBase(key, attr), defaultValue(0){};
+		Prefs(const char* key, const char* defaultValue, Attribute attr = save)
+			: PrefsBase(key, attr), std::string(defaultValue),
+			  defaultValue(defaultValue){};
 		~Prefs(){};
-		operator const char*() const { return IsDeleted() ? defaultValue : body; };
-		void operator=(const char* v) override{
-			if(v){
-				strncpy(body, v, maxLen);
-				body[maxLen - 1] = 0;
-			}else{
-				body[0] = 0;
-			}
-			Undelete();
-			Waste();
-		};
 
 	protected:
-		char body[maxLen];
 		const char* const defaultValue;
-
-	private:
-		void AfterRead(const void* d, unsigned l) final{
-			strcpy(body, (const char*)d);
-		};
-		void Write() final{
-			WriteRecord(body, strlen((const char*)body));
-		};
+		void Load(const char* value) override;
+		void Store(FILE*) override;
 	};
 
-	template<> class Prefs<String> : public CommonPrefs{
-		Prefs();
-		Prefs(const Prefs&);
-		void operator=(const Prefs&);
-	public:
-		Prefs(const char* key, Attribute attr=save) :
-			CommonPrefs(key, attr),
-			defaultValue(0){};
-		Prefs(const char* key, const char* defaultValue, Attribute attr=save) :
-			CommonPrefs(key, attr),
-			body(defaultValue),
-			defaultValue(defaultValue){};
+	template <> struct Prefs<std::string> : public PrefsBase,
+											public std::string {
+		Prefs(const char* key, Attribute attr = save)
+			: PrefsBase(key, attr), defaultValue(0){};
+		Prefs(const char* key, const char* defaultValue, Attribute attr = save)
+			: PrefsBase(key, attr), std::string(defaultValue),
+			  defaultValue(defaultValue){};
 		~Prefs(){};
-		operator const char*() const { return IsDeleted() ? defaultValue : (const char*)body; };
-		void operator=(const char* v) override{
-			body = v;
-			Undelete();
-			Waste();
-		};
 
 	protected:
-		String body;
 		const char* const defaultValue;
-
-	private:
-		void AfterRead(const void* d, unsigned l) final{
-			body = (const char*)d;
-		};
-		void Write() final{
-			WriteRecord((const void*)(const char*)body, body.Length());
-		};
+		void Load(const char* value) override;
+		void Store(FILE*) override;
 	};
-
 }
