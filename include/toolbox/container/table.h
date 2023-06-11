@@ -32,6 +32,7 @@ namespace TB {
 			const unsigned id;
 
 			Node(Table& table) : table(table), id(table.Register(*this)){};
+			Node(Table& table, unsigned id) : table(table), id(id){};
 		};
 
 	protected:
@@ -44,7 +45,7 @@ namespace TB {
 
 		union Entry {
 			Node* node;
-			unsigned next;
+			unsigned next; // tableはreallocされるのでポインタではなく添字
 		};
 		Entry* table; // 確保された領域
 		unsigned nEntry; // tableに確保されているエントリ数
