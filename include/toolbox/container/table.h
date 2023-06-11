@@ -35,10 +35,11 @@ namespace TB {
 			Node(Table& table, unsigned id) : table(table), id(id){};
 		};
 
+		Node* operator[](unsigned id) { return table[id].node; };
+
 	protected:
 		Table();
 		~Table();
-
 
 	private:
 		static constexpr unsigned emptyEntry = ~0L;
