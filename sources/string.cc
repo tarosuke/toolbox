@@ -17,9 +17,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include <toolbox/string.h>
-#include <toolbox/exception/exception.h>
 #include <string.h>
+#include <toolbox/exception.h>
+#include <toolbox/string.h>
 
 
 

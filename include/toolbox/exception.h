@@ -1,5 +1,5 @@
-/********************************************************** 3D -> ThreeD -> TD
- *  Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+/***** 例外
+ *  Copyright (C) 2021, 2023 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,9 +18,26 @@
  */
 #pragma once
 
-#include <toolbox/exception/exception.h>
 
 
+namespace TB {
+	struct Exception {
+		Exception() : message(0){};
+		Exception(const Exception& e);
+		Exception(const char* message, const char* path = 0, unsigned line = 0);
+		~Exception();
+		operator const char*() { return message ? message : ""; };
+
+	protected:
+		char* message;
+	};
+
+	class PosixException : Exception {
+	public:
+		PosixException();
+		PosixException(const char* path = 0, unsigned line = 0);
+	};
+}
 
 #define Posit(c)                                                               \
 	if (!c) {                                                                  \
