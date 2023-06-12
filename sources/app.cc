@@ -31,7 +31,7 @@ namespace TB {
 
 	App* App::instance(0);
 	std::string App::name;
-	TB::Prefs<unsigned> logLevel("--verbose", 1, TB::PrefsBase::nosave);
+	TB::Prefs<unsigned> App::logLevel("--verbose", 1, TB::PrefsBase::nosave);
 
 	int App::main(int argc, const char* argv[]) {
 		name = TB::Path(argv[0]).LastSegment();
