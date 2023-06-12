@@ -147,9 +147,22 @@ namespace TB {
 		}
 	}
 
+	void PrefsBase::Store() {
+		// ファイルを開いてStore
+		FILE* f(Open(path.c_str(), "w"));
+		if (f) {
+			for (PrefsBase* p(q); p; p = p->next) {
+				if (~p->attr & nosave) {
+					p->Write(f);
+				}
+			}
+			fclose(f);
+		}
+	}
 
 
-	PrefsBase::PrefsBase(const char* key, Attribute attr)
+
+	PrefsBase::PrefsBase(const char* key, unsigned attr)
 		: key(key), attr(attr) {
 		// スタックに自身を追加
 		next = q;

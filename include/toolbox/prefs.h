@@ -46,11 +46,9 @@ namespace TB {
 
 	public:
 		// 属性値
-		enum Attribute {
-			save,
-			nosave,
-		};
+		static constexpr unsigned nosave = 0x01;
 
+		// 読み出しと保存
 		static void Store();
 		static void Load(
 			int argc,
@@ -59,9 +57,9 @@ namespace TB {
 
 	protected:
 		const char* const key;
-		const Attribute attr;
+		const unsigned attr;
 
-		PrefsBase(const char* key, Attribute attr);
+		PrefsBase(const char* key, unsigned attr);
 		~PrefsBase(){};
 
 		virtual void Read(const char* value) = 0;
@@ -87,8 +85,8 @@ namespace TB {
 	 * NOTE:処理がmainに入るまでは機能しない
 	 */
 	template <typename T> struct Prefs : public PrefsBase {
-		Prefs(const char* key, Attribute attr = save) : PrefsBase(key, attr){};
-		Prefs(const char* key, const T& defaultValue, Attribute attr = save)
+		Prefs(const char* key, unsigned attr = 0) : PrefsBase(key, attr){};
+		Prefs(const char* key, const T& defaultValue, unsigned attr = 0)
 			: PrefsBase(key, attr), body(defaultValue),
 			  defaultValue(defaultValue){};
 		~Prefs(){};
@@ -108,9 +106,9 @@ namespace TB {
 	};
 
 	template <> struct Prefs<char*> : public PrefsBase, public std::string {
-		Prefs(const char* key, Attribute attr = save)
+		Prefs(const char* key, unsigned attr = 0)
 			: PrefsBase(key, attr), defaultValue(0){};
-		Prefs(const char* key, const char* defaultValue, Attribute attr = save)
+		Prefs(const char* key, const char* defaultValue, unsigned attr = 0)
 			: PrefsBase(key, attr), std::string(defaultValue),
 			  defaultValue(defaultValue){};
 		~Prefs(){};
@@ -123,9 +121,9 @@ namespace TB {
 
 	template <> struct Prefs<std::string> : public PrefsBase,
 											public std::string {
-		Prefs(const char* key, Attribute attr = save)
+		Prefs(const char* key, unsigned attr = 0)
 			: PrefsBase(key, attr), defaultValue(0){};
-		Prefs(const char* key, const char* defaultValue, Attribute attr = save)
+		Prefs(const char* key, const char* defaultValue, unsigned attr = 0)
 			: PrefsBase(key, attr), std::string(defaultValue),
 			  defaultValue(defaultValue){};
 		~Prefs(){};
