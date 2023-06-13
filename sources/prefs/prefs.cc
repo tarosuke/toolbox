@@ -173,6 +173,7 @@ namespace TB {
 
 	/** 型ごとのLoad/Write
 	 */
+	template <> void Prefs<std::string>::Read(const char* v) { body = v; };
 	template <> void Prefs<int>::Read(const char* v) { sscanf(v, "%d", &body); }
 	template <> void Prefs<unsigned>::Read(const char* v) {
 		sscanf(v, "%u", &body);
@@ -210,7 +211,9 @@ namespace TB {
 		sscanf(v, "%f %f %f", &body[0], &body[1], &body[2]);
 	}
 
-
+	template <> void Prefs<std::string>::Write(FILE* f) {
+		fprintf(f, "%s\n", body.c_str());
+	}
 	template <> void Prefs<int>::Write(FILE* f) {
 		fprintf(f, "%s=%d\n", key, body);
 	}

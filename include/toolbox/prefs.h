@@ -104,33 +104,4 @@ namespace TB {
 		void Write(FILE*) override;
 		void Reset() override { body = defaultValue; };
 	};
-
-	template <> struct Prefs<char*> : public PrefsBase, public std::string {
-		Prefs(const char* key, unsigned attr = 0)
-			: PrefsBase(key, attr), defaultValue(0){};
-		Prefs(const char* key, const char* defaultValue, unsigned attr = 0)
-			: PrefsBase(key, attr), std::string(defaultValue),
-			  defaultValue(defaultValue){};
-		~Prefs(){};
-
-	protected:
-		const char* const defaultValue;
-		void Read(const char* value) override;
-		void Write(FILE*) override;
-	};
-
-	template <> struct Prefs<std::string> : public PrefsBase,
-											public std::string {
-		Prefs(const char* key, unsigned attr = 0)
-			: PrefsBase(key, attr), defaultValue(0){};
-		Prefs(const char* key, const char* defaultValue, unsigned attr = 0)
-			: PrefsBase(key, attr), std::string(defaultValue),
-			  defaultValue(defaultValue){};
-		~Prefs(){};
-
-	protected:
-		const char* const defaultValue;
-		void Read(const char* value) override;
-		void Write(FILE*) override;
-	};
 }
