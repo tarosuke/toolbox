@@ -15,7 +15,7 @@ namespace TB {
 		void operator=(const List&);
 
 	public:
-		//このリストのためのKey(このリストを初期値にして作る)
+		// このリストのためのKey(このリストを初期値にして作る)
 		using Key = Lock::Key<L>;
 
 		/**ノード：リストのノードはこれをpublicで継承しておく必要がある
@@ -178,7 +178,7 @@ namespace TB {
 			return 0;
 		};
 
-		/**要素の操作
+		/** 要素の操作
 		 */
 		void Add(Key&, Node& n) { n.Insert(anchor); };
 		void Add(Node& n) {
@@ -206,7 +206,20 @@ namespace TB {
 			return Get(key);
 		};
 
-		//コンストラクタ／デストラクタ
+		// 挿入ソート
+		void Add(Key&, Node& n, bool (*isAAfterB)(const T& a, const T& b)) {
+			for (const auto& i : *this) {
+				if (isAAfterB(n, i)) {
+					n.Insert(i);
+				}
+			}
+		};
+		void Add(Node& n, bool (*isAAfterB)(const T& a, const T& b)) {
+			Key k(*this);
+			Add(k, n, isAAfterB);
+		};
+
+		// コンストラクタ／デストラクタ
 		List(){};
 		~List() {
 			while (anchor.next != &anchor) {
