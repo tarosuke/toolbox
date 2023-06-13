@@ -49,4 +49,11 @@ namespace TB {
 		static App* instance;
 		static Prefs<unsigned> logLevel;
 	};
+
+	/** Mainの時点でインスタンスを作れない場合
+	 * これをインスタンス化するとstaticなT::Mainが呼ばれる
+	 */
+	template <class T> struct StaticApp : App {
+		int Main() final { return T::Main(); };
+	};
 }
