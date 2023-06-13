@@ -47,7 +47,7 @@ namespace {
 				// 何かのエラー
 				fclose(file);
 				file = 0;
-				Posit(false);
+				Assume(false);
 			}
 			// ファイルの変更に備えて先頭に戻しておく
 			lseek(fd, 0, SEEK_SET);

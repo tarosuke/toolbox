@@ -39,7 +39,7 @@ namespace TB {
 	};
 }
 
-#define Posit(c)                                                               \
+#define Assume(c)                                                              \
 	if (!c) {                                                                  \
-		throw TB::Exception("fail: Posit failed - " #c, __FILE__, __LINE__);   \
+		throw TB::Exception("fail: Assume failed - " #c, __FILE__, __LINE__);  \
 	}
