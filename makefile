@@ -10,23 +10,24 @@
 
 ME := $(MAKEFILE_LIST)
 MAKECMDGOALS ?= RELEASE
+
 ifeq ($(MAKECMDGOALS), RELEASE)
 TARGETDIR := RELEASE
-COPTS := -O3 -DNDEBUG -Wno-stringop-overflow -DVK_USE_PLATFORM_XLIB_KHR
+COPTS += -O3 -DNDEBUG -Wno-stringop-overflow
 endif
 ifeq ($(MAKECMDGOALS), COVERAGE)
 TARGETDIR := COVERAGE
-COPTS := -g -coverage -DVK_USE_PLATFORM_XLIB_KHR
+COPTS += -g -coverage
 endif
-
-TARGETDIR ?= DEBUG
-COPTS ?= -O0 -g3 -DVK_USE_PLATFORM_XLIB_KHR
-
+ifeq ($(MAKECMDGOALS), DEBUG)
+TARGETDIR := DEBUG
+COPTS += -O0 -g3
+endif
 
 COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
 CCOPTS += $(COPTS) -std=c++11
 
-EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov -lvulkan -lgdbm
+EXLIBS += -lstdc++
 
 -include target.make
 target ?= $(shell echo $$PWD | sed s!.*/!! )
