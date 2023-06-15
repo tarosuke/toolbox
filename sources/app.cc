@@ -53,14 +53,21 @@ namespace TB {
 
 		int rc(0);
 		try {
+			if (!instance) {
+				throw "No instance of TB::App";
+			}
 			rc = instance->Main();
 		} catch (int returnCode) {
 			rc = returnCode;
 		} catch (std::exception& e) {
 			syslog(LOG_CRIT, e.what());
-		} catch (...) { syslog(LOG_CRIT, "Unknown exception."); }
+		} catch (const char* m) { syslog(LOG_CRIT, m); } catch (...) {
+			syslog(LOG_CRIT, "Unknown exception.");
+		}
 
-		instance->Finally();
+		if (instance) {
+			instance->Finally();
+		}
 
 		// 設定保存
 		TB::PrefsBase::Store();
