@@ -51,9 +51,9 @@ namespace TB {
 	};
 
 	/** Mainの時点でインスタンスを作れない場合
-	 * これをインスタンス化するとstaticなT::Mainが呼ばれる
+	 * これをインスタンス化するとstaticなT::StaticMainが呼ばれる
 	 */
 	template <class T> struct StaticApp : App {
-		int Main() final { return T::Main(); };
+		int Main() final { return T::StaticMain(); };
 	};
 }
