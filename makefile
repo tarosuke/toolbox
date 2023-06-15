@@ -24,6 +24,10 @@ TARGETDIR := DEBUG
 COPTS += -O0 -g3
 endif
 
+TARGETDIR ?= DEBUG
+COPTS += -O0 -g3
+
+
 COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
 CCOPTS += $(COPTS) -std=c++11
 
