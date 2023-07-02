@@ -86,10 +86,10 @@ namespace {
 
 namespace TB {
 
-	TB::Path PrefsBase::path;
+	TB::Path PrefsBase::paths[];
 	PrefsBase* PrefsBase::q(0);
 
-	void PrefsBase::SetValue(char* line) {
+	void PrefsBase::SetValue(unsigned n, char* line) {
 		// 行を=でkey/valueに分ける
 		char* v(line);
 		for (; *v && *v != '='; ++v) {}
@@ -100,7 +100,7 @@ namespace TB {
 		// keyがマッチしたエントリにはLoad
 		for (auto* p(q); p; p = p->next) {
 			if (!strcmp(line, p->key)) {
-				p->Read(v);
+				p->Read(n, v);
 			}
 		}
 	}
@@ -108,19 +108,26 @@ namespace TB {
 	void PrefsBase::Load(int argc, const char* argv[]) {
 		// パスのセットアップ
 		Path p(argv[0]);
-		path = getenv("HOME");
-		path += "/.";
-		path += p.LastSegment();
+		paths[0] = "/etc/";
+		paths[1] = getenv("HOME");
+		paths[1] += "/.";
+		std::string pname = p.LastSegment();
 
 		// 設定ファイルを読む
 		char line[1024];
-		FILE* f(Open(path.c_str(), "r"));
-		if (f) {
-			while (!!fgets(line, sizeof(line), f)) {
-				// key/valueを設定
-				SetValue(line);
+		for (unsigned n(0); n < 3; ++n) {
+			if (!paths[n].length()) {
+				continue;
 			}
-			fclose(f);
+			paths[n] += pname;
+			FILE* f(Open(paths[n].c_str(), "r"));
+			if (f) {
+				while (!!fgets(line, sizeof(line), f)) {
+					// key/valueを設定
+					SetValue(n, line);
+				}
+				fclose(f);
+			}
 		}
 
 		// コマンドラインを読む
@@ -130,16 +137,16 @@ namespace TB {
 				if (a[1] == '-') {
 					// --key=value形式
 					strcpy(line, a);
-					SetValue(line);
+					SetValue(3, line);
 				} else {
 					// -スイッチ形式
 					snprintf(line, sizeof(line), "%s=false", a);
-					SetValue(line);
+					SetValue(3, line);
 				}
 			} else if (a[0] == '+') {
 				// +スイッチ形式
 				snprintf(line, sizeof(line), "%s=true", a);
-				SetValue(line);
+				SetValue(3, line);
 			} else {
 				// それ以外が現れたら終了
 				return;
@@ -148,22 +155,21 @@ namespace TB {
 	}
 
 	void PrefsBase::Store() {
-		// ファイルを開いてStore
-		FILE* f(Open(path.c_str(), "w"));
-		if (f) {
-			for (PrefsBase* p(q); p; p = p->next) {
-				if (~p->attr & nosave) {
-					p->Write(f);
+		// userとworkplaceについてファイルを開いてStore
+		for (unsigned n(1); n < 3; ++n) {
+			FILE* f(Open(paths[n].c_str(), "w"));
+			if (f) {
+				for (PrefsBase* p(q); p; p = p->next) {
+					p->Write(n, f);
 				}
+				fclose(f);
 			}
-			fclose(f);
 		}
 	}
 
 
 
-	PrefsBase::PrefsBase(const char* key, unsigned attr)
-		: key(key), attr(attr) {
+	PrefsBase::PrefsBase(const char* key) : key(key) {
 		// スタックに自身を追加
 		next = q;
 		q = this;
@@ -173,24 +179,35 @@ namespace TB {
 
 	/** 型ごとのLoad/Write
 	 */
-	template <> void Prefs<std::string>::Read(const char* v) { body = v; };
-	template <> void Prefs<int>::Read(const char* v) { sscanf(v, "%d", &body); }
-	template <> void Prefs<unsigned>::Read(const char* v) {
+	template <> void Prefs<std::string>::Body::Read(const char* v) {
+		body = v;
+		valid = true;
+	};
+	template <> void Prefs<int>::Body::Read(const char* v) {
+		sscanf(v, "%d", &body);
+		valid = true;
+	}
+	template <> void Prefs<unsigned>::Body::Read(const char* v) {
 		sscanf(v, "%u", &body);
+		valid = true;
 	}
-	template <> void Prefs<long>::Read(const char* v) {
+	template <> void Prefs<long>::Body::Read(const char* v) {
 		sscanf(v, "%ld", &body);
+		valid = true;
 	}
-	template <> void Prefs<unsigned long>::Read(const char* v) {
+	template <> void Prefs<unsigned long>::Body::Read(const char* v) {
 		sscanf(v, "%lu", &body);
+		valid = true;
 	}
-	template <> void Prefs<float>::Read(const char* v) {
+	template <> void Prefs<float>::Body::Read(const char* v) {
 		sscanf(v, "%f", &body);
+		valid = true;
 	}
-	template <> void Prefs<double>::Read(const char* v) {
+	template <> void Prefs<double>::Body::Read(const char* v) {
 		sscanf(v, "%lf", &body);
+		valid = true;
 	}
-	template <> void Prefs<bool>::Read(const char* v) {
+	template <> void Prefs<bool>::Body::Read(const char* v) {
 		switch (*v) {
 		case 't':
 		case 'T':
@@ -203,42 +220,88 @@ namespace TB {
 			body = false;
 			break;
 		}
+		valid = true;
 	}
-	template <> void Prefs<Vector<3, double>>::Read(const char* v) {
+	template <> void Prefs<Vector<3, double>>::Body::Read(const char* v) {
 		sscanf(v, "%lf %lf %lf", &body[0], &body[1], &body[2]);
+		valid = true;
 	}
-	template <> void Prefs<Vector<3, float>>::Read(const char* v) {
+	template <> void Prefs<Vector<3, float>>::Body::Read(const char* v) {
 		sscanf(v, "%f %f %f", &body[0], &body[1], &body[2]);
+		valid = true;
 	}
 
-	template <> void Prefs<std::string>::Write(FILE* f) {
+	template <> void Prefs<std::string>::Body::Write(const char* key, FILE* f) {
+		if (!dirty) {
+			return;
+		}
 		fprintf(f, "%s\n", body.c_str());
+		dirty = false;
 	}
-	template <> void Prefs<int>::Write(FILE* f) {
+	template <> void Prefs<int>::Body::Write(const char* key, FILE* f) {
+		if (!dirty) {
+			return;
+		}
 		fprintf(f, "%s=%d\n", key, body);
+		dirty = false;
 	}
-	template <> void Prefs<unsigned>::Write(FILE* f) {
+	template <> void Prefs<unsigned>::Body::Write(const char* key, FILE* f) {
+		if (!dirty) {
+			return;
+		}
 		fprintf(f, "%s=%u\n", key, body);
+		dirty = false;
 	}
-	template <> void Prefs<long>::Write(FILE* f) {
+	template <> void Prefs<long>::Body::Write(const char* key, FILE* f) {
+		if (!dirty) {
+			return;
+		}
 		fprintf(f, "%s=%ld\n", key, body);
+		dirty = false;
 	}
-	template <> void Prefs<unsigned long>::Write(FILE* f) {
+	template <>
+	void Prefs<unsigned long>::Body::Write(const char* key, FILE* f) {
+		if (!dirty) {
+			return;
+		}
 		fprintf(f, "%s=%lu\n", key, body);
+		dirty = false;
 	}
-	template <> void Prefs<float>::Write(FILE* f) {
+	template <> void Prefs<float>::Body::Write(const char* key, FILE* f) {
+		if (!dirty) {
+			return;
+		}
 		fprintf(f, "%s=%f\n", key, body);
+		dirty = false;
 	}
-	template <> void Prefs<double>::Write(FILE* f) {
+	template <> void Prefs<double>::Body::Write(const char* key, FILE* f) {
+		if (!dirty) {
+			return;
+		}
 		fprintf(f, "%s=%lf\n", key, body);
+		dirty = false;
 	}
-	template <> void Prefs<bool>::Write(FILE* f) {
+	template <> void Prefs<bool>::Body::Write(const char* key, FILE* f) {
+		if (!dirty) {
+			return;
+		}
 		fprintf(f, "%s=%s\n", key, body ? "true" : "false");
+		dirty = false;
 	}
-	template <> void Prefs<Vector<3, double>>::Write(FILE* f) {
+	template <>
+	void Prefs<Vector<3, double>>::Body::Write(const char* key, FILE* f) {
+		if (!dirty) {
+			return;
+		}
 		fprintf(f, "%s=%lf %lf %lf\n", key, body[0], body[1], body[2]);
+		dirty = false;
 	}
-	template <> void Prefs<Vector<3, float>>::Write(FILE* f) {
+	template <>
+	void Prefs<Vector<3, float>>::Body::Write(const char* key, FILE* f) {
+		if (!dirty) {
+			return;
+		}
 		fprintf(f, "%s=%f %f %f\n", key, body[0], body[1], body[2]);
+		dirty = false;
 	}
 }

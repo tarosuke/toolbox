@@ -20,12 +20,14 @@
  * 設定を与えてstaticなインスタンスを作っておくと変数を設定値として管理して
  * くれる便利クラス
  *
+ * 設定はsystem, user, workplace, temporaryの四種類あり、以下の違いがある。
+ * 使うときの優先度はtemporary, workplace, user, systemの順になる。
+ *    system:/etc/(プロセス名)に書いてあるものを読む。保存はしない。
+ *      user:~/.(プロセス名)を読み書き。
+ * workplace:指定したパス/.(プロセス名)を読み書き
+ * temporary:ファイルは扱わない。コマンドライン引数向け。
  *
- * 設定はKeeperを作ると読み込まれ、Keeperが消滅すると保存される。
- *
- * 末端の設定に何かさせたい時はPrefsの子クラスを作ってExtendedHandlerをオー
- * バーライドした上で呼び出す。また全ての設定を辿る時はItorを作って0になるま
- * でループする。
+ * また何も設定されていなければコード上で指定されるデフォルト値が使われる
  */
 #pragma once
 
@@ -45,33 +47,31 @@ namespace TB {
 		void operator=(const PrefsBase&);
 
 	public:
-		// 属性値
-		static constexpr unsigned nosave = 0x01;
-
 		// 読み出しと保存
 		static void Store();
 		static void Load(
 			int argc,
 			const char* argv[]); // 設定を読んでコマンドラインで上書き
-		virtual void Reset() = 0; // 初期値に戻す
 
 	protected:
 		const char* const key;
-		const unsigned attr;
 
-		PrefsBase(const char* key, unsigned attr);
+		PrefsBase(const char* key);
 		~PrefsBase(){};
 
-		virtual void Read(const char* value) = 0;
-		virtual void Write(FILE*) = 0;
+		virtual void Read(unsigned index, const char*) = 0;
+		virtual void Write(unsigned index, FILE*) = 0;
 
 	private:
-		static Path path;
+		static Path paths[3]; // system, user, workplaceの３つ
 		static PrefsBase* q;
 
-		static void SetValue(char* line);
+		static void SetValue(unsigned index, char* line);
 
 		PrefsBase* next;
+
+		static void Store(FILE*);
+		static void Load(FILE*);
 	};
 
 
@@ -84,24 +84,51 @@ namespace TB {
 	 * ある
 	 * NOTE:処理がmainに入るまでは機能しない
 	 */
-	template <typename T> struct Prefs : public PrefsBase {
-		Prefs(const char* key, unsigned attr = 0) : PrefsBase(key, attr){};
-		Prefs(const char* key, const T& defaultValue, unsigned attr = 0)
-			: PrefsBase(key, attr), body(defaultValue),
+	template <typename T> struct Prefs : PrefsBase {
+		struct Body {
+			bool valid;
+			bool dirty;
+			T body;
+
+			Body() : valid(false), dirty(false){};
+			void operator=(const T& v) {
+				body = v;
+				valid = true;
+				dirty = true;
+			};
+			void Read(const char*); // NOTE:validを真にすること
+			void Write(const char*, FILE*);
+
+			Body(const Body&) = delete;
+			void operator=(const Body&) = delete;
+		} & system, &user, &workspace, &temporary;
+
+		Prefs(const char* key)
+			: PrefsBase(key), system(bodies[0]), user(bodies[1]),
+			  workspace(bodies[2]), temporary(bodies[3]){};
+		Prefs(const char* key, const T& defaultValue)
+			: PrefsBase(key), system(bodies[0]), user(bodies[1]),
+			  workspace(bodies[2]), temporary(bodies[3]),
 			  defaultValue(defaultValue){};
 		~Prefs(){};
 
-		T operator=(const T& v) {
-			body = v;
-			return body;
+		void operator=(const T& v) { temporary = v; };
+		operator const T&() {
+			return temporary.valid ? temporary.body
+				 : workspace.valid ? workspace.body
+				 : user.valid	   ? user.body
+				 : system.valid	   ? system.body
+								   : defaultValue;
 		};
-		operator const T&() { return body; };
 
 	protected:
-		T body;
 		T defaultValue;
-		void Read(const char* value) override;
-		void Write(FILE*) override;
-		void Reset() override { body = defaultValue; };
+		Body bodies[4];
+		void Read(unsigned index, const char* v) final {
+			bodies[index].Read(v);
+		};
+		void Write(unsigned index, FILE* f) final {
+			bodies[index].Write(key, f);
+		};
 	};
 }
