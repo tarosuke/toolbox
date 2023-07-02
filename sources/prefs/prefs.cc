@@ -116,9 +116,6 @@ namespace TB {
 		// 設定ファイルを読む
 		char line[1024];
 		for (unsigned n(0); n < 3; ++n) {
-			if (!paths[n].length()) {
-				continue;
-			}
 			paths[n] += pname;
 			FILE* f(Open(paths[n].c_str(), "r"));
 			if (f) {
@@ -154,10 +151,12 @@ namespace TB {
 		}
 	}
 
+	const char* PrefsBase::writeModes[] = {"r", "w", "r+"};
 	void PrefsBase::Store() {
 		// userとworkplaceについてファイルを開いてStore
+		// userはファイルがない時に新しく作るがcurrentでは失敗する
 		for (unsigned n(1); n < 3; ++n) {
-			FILE* f(Open(paths[n].c_str(), "w"));
+			FILE* f(Open(paths[n].c_str(), writeModes[n]));
 			if (f) {
 				for (PrefsBase* p(q); p; p = p->next) {
 					p->Write(n, f);
@@ -219,6 +218,8 @@ namespace TB {
 		case '0':
 			body = false;
 			break;
+		default:
+			return; // 解釈できないのでそのまま--例外吐くのが親切だが
 		}
 		valid = true;
 	}
