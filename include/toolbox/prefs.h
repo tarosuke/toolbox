@@ -65,6 +65,7 @@ namespace TB {
 	private:
 		static Path paths[3]; // system, user, workplaceの３つ
 		static PrefsBase* q;
+		static const char* writeModes[3];
 
 		static void SetValue(unsigned index, char* line);
 
@@ -101,21 +102,21 @@ namespace TB {
 
 			Body(const Body&) = delete;
 			void operator=(const Body&) = delete;
-		} & system, &user, &workspace, &temporary;
+		} & system, &user, &current, &temporary;
 
 		Prefs(const char* key)
 			: PrefsBase(key), system(bodies[0]), user(bodies[1]),
-			  workspace(bodies[2]), temporary(bodies[3]){};
+			  current(bodies[2]), temporary(bodies[3]){};
 		Prefs(const char* key, const T& defaultValue)
 			: PrefsBase(key), system(bodies[0]), user(bodies[1]),
-			  workspace(bodies[2]), temporary(bodies[3]),
+			  current(bodies[2]), temporary(bodies[3]),
 			  defaultValue(defaultValue){};
 		~Prefs(){};
 
 		void operator=(const T& v) { temporary = v; };
 		operator const T&() {
 			return temporary.valid ? temporary.body
-				 : workspace.valid ? workspace.body
+				 : current.valid   ? current.body
 				 : user.valid	   ? user.body
 				 : system.valid	   ? system.body
 								   : defaultValue;
