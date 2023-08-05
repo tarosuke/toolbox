@@ -24,7 +24,7 @@
 
 namespace TB {
 
-	Table::Table()
+	TableBase::TableBase()
 		: table((Entry*)malloc(sizeof(Entry) * initialEntries)),
 		  nEntry(initialEntries), pool(emptyEntry) {
 		// 確保した領域をpoolに詰んでおく
@@ -34,13 +34,13 @@ namespace TB {
 		}
 	}
 
-	Table::~Table() {
+	TableBase::~TableBase() {
 		if (table) {
 			free(table);
 		}
 	}
 
-	unsigned Table::Register(Node& node) {
+	unsigned TableBase::Register(Node& node) {
 		if (pool == emptyEntry) {
 			// メモリを追加確保して新気分をpoolに詰む
 			if (!(table = (Entry*)realloc(table, nEntry * sizeof(Entry) * 2))) {
@@ -60,7 +60,7 @@ namespace TB {
 		return id;
 	}
 
-	Table::Node::~Node() {
+	TableBase::Node::~Node() {
 		table.table[id].next = table.pool;
 		table.pool = id;
 	}

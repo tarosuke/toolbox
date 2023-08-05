@@ -21,25 +21,25 @@
 
 namespace TB {
 
-	struct Table {
+	struct TableBase {
 		static constexpr unsigned initialEntries = 16;
 
 		struct Node {
 			virtual ~Node();
 
 		protected:
-			Table& table;
+			TableBase& table;
 			const unsigned id;
 
-			Node(Table& table) : table(table), id(table.Register(*this)){};
-			Node(Table& table, unsigned id) : table(table), id(id){};
+			Node(TableBase& table) : table(table), id(table.Register(*this)){};
+			Node(TableBase& table, unsigned id) : table(table), id(id){};
 		};
 
-		Node* operator[](unsigned id) { return table[id].node; };
-
 	protected:
-		Table();
-		~Table();
+		TableBase();
+		~TableBase();
+
+		Node* Find(unsigned id) { return table[id].node; };
 
 	private:
 		static constexpr unsigned emptyEntry = ~0L;
@@ -56,4 +56,7 @@ namespace TB {
 		void Unregister(Node&); // エントリを返却する
 	};
 
+	template <typename T> struct Table : TableBase {
+		T* operator[](unsigned id) { return dynamic_cast<T*>(Find(id)); };
+	};
 }
