@@ -24,6 +24,10 @@
 
 namespace tb {
 
+	namespace std {
+		class string;
+	}
+
 	template <typename T> struct Pixel {
 		Pixel(T v = 0) : arr{v, v, v, v} {};
 		template <typename W> Pixel(W wc) // W:Tの4倍サイズの符号なし整数
@@ -67,6 +71,8 @@ namespace tb {
 				arr[2] + t.arr[2],
 				arr[3] + t.arr[3]};
 		};
+
+		T operator[](uint n) const { return arr[n]; };
 
 	private:
 		static constexpr T max = ((T)~0U);

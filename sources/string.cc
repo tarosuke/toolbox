@@ -1,5 +1,5 @@
 /********************************************************************** 文字列
- * Copyright (C) 2017,2019,2021 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2017,2019,2021,2023 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,9 +17,24 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include <toolbox/string.h>
-#include <toolbox/exception/exception.h>
+#include <tb/string.h>
+
+
+
+namespace tb {
+
+	const char String::numericChars[] = "0123456789abcdef";
+
+	template <> String& String::Append(uint v, char p, uint w, uint r) {
+		String s;
+	}
+}
+
+
+
 #include <string.h>
+#include <toolbox/exception/exception.h>
+#include <toolbox/string.h>
 
 
 
