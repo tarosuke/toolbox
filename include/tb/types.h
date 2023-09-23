@@ -38,6 +38,8 @@ namespace tb {
 	using f64 = double;
 	using f128 = long double;
 
+	using uint = unsigned;
+
 }
 
 #define elementsOf(a) (sizeof(a) / sizeof(a[0]))
