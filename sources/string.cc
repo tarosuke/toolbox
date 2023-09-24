@@ -26,7 +26,22 @@ namespace tb {
 	const char String::numericChars[] = "0123456789abcdef";
 
 	template <> String& String::Append(uint v, char p, uint w, uint r) {
-		String s;
+		// 最後の文字
+		String s(numericChars[v % r]);
+
+		// 剰余を並べて
+		for (; v /= r, --w || v;) {
+			s += numericChars[v % r];
+		}
+		// 逆順に追加
+		for (auto i(s.crbegin()); i != s.crend(); ++i) {
+			push_back(*i);
+		}
+
+		return *this;
+	}
+	template <> String& String::Append(u8 v, char p, uint w, uint r) {
+		return Append((uint)v, p, w, r);
 	}
 }
 

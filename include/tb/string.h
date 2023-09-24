@@ -33,6 +33,7 @@ namespace tb {
 		String(const String& s) : ::std::string(s){};
 		String(String&& s) : ::std::string(s){};
 		String(const char* s) : ::std::string(s){};
+		String(char c) : ::std::string(1, c){};
 
 		String& operator=(const String& s) {
 			*(::std::string*)this = s;
@@ -57,7 +58,7 @@ namespace tb {
 
 		// 文字列に数値文字列を追加(appendでないのはstd:;stringとの区別)
 		template <typename T>
-		String& Append(T, char padding = ' ', uint width = 0, uint radix = 10);
+		String& Append(T, char padding = ' ', uint width = 1, uint radix = 10);
 
 	private:
 		static const char numericChars[];
