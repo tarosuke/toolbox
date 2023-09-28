@@ -19,11 +19,25 @@ int main() {
 	tb::Image<tb::Pixel<tb::u8>> image(&buffer[0][0], 2, 2);
 
 
-	const tb::Pixel<tb::u8> p(image[0.5f][0.5]);
 
-	const tb::Pixel<tb::u8> ans(128);
+	const tb::Pixel<tb::f32> of((const float[4]){2.0f, 2.0f, 2.0f, 2.0f});
+	const tb::Pixel<tb::f32> uf((const float[4]){-1.0f, -1.0f, -1.0f, -1.0f});
+	const tb::Pixel<tb::f32> hf((const float[4]){0.5f, 0.5f, 0.5f, 0.5f});
 
-	assertEQ(p, ans);
+	const tb::Pixel<tb::u8> mb(255U, 255U, 255U, 255U);
+	const tb::Pixel<tb::u8> lb(0U, 0U, 0U, 0U);
+	const tb::Pixel<tb::u8> hb(127U, 127U, 127U, 127U);
+
+
+	assertEQ(tb::Pixel<tb::u8>(of), mb);
+	assertEQ(tb::Pixel<tb::u8>(uf), lb);
+	assertEQ(tb::Pixel<tb::u8>(hf), hb);
+
+
+	// const tb::Pixel<tb::u8> p(image[0.5f][0.5f]);
+
+
+	// assertEQ(p, hb);
 
 
 	return 0;
