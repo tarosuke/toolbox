@@ -23,7 +23,7 @@ COPTS ?= -O0 -g3 -DVK_USE_PLATFORM_XLIB_KHR
 
 
 COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
-CCOPTS += $(COPTS) -std=c++11
+CCOPTS += $(COPTS) -std=c++20
 
 EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov -lvulkan -lgdbm
 
