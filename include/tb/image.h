@@ -18,6 +18,7 @@
  */
 #pragma once
 
+#include <limits>
 #include <tb/types.h>
 #include <type_traits>
 
@@ -26,7 +27,7 @@
 namespace tb {
 
 	template <typename T> struct Pixel {
-		static constexpr T max = ((T)~0U);
+		static constexpr T max = std::numeric_limits<T>::max();
 
 		Pixel(T v = 0) : arr{v, v, v, v} {};
 
