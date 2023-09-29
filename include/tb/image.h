@@ -38,7 +38,8 @@ namespace tb {
 		Pixel(const T (&iv)[4]) : arr{iv[0], iv[1], iv[2], iv[3]} {};
 		Pixel(T a, T b, T c, T d) : arr{a, b, c, d} {};
 
-
+		template <typename U> Pixel(T a, T b, T c, T d)
+			: arr{Limit(a), Limit(b), Limit(c), Limit(d)} {};
 		template <typename U> Pixel(const U (&o)[4])
 			: arr{Limit(o[0]), Limit(o[1]), Limit(o[2]), Limit(o[3])} {};
 
@@ -59,15 +60,26 @@ namespace tb {
 			static_assert(
 				std::is_floating_point<U>::value,
 				"引数は実数でなければならない。");
-			return Pixel<U>((
-				const U(&)[4]){arr[0] * v, arr[1] * v, arr[2] * v, arr[3] * v});
+			Pixel<U> r(arr);
+			r *= v;
+			return r;
+		};
+		template <typename U> Pixel& operator*=(U u) {
+			static_assert(
+				std::is_floating_point<U>::value,
+				"引数は実数でなければならない。");
+			arr[0] *= u;
+			arr[1] *= u;
+			arr[2] *= u;
+			arr[3] *= u;
+			return *this;
 		};
 		Pixel operator+(Pixel t) const {
 			return Pixel{
-				Limit(arr[0] + t.arr[0], max),
-				Limit(arr[1] + t.arr[1], max),
-				Limit(arr[2] + t.arr[2], max),
-				Limit(arr[3] + t.arr[3], max)};
+				arr[0] + t.arr[0],
+				arr[1] + t.arr[1],
+				arr[2] + t.arr[2],
+				arr[3] + t.arr[3]};
 		};
 
 		T operator[](uint n) const { return arr[n]; };
