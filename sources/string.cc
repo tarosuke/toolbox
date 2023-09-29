@@ -43,6 +43,9 @@ namespace tb {
 	template <> String& String::Append(u8 v, char p, uint w, uint r) {
 		return Append((uint)v, p, w, r);
 	}
+	template <> String& String::Append(int v, char p, uint w, uint r) {
+		return v < 0 ? Append((uint)-v, p, w - 1, r) : Append((uint)v, p, w, r);
+	}
 }
 
 
