@@ -41,5 +41,11 @@ int main() {
 	assertEQ(Cross2(h, i), -4);
 
 
+	const tb::Vector<3, int> j((const int[]){1, 2, 3});
+	const tb::Vector<3, int> k((const int[]){4, 5, 6});
+
+	assertEQ(j * k, 32);
+
+
 	return 0;
 }

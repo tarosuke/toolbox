@@ -34,7 +34,7 @@ namespace tb {
 		String s(numericChars[v % r]);
 
 		// 剰余を並べて
-		for (; v /= r, --w || v;) {
+		for (; v /= r, (w ? --w : w) || v;) {
 			s += numericChars[v % r];
 		}
 		// 逆順に追加
