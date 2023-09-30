@@ -153,6 +153,11 @@ namespace tb {
 		template <typename U> static constexpr bool fail = false;
 		T arr[D];
 	};
+
+	template <typename T>
+	T Cross2(const Vector<2, T>& a, const Vector<2, T>& b) {
+		return a[0] * b[1] - a[1] * b[0];
+	}
 }
 
 
