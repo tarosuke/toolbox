@@ -18,7 +18,6 @@
  */
 #pragma once
 
-#include <algorithm>
 #include <math.h>
 
 
@@ -150,7 +149,6 @@ namespace tb {
 		};
 
 	private:
-		template <typename U> static constexpr bool fail = false;
 		T arr[D];
 	};
 
