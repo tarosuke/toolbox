@@ -18,6 +18,13 @@ template <> tb::String::String(const tb::Complex<4, int>& c) {
 	push_back(',');
 	Append(c[3]);
 }
+template <> tb::String::String(const tb::Vector<3, int>& c) {
+	Append(c[0]);
+	push_back(',');
+	Append(c[1]);
+	push_back(',');
+	Append(c[2]);
+}
 template <> tb::String::String(const int& o) { Append(o); }
 
 
@@ -41,6 +48,11 @@ int main() {
 	assertEQ(a, b);
 	a /= 2;
 	assertEQ(a, c);
+
+	const tb::Vector<3, int> d((const int[3]){0, 0, 1});
+	const tb::Vector<3, int> e((const int[3]){-1, 0, 0});
+	const tb::Complex<4, int> f((const int[4]){1, 0, 1, 0});
+	assertEQ(f.Rotate(d), e);
 
 	return 0;
 }

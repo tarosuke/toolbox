@@ -92,7 +92,7 @@ namespace tb {
 
 
 		// 乗算
-		const Complex& operator*(const Complex& o) const {
+		Complex operator*(const Complex& o) const {
 			if constexpr (D == 2) {
 				Complex r;
 				r.a[0] = a[0] * o.a[0] - a[1] * o.a[1];
@@ -121,18 +121,19 @@ namespace tb {
 		Complex(const ::tb::Vector<D - 1, T>& o) { // ベクタからの生成
 			a[0] = 0;
 			for (unsigned n(1); n < D; ++n) {
-				a[n] = o.arr[n - 1];
+				a[n] = o[n - 1];
 			}
 		};
 		operator ::tb::Vector<D - 1, T>() { // ベクタの生成
-			return ::tb::Vector<D - 1, T>(&a[1]);
+			return ::tb::Vector<D - 1, T>(a, 1);
 		};
-		const Complex& operator~() const { // 共役を返す
+		Complex operator~() const { // 共役を返す
 			Complex r;
 			r.a[0] = a[0];
 			for (unsigned n(1); n < D; ++n) {
 				r.a[n] = -a[n];
 			}
+			return r;
 		};
 		::tb::Vector<D - 1, T> Rotate(const ::tb::Vector<D - 1, T>& v) const {
 			return ::tb::Vector<D - 1, T>(*this * Complex(v) * ~*this);

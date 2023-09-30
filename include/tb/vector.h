@@ -33,8 +33,8 @@ namespace tb {
 				*const_cast<T*>(&arr[n]) = o;
 			}
 		};
-		template <unsigned E> Vector(const T (&o)[E]) {
-			for (uint n(0); n < D; ++n) {
+		template <unsigned E> Vector(const T (&o)[E], unsigned offset = 0) {
+			for (uint n(offset); n < D; ++n) {
 				*const_cast<T*>(&arr[n]) = o[n];
 			}
 		};
