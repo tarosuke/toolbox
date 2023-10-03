@@ -34,8 +34,8 @@ namespace tb {
 			}
 		};
 		template <unsigned E> Vector(const T (&o)[E], unsigned offset = 0) {
-			for (uint n(offset); n < D; ++n) {
-				*const_cast<T*>(&arr[n]) = o[n];
+			for (uint n(0); n < D; ++n) {
+				*const_cast<T*>(&arr[n]) = o[n + E - D];
 			}
 		};
 
@@ -52,11 +52,17 @@ namespace tb {
 		T operator[](unsigned n) const { return n < D ? arr[n] : 0; };
 
 
-		// 比較
+		// 比較(実数の場合誤差が一定以下なら同値とする)
 		bool operator==(const Vector& o) const {
 			for (uint n(0); n < D; ++n) {
-				if (arr[n] != o.arr[n]) {
-					return false;
+				if constexpr (std::is_floating_point<T>::value) {
+					if (0.000001 < abs(arr[n] - o.arr[n])) {
+						return false;
+					}
+				} else {
+					if (arr[n] != o.arr[n]) {
+						return false;
+					}
 				}
 			}
 			return true;

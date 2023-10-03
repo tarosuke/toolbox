@@ -79,11 +79,17 @@ namespace tb {
 
 
 
-		// 比較
+		// 比較(実数の場合誤差が一定以下なら同値とする)
 		bool operator==(const Complex& o) const {
 			for (uint n(0); n < D; ++n) {
-				if (a[n] != o.a[n]) {
-					return false;
+				if constexpr (std::is_floating_point<T>::value) {
+					if (0.000001 < abs(a[n] - o.a[n])) {
+						return false;
+					}
+				} else {
+					if (a[n] != o.a[n]) {
+						return false;
+					}
 				}
 			}
 			return true;
@@ -162,11 +168,15 @@ namespace tb {
 			return r;
 		};
 		::tb::Vector<D - 1, T> Rotate(const ::tb::Vector<D - 1, T>& v) const {
-			return ::tb::Vector<D - 1, T>(*this * Complex(v) * ~*this);
+			auto r(::tb::Vector<D - 1, T>(*this * Complex(v) * ~*this));
+			r.Normalize();
+			return r;
 		};
 		::tb::Vector<D - 1, T>
 		ReverseRotate(const ::tb::Vector<D - 1, T>& v) const {
-			return ::tb::Vector<D - 1, T>(~*this * Complex(v) * *this);
+			auto r(::tb::Vector<D - 1, T>(~*this * Complex(v) * *this));
+			r.Normalize();
+			return r;
 		};
 
 	private:
