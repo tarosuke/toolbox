@@ -30,37 +30,37 @@ namespace tb {
 
 		Vector(T o) {
 			for (uint n(0); n < D; ++n) {
-				*const_cast<T*>(&arr[n]) = o;
+				*const_cast<T*>(&a[n]) = o;
 			}
 		};
 		template <unsigned E> Vector(const T (&o)[E], unsigned offset = 0) {
 			for (uint n(0); n < D; ++n) {
-				*const_cast<T*>(&arr[n]) = o[n + E - D];
+				*const_cast<T*>(&a[n]) = o[n + E - D];
 			}
 		};
 
 
 		template <unsigned E> const Vector& operator=(const T (&o)[E]) {
 			for (uint n(0); n < D; ++n) {
-				arr[n] = o[n];
+				a[n] = o[n];
 			}
 		};
 		template <unsigned E> const Vector& operator=(const Vector<E, T>& o) {
 			return *this = o.arr;
 		};
 
-		T operator[](unsigned n) const { return n < D ? arr[n] : 0; };
+		T operator[](unsigned n) const { return n < D ? a[n] : 0; };
 
 
 		// 比較(実数の場合誤差が一定以下なら同値とする)
 		bool operator==(const Vector& o) const {
 			for (uint n(0); n < D; ++n) {
 				if constexpr (std::is_floating_point<T>::value) {
-					if (0.000001 < abs(arr[n] - o.arr[n])) {
+					if (0.000001 < abs(a[n] - o.a[n])) {
 						return false;
 					}
 				} else {
-					if (arr[n] != o.arr[n]) {
+					if (a[n] != o.a[n]) {
 						return false;
 					}
 				}
@@ -74,53 +74,53 @@ namespace tb {
 		Vector operator+(const Vector& o) const {
 			T r[D]{};
 			for (uint n(0); n < D; ++n) {
-				r[n] = arr[n] + o.arr[n];
+				r[n] = a[n] + o.a[n];
 			}
 			return Vector(r);
 		};
 		Vector operator-(const Vector& o) const {
 			T r[D];
 			for (uint n(0); n < D; ++n) {
-				r[n] = arr[n] - o.arr[n];
+				r[n] = a[n] - o.a[n];
 			}
 			return Vector(r);
 		};
 		Vector operator*(T o) const {
 			T r[D];
 			for (uint n(0); n < D; ++n) {
-				r[n] = arr[n] * o;
+				r[n] = a[n] * o;
 			}
 			return Vector(r);
 		};
 		Vector operator/(T o) const {
 			T r[D];
 			for (uint n(0); n < D; ++n) {
-				r[n] = arr[n] / o;
+				r[n] = a[n] / o;
 			}
 			return Vector(r);
 		}
 
 		const Vector& operator+=(const Vector& o) {
 			for (uint n(0); n < D; ++n) {
-				arr[n] += o.arr[n];
+				a[n] += o.a[n];
 			}
 			return *this;
 		};
 		const Vector& operator-=(const Vector& o) {
 			for (uint n(0); n < D; ++n) {
-				arr[n] -= o.arr[n];
+				a[n] -= o.a[n];
 			}
 			return *this;
 		};
 		const Vector& operator*=(T o) {
 			for (uint n(0); n < D; ++n) {
-				arr[n] *= o;
+				a[n] *= o;
 			}
 			return *this;
 		};
 		const Vector& operator/=(T o) {
 			for (uint n(0); n < D; ++n) {
-				arr[n] /= o;
+				a[n] /= o;
 			}
 			return *this;
 		};
@@ -130,7 +130,7 @@ namespace tb {
 		T Norm2() const {
 			T r(0);
 			for (uint n(0); n < D; ++n) {
-				r += arr[n] * arr[n];
+				r += a[n] * a[n];
 			}
 			return r;
 		};
@@ -142,20 +142,20 @@ namespace tb {
 		T operator*(const Vector& o) const {
 			T r(0);
 			for (uint n(0); n < D; ++n) {
-				r += arr[n] * o.arr[n];
+				r += a[n] * o.a[n];
 			}
 			return r;
 		};
 
 		Vector Cross(const Vector& o) const {
 			return tb::Vector<3, T>((const T[D]){
-				arr[1] * o.arr[2] - arr[2] * o.arr[1],
-				arr[2] * o.arr[0] - arr[0] * o.arr[2],
-				arr[0] * o.arr[1] - arr[1] * o.arr[0]});
+				a[1] * o.a[2] - a[2] * o.a[1],
+				a[2] * o.a[0] - a[0] * o.a[2],
+				a[0] * o.a[1] - a[1] * o.a[0]});
 		};
 
 	private:
-		T arr[D];
+		T a[D];
 	};
 
 	template <typename T>
