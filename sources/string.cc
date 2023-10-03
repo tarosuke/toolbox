@@ -17,6 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <stdio.h>
 #include <tb/string.h>
 
 
@@ -58,6 +59,15 @@ namespace tb {
 			Append((uint)v, p, w, r);
 		}
 		return *this;
+	}
+	template <> String& String::Append(double v, char p, uint w, uint r) {
+		char b[std::numeric_limits<double>::max_digits10];
+		snprintf(b, sizeof(b), "%*f", w, v);
+		append(b);
+		return *this;
+	}
+	template <> String& String::Append(float v, char p, uint w, uint r) {
+		return Append((double)v, p, w, r);
 	}
 }
 
