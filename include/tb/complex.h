@@ -40,6 +40,32 @@ namespace tb {
 			}
 		};
 
+		// 各軸の回転角で初期化
+		Complex(const T axis[D - 1], T ratio) {
+			// 一旦格納
+			for (unsigned n(1); n < D; ++n) {
+				a[n] = axis[n - 1] * ratio;
+			}
+			// 回転角を算出
+			T norm2(0.0);
+			for (unsigned n(1); n < D; ++n) {
+				norm2 += a[n] * a[n];
+			}
+			if (0.0 < norm2) {
+				// 回転角が0.0ではない場合は普通にn元数算出
+				const T norm(sqrt(norm2));
+				const T half(norm * 0.5);
+				const T sinA(sin(half) / norm);
+				a[0] = cos(half);
+				for (unsigned n(1); n < D; ++n) {
+					a[n] *= sinA;
+				}
+			} else {
+				// norm2が0.0なら回転なし(a[1]〜a[dim-1]はすべて0)
+				a[0] = 1.0;
+			}
+		};
+
 		template <unsigned E> const Complex& operator=(const T (&o)[E]) {
 			for (uint n(0); n < D; ++n) {
 				a[n] = o[n];
