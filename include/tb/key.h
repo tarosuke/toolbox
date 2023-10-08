@@ -17,13 +17,16 @@
  */
 #pragma once
 
+#include <type_traits>
+
+
 
 namespace tb {
 
 	/***** RAIIキー
 	 * キーが存在する間はロックされる
 	 */
-	template <class L> struct Key {
+	template <class L = NullLock> struct Key {
 		Key(L& l) : lock(l) { l.Lock(); };
 		~Key() { lock.Unlock(); };
 
@@ -35,9 +38,10 @@ namespace tb {
 	 * デフォルトでは空ロック
 	 * 特殊化して使う
 	 */
-	template <class C> struct Lock {
+	template <typename C> struct Lock {
 		void Lock(){};
 		void Unlock(){};
 	};
 
+	using NullLock = Lock<std::nullptr_t>;
 };
