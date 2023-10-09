@@ -17,6 +17,9 @@
  */
 #pragma once
 
+#include <type_traits>
+
+
 
 namespace tb {
 
@@ -31,13 +34,11 @@ namespace tb {
 		L& lock;
 	};
 
-	/***** ロックの基本形
-	 * デフォルトでは空ロック
-	 * 特殊化して使う
+	/***** 何もしないロック
 	 */
-	template <class C> struct Lock {
+	struct NullLock {
+		friend class Key<NullLock>;
 		void Lock(){};
 		void Unlock(){};
 	};
-
 };
