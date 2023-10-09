@@ -26,7 +26,7 @@ namespace tb {
 	/***** RAIIキー
 	 * キーが存在する間はロックされる
 	 */
-	template <class L = NullLock> struct Key {
+	template <class L> struct Key {
 		Key(L& l) : lock(l) { l.Lock(); };
 		~Key() { lock.Unlock(); };
 
@@ -34,14 +34,11 @@ namespace tb {
 		L& lock;
 	};
 
-	/***** ロックの基本形
-	 * デフォルトでは空ロック
-	 * 特殊化して使う
+	/***** 何もしないロック
 	 */
-	template <typename C> struct Lock {
+	struct NullLock {
+		friend class Key<NullLock>;
 		void Lock(){};
 		void Unlock(){};
 	};
-
-	using NullLock = Lock<std::nullptr_t>;
 };

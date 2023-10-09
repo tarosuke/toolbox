@@ -28,9 +28,6 @@ namespace tb {
 		List(const List&) = delete;
 		void operator=(const List&) = delete;
 
-		// このリストのためのKey(このリストを初期値にして作る)
-		using Key = Lock::Key<L>;
-
 		/**ノード：リストのノードはこれをpublicで継承しておく必要がある
 		 * 複数のリストを使うときはそれぞれ継承してxxListのような子を作って
 		 * 区別する
@@ -120,7 +117,7 @@ namespace tb {
 			};
 
 		private:
-			Key key;
+			Key<L> key;
 			Node* node;
 			Node* prev;
 			Node* next;
@@ -187,20 +184,20 @@ namespace tb {
 
 		/**要素の操作
 		 */
-		void Add(Key&, Node& n) { n.Insert(anchor); };
+		void Add(Key<L>&, Node& n) { n.Insert(anchor); };
 		void Add(Node& n) {
-			Key k(*this);
+			Key<L> k(*this);
 			Add(k, n);
 		};
-		void Insert(Key&, Node& n) { n.Attach(anchor); };
+		void Insert(Key<L>&, Node& n) { n.Attach(anchor); };
 		void Insert(Node& n) {
-			Key k(*this);
+			Key<L> k(*this);
 			Insert(k, n);
 		};
-		T* Top(Key&) { return dynamic_cast<T*>(anchor.next); };
-		T* Bottom(Key&) { return dynamic_cast<T*>(anchor.prev); };
+		T* Top(Key<L>&) { return dynamic_cast<T*>(anchor.next); };
+		T* Bottom(Key<L>&) { return dynamic_cast<T*>(anchor.prev); };
 
-		T* Get(Key&) {
+		T* Get(Key<L>&) {
 			Node* const tn(anchor.next);
 			if (tn != &anchor) {
 				(*tn).Detach();
@@ -209,7 +206,7 @@ namespace tb {
 			return 0;
 		};
 		T* Get() {
-			Key key(*this);
+			Key<L> key(*this);
 			return Get(key);
 		};
 
