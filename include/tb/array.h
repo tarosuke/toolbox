@@ -1,5 +1,4 @@
-/** 汎用配列
- * Copyright (C) 2016,2021,2023 tarosuke<webmaster@tarosuke.net>
+/** Copyright (C) 2023 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,145 +17,106 @@
  */
 #pragma once
 
-#include <stdexcept>
-#include <stdlib.h>
-#include <string.h>
+#include <limits>
 #include <tb/key.h>
 #include <tb/types.h>
-#include <type_traits>
+#include <vector>
 
 
 
 namespace tb {
-	template <typename T> struct Array {
-		Array() : elements(0), assigned(0), body(0){};
-		Array(const T origin[], unsigned elements)
-			: elements(0), assigned(0), body(0) {
-			for (unsigned n(0); n < elements; ++n) {
-				Copy(origin[n], n);
-			}
-		};
-		Array(const Array& origin) : elements(0), assigned(0), body(0) {
-			Resize(0);
-			Copy(origin, 0);
-		};
-		void operator=(const Array& origin) {
-			Resize(origin.elements);
-			memmove(body, origin.body, sizeof(T) * elements);
+
+	/***** 要素がNodeで管理される配列
+	 * TはArray<T>::Nodeの特である必要がある
+	 * 排他制御が必要ならLにロックを設定する(規定は何もしないダミーのロック)
+	 * NodeをIDを指定して作るとArray上にIDとして設定される
+	 * NodeをIDなしで作るとIDが割り当てられて設定される
+	 * Arrayがなくなると繋がれている全NodeのNotifyArrayDeletedが呼ばれる
+	 * NOTE:ID指定NodeとIDなしNodeをひとつのArrayで混ぜて使わないこと
+	 */
+	template <class T, class L = NullLock, typename I = uint> struct Array : L {
+		struct Node {
+			friend class Array;
+			Node() = delete;
+			Node(const Node&) = delete;
+			void operator=(const Node&) = delete;
+
+			Node(Array& a, I id) : array(a), id(id) { a.Attach(*this, id); };
+			Node(Array& a) : array(a), id(a.Attach(*this)){};
+			virtual ~Node() { array.Detach(id); };
+			I ID() const { return id; };
+
+		protected:
+			virtual void NotifyArrayDeleted(){};
+
+		private:
+			Array& array;
+			const I id;
 		};
 
+		Array() : pool(invalid){};
 		~Array() {
-			if (body) {
-				Free();
+			for (auto& i : body) {
+				if (i.node) {
+					i.node->NotifyArrayDeleted();
+				}
 			}
 		};
-		const T& operator[](unsigned index) const {
-			if (elements <= index) {
-				throw std::out_of_range("TB:Array");
-			}
-			return body[index];
-		};
-		T& operator[](unsigned index) {
-			if (elements <= index) {
-				throw std::out_of_range("TB:Array");
-			}
-			return body[index];
-		};
 
-		void operator+=(const T& v) { Copy(v, Length()); };
-		void operator+=(const Array& v) { Copy(v, Length()); };
-
-		bool operator==(const Array& v) const {
-			if (elements != v.elements) {
-				return false;
-			}
-			return Compare(v);
-		};
-		bool operator!=(const Array& t) const { return !(*this == t); };
-
-		unsigned Size() const { return elements * sizeof(T); };
-		unsigned Length() const { return elements; };
-		T* Raw() const { return body; };
-
-	protected:
-		static constexpr bool TribialConstructable =
-			std::is_trivially_constructible<T>::value;
-
-		unsigned elements;
-		unsigned assigned;
-		T* body;
-
-		// サイズ変更
-		void Resize(unsigned requierd) {
-			if (requierd <= assigned) {
-				elements = requierd;
-				return;
-			}
-			const unsigned r(requierd < 16 ? 16 : GetOverPow2(requierd));
-			T* newBody(Realloc(r));
-			if (!!r && !newBody) {
-				throw std::runtime_error("realloc failed in 'TB::Array'");
-			}
-			body = (T*)newBody;
-			assigned = r;
-			elements = requierd;
-		};
-		// 末尾に追加
-		void Copy(const T& v, unsigned offset) {
-			Resize(offset + 1);
-			body[offset] = v;
-		};
+		T operator[](I index) { return body[index]; };
 
 	private:
-		template <typename U> static U GetOverPow2(U n) {
-			for (unsigned m(1); m < sizeof(U) * 8; ++m) {
-				n |= n >> 1;
-			}
-			return n + 1;
+		static constexpr I invalid = std::numeric_limits<I>::max();
+		struct Index {
+			Index() : node(0){};
+
+			void operator=(Node& n) { node = &n; };
+			operator T&() { return *dynamic_cast<T*>(node); };
+
+			Node* node;
+			I next;
 		};
-		bool Compare(const Array& v) const {
-			if constexpr (TribialConstructable) {
-				return !memcmp(body, v.body, sizeof(T) * elements);
-			} else {
-				for (unsigned n(0); n < elements; ++n) {
-					if (body[n] != v.body[n]) {
-						return false;
-					}
-				}
-				return true;
-			}
+		std::vector<Index> body;
+		I pool;
+		void Detach(I index) {
+			Key<L> key(*this);
+
+			// 要素をpoolへつなぐ
+			Index i(body[index]);
+			i.node = 0;
+			i.next = pool;
+			pool = index;
 		};
-		void Copy(const Array& t, unsigned offset) {
-			const unsigned tSize(t.elements);
-			Resize(offset + tSize);
-			if constexpr (TribialConstructable) {
-				memmove(body + offset, t.body, tSize * sizeof(T));
-			} else {
-				for (unsigned n(0); n < tSize; ++n) {
-					body[n + offset] = t.body[n];
-				}
+		void Attach(Node& node, I index) {
+			Key<L> key(*this);
+
+			if (body.size() <= index) {
+				body.resize(index);
 			}
+
+			attach(node, index);
 		};
-		T* Realloc(unsigned el) {
-			if constexpr (TribialConstructable) {
-				return (T*)realloc(body, sizeof(T) * el);
-			} else {
-				T* newBody(new T[el]);
-				if (newBody) {
-					for (unsigned n(0); n < elements; ++n) {
-						newBody[n] = body[n];
-					}
-					delete[] body;
-				}
-				return newBody;
+		I Attach(Node& node) {
+			Key<L> key(*this);
+
+			// 要素を割り当ててnodeを結びつける
+			if (pool == invalid) {
+				// 新規割当
+				const I l(body.size());
+				body.resize(l + 1);
+				attach(node, l);
+				return l;
 			}
+
+			// リサイクル
+			const I l(pool);
+			pool = body[pool].next;
+			attach(node, l);
+			return l;
 		};
-		void Free() {
-			if constexpr (TribialConstructable) {
-				free(body);
-			} else {
-				delete[] body;
-			}
+		void attach(Node& node, I index) {
+			// 要素にnodeを結びつける
+			body[index].node = &node;
 		};
 	};
 }
