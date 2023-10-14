@@ -36,6 +36,7 @@ namespace tb {
 	 */
 	template <class T, class L = NullLock, typename I = uint> struct Array : L {
 		struct Node {
+			friend class Array;
 			Node() = delete;
 			Node(const Node&) = delete;
 			void operator=(const Node&) = delete;
@@ -43,6 +44,7 @@ namespace tb {
 			Node(Array& a, I id) : array(a), id(id) { a.Attach(*this, id); };
 			Node(Array& a) : array(a), id(a.Attach(*this)){};
 			virtual ~Node() { array.Detach(id); };
+			I ID() const { return id; };
 
 		protected:
 			virtual void NotifyArrayDeleted(){};
@@ -56,7 +58,7 @@ namespace tb {
 		~Array() {
 			for (auto& i : body) {
 				if (i.node) {
-					i.NotifyArrayDeleted();
+					i.node->NotifyArrayDeleted();
 				}
 			}
 		};
@@ -102,7 +104,7 @@ namespace tb {
 				// 新規割当
 				const I l(body.size());
 				body.resize(l + 1);
-				attacch(node, l);
+				attach(node, l);
 				return l;
 			}
 

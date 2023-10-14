@@ -1,32 +1,36 @@
-#include <tb/array.h>
-#include <tb/test.h>
-// #include <toolbox/type.h>
-
 #include <stdio.h>
+#include <tb/array.h>
+#include <tb/string.h>
+#include <tb/test.h>
 
 
 
-// using I = tb::Type<int>;
+struct N : public tb::Array<N>::Node {
+	N(tb::Array<N>& a) : Node(a){};
+	bool operator==(uint t) { return t == ID(); };
+	bool operator!=(uint t) { return t != ID(); };
+};
 
-// template <> tb::String::String(const tb::Array<int>& v) {
-// 	*this += "{ ";
-// 	for (unsigned n(0); n < v.Length(); ++n) {
-// 		Append(v[n]);
-// 		*this += ", ";
-// 	}
-// 	*this += "}";
-// }
-// template <> tb::String::String(const tb::Array<I>& v) {
-// 	*this << "{ ";
-// 	for (unsigned n(0); n < v.Length(); ++n) {
-// 		*this << (int&&)v[n] << ", ";
-// 	}
-// 	*this << "}";
-// }
+
+
+template <> tb::String::String(const N& v) { Append(v.ID()); }
+template <> tb::String::String(const int& o) { Append(o); }
 
 
 
 int main() {
+	tb::Array<N> arr;
+
+	N* a(new N(arr));
+	N* b(new N(arr));
+	N* c(new N(arr));
+
+	assertEQ(*a, 0);
+	assertEQ(*b, 1);
+	assertEQ(*c, 2);
+
+
+
 	// const int test[]{-1, 0, 1, 2, 7, -1, 0, 1, 2, 7,
 	// 				 -1, 0, 1, 2, 7, -1, 0, 1, 2, 7};
 	// {
