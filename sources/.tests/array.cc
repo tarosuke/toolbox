@@ -30,6 +30,13 @@ int main() {
 	assertEQ(*c, 2);
 
 
+	delete b;
+	N* d(new N(arr));
+	assertEQ(*a, 0);
+	assertEQ(*d, 1);
+	assertEQ(*c, 2);
+
+
 
 	// const int test[]{-1, 0, 1, 2, 7, -1, 0, 1, 2, 7,
 	// 				 -1, 0, 1, 2, 7, -1, 0, 1, 2, 7};
