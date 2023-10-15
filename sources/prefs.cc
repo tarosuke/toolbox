@@ -40,13 +40,13 @@ namespace tb {
 	void CommonPrefs::LoadLine(const char* line) {
 		for (CommonPrefs* i(q); i; i = (*i).next) {
 			const auto len(strlen(i->key));
-			if (!!strncmp(i->key, line, len)) {
+			if (!strncmp(i->key, line, len)) {
 				// 形式チェック
-				if (len < 1 || line[len - 1] != '=') {
+				if (len < 1 || line[len] != '=') {
 					syslog(LOG_ALERT, "invalid option:%s", line);
 					return;
 				}
-				i->DeSerialize(line + len);
+				i->DeSerialize(line + len + 1);
 			}
 		}
 	}
@@ -58,7 +58,7 @@ namespace tb {
 		// 設定ファイルのパスを生成
 		const char* const home(getenv("HOME"));
 		path = home ? home : "/root";
-		path += "/";
+		path += "/.";
 		path += name;
 
 		FILE* const file(fopen(path.c_str(), "r"));
@@ -84,11 +84,8 @@ namespace tb {
 			}
 
 			// キーの取り出し
-			String key(arg);
-			String value;
-			if (arg[0] == '-' && arg[1] == '=') {
-				const auto len(strlen(arg));
-				if (arg[len - 1] == '=') {
+			if (arg[0] == '-' && arg[1] == '-') {
+				if (strchr(arg, '=')) {
 					// 値オプション(--xxx=yyy)
 					line = arg;
 				} else {
@@ -99,11 +96,11 @@ namespace tb {
 					}
 					line = arg;
 					line += '=';
-					line = argv[n];
+					line += argv[n];
 				}
-			} else {
+			} else if ((arg[0] == '+' || arg[0] == '-') && arg[1] != '-') {
 				// スイッチオプション(-/+xxx)
-				line = '-';
+				line = "-";
 				line += &arg[1];
 				line += '=';
 				line += arg[0] == '-' ? 'f' : 't';
@@ -114,7 +111,7 @@ namespace tb {
 	}
 
 	void CommonPrefs::Store() {
-		FILE* const file(fopen(path.c_str(), "r"));
+		FILE* const file(fopen(path.c_str(), "w"));
 
 		if (!file) {
 			return;
@@ -125,6 +122,7 @@ namespace tb {
 				String line(i->key);
 				line += '=';
 				line += i->Serialize();
+				line += '\n';
 				fputs(line.c_str(), file);
 			}
 		}
@@ -140,4 +138,14 @@ namespace tb {
 		q = this;
 	}
 
+
+
+	template <> String Prefs<uint>::Serialize() {
+		String r;
+		r.Append(body);
+		return r;
+	}
+	template <> void Prefs<uint>::DeSerialize(const char* t) {
+		body = strtoul(t, 0, 10);
+	}
 }

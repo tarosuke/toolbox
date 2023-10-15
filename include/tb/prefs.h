@@ -61,8 +61,8 @@ namespace tb {
 
 		public:
 			Keeper(int argc, const char** argv, const char* name = 0) {
-				Parse(argc, argv);
 				Load(argc, argv, name);
+				Parse(argc, argv);
 			};
 			~Keeper() { CommonPrefs::Store(); };
 			void Store() { CommonPrefs::Store(); };
@@ -132,6 +132,6 @@ namespace tb {
 
 	private:
 		String Serialize() final;
-		void DeSerialize(const String&) final;
+		void DeSerialize(const char*) final;
 	};
 }
