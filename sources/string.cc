@@ -26,7 +26,7 @@ namespace tb {
 
 	const char String::numericChars[] = "0123456789abcdef";
 
-	template <> String& String::Append(uint v, char p, uint w, uint r) {
+	template <> String& String::Append(u64 v, char p, uint w, uint r) {
 		if (!w) {
 			w = 1;
 		}
@@ -46,9 +46,15 @@ namespace tb {
 		return *this;
 	}
 	template <> String& String::Append(u8 v, char p, uint w, uint r) {
-		return Append((uint)v, p, w, r);
+		return Append((u64)v, p, w, r);
 	}
-	template <> String& String::Append(int v, char p, uint w, uint r) {
+	template <> String& String::Append(u16 v, char p, uint w, uint r) {
+		return Append((u64)v, p, w, r);
+	}
+	template <> String& String::Append(u32 v, char p, uint w, uint r) {
+		return Append((u64)v, p, w, r);
+	}
+	template <> String& String::Append(i64 v, char p, uint w, uint r) {
 		if (!w) {
 			w = 1;
 		}
@@ -59,6 +65,15 @@ namespace tb {
 			Append((uint)v, p, w, r);
 		}
 		return *this;
+	}
+	template <> String& String::Append(i8 v, char p, uint w, uint r) {
+		return Append((i64)v, p, w, r);
+	}
+	template <> String& String::Append(i16 v, char p, uint w, uint r) {
+		return Append((i64)v, p, w, r);
+	}
+	template <> String& String::Append(i32 v, char p, uint w, uint r) {
+		return Append((i64)v, p, w, r);
 	}
 	template <> String& String::Append(double v, char p, uint w, uint r) {
 		char b[std::numeric_limits<double>::max_digits10];

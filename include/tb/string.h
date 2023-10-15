@@ -53,6 +53,12 @@ namespace tb {
 		template <typename T> String& operator=(const T&);
 		template <typename T> String& operator=(T&&);
 
+		String operator+(const String& t) const {
+			String r(*this);
+			r += t;
+			return r;
+		};
+
 		// const char*へのキャスト
 		operator const char*() const { return c_str(); };
 
