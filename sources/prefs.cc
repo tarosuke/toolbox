@@ -69,7 +69,7 @@ namespace tb {
 
 		for (char b[256]; fgets(b, sizeof(b), file);) {
 			auto l(strlen(b));
-			if (1 <= l &&(b[l - 1] == '\n' || b[l - 1] == '\r')) {
+			if (1 <= l && (b[l - 1] == '\n' || b[l - 1] == '\r')) {
 				// 末尾の改行は潰す
 				b[l - 1] = 0;
 			}
@@ -145,14 +145,73 @@ namespace tb {
 
 
 
-	template <> String Prefs<uint>::Serialize() {
+	// Integerみたいな抽象型がないばっかりにこんなことになっているksg
+	template <> String Prefs<i8>::Serialize() {
 		String r;
 		r.Append(body);
 		return r;
 	}
-	template <> void Prefs<uint>::DeSerialize(const char* t) {
+	template <> String Prefs<i16>::Serialize() {
+		String r;
+		r.Append(body);
+		return r;
+	}
+	template <> String Prefs<i32>::Serialize() {
+		String r;
+		r.Append(body);
+		return r;
+	}
+	template <> String Prefs<i64>::Serialize() {
+		String r;
+		r.Append(body);
+		return r;
+	}
+	template <> String Prefs<u8>::Serialize() {
+		String r;
+		r.Append(body);
+		return r;
+	}
+	template <> String Prefs<u16>::Serialize() {
+		String r;
+		r.Append(body);
+		return r;
+	}
+	template <> String Prefs<u32>::Serialize() {
+		String r;
+		r.Append(body);
+		return r;
+	}
+	template <> String Prefs<u64>::Serialize() {
+		String r;
+		r.Append(body);
+		return r;
+	}
+	template <> void Prefs<i8>::DeSerialize(const char* t) {
+		body = strtol(t, 0, 10);
+	}
+	template <> void Prefs<i16>::DeSerialize(const char* t) {
+		body = strtol(t, 0, 10);
+	}
+	template <> void Prefs<i32>::DeSerialize(const char* t) {
+		body = strtol(t, 0, 10);
+	}
+	template <> void Prefs<i64>::DeSerialize(const char* t) {
+		body = strtol(t, 0, 10);
+	}
+	template <> void Prefs<u8>::DeSerialize(const char* t) {
 		body = strtoul(t, 0, 10);
 	}
+	template <> void Prefs<u16>::DeSerialize(const char* t) {
+		body = strtoul(t, 0, 10);
+	}
+	template <> void Prefs<u32>::DeSerialize(const char* t) {
+		body = strtoul(t, 0, 10);
+	}
+	template <> void Prefs<u64>::DeSerialize(const char* t) {
+		body = strtoul(t, 0, 10);
+	}
+
+
 	template <> String Prefs<String>::Serialize() { return body; }
 	template <> void Prefs<String>::DeSerialize(const char* t) { body = t; }
 }
