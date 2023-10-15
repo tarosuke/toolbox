@@ -68,6 +68,11 @@ namespace tb {
 		}
 
 		for (char b[256]; fgets(b, sizeof(b), file);) {
+			auto l(strlen(b));
+			if (1 <= l &&(b[l - 1] == '\n' || b[l - 1] == '\r')) {
+				// 末尾の改行は潰す
+				b[l - 1] = 0;
+			}
 			LoadLine(b);
 		}
 		fclose(file);
@@ -148,4 +153,6 @@ namespace tb {
 	template <> void Prefs<uint>::DeSerialize(const char* t) {
 		body = strtoul(t, 0, 10);
 	}
+	template <> String Prefs<String>::Serialize() { return body; }
+	template <> void Prefs<String>::DeSerialize(const char* t) { body = t; }
 }
