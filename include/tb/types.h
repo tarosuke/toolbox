@@ -40,6 +40,42 @@ namespace tb {
 
 	using uint = unsigned;
 
+
+	// クラス化(Tは基本型を想定している)
+	template <typename T> struct Class {
+		Class() = default;
+		Class(const T& t) : body(t){};
+		T& operator=(const T& t) { return body = t; };
+		operator T() const { return body; };
+
+		bool operator==(const T& t) const { return body == t; };
+		bool operator!=(const T& t) const { return body != t; };
+
+		T operator+(const T& t) const { return body + t; };
+		T operator-(const T& t) const { return body - t; };
+		T operator*(const T& t) const { return body * t; };
+		T operator/(const T& t) const { return body / t; };
+		T operator%(const T& t) const { return body % t; };
+		T operator&(const T& t) const { return body & t; };
+		T operator|(const T& t) const { return body | t; };
+		T operator^(const T& t) const { return body ^ t; };
+		T operator<<(const T& t) const { return body << t; };
+		T operator>>(const T& t) const { return body >> t; };
+		T operator~() const { return ~body; };
+
+		T& operator+=(const T& t) { return body += t; };
+		T& operator-=(const T& t) { return body -= t; };
+		T& operator*=(const T& t) { return body *= t; };
+		T& operator/=(const T& t) { return body /= t; };
+		T& operator%=(const T& t) { return body %= t; };
+		T& operator&=(const T& t) { return body &= t; };
+		T& operator|=(const T& t) { return body |= t; };
+		T& operator<<=(const T& t) { return body <<= t; };
+		T& operator>>=(const T& t) { return body >>= t; };
+
+	protected:
+		T body;
+	};
 }
 
 #define elementsOf(a) (sizeof(a) / sizeof(a[0]))
