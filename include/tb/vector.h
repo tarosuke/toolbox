@@ -25,7 +25,12 @@
 namespace tb {
 	template <uint D, typename T> struct Vector {
 		///// 構築子、代入、[]
-		Vector() = delete;
+		Vector() { Clear(); };
+		void Clear() {
+			for (uint n(0); n < D; ++n) {
+				a[n] = 0;
+			}
+		};
 		Vector(const Vector&) = default;
 
 		Vector(T o) {
@@ -49,7 +54,8 @@ namespace tb {
 			return *this = o.arr;
 		};
 
-		T operator[](unsigned n) const { return n < D ? a[n] : 0; };
+		operator T*() { return a; };
+		operator const T*() const { return a; };
 
 
 		// 比較(実数の場合誤差が一定以下なら同値とする)
