@@ -19,52 +19,22 @@
  ** アプリケーションのフレームワーク
  */
 
-#include <toolbox/app.h>
+#include <tb/app.h>
 
+#include <assert.h>
 #include <stdexcept>
 #include <syslog.h>
-#include <assert.h>
 
 
 
-namespace TB {
+tb::App* tb::App::instance(0);
+tb::Prefs<unsigned>
+	tb::App::logLevel("--logLevel", 1, 0, tb::CommonPrefs::nosave);
 
-	const char* App::projectName(0);
-	TB::Prefs<unsigned> logLevel("--verbose", 1, TB::CommonPrefs::nosave);
-
-	int App::main(App& instance, int argc, const char* argv[]) {
-		projectName = TB::Path::Base(argv[0]);
-
-		// syslogを準備する
-		static const int logLevels[] = {LOG_CRIT, LOG_INFO, LOG_DEBUG};
-		if (2 < logLevel) {
-			logLevel = 2;
-		}
-		openlog(0, LOG_CONS, LOG_SYSLOG);
-		syslog(LOG_INFO, projectName);
-
-		//設定ファイルのパスを作る
-		TB::String prefsPath(".");
-		prefsPath << projectName;
-
-		//設定ファイル読み込み／コマンドラインオプション取得
-		TB::CommonPrefs::Keeper prefs(prefsPath, argc, argv);
-
-		//コマンドラインオプションに従ってログレベルを設定
-		const unsigned logMask(LOG_UPTO(logLevels[logLevel]));
-		setlogmask(logMask);
-
-		int rc(0);
-		try {
-			rc = instance.Main();
-		} catch (int returnCode) {
-			rc = returnCode;
-		} catch (std::exception& e) {
-			syslog(LOG_CRIT, e.what());
-		} catch (...) { syslog(LOG_CRIT, "Unknown exception."); }
-
-		instance.Finally();
-
-		return rc;
-	}
+int main(int argc, char** argv) {
+	tb::CommonPrefs::Keeper k(
+		argc,
+		(const char**)argv,
+		tb::App::instance->Name());
+	return tb::App::instance->Main();
 }
