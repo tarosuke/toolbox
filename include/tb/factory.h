@@ -21,17 +21,20 @@
  * struct T : U{
  * 	...
  * 	struct V : tb::Factory<U>{
- * 		uint Score(...)override;
- * 		U* New(...)override{ return new T; };
+ * 		uint Score()override;
+ * 		U* New()override{ return new T; };
  * 	};
  * 	static tb::Factory<U> factory;
  * };
  *
- * またどこかに以下を用意する。
+ * またどこかに以下を用意する。Uと同じソースがいいだろう。
  * tb::Factory<U>* tb::Factory<U>::start(0);
  *
- * Factory<U>::Createを呼ぶとT::Scoreにより適切なT::Newが呼ばれてインsタンスが
- * 戻る
+ * さらに各クラス(T)のファクトリ(T::V)のインスタンスを関数外に用意する。
+ *
+ * Factory<U>::Createを呼ぶとT::Scoreにより適切なT::Newが選択されて呼ばれる。
+ * なおScoreの戻り値が最大のものが選択される。同値の場合は先に呼ばれた方になる
+ * のでどれが選択されるかはリンク順次第になる。
  *
  * NOTE:Factory<親クラス>::Createを呼ぶのはmainに入った後にすること
  */
