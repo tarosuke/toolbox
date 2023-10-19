@@ -78,14 +78,14 @@ namespace tb {
 		fclose(file);
 	}
 
-	void CommonPrefs::Parse(int argc, const char** argv) {
+	unsigned CommonPrefs::Parse(int argc, const char** argv) {
 		for (int n(1); n < argc; ++n) {
 			const char* const arg(argv[n]);
 			String line;
 
 			if (arg[0] != '-' && arg[0] != '+') {
 				// 解釈できる形式は終了
-				return;
+				return n;
 			}
 
 			// キーの取り出し
@@ -97,7 +97,7 @@ namespace tb {
 					// 値オプション(--xxx yyy)
 					if (argc <= ++n) {
 						syslog(LOG_CRIT, "option %s needs parametor", arg);
-						return;
+						return n;
 					}
 					line = arg;
 					line += '=';
@@ -113,6 +113,7 @@ namespace tb {
 
 			LoadLine(line.c_str());
 		}
+		return argc;
 	}
 
 	void CommonPrefs::Store() {
