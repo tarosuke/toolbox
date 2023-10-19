@@ -1,5 +1,5 @@
 /************************************************************************* App
- * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2021,2023 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,5 +36,5 @@ int main(int argc, char** argv) {
 		argc,
 		(const char**)argv,
 		tb::App::instance->Name());
-	return tb::App::instance->Main();
+	return tb::App::instance->Main((uint)argc + k, (const char**)argv + k);
 }
