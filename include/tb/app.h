@@ -44,7 +44,7 @@ namespace tb {
 		virtual ~App(){};
 
 	protected:
-		virtual int Main(uint, const char**) { return 0; };
+		virtual int Main(uint remainArgs, const char**) { return 0; };
 		virtual const char* Name() { return 0; };
 
 	private:

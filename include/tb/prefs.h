@@ -62,10 +62,14 @@ namespace tb {
 		public:
 			Keeper(int argc, const char** argv, const char* name = 0) {
 				Load(argc, argv, name);
-				Parse(argc, argv);
+				parsed = Parse(argc, argv);
 			};
 			~Keeper() { CommonPrefs::Store(); };
 			void Store() { CommonPrefs::Store(); };
+			operator unsigned() { return parsed; };
+
+		private:
+			unsigned parsed;
 		};
 
 	protected:
@@ -90,7 +94,7 @@ namespace tb {
 		const char* const key;
 		const Attribute attr;
 
-		static void Parse(int argc, const char** argv);
+		static unsigned Parse(int argc, const char** argv);
 		static void Load(int argc, const char** argv, const char* name);
 		static void Store();
 		static void LoadLine(const char*);
