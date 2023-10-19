@@ -37,12 +37,13 @@
  */
 #pragma once
 
+#include <tb/types.h>
+
 
 
 namespace tb {
 
 	template <class T> struct Factory {
-		Factory() = delete;
 		Factory(const Factory&) = delete;
 		void operator=(const Factory&) = delete;
 
@@ -53,21 +54,12 @@ namespace tb {
 			}
 			return m ? m.matched->New() : 0;
 		}
-		template <typename U> static T* Create(const U* u) {
-			Match m;
-			for (Factory* f(start); f; f = (*f).next) {
-				m.Scored(f, f->Score(u));
-			}
-			return m ? m.matched->New(u) : 0;
-		}
 
 	protected:
 		Factory() : next(start) { start = this; };
 
-		template <typename U> virtual uint Score(const U&) { return 0; };
-		template <typename U> virtual void New(const U&) { return 0; };
 		virtual uint Score() { return 0; };
-		virtual void New() { return 0; };
+		virtual T* New() { return 0; };
 
 	private:
 		static Factory* start;
