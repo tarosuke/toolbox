@@ -1,5 +1,5 @@
 /****************************************************************** 子プロセス
- * Copyright (C) 2017 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2017,2023 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,12 +19,16 @@
 #pragma once
 
 
-namespace TB{
+namespace tb {
 
-	class Child{
+	/***** fork、exec
+	 * 子プロセスのpidを持つ
+	 */
+	class Child {
 		Child();
 		Child(const Child&);
 		void operator=(const Child&);
+
 	public:
 		const long pid;
 
@@ -32,24 +36,26 @@ namespace TB{
 		~Child();
 	};
 
-	class PipedChild{
+	/***** PIPEを生成して、fork、exec
+	 * PID、読み書きのハンドルはpipes内にある
+	 */
+	class PipedChild {
 		PipedChild();
 		PipedChild(const PipedChild&);
 		void operator=(const PipedChild&);
+
 	public:
 		PipedChild(const char* const args[]);
 		~PipedChild();
 
-		int ReadFd(){ return pipes.read; };
-		int WriteFd(){ return pipes.write; };
-	private:
-		struct Pipes{
+		struct Pipes {
 			int pid;
 			int read;
 			int write;
 		};
 		const Pipes pipes;
+
+	private:
 		static Pipes Pipe(const char[], const char* const*);
 	};
-
 }
