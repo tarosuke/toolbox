@@ -2,7 +2,7 @@
 # 1. ソースを勝手に探して依存関係ファイルを作成
 # 2. ターゲット情報を拾って、なければディレクトリ名を使う
 
-.PHONY : clean test manualTest RELEASE DEBUG COVERAGE
+.PHONY : clean test tangereTest RELEASE DEBUG COVERAGE
 
 
 
@@ -56,16 +56,19 @@ deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
 
 # オブジェクトファイルの分類
 testPlaces := $(TARGETDIR)/.tests/%
+ttestPlaces := $(TARGETDIR)/.tangereTests/%
 nobjs := $(filter-out $(testPlaces), $(objs))
 tobjs := $(filter $(testPlaces), $(objs))
+ttobjs := $(filter $(ttestPlaces), $(objs))
 tmods := $(addprefix $(TARGETDIR)/, $(filter .tests/%, $(mods)))
+ttmods := $(addprefix $(TARGETDIR)/, $(filter .tangereTests/%, $(mods)))
 
 
 
 ################################################################# COMMON RULES
 
 ifneq ($(MAKECMDGOALS),clean)
--include $(deps) $(tdeps)
+-include $(deps) $(tdeps) $(ttdeps)
 endif
 
 vpath %.o $(TARGETDIR)
@@ -136,18 +139,16 @@ $(tmods) : $(tobjs) $(TARGETDIR)/$(target)
 	@echo " LD $@"
 	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS)
 
-testTargets := $(addsuffix .test, $(tmods))
+$(ttmods) : $(ttobjs) $(TARGETDIR)/$(target)
+	@echo " LD $@"
+	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS)
 
 %.test : %
 	@echo $<
-ifeq ($(MAKECMDGOALS), manualTest)
 	$<
-else
-	@AUTO_TEST=1 $<
-endif
 
-test: $(testTargets)
-manualTest: $(testTargets)
+test: $(addsuffix .test, $(tmods))
+tangereTest: $(addsuffix .test, $(ttmods))
 
 
 RELEASE: RELEASE/$(target) test
