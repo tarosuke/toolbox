@@ -62,7 +62,7 @@ namespace tb {
 				while (sizeof(ev) == read(e.fd, &ev, sizeof(ev))) {
 					switch (ev.type) {
 					case EV_KEY:
-						switch (ev.code & 0xfff0) {
+						switch (ev.code & 0xff00) {
 						case KEY_RESERVED: // キーボード
 							switch (ev.value) {
 							case 0: // up
