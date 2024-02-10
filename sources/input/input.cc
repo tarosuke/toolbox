@@ -1,5 +1,5 @@
 /** linux input subsystem
- * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2021, 2024 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,22 +16,22 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#include <errno.h>
+#include <fcntl.h>
 #include <linux/input.h>
 #include <stdio.h>
-#include <fcntl.h>
 #include <unistd.h>
-#include <errno.h>
 
-#include <toolbox/input/input.h>
-#include <toolbox/type.h>
-
+#include <tb/input.h>
+#include <tb/types.h>
 
 
-namespace TB {
+
+namespace tb {
 
 	const int Input::relDirs[] = {1, -1, 1, 1, 1, 1, 1, 1};
 
-	Input::Input(bool grab) {
+	Input::Input(msec outTime, bool grab) : outms((int)(u64)outTime) {
 		for (unsigned n(0);; ++n) {
 			char path[32];
 			sprintf(path, "/dev/input/event%u", n);
@@ -39,66 +39,66 @@ namespace TB {
 			if (fd < 0) {
 				return;
 			}
-			auto* const ev(new Event(*this, fd, grab));
-			if (ev) {
-				events.Add(*ev);
-			}
-		}
-	}
-	Input::~Input() {
-		for (List<Event>::I i(events); ++i;) {
-			delete i;
-		}
-	}
-	void Input::GetInput() {
-		for (List<Event>::I i(events); ++i;) {
-			(*i).GetInput();
+			ioctl(fd, EVIOCGRAB, grab);
+			evs.push_back({fd, POLLIN, 0});
 		}
 	}
 
-	Input::Event::Event(Input& input, int fd, bool grab)
-		: input(input), fd(fd) {
-		ioctl(fd, EVIOCGRAB, grab);
+	Input::~Input() {
+		for (auto& e : evs) {
+			close(e.fd);
+		}
 	}
-	Input::Event::~Event() { ioctl(fd, EVIOCGRAB, 0); }
-	void Input::Event::GetInput() {
-		input_event ev;
-		while (sizeof(ev) == read(fd, &ev, sizeof(ev))) {
-			switch (ev.type) {
-			case EV_KEY:
-				switch (ev.code & 0xfff0) {
-				case KEY_RESERVED: //キーボード
-					switch (ev.value) {
-					case 0: // up
-						input.OnKeyUp(ev.code);
+
+	void Input::GetInput() {
+		const int p = poll(evs.data(), evs.size(), outms);
+		if (0 < p) {
+			// イベント発生
+			for (auto& e : evs) {
+				if (~e.revents & POLLIN) {
+					continue;
+				}
+				input_event ev;
+				while (sizeof(ev) == read(e.fd, &ev, sizeof(ev))) {
+					switch (ev.type) {
+					case EV_KEY:
+						switch (ev.code & 0xfff0) {
+						case KEY_RESERVED: // キーボード
+							switch (ev.value) {
+							case 0: // up
+								OnKeyUp(ev.code);
+								break;
+							case 1: // down
+								OnKeyDown(ev.code);
+								break;
+							case 2: // repeat
+								OnKeyRepeat(ev.code);
+								break;
+							}
+							break;
+						case BTN_MOUSE: // マウスボタン他
+							switch (ev.value) {
+							case 0: // up
+								OnButtonUp(ev.code & 0xff);
+								break;
+							case 1: // down
+								OnButtonDown(ev.code & 0xff);
+								break;
+							}
+							break;
+						}
 						break;
-					case 1: // down
-						input.OnKeyDown(ev.code);
+					case EV_REL:
+						if (ev.code < elementsOf(relDirs)) {
+							OnMouseMove(ev.code, relDirs[ev.code] * ev.value);
+						}
 						break;
-					case 2: // repeat
-						input.OnKeyRepeat(ev.code);
+					case EV_ABS:
+						break;
+					default:
 						break;
 					}
-					break;
-				case BTN_MOUSE: //マウスボタン他
-					switch (ev.value) {
-					case 0: // up
-						input.OnButtonUp(ev.code & 0xff);
-						break;
-					case 1: // down
-						input.OnButtonDown(ev.code & 0xff);
-						break;
-					}
-					break;
 				}
-				break;
-			case EV_REL:
-				if (ev.code < elementsOf(relDirs)) {
-					input.OnMouseMove(ev.code, relDirs[ev.code] * ev.value);
-				}
-				break;
-			default:
-				break;
 			}
 		}
 	}

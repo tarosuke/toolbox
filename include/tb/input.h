@@ -1,5 +1,5 @@
 /** linux input subsystem
- * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 20212 2024 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,11 +26,13 @@
  * 使用するときはデバイスファイルのパーミッションを取得しておくこと *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
-#include <toolbox/container/list.h>
+#include <poll.h>
+#include <tb/time.h>
+#include <vector>
 
 
 
-namespace TB {
+namespace tb {
 
 	class Input {
 		Input(const Input&);
@@ -40,7 +42,7 @@ namespace TB {
 		void GetInput();
 
 	protected:
-		Input(bool grab = false);
+		Input(msec outTime = 0, bool grab = false);
 		virtual ~Input();
 
 		virtual void OnKeyDown(unsigned key){};
@@ -53,16 +55,7 @@ namespace TB {
 
 	private:
 		static const int relDirs[];
-		class Event : public List<Event>::Node {
-		public:
-			Event(Input&, int fd, bool grab);
-			~Event();
-			void GetInput();
-
-		private:
-			Input& input;
-			const int fd;
-		};
-		List<Event> events;
+		const int outms;
+		std::vector<pollfd> evs;
 	};
 }

@@ -16,20 +16,18 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <toolbox/test.h>
+#include <tb/test.h>
 
-#include <toolbox/input/input.h>
+#include <tb/input.h>
 
 #include <stdio.h>
 
 
 
 int main() {
-	ManualTest;
-
-	class Test : public TB::Input {
+	class Test : public tb::Input {
 	public:
-		Test() : Input(false){};
+		Test() : Input(1000, false){};
 		void OnKeyDown(unsigned key) final { printf("keydown:%x.\n", key); };
 		void OnKeyUp(unsigned key) final { printf("keyUp:%x.\n", key); };
 		void OnKeyRepeat(unsigned key) final {
@@ -46,7 +44,7 @@ int main() {
 		};
 	} test;
 
-	for (unsigned n(0); n < 1000000; ++n) {
+	for (unsigned n(0); n < 30; ++n) {
 		test.GetInput();
 	}
 
