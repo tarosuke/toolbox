@@ -22,35 +22,35 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include <tb/input.h>
+#include <tb/linux/evdev.h>
 #include <tb/types.h>
 
 
 
 namespace tb {
 
-	const int Input::relDirs[] = {1, -1, 1, 1, 1, 1, 1, 1};
+	const int Evdev::relDirs[] = {1, -1, 1, 1, 1, 1, 1, 1};
 
-	Input::Input(msec outTime, bool grab) : outms((int)(u64)outTime) {
+	Evdev::Evdev(msec outTime, bool grab) : outms((int)(u64)outTime) {
 		for (unsigned n(0);; ++n) {
 			char path[32];
 			sprintf(path, "/dev/input/event%u", n);
 			const int fd(open(path, O_RDWR | O_NONBLOCK));
 			if (fd < 0) {
-				return;
+				break;
 			}
 			ioctl(fd, EVIOCGRAB, grab);
 			evs.push_back({fd, POLLIN, 0});
 		}
 	}
 
-	Input::~Input() {
+	Evdev::~Evdev() {
 		for (auto& e : evs) {
 			close(e.fd);
 		}
 	}
 
-	void Input::GetInput() {
+	void Evdev::GetInput() {
 		const int p = poll(evs.data(), evs.size(), outms);
 		if (0 < p) {
 			// イベント発生
@@ -62,8 +62,8 @@ namespace tb {
 				while (sizeof(ev) == read(e.fd, &ev, sizeof(ev))) {
 					switch (ev.type) {
 					case EV_KEY:
-						switch (ev.code & 0xff00) {
-						case KEY_RESERVED: // キーボード
+						if (ev.code < 256) {
+							// キーボード
 							switch (ev.value) {
 							case 0: // up
 								OnKeyUp(ev.code);
@@ -75,17 +75,34 @@ namespace tb {
 								OnKeyRepeat(ev.code);
 								break;
 							}
-							break;
-						case BTN_MOUSE: // マウスボタン他
-							switch (ev.value) {
-							case 0: // up
-								OnButtonUp(ev.code & 0xff);
+						} else {
+							switch (ev.code & 0xfff0) {
+							case KEY_RESERVED:
 								break;
-							case 1: // down
-								OnButtonDown(ev.code & 0xff);
+							case BTN_MOUSE: // マウスボタン他
+								switch (ev.value) {
+								case 0: // up
+									OnMouseUp(ev.code & 0xff);
+									break;
+								case 1: // down
+									OnMouseDown(ev.code & 0xff);
+									break;
+								}
+								break;
+							case BTN_JOYSTICK:
+								break;
+							case BTN_GAMEPAD:
+								break;
+							case BTN_WHEEL:
+								if (!ev.value) {
+									// ホイールはdownのみ認識
+									const tb::Vector<2, float> v((float[]){
+										0,
+										ev.code & 1 ? 1.0f : -1.0f});
+									OnWheel(v);
+								}
 								break;
 							}
-							break;
 						}
 						break;
 					case EV_REL:
@@ -94,6 +111,15 @@ namespace tb {
 						}
 						break;
 					case EV_ABS:
+						/***** アナログスティックの場合
+						 * 0:左左右
+						 * 1:左上下
+						 * 2:左トリガ
+						 * 3:右左右
+						 * 4:右上下
+						 * 5:右トリガ
+						 */
+
 						break;
 					default:
 						break;

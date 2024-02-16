@@ -19,24 +19,25 @@
 #include <tb/test.h>
 
 #include <tb/input.h>
+#include <tb/linux/evdev.h>
 
 #include <stdio.h>
 
 
 
 int main() {
-	class Test : public tb::Input {
+	class Test : virtual tb::Input, public tb::Evdev {
 	public:
-		Test() : Input(1000, false){};
+		Test() : Evdev(1000, false){};
 		void OnKeyDown(unsigned key) final { printf("keydown:%x.\n", key); };
 		void OnKeyUp(unsigned key) final { printf("keyUp:%x.\n", key); };
 		void OnKeyRepeat(unsigned key) final {
 			printf("keyRepeat:%x.\n", key);
 		};
-		void OnButtonDown(unsigned button) final {
+		void OnMouseDown(unsigned button) final {
 			printf("buttondown:%x.\n", button);
 		};
-		void OnButtonUp(unsigned button) final {
+		void OnMouseUp(unsigned button) final {
 			printf("buttonup:%x.\n", button);
 		};
 		void OnMouseMove(unsigned axis, int diff) final {
@@ -44,8 +45,10 @@ int main() {
 		};
 	} test;
 
+	tb::Input& t(test);
+
 	for (unsigned n(0); n < 30; ++n) {
-		test.GetInput();
+		t.GetInput();
 	}
 
 	return 0;

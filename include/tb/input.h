@@ -1,4 +1,4 @@
-/** linux input subsystem
+/** input interface
  * Copyright (C) 20212 2024 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
@@ -28,6 +28,7 @@
  */
 #include <poll.h>
 #include <tb/time.h>
+#include <tb/vector.h>
 #include <vector>
 
 
@@ -39,23 +40,20 @@ namespace tb {
 		void operator=(const Input&);
 
 	public:
-		void GetInput();
+		virtual void GetInput() = 0;
 
 	protected:
-		Input(msec outTime = 0, bool grab = false);
-		virtual ~Input();
+		Input() = default;
+		virtual ~Input(){};
 
 		virtual void OnKeyDown(unsigned key){};
 		virtual void OnKeyUp(unsigned key){};
 		virtual void OnKeyRepeat(unsigned key){};
 
-		virtual void OnButtonDown(unsigned button){};
-		virtual void OnButtonUp(unsigned button){};
+		virtual void OnMouseDown(unsigned button){};
+		virtual void OnMouseUp(unsigned button){};
 		virtual void OnMouseMove(unsigned axis, int diff){};
 
-	private:
-		static const int relDirs[];
-		const int outms;
-		std::vector<pollfd> evs;
+		virtual void OnWheel(const tb::Vector<2, float>&){};
 	};
 }
