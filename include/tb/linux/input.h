@@ -1,4 +1,4 @@
-﻿/** evdev inputmodule
+﻿/** linux input subsystem
  * Copyright (C) 2022 2024 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
@@ -23,16 +23,18 @@
 
 
 namespace tb {
+	namespace linux {
 
-	struct Evdev : public virtual Input {
-		Evdev(msec outTime = 0, bool grab = false);
-		~Evdev();
+		struct Input : public virtual tb::Input {
+			Input(msec outTime = 0, bool grab = false);
+			~Input();
 
-	private:
-		static const int relDirs[];
-		const int outms;
-		std::vector<pollfd> evs;
+		private:
+			static const int relDirs[];
+			const int outms;
+			std::vector<pollfd> evs;
 
-		void GetInput() override;
-	};
+			void GetInput() override;
+		};
+	}
 }

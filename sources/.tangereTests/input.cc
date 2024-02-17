@@ -19,16 +19,16 @@
 #include <tb/test.h>
 
 #include <tb/input.h>
-#include <tb/linux/evdev.h>
+#include <tb/linux/input.h>
 
 #include <stdio.h>
 
 
 
 int main() {
-	class Test : virtual tb::Input, public tb::Evdev {
+	class Test : virtual tb::Input, public tb::linux::Input {
 	public:
-		Test() : Evdev(1000, false){};
+		Test() : tb::linux::Input(1000, false){};
 		void OnKeyDown(unsigned key) final { printf("keydown:%x.\n", key); };
 		void OnKeyUp(unsigned key) final { printf("keyUp:%x.\n", key); };
 		void OnKeyRepeat(unsigned key) final {
