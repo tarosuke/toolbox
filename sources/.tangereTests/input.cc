@@ -1,5 +1,5 @@
-/** linux input subsystem
- * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+/** linux input subsystem test
+ * Copyright (C) 2021, 2024 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
