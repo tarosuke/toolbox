@@ -1,5 +1,5 @@
 /*****************************************************************
- * pthreadなクラス Copyright (C) 2017 tarosuke<webmaster@tarosuke.net>
+ * pthreadなクラス Copyright (C) 2017, 2024 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
