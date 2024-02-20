@@ -3,6 +3,8 @@
 
 
 
+// 試験用比較演算子
+
 // ダンプ用コピーコンストラクタ
 template <> tb::String::String(const tb::Vector<3, int>& c) {
 	Append(c[0]);

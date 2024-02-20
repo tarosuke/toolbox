@@ -1,5 +1,5 @@
 /**************************************************************** toolbox test
- * Copyright (C) 2021, 2023 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2021, 2023, 2024 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,18 +18,13 @@
  */
 #pragma once
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <tb/string.h>
 
 
 
-#define ManualTest                                                             \
-	{                                                                          \
-		if (getenv("AUTO_TEST")) {                                             \
-			exit(0);                                                           \
-		}                                                                      \
-	}
 #define assert(c)                                                              \
 	if (!(c)) {                                                                \
 		fprintf(stderr, "%s:%u:: info: %s.\n", __FILE__, __LINE__, #c);        \
