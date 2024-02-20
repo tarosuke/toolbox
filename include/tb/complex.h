@@ -1,4 +1,4 @@
-/* Copyright (C) 2023 tarosuke<webmaster@tarosuke.net>
+/* Copyright (C) 2023, 2924 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 
 namespace tb {
 
-	template <unsigned D, typename T> struct Complex {
+	template <unsigned D, typename T, bool ER = false> struct Complex {
 		///// 構築子、代入、[]
 		Complex() { // Identityに初期化
 			a[0] = 1;
@@ -79,10 +79,10 @@ namespace tb {
 
 
 
-		// 比較(実数の場合誤差が一定以下なら同値とする)
+		// 比較
 		bool operator==(const Complex& o) const {
 			for (uint n(0); n < D; ++n) {
-				if constexpr (std::is_floating_point<T>::value) {
+				if constexpr (ER && std::is_floating_point<T>::value) {
 					if (0.000001 < abs(a[n] - o.a[n])) {
 						return false;
 					}
@@ -94,7 +94,6 @@ namespace tb {
 			}
 			return true;
 		};
-		bool operator!=(const Complex& o) const { return !(*this == o); };
 
 
 		// ノルム
@@ -150,14 +149,14 @@ namespace tb {
 
 
 		// 回転ほか
-		Complex(const ::tb::Vector<D - 1, T>& o) { // ベクタからの生成
+		Complex(const ::tb::Vector<D - 1, T, ER>& o) { // ベクタからの生成
 			a[0] = 0;
 			for (unsigned n(1); n < D; ++n) {
 				a[n] = o[n - 1];
 			}
 		};
-		operator ::tb::Vector<D - 1, T>() { // ベクタの生成
-			return ::tb::Vector<D - 1, T>(a, 1);
+		operator ::tb::Vector<D - 1, T, ER>() { // ベクタの生成
+			return ::tb::Vector<D - 1, T, ER>(a, 1);
 		};
 		Complex operator~() const { // 共役を返す
 			Complex r;
@@ -167,14 +166,15 @@ namespace tb {
 			}
 			return r;
 		};
-		::tb::Vector<D - 1, T> Rotate(const ::tb::Vector<D - 1, T>& v) const {
-			auto r(::tb::Vector<D - 1, T>(*this * Complex(v) * ~*this));
+		::tb::Vector<D - 1, T, ER>
+		Rotate(const ::tb::Vector<D - 1, T, ER>& v) const {
+			auto r(::tb::Vector<D - 1, T, ER>(*this * Complex(v) * ~*this));
 			r.Normalize();
 			return r;
 		};
-		::tb::Vector<D - 1, T>
-		ReverseRotate(const ::tb::Vector<D - 1, T>& v) const {
-			auto r(::tb::Vector<D - 1, T>(~*this * Complex(v) * *this));
+		::tb::Vector<D - 1, T, ER>
+		ReverseRotate(const ::tb::Vector<D - 1, T, ER>& v) const {
+			auto r(::tb::Vector<D - 1, T, ER>(~*this * Complex(v) * *this));
 			r.Normalize();
 			return r;
 		};
