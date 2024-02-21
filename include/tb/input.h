@@ -35,9 +35,11 @@
 
 namespace tb {
 
-	class Input {
-		Input(const Input&);
-		void operator=(const Input&);
+	struct Input {
+		Input(const Input&) = delete;
+		void operator=(const Input&) = delete;
+
+		static constexpr unsigned nAxis = 8;
 
 	public:
 		virtual void GetInput() = 0;
@@ -52,8 +54,41 @@ namespace tb {
 
 		virtual void OnMouseDown(unsigned button){};
 		virtual void OnMouseUp(unsigned button){};
-		virtual void OnMouseMove(unsigned axis, int diff){};
 
 		virtual void OnWheel(const tb::Vector<2, float>&){};
+
+		/***** マウス、スティックなど */
+		struct AxisReport {
+			AxisReport() : value{}, moved(0){};
+			void AddEvent(unsigned axis, int v) {
+				if (axis < nAxis) {
+					moved |= 1 << axis;
+					value[axis] += v;
+				}
+			};
+			void SetEvent(unsigned axis, int v) {
+				if (axis < nAxis) {
+					moved |= 1 << axis;
+					value[axis] = v;
+				}
+			};
+			operator bool() const { return !!moved; };
+			int value[nAxis]; // 軸ごとの値
+			unsigned moved; // イベントがあったビットが1
+		};
+
+		/***** およそマウスの移動
+		 */
+		virtual void OnRelMoved(const AxisReport&){};
+
+		/***** ゲームコントローラーのスティックとトリガなど
+		 * 0:左左右
+		 * 1:左上下
+		 * 2:左トリガ
+		 * 3:右左右
+		 * 4:右上下
+		 * 5:右トリガ
+		 */
+		virtual void OnAbsMoved(const AxisReport&){};
 	};
 }

@@ -22,8 +22,18 @@ int main() {
 		void OnMouseUp(unsigned button) final {
 			printf("buttonup:%x.\n", button);
 		};
-		void OnMouseMove(unsigned axis, int diff) final {
-			printf("mouseMove(%u):%d.\n", axis, diff);
+		void OnRelMoved(const AxisReport& r) final {
+			printf("mouse moved:%+2d %+2d.\n", r.value[0], r.value[1]);
+		};
+		void OnAbsMoved(const AxisReport& r) final {
+			printf(
+				"stick moved:(%+2d %+2d %+2d) - (%+2d %+2d %+2d).\n",
+				r.value[0],
+				r.value[1],
+				r.value[2],
+				r.value[3],
+				r.value[4],
+				r.value[5]);
 		};
 	} test;
 

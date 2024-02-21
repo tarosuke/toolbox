@@ -30,7 +30,6 @@ namespace tb {
 			~Input();
 
 		private:
-			static const int relDirs[];
 			const int outms;
 			std::vector<pollfd> evs;
 

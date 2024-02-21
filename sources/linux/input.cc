@@ -29,7 +29,6 @@
 
 namespace tb {
 	namespace linux {
-		const int Input::relDirs[] = {1, -1, 1, 1, 1, 1, 1, 1};
 
 		Input::Input(msec outTime, bool grab) : outms((int)(u64)outTime) {
 			for (unsigned n(0);; ++n) {
@@ -54,6 +53,8 @@ namespace tb {
 			const int p = poll(evs.data(), evs.size(), outms);
 			if (0 < p) {
 				// イベント発生
+				AxisReport relativeReport, absoluteReport;
+
 				for (auto& e : evs) {
 					if (~e.revents & POLLIN) {
 						continue;
@@ -106,27 +107,24 @@ namespace tb {
 							}
 							break;
 						case EV_REL:
-							if (ev.code < elementsOf(relDirs)) {
-								OnMouseMove(
-									ev.code,
-									relDirs[ev.code] * ev.value);
-							}
+							relativeReport.AddEvent(ev.code, ev.value);
 							break;
 						case EV_ABS:
-							/***** アナログスティックの場合
-							 * 0:左左右
-							 * 1:左上下
-							 * 2:左トリガ
-							 * 3:右左右
-							 * 4:右上下
-							 * 5:右トリガ
-							 */
-
+							absoluteReport.SetEvent(ev.code, ev.value);
 							break;
 						default:
 							break;
 						}
 					}
+				}
+
+				if (relativeReport) {
+					// マウス移動はまとめて通知
+					OnRelMoved(relativeReport);
+				}
+				if (absoluteReport) {
+					// まとめて通知
+					OnAbsMoved(absoluteReport);
 				}
 			}
 		}
