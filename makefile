@@ -33,7 +33,6 @@ target ?= $(shell echo $$PWD | sed s!.*/!! )
 
 # targetがlibtoolbox.aでない場合の定義
 ifneq ($(target),libtoolbox.a)
-COPTS += -Itoolbox/include
 $(TARGETDIR)/$(target): toolbox/$(TARGETDIR)/libtoolbox.a
 toolbox/$(TARGETDIR)/libtoolbox.a :
 	make -j -C toolbox $(TARGETDIR)
@@ -43,6 +42,13 @@ endif
 
 
 ############################################################ FILE RECOGNITIONS
+
+subProjects:=$(dir $(wildcard */makefile */Makefile))
+subIncludes:=$(addsuffix include, $(addprefix -I, $(subProjects)))
+subLibraries:=$(wildcard */$(TARGETDIR)/*.a)
+
+COPTS += $(subIncludes)
+
 
 suffixes := %.c %.cc %.glsl
 
@@ -134,7 +140,7 @@ clean:
 
 $(tmods) : $(tobjs) $(TARGETDIR)/$(target)
 	@echo " LD $@"
-	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS)
+	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS) $(subLibraries)
 
 testTargets := $(addsuffix .test, $(tmods))
 
