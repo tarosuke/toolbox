@@ -1,53 +1,61 @@
-/** linux input subsystem
- * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
-#include <toolbox/test.h>
+#include <tb/test.h>
 
-#include <toolbox/input/input.h>
+#include <tb/linux/input.h>
 
 #include <stdio.h>
 
 
 
 int main() {
-	ManualTest;
-
-	class Test : public TB::Input {
+	class Test : virtual tb::Input, public tb::linux::Input {
 	public:
-		Test() : Input(false){};
-		void OnKeyDown(unsigned key) final { printf("keydown:%x.\n", key); };
-		void OnKeyUp(unsigned key) final { printf("keyUp:%x.\n", key); };
-		void OnKeyRepeat(unsigned key) final {
+		Test() : tb::linux::Input(1000, false){};
+		void OnKeyDown(const tb::Timestamp&, unsigned key) final {
+			printf("keydown:%x.\n", key);
+		};
+		void OnKeyUp(const tb::Timestamp&, unsigned key) final {
+			printf("keyUp:%x.\n", key);
+		};
+		void OnKeyRepeat(const tb::Timestamp&, unsigned key) final {
 			printf("keyRepeat:%x.\n", key);
 		};
-		void OnButtonDown(unsigned button) final {
-			printf("buttondown:%x.\n", button);
+		void OnMouseButton(const tb::Timestamp&, const ButtonReport& b) final {
+			printf(
+				"mouse down:%04x up:%04x state:%04x .\n",
+				b.up,
+				b.down,
+				b.state);
 		};
-		void OnButtonUp(unsigned button) final {
-			printf("buttonup:%x.\n", button);
+		void OnWheel(const tb::Timestamp&, const ButtonReport& b) final {
+			printf(
+				"wheel down:%04x up:%04x state:%04x .\n",
+				b.up,
+				b.down,
+				b.state);
 		};
-		void OnMouseMove(unsigned axis, int diff) final {
-			printf("mouseMove(%u):%d.\n", axis, diff);
+		void OnGamepad(const tb::Timestamp&, const ButtonReport& b) final {
+			printf(
+				"gamepad down:%04x up:%04x state:%04x .\n",
+				b.up,
+				b.down,
+				b.state);
+		};
+		void OnRelMoved(const tb::Timestamp&, const AxisReport& r) final {
+			printf("mouse moved:%+2d %+2d.\n", r.value[0], r.value[1]);
+		};
+		void OnAbsMoved(const tb::Timestamp&, const AxisReport& r) final {
+			printf("stick moved:");
+			for (unsigned n(0); n < 18; ++n) {
+				printf("%+5d ", r.value[n]);
+			}
+			puts("");
 		};
 	} test;
 
-	for (unsigned n(0); n < 1000000; ++n) {
-		test.GetInput();
+	tb::Input& t(test);
+
+	for (unsigned n(0); n < 30; ++n) {
+		t.GetInput();
 	}
 
 	return 0;

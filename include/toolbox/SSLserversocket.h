@@ -21,16 +21,15 @@
 
 #include <openssl/ssl.h>
 
-#include <toolbox/thread/pthread.h>
 
 
+namespace TB {
 
-namespace TB{
-
-	class Socket{
+	class Socket {
 		Socket();
 		Socket(const Socket&);
 		void operator=(const Socket&);
+
 	public:
 		Socket(int);
 		virtual ~Socket();
@@ -43,10 +42,11 @@ namespace TB{
 	};
 
 
-	class SSLSocket : public Socket{
+	class SSLSocket : public Socket {
 		SSLSocket();
 		SSLSocket(const SSLSocket&);
 		void operator=(const SSLSocket&);
+
 	public:
 		SSLSocket(int, SSL_CTX*);
 		~SSLSocket();
@@ -61,13 +61,11 @@ namespace TB{
 
 
 
-
-
-
-	class TCPServer{
+	class TCPServer {
 		TCPServer();
 		TCPServer(const TCPServer&);
 		void operator=(const TCPServer&);
+
 	public:
 		TCPServer(unsigned port);
 		~TCPServer();
@@ -82,10 +80,11 @@ namespace TB{
 
 
 
-	class SSLServer : private TCPServer{
+	class SSLServer : private TCPServer {
 		SSLServer();
 		SSLServer(const SSLServer&);
 		void operator=(const SSLServer&);
+
 	public:
 		SSLServer(unsigned port);
 		~SSLServer();
