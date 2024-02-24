@@ -18,7 +18,6 @@
  */
 #include <errno.h>
 #include <fcntl.h>
-#include <linux/input.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -31,12 +30,12 @@ namespace tb {
 	namespace linux {
 
 		Input::Input(msec outTime, bool grab) : outms((int)(u64)outTime) {
-			for (unsigned n(0);; ++n) {
+			for (unsigned n(0); n < 32; ++n) {
 				char path[32];
 				sprintf(path, "/dev/input/event%u", n);
 				const int fd(open(path, O_RDWR | O_NONBLOCK));
 				if (fd < 0) {
-					break;
+					continue;
 				}
 				ioctl(fd, EVIOCGRAB, grab);
 				evs.push_back({fd, POLLIN, 0});
@@ -54,6 +53,7 @@ namespace tb {
 			if (0 < p) {
 				// イベント発生
 				AxisReport relativeReport, absoluteReport;
+				timestamp.Update();
 
 				for (auto& e : evs) {
 					if (~e.revents & POLLIN) {
@@ -67,41 +67,25 @@ namespace tb {
 								// キーボード
 								switch (ev.value) {
 								case 0: // up
-									OnKeyUp(ev.code);
+									OnKeyUp(timestamp, ev.code);
 									break;
 								case 1: // down
-									OnKeyDown(ev.code);
+									OnKeyDown(timestamp, ev.code);
 									break;
 								case 2: // repeat
-									OnKeyRepeat(ev.code);
+									OnKeyRepeat(timestamp, ev.code);
 									break;
 								}
 							} else {
 								switch (ev.code & 0xfff0) {
-								case KEY_RESERVED:
-									break;
-								case BTN_MOUSE: // マウスボタン他
-									switch (ev.value) {
-									case 0: // up
-										OnMouseUp(ev.code & 0xff);
-										break;
-									case 1: // down
-										OnMouseDown(ev.code & 0xff);
-										break;
-									}
-									break;
-								case BTN_JOYSTICK:
-									break;
-								case BTN_GAMEPAD:
+								case BTN_MOUSE:
+									mouseButton += ev;
 									break;
 								case BTN_WHEEL:
-									if (!ev.value) {
-										// ホイールはup/downのみ認識
-										const tb::Vector<2, float> v((float[]){
-											0,
-											ev.code & 1 ? 1.0f : -1.0f});
-										OnWheel(v);
-									}
+									wheelButton += ev;
+									break;
+								case BTN_GAMEPAD:
+									gamepad += ev;
 									break;
 								}
 							}
@@ -120,11 +104,23 @@ namespace tb {
 
 				if (relativeReport) {
 					// マウス移動はまとめて通知
-					OnRelMoved(relativeReport);
+					OnRelMoved(timestamp, relativeReport);
 				}
 				if (absoluteReport) {
 					// まとめて通知
-					OnAbsMoved(absoluteReport);
+					OnAbsMoved(timestamp, absoluteReport);
+				}
+				if (mouseButton) {
+					OnMouseButton(timestamp, mouseButton);
+					mouseButton.Clear();
+				}
+				if (wheelButton) {
+					OnWheel(timestamp, wheelButton);
+					wheelButton.Clear();
+				}
+				if (gamepad) {
+					OnGamepad(timestamp, gamepad);
+					gamepad.Clear();
 				}
 			}
 		}

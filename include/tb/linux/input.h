@@ -18,6 +18,7 @@
  */
 #pragma once
 
+#include <linux/input.h>
 #include <tb/input.h>
 
 
@@ -30,6 +31,23 @@ namespace tb {
 			~Input();
 
 		private:
+			struct LBR : tb::Input::ButtonReport {
+				void operator+=(const input_event& e) {
+					const unsigned mask(1 << (e.code & 0x0f));
+					if (e.value) {
+						down |= mask;
+						state |= mask;
+					} else {
+						up |= mask;
+						state &= ~mask;
+					}
+				};
+			};
+
+			LBR mouseButton;
+			LBR wheelButton;
+			LBR gamepad;
+
 			const int outms;
 			std::vector<pollfd> evs;
 

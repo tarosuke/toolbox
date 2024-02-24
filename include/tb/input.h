@@ -1,5 +1,5 @@
 /** input interface
- * Copyright (C) 20212 2024 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2012 2024 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -39,26 +39,26 @@ namespace tb {
 		Input(const Input&) = delete;
 		void operator=(const Input&) = delete;
 
-		static constexpr unsigned nAxis = 8;
+		enum class Key {
+			A = 0x01,
+			B = 0x02,
+			X = 0x08,
+			Y = 0x10,
+			LB = 0x40,
+			RB = 0x80,
+			C = 0x1000,
+			L3 = 0x2000,
+			R3 = 0x4000,
+			select = 0x400,
+			start = 0x800,
+			liftRight = 0x10,
+			upDown = 0x11,
+		};
 
-	public:
-		virtual void GetInput() = 0;
-
-	protected:
-		Input() = default;
-		virtual ~Input(){};
-
-		virtual void OnKeyDown(unsigned key){};
-		virtual void OnKeyUp(unsigned key){};
-		virtual void OnKeyRepeat(unsigned key){};
-
-		virtual void OnMouseDown(unsigned button){};
-		virtual void OnMouseUp(unsigned button){};
-
-		virtual void OnWheel(const tb::Vector<2, float>&){};
 
 		/***** マウス、スティックなど */
 		struct AxisReport {
+			static constexpr unsigned nAxis = 0x40;
 			AxisReport() : value{}, moved(0){};
 			void AddEvent(unsigned axis, int v) {
 				if (axis < nAxis) {
@@ -76,10 +76,35 @@ namespace tb {
 			int value[nAxis]; // 軸ごとの値
 			unsigned moved; // イベントがあったビットが1
 		};
+		/***** グループごとの各種ボタン */
+		struct ButtonReport {
+			ButtonReport() : up(0), down(0), state(0){};
+			operator bool() const { return up || down; };
+			void Clear() { up = down = 0; };
+			unsigned up;
+			unsigned down;
+			unsigned state;
+		};
+
+		virtual void GetInput() = 0;
+
+	protected:
+		Timestamp timestamp;
+
+		Input() = default;
+		virtual ~Input(){};
+
+		virtual void OnKeyDown(const Timestamp&, unsigned key){};
+		virtual void OnKeyUp(const Timestamp&, unsigned key){};
+		virtual void OnKeyRepeat(const Timestamp&, unsigned key){};
+
+		virtual void OnMouseButton(const Timestamp&, const ButtonReport&){};
+		virtual void OnWheel(const Timestamp&, const ButtonReport&){};
+		virtual void OnGamepad(const Timestamp&, const ButtonReport&){};
 
 		/***** およそマウスの移動
 		 */
-		virtual void OnRelMoved(const AxisReport&){};
+		virtual void OnRelMoved(const Timestamp&, const AxisReport&){};
 
 		/***** ゲームコントローラーのスティックとトリガなど
 		 * 0:左左右
@@ -89,6 +114,6 @@ namespace tb {
 		 * 4:右上下
 		 * 5:右トリガ
 		 */
-		virtual void OnAbsMoved(const AxisReport&){};
+		virtual void OnAbsMoved(const Timestamp&, const AxisReport&){};
 	};
 }
