@@ -2,7 +2,7 @@
 # 1. ソースを勝手に探して依存関係ファイルを作成
 # 2. ターゲット情報を拾って、なければディレクトリ名を使う
 
-.PHONY : clean test tangereTest RELEASE DEBUG COVERAGE
+.PHONY : clean test RELEASE DEBUG COVERAGE
 
 
 
@@ -25,7 +25,8 @@ COPTS ?= -O0 -g3 -DVK_USE_PLATFORM_XLIB_KHR
 COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
 CCOPTS += $(COPTS) -std=c++20
 
-EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov -lvulkan -lgdbm
+EXLIBS := -lstdc++ -lm
+# -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lvulkan -lgdbm
 
 -include target.make
 target ?= $(shell echo $$PWD | sed s!.*/!! )
@@ -46,23 +47,19 @@ endif
 
 suffixes := %.c %.cc %.glsl
 
-files:= $(subst sources/,, $(shell find sources -type f))
+files:= $(shell find sources tests -type f)
 srcs := $(filter $(suffixes), $(files))
 ssrcs:= $(filter %.frag %.vert, $(files))
 spvs := $(addsuffix .spv, $(ssrcs))
 mods := $(basename $(srcs) $(spvs))
 objs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(mods)))
 deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
+subs := $(dir $(wildcard */makefile))
 
-# オブジェクトファイルの分類
-testPlaces := $(TARGETDIR)/.tests/%
-ttestPlaces := $(TARGETDIR)/.tangereTests/%
-nobjs := $(filter-out $(testPlaces), $(objs))
-tobjs := $(filter $(testPlaces), $(objs))
-ttobjs := $(filter $(ttestPlaces), $(objs))
-tmods := $(addprefix $(TARGETDIR)/, $(filter .tests/%, $(mods)))
-ttmods := $(addprefix $(TARGETDIR)/, $(filter .tangereTests/%, $(mods)))
-
+# 試験用設定
+testTarget = $(addprefix $(TARGETDIR)/, $(basename $(foreach s, $(suffix $(suffixes)), $(wildcard $(1)/*$(s)))))
+tmods:= $(call testTarget,tests)
+-include $(wildcard tests/*.make)
 
 
 ################################################################# COMMON RULES
@@ -74,28 +71,28 @@ endif
 vpath %.o $(TARGETDIR)
 
 
-$(TARGETDIR)/%.o : sources/%.cc makefile
+$(TARGETDIR)/%.o : %.cc makefile
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
 	@LANG=C $(CC) $(CCOPTS) -c -o $@ $<
 
-$(TARGETDIR)/%.o : sources/%.c makefile
+$(TARGETDIR)/%.o : %.c makefile
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
 	@LANG=C ${CC} $(COPTS) -c -o $@ $<
 
-$(TARGETDIR)/%.o : sources/%.glsl makefile
+$(TARGETDIR)/%.o : %.glsl makefile
 	@echo " OBJCOPY $@"
 	@mkdir -p $(dir $@)
 	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
 
-$(TARGETDIR)/%.dep : sources/%.cc makefile
+$(TARGETDIR)/%.dep : %.cc makefile
 	@echo " CPP $@"
 	@mkdir -p $(dir $@)
 	@echo -n $(dir $@) > $@
 	@$(CPP) $(CCOPTS) -MM $< >> $@
 
-$(TARGETDIR)/%.dep : sources/%.c makefile
+$(TARGETDIR)/%.dep : %.c makefile
 	@echo " CPP $@"
 	@echo -n $(dir $@) > $@
 	@mkdir -p $(dir $@)
@@ -104,11 +101,11 @@ $(TARGETDIR)/%.dep : sources/%.c makefile
 # Vulkan shaders
 .PRECIOUS: $(addprefix $(TARGETDIR)/, $(spvs))
 
-$(TARGETDIR)/%.frag.spv : sources/%.frag makefile
+$(TARGETDIR)/%.frag.spv : %.frag makefile
 	@echo " GLSLC $@"
 	@glslc $< -o $@
 
-$(TARGETDIR)/%.vert.spv : sources/%.vert makefile
+$(TARGETDIR)/%.vert.spv : %.vert makefile
 	@echo " GLSLC $@"
 	@glslc $< -o $@
 
@@ -121,39 +118,34 @@ $(TARGETDIR)/%.o : $(TARGETDIR)/%.spv makefile
 
 ############################################################### RULES & TARGET
 
-$(TARGETDIR)/$(target): makefile $(nobjs)
+$(TARGETDIR)/$(target): makefile $(objs)
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
-	ar rc $@ $(nobjs)
+	ar rc $@ $(objs)
 else
 	@echo " LD $@"
-	gcc -o $(TARGETDIR)/$(target) $(nobjs) $(EXLIBS)
+	gcc -o $(TARGETDIR)/$(target) $(objs) $(EXLIBS)
 endif
 
 clean:
-	@echo test:$(addsuffix .test, )
 	rm -rf RELEASE DEBUG COVERAGE *.gcov
-	if [ -d toolbox ]; then make -C toolbox clean; fi
+	$(if $(subs), $(foreach $(subs), s, make -C $(s) clean))
 
-$(tmods) : $(tobjs) $(TARGETDIR)/$(target)
+$(TARGETDIR)/tests/% : $(TARGETDIR)/tests/%.o $(TARGETDIR)/$(target)
 	@echo " LD $@"
 	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS)
 
-$(ttmods) : $(ttobjs) $(TARGETDIR)/$(target)
-	@echo " LD $@"
-	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS)
-
-%.test : %
-	@echo $<
+$(TARGETDIR)/tests/%.test : $(TARGETDIR)/tests/%
 	$<
 
+
+.PRECIOUS: $(tmods)
 test: $(addsuffix .test, $(tmods))
-tangereTest: $(addsuffix .test, $(ttmods))
 
+RELEASE: RELEASE/$(target)
 
-RELEASE: RELEASE/$(target) test
+DEBUG: DEBUG/$(target)
 
-DEBUG: DEBUG/$(target) test
-
+COVERAGE: EXLIBS += -lgcov
 COVERAGE: COVERAGE/$(target) test
 	@lcov -c -d $(TARGETDIR) -o $(TARGETDIR)/lcov.info
