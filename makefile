@@ -25,7 +25,8 @@ COPTS ?= -O0 -g3 -DVK_USE_PLATFORM_XLIB_KHR
 COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
 CCOPTS += $(COPTS) -std=c++20
 
-EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov -lvulkan -lgdbm
+EXLIBS := -lstdc++ -lm
+# -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lvulkan -lgdbm
 
 -include target.make
 target ?= $(shell echo $$PWD | sed s!.*/!! )
@@ -138,11 +139,13 @@ $(TARGETDIR)/tests/%.test : $(TARGETDIR)/tests/%
 	$<
 
 
+.PRECIOUS: $(tmods)
 test: $(addsuffix .test, $(tmods))
 
 RELEASE: RELEASE/$(target)
 
 DEBUG: DEBUG/$(target)
 
+COVERAGE: EXLIBS += -lgcov
 COVERAGE: COVERAGE/$(target) test
 	@lcov -c -d $(TARGETDIR) -o $(TARGETDIR)/lcov.info
