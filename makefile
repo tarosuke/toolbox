@@ -56,9 +56,9 @@ deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
 subs := $(dir $(wildcard */makefile))
 
 # 試験用設定
-tmods:= $(addprefix $(TARGETDIR)/, $(basename $(foreach s, $(suffix $(suffixes)), $(wildcard tests/*$(s)))))
+testTarget = $(addprefix $(TARGETDIR)/, $(basename $(foreach s, $(suffix $(suffixes)), $(wildcard $(1)/*$(s)))))
+tmods:= $(call testTarget,tests)
 -include $(wildcard tests/*.make)
-
 
 
 ################################################################# COMMON RULES
@@ -137,7 +137,6 @@ $(TARGETDIR)/tests/% : $(TARGETDIR)/tests/%.o $(TARGETDIR)/$(target)
 $(TARGETDIR)/tests/%.test : $(TARGETDIR)/tests/%
 	$<
 
-.PRECIOUS: $(tmods)
 
 test: $(addsuffix .test, $(tmods))
 
