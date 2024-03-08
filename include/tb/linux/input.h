@@ -19,6 +19,7 @@
 #pragma once
 
 #include <linux/input.h>
+#include <poll.h>
 #include <tb/input.h>
 
 
