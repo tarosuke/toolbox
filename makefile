@@ -46,7 +46,7 @@ endif
 
 suffixes := %.c %.cc %.glsl
 
-files:= $(shell find sources tests -type f))
+files:= $(shell find sources tests -type f)
 srcs := $(filter $(suffixes), $(files))
 ssrcs:= $(filter %.frag %.vert, $(files))
 spvs := $(addsuffix .spv, $(ssrcs))
@@ -56,7 +56,7 @@ deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
 subs := $(dir $(wildcard */makefile))
 
 # 試験用設定
-tmods:= $(addprefix $(TARGETDIR)/, $(filter tests/%, $(mods)))
+tmods:= $(addprefix $(TARGETDIR)/, $(basename $(foreach s, $(suffix $(suffixes)), $(wildcard tests/*$(s)))))
 -include $(wildcard tests/*.make)
 
 
@@ -135,7 +135,6 @@ $(TARGETDIR)/tests/% : $(TARGETDIR)/tests/%.o $(TARGETDIR)/$(target)
 	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS)
 
 $(TARGETDIR)/tests/%.test : $(TARGETDIR)/tests/%
-	@echo -n "test: "
 	$<
 
 .PRECIOUS: $(tmods)
