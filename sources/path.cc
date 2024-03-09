@@ -18,37 +18,70 @@
  */
 
 #include <sys/stat.h>
-#include <toolbox/path.h>
+
+#include <tb/path.h>
 
 
 
-namespace TB {
+namespace tb {
 
-	bool Path::IsFile() {
+	/** パスを合成しながらファイルの存在をチェックしてファイルが存在したパスを返す
+	 * 以下の場合はpathのコピーを返す。
+	 * 1. pathが絶対パス
+	 * 2. カレントディレクトリにpathが示すファイルがあった
+	 * 3. ファイルが見つからなかった
+	 * でなければresPath+pathをチェックし、ファイルがあればそれを返す。
+	 */
+	String Path::StatPath(const String& resPath, const String& path) {
+		if (!path.size() || path[0] == '/') {
+			// 絶対パスか空文字列
+			return path;
+		}
+
+		// カレントディレクトリを確認
+		if (Is(path)) {
+			// カレントディレクトリにあったのでpathをそのまま返す
+			return path;
+		}
+
+		// resPathを追加して確認
+		String p(resPath + path);
+		if (Is(p)) {
+			// resPath以下にあったのでそのパスを返す
+			return p;
+		}
+
+		// ファイルがなかったのでpathをそのまま返す(帰った先でエラーになる)
+		return path;
+	}
+
+	/** 与えられたパスにファイルが存在するかどうかチェック
+	 * 通常ファイルかシンボリックリンクの先が通常ファイルである場合に真を返す
+	 */
+	bool Path::Is(const String& p) {
 		struct stat statBuff;
-		if (!stat(c_str(), &statBuff)) {
+		if (!stat(p, &statBuff)) {
 			return S_ISREG(statBuff.st_mode);
 		}
 		return false;
 	}
-	bool Path::IsDirectory() {
-		struct stat statBuff;
-		if (!stat(c_str(), &statBuff)) {
-			return S_ISDIR(statBuff.st_mode);
-		}
-		return false;
-	}
+
+	/** 構築子
+	 */
+	Path::Path(const String& r, const char* p) : String(StatPath(r, p)) {}
+	Path::Path(const String& r, const String& p) : String(StatPath(r, p)) {}
+	Path::Path(const String& r, const Path& p) : String(StatPath(r, p)) {}
 
 
-	const char* Path::LastSegment() const {
-		const char* p(c_str());
-		for (const char* q(p); *q;) {
-			if (*q == '/') {
-				p = ++q;
-			} else {
-				++q;
+	/** BasePath / Base
+	 */
+	const char* Path::Base(const char* p) {
+		const char* b;
+		for (b = p; *p; ++p) {
+			if (*p == '/') {
+				b = p + 1;
 			}
 		}
-		return p;
+		return b;
 	}
 }
