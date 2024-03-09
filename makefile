@@ -35,11 +35,11 @@ EXLIBS := -lstdc++ -lm
 # -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lvulkan -lgdbm
 
 -include target.make
-target ?= $(shell echo $$PWD | sed s!.*/!! )
+target ?= $(notdir $(PWD))
 
 
 # targetがlibtoolbox.aでない場合の定義
-TOOLBOXDIR ?= toolbox
+TOOLBOXDIR?=$(shell if [ -f toolbox/makefile ]; then echo toolbox; else echo ../toolbox; fi)
 ifneq ($(target),libtoolbox.a)
 COPTS += -I$(TOOLBOXDIR)/include
 $(TARGETDIR)/$(target): $(TOOLBOXDIR)/$(TARGETDIR)/libtoolbox.a
@@ -85,28 +85,28 @@ endif
 vpath %.o $(TARGETDIR)
 
 
-$(TARGETDIR)/%.o : %.cc makefile
+$(TARGETDIR)/%.o : %.cc $(TOOLBOXDIR)/makefile
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
 	@LANG=C $(CC) $(CCOPTS) -c -o $@ $<
 
-$(TARGETDIR)/%.o : %.c makefile
+$(TARGETDIR)/%.o : %.c $(TOOLBOXDIR)/makefile
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
 	@LANG=C ${CC} $(COPTS) -c -o $@ $<
 
-$(TARGETDIR)/%.o : %.glsl makefile
+$(TARGETDIR)/%.o : %.glsl $(TOOLBOXDIR)/makefile
 	@echo " OBJCOPY $@"
 	@mkdir -p $(dir $@)
 	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
 
-$(TARGETDIR)/%.dep : %.cc makefile
+$(TARGETDIR)/%.dep : %.cc $(TOOLBOXDIR)/makefile
 	@echo " CPP $@"
 	@mkdir -p $(dir $@)
 	@echo -n $(dir $@) > $@
 	@$(CPP) $(CCOPTS) -MM $< >> $@
 
-$(TARGETDIR)/%.dep : %.c makefile
+$(TARGETDIR)/%.dep : %.c $(TOOLBOXDIR)/makefile
 	@echo " CPP $@"
 	@echo -n $(dir $@) > $@
 	@mkdir -p $(dir $@)
@@ -115,11 +115,11 @@ $(TARGETDIR)/%.dep : %.c makefile
 # Vulkan shaders
 .PRECIOUS: $(addprefix $(TARGETDIR)/, $(spvs))
 
-$(TARGETDIR)/%.frag.spv : %.frag makefile
+$(TARGETDIR)/%.frag.spv : %.frag $(TOOLBOXDIR)/makefile
 	@echo " GLSLC $@"
 	@glslc $< -o $@
 
-$(TARGETDIR)/%.vert.spv : %.vert makefile
+$(TARGETDIR)/%.vert.spv : %.vert $(TOOLBOXDIR)/makefile
 	@echo " GLSLC $@"
 	@glslc $< -o $@
 
@@ -132,7 +132,7 @@ $(TARGETDIR)/%.o : $(TARGETDIR)/%.spv $(ME)
 
 ############################################################### RULES & TARGET
 
-$(TARGETDIR)/$(target): makefile $(objs)
+$(TARGETDIR)/$(target): $(TOOLBOXDIR)/makefile $(objs)
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
 	ar rc $@ $(objs)
@@ -144,7 +144,6 @@ endif
 
 clean:
 	rm -rf RELEASE DEBUG COVERAGE *.gcov
-	$(if $(subs), $(foreach $(subs), s, make -C $(s) clean))
 
 $(TARGETDIR)/tests/% : $(TARGETDIR)/tests/%.o $(TARGETDIR)/$(target)
 	@echo " LD $@"
