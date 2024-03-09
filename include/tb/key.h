@@ -1,5 +1,4 @@
-/************************************************************************* App
- * Copyright (C) 2021,2023 tarosuke<webmaster@tarosuke.net>
+/* Copyright (C) 2014, 2023 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,26 +14,31 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- *
- ** アプリケーションのフレームワーク
  */
+#pragma once
 
-#include <tb/app.h>
-
-#include <assert.h>
-#include <stdexcept>
-#include <syslog.h>
+#include <type_traits>
 
 
 
-tb::App* tb::App::instance(0);
-tb::Prefs<unsigned>
-	tb::App::logLevel("--logLevel", 1, 0, tb::CommonPrefs::nosave);
+namespace tb {
 
-int main(int argc, char** argv) {
-	tb::CommonPrefs::Keeper k(
-		argc,
-		(const char**)argv,
-		tb::App::instance->Name());
-	return tb::App::instance->Main((uint)argc + k, (const char**)argv + k);
-}
+	/***** RAIIキー
+	 * キーが存在する間はロックされる
+	 */
+	template <class L> struct Key {
+		Key(L& l) : lock(l) { l.Lock(); };
+		~Key() { lock.Unlock(); };
+
+	private:
+		L& lock;
+	};
+
+	/***** 何もしないロック
+	 */
+	struct NullLock {
+		friend class Key<NullLock>;
+		void Lock(){};
+		void Unlock(){};
+	};
+};

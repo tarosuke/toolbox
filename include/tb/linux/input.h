@@ -1,5 +1,5 @@
-/************************************************************************* App
- * Copyright (C) 2021,2023 tarosuke<webmaster@tarosuke.net>
+﻿/** linux input subsystem
+ * Copyright (C) 2022 2024 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,26 +15,44 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- *
- ** アプリケーションのフレームワーク
  */
+#pragma once
 
-#include <tb/app.h>
-
-#include <assert.h>
-#include <stdexcept>
-#include <syslog.h>
-
+#include <linux/input.h>
+#include <poll.h>
+#include <tb/input.h>
 
 
-tb::App* tb::App::instance(0);
-tb::Prefs<unsigned>
-	tb::App::logLevel("--logLevel", 1, 0, tb::CommonPrefs::nosave);
 
-int main(int argc, char** argv) {
-	tb::CommonPrefs::Keeper k(
-		argc,
-		(const char**)argv,
-		tb::App::instance->Name());
-	return tb::App::instance->Main((uint)argc + k, (const char**)argv + k);
+namespace tb {
+	namespace linux {
+
+		struct Input : public virtual tb::Input {
+			Input(msec outTime = 0, bool grab = false);
+			~Input();
+
+		private:
+			struct LBR : tb::Input::ButtonReport {
+				void operator+=(const input_event& e) {
+					const unsigned mask(1 << (e.code & 0x0f));
+					if (e.value) {
+						down |= mask;
+						state |= mask;
+					} else {
+						up |= mask;
+						state &= ~mask;
+					}
+				};
+			};
+
+			LBR mouseButton;
+			LBR wheelButton;
+			LBR gamepad;
+
+			const int outms;
+			std::vector<pollfd> evs;
+
+			void GetInput() override;
+		};
+	}
 }

@@ -1,5 +1,5 @@
-/************************************************************************* App
- * Copyright (C) 2021,2023 tarosuke<webmaster@tarosuke.net>
+/**************************************************************** instanceList
+ * Copyright (C) 2020,2023 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,25 +16,30 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- ** アプリケーションのフレームワーク
+ * タイプ別インスタンスリスト
+ * インスタンスリストを使いたいクラスの親にLinstanceList::Nodeを追加する
+ * NOTE: listをどこかに置くこと
  */
+#pragma once
 
-#include <tb/app.h>
-
-#include <assert.h>
-#include <stdexcept>
-#include <syslog.h>
+#include "list.h"
 
 
 
-tb::App* tb::App::instance(0);
-tb::Prefs<unsigned>
-	tb::App::logLevel("--logLevel", 1, 0, tb::CommonPrefs::nosave);
+namespace TB {
 
-int main(int argc, char** argv) {
-	tb::CommonPrefs::Keeper k(
-		argc,
-		(const char**)argv,
-		tb::App::instance->Name());
-	return tb::App::instance->Main((uint)argc + k, (const char**)argv + k);
+	template <class T> class InstanceList {
+	public:
+		class Node : private List<InstanceList::Node> {
+			Node(const Node&);
+			void operator=(const Node&);
+
+		public:
+			Node() { InstanceList::list.Add(*this); };
+		};
+
+	protected:
+		static List<InstanceList::Node> list;
+	};
+
 }

@@ -1,5 +1,5 @@
 /************************************************************************* App
- * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2021,2023 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,43 +17,38 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  ** アプリケーションのフレームワーク
- * Appを導出してMain、必要があればFinallyをoverride
- * 導出したクラスのインスタンスをstaticに作るとmainがセットで付いてきて
- * App::Mainが呼ばれる
+ * Appを導出して必要に応じてMain, Nameをoverride。
+ * Nameをoverrideすると設定ファイル名を変更できる(デフォルトは実行ファイル名)
+ * 導出したクラスを適当なところにstaticに確保すると初期設定のあとに
+ * Init, Mainが呼ばれ、Mainを終了するとFinallyが呼ばれてから終了する。
+ * NOTE:構築子が呼ばれるのはstaticインスタンス構築時なので何もできない
+ * NOTE:Appが参照された時点でmainはtb::App側で確保されたものがリンクされる
  */
 #pragma once
 
-#include <toolbox/path.h>
-#include <toolbox/prefs.h>
+#include <tb/prefs.h>
 
 
+extern "C" {
+	int main(int, char**);
+}
 
-namespace TB {
+namespace tb {
 
-	class App {
-		App(const App&);
-		void operator=(const App&);
+	struct App {
+		friend int ::main(int, char**);
+		App(const App&) = delete;
+		void operator=(const App&) = delete;
 
-	public:
 		App() { instance = this; };
 		virtual ~App(){};
-		static int main(int argc, const char* argv[]);
 
 	protected:
-		static std::string name;
-
-		virtual int Main() = 0;
-		virtual void Finally(){};
+		virtual int Main(uint remainArgs, const char**) { return 0; };
+		virtual const char* Name() { return 0; };
 
 	private:
 		static App* instance;
 		static Prefs<unsigned> logLevel;
-	};
-
-	/** Mainの時点でインスタンスを作れない場合
-	 * これをインスタンス化するとstaticなT::StaticMainが呼ばれる
-	 */
-	template <class T> struct StaticApp : App {
-		int Main() final { return T::StaticMain(); };
 	};
 }

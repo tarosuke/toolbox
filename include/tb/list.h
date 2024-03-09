@@ -1,30 +1,40 @@
 /************************************************************************ List
- * Copyright (C) 2017, 2021 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2017, 2021, 2023 tarosuke<webmaster@tarosuke.net>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
 #pragma once
 
-#include "../lock/key.h"
+#include <tb/key.h>
 
 
 
-namespace TB {
+namespace tb {
 
-	template <class T, class L = Lock::NullLock> class List : public L {
-		List(const List&);
-		void operator=(const List&);
-
-	public:
-		// このリストのためのKey(このリストを初期値にして作る)
-		using Key = Lock::Key<L>;
+	template <class T, class L = NullLock> struct List : private L {
+		List(const List&) = delete;
+		void operator=(const List&) = delete;
 
 		/**ノード：リストのノードはこれをpublicで継承しておく必要がある
-		 * 複数のリストを使うときはそれぞれ継承してxxLisuのようにして区別する
+		 * 複数のリストを使うときはそれぞれ継承してxxListのような子を作って
+		 * 区別する
 		 *
 		 * ノードがdeleteされると自動的にリストから外れる
-		 * List自体がdeleteされると要素が切り離された上でNotifyListDeletedが呼ばれる
-		 * NotifyListDeletedのデフォルトは「何もしない」なので、
-		 * Listが主参照であるならNotifyListDeletedで自身をdeleteする必要がある
+		 * またList自体がdeleteされると要素が切り離された上でNotifyListDeletedが
+		 * 呼ばれる
 		 */
 		class Node {
 			friend class List;
@@ -37,18 +47,12 @@ namespace TB {
 			virtual ~Node() { Detach(); };
 
 		protected:
-			Node(bool dwl = false)
-				: prev(this), next(this), deleteWithList(dwl){};
-			virtual void NotifyListDeleted() {
-				if (deleteWithList) {
-					delete this;
-				}
-			};
+			Node() : prev(this), next(this){};
+			virtual void NotifyListDeleted(){};
 
 		private:
 			Node* prev;
 			Node* next;
-			const bool deleteWithList;
 
 		protected:
 			void Insert(Node& n) {
@@ -75,20 +79,20 @@ namespace TB {
 			operator T*() { return dynamic_cast<T*>(this); };
 		};
 
-		/** 反復子
-		 * Listを与えればJavaスタイルの反復子。
+		/** toolbox反復子
 		 * 順、逆順共通で以下のように使う。
 		 * 正：for(I i(list); ++i;) hoge;
 		 * 逆：for(I i(list); --i;) huga;
 		 * 初期化時は無効要素を指す。
 		 * Listは環状なので初期状態から++すれば最初の要素、
 		 * --すれば最後の要素を指すようになる。
-		 *
-		 * NOTE:反復子が有効な状態で要素を追加するときは反復子のInsert/Addを使う
+		 * NOTE: なお、反復子は前後の情報を保持しているので要素を削除することも
+		 *      可能だが、反復子が有効な状態で要素を追加するときはリストではなく
+		 *      反復子のInsert/Addを使う
 		 */
 		class I {
 		public:
-			// Javaスタイル反復子
+			// toolboxスタイル反復子
 			I(List& l)
 				: key(l), node(&l.anchor), prev((*node).prev),
 				  next((*node).next){};
@@ -113,7 +117,7 @@ namespace TB {
 			};
 
 		private:
-			Key key;
+			Key<L> key;
 			Node* node;
 			Node* prev;
 			Node* next;
@@ -165,7 +169,7 @@ namespace TB {
 
 		/** 検索
 		 * ありがちな[]演算子による検索
-		 * T*を返す。なければ0
+		 * 発見できたらT*を返す。なければ0
 		 * Tにはキーに対応した型の==演算子が必要
 		 * なお、シリアルサーチなのでO(n)、つまり遅い
 		 */
@@ -178,22 +182,22 @@ namespace TB {
 			return 0;
 		};
 
-		/** 要素の操作
+		/**要素の操作
 		 */
-		void Add(Key&, Node& n) { n.Insert(anchor); };
+		void Add(Key<L>&, Node& n) { n.Insert(anchor); };
 		void Add(Node& n) {
-			Key k(*this);
+			Key<L> k(*this);
 			Add(k, n);
 		};
-		void Insert(Key&, Node& n) { n.Attach(anchor); };
+		void Insert(Key<L>&, Node& n) { n.Attach(anchor); };
 		void Insert(Node& n) {
-			Key k(*this);
+			Key<L> k(*this);
 			Insert(k, n);
 		};
-		T* Top(Key&) { return dynamic_cast<T*>(anchor.next); };
-		T* Bottom(Key&) { return dynamic_cast<T*>(anchor.prev); };
+		T* Top(Key<L>&) { return dynamic_cast<T*>(anchor.next); };
+		T* Bottom(Key<L>&) { return dynamic_cast<T*>(anchor.prev); };
 
-		T* Get(Key&) {
+		T* Get(Key<L>&) {
 			Node* const tn(anchor.next);
 			if (tn != &anchor) {
 				(*tn).Detach();
@@ -202,21 +206,8 @@ namespace TB {
 			return 0;
 		};
 		T* Get() {
-			Key key(*this);
+			Key<L> key(*this);
 			return Get(key);
-		};
-
-		// 挿入ソート
-		void Add(Key&, Node& n, bool (*isAAfterB)(const T& a, const T& b)) {
-			for (const auto& i : *this) {
-				if (isAAfterB(n, i)) {
-					n.Insert(i);
-				}
-			}
-		};
-		void Add(Node& n, bool (*isAAfterB)(const T& a, const T& b)) {
-			Key k(*this);
-			Add(k, n, isAAfterB);
 		};
 
 		// コンストラクタ／デストラクタ
@@ -253,6 +244,8 @@ namespace TB {
 		};
 		itor begin() { return itor(*anchor.next); };
 		itor end() { return itor(anchor); };
+		itor rbegin() { return itor(*anchor.prev); };
+		itor lend() { return itor(anchor); };
 
 	private:
 		Node anchor;

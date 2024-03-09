@@ -1,5 +1,5 @@
-/************************************************************************* App
- * Copyright (C) 2021,2023 tarosuke<webmaster@tarosuke.net>
+/** Path search
+ * Copyright (C) 2018 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,26 +15,32 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- *
- ** アプリケーションのフレームワーク
  */
+#pragma once
 
-#include <tb/app.h>
-
-#include <assert.h>
-#include <stdexcept>
-#include <syslog.h>
+#include <tb/string.h>
 
 
 
-tb::App* tb::App::instance(0);
-tb::Prefs<unsigned>
-	tb::App::logLevel("--logLevel", 1, 0, tb::CommonPrefs::nosave);
+namespace tb {
 
-int main(int argc, char** argv) {
-	tb::CommonPrefs::Keeper k(
-		argc,
-		(const char**)argv,
-		tb::App::instance->Name());
-	return tb::App::instance->Main((uint)argc + k, (const char**)argv + k);
+	class Path : public String {
+	public:
+		Path() : String(){};
+		Path(const char* path) : String(path){};
+
+		const char* BaseName() { return Base((const char*)*this); };
+		static const char* Base(const char*);
+
+
+	protected:
+		Path(const String&, const char*);
+		Path(const String&, const String&);
+		Path(const String&, const Path&);
+
+	private:
+		static String StatPath(const String&, const String&);
+		static bool Is(const String&);
+	};
+
 }

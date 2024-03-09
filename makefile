@@ -1,42 +1,51 @@
-#################################################################### makefile
+#################################################################### $(ME)
 # 1. ソースを勝手に探して依存関係ファイルを作成
 # 2. ターゲット情報を拾って、なければディレクトリ名を使う
 
-.PHONY : clean test manualTest RELEASE DEBUG COVERAGE
+.PHONY : clean test RELEASE DEBUG COVERAGE
 
 
 
 ############################################################# TARGET & OPTIONS
 
+ME := $(MAKEFILE_LIST)
 MAKECMDGOALS ?= RELEASE
+
 ifeq ($(MAKECMDGOALS), RELEASE)
 TARGETDIR := RELEASE
-COPTS := -O3 -DNDEBUG -Wno-stringop-overflow -DVK_USE_PLATFORM_XLIB_KHR
+COPTS += -O3 -DNDEBUG -Wno-stringop-overflow
 endif
 ifeq ($(MAKECMDGOALS), COVERAGE)
 TARGETDIR := COVERAGE
-COPTS := -g -coverage -DVK_USE_PLATFORM_XLIB_KHR
+COPTS += -g -coverage
+endif
+ifeq ($(MAKECMDGOALS), DEBUG)
+TARGETDIR := DEBUG
+COPTS += -O0 -g3
 endif
 
 TARGETDIR ?= DEBUG
-COPTS ?= -O0 -g3 -DVK_USE_PLATFORM_XLIB_KHR
+COPTS += -O0 -g3
 
 
 COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
-CCOPTS += $(COPTS) -std=c++11
+CCOPTS += $(COPTS) -std=c++20
 
-EXLIBS := -lstdc++ -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lm -lgcov -lvulkan -lgdbm
+EXLIBS := -lstdc++ -lm
+# -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lvulkan -lgdbm
 
 -include target.make
 target ?= $(shell echo $$PWD | sed s!.*/!! )
 
 
 # targetがlibtoolbox.aでない場合の定義
+TOOLBOXDIR ?= toolbox
 ifneq ($(target),libtoolbox.a)
-$(TARGETDIR)/$(target): toolbox/$(TARGETDIR)/libtoolbox.a
-toolbox/$(TARGETDIR)/libtoolbox.a :
-	make -j -C toolbox $(TARGETDIR)
-EXLIBS += -Ltoolbox/$(TARGETDIR) -ltoolbox
+COPTS += -I$(TOOLBOXDIR)/include
+$(TARGETDIR)/$(target): $(TOOLBOXDIR)/$(TARGETDIR)/libtoolbox.a
+$(TOOLBOXDIR)/$(TARGETDIR)/libtoolbox.a :
+	make -j -C $(TOOLBOXDIR) $(TARGETDIR)
+EXLIBS += -L$(TOOLBOXDIR)/$(TARGETDIR) -ltoolbox
 endif
 
 
@@ -52,53 +61,52 @@ COPTS += $(subIncludes)
 
 suffixes := %.c %.cc %.glsl
 
-files:= $(subst sources/,, $(shell find sources -type f))
+files:= $(shell find sources tests -type f)
 srcs := $(filter $(suffixes), $(files))
 ssrcs:= $(filter %.frag %.vert, $(files))
 spvs := $(addsuffix .spv, $(ssrcs))
 mods := $(basename $(srcs) $(spvs))
 objs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(mods)))
 deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
+subs := $(dir $(wildcard */makefile))
 
-# オブジェクトファイルの分類
-testPlaces := $(TARGETDIR)/.tests/%
-nobjs := $(filter-out $(testPlaces), $(objs))
-tobjs := $(filter $(testPlaces), $(objs))
-tmods := $(addprefix $(TARGETDIR)/, $(filter .tests/%, $(mods)))
-
+# 試験用設定
+testTarget = $(addprefix $(TARGETDIR)/, $(basename $(foreach s, $(suffix $(suffixes)), $(wildcard $(1)/*$(s)))))
+tmods:= $(call testTarget,tests)
+-include $(wildcard tests/*.make)
 
 
 ################################################################# COMMON RULES
 
 ifneq ($(MAKECMDGOALS),clean)
--include $(deps) $(tdeps)
+-include $(deps) $(tdeps) $(ttdeps)
 endif
 
 vpath %.o $(TARGETDIR)
 
 
-$(TARGETDIR)/%.o : sources/%.cc makefile
+$(TARGETDIR)/%.o : %.cc makefile
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
 	@LANG=C $(CC) $(CCOPTS) -c -o $@ $<
 
-$(TARGETDIR)/%.o : sources/%.c makefile
+$(TARGETDIR)/%.o : %.c makefile
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
 	@LANG=C ${CC} $(COPTS) -c -o $@ $<
 
-$(TARGETDIR)/%.o : sources/%.glsl makefile
+$(TARGETDIR)/%.o : %.glsl makefile
 	@echo " OBJCOPY $@"
 	@mkdir -p $(dir $@)
 	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
 
-$(TARGETDIR)/%.dep : sources/%.cc makefile
+$(TARGETDIR)/%.dep : %.cc makefile
 	@echo " CPP $@"
 	@mkdir -p $(dir $@)
 	@echo -n $(dir $@) > $@
 	@$(CPP) $(CCOPTS) -MM $< >> $@
 
-$(TARGETDIR)/%.dep : sources/%.c makefile
+$(TARGETDIR)/%.dep : %.c makefile
 	@echo " CPP $@"
 	@echo -n $(dir $@) > $@
 	@mkdir -p $(dir $@)
@@ -107,15 +115,15 @@ $(TARGETDIR)/%.dep : sources/%.c makefile
 # Vulkan shaders
 .PRECIOUS: $(addprefix $(TARGETDIR)/, $(spvs))
 
-$(TARGETDIR)/%.frag.spv : sources/%.frag makefile
+$(TARGETDIR)/%.frag.spv : %.frag makefile
 	@echo " GLSLC $@"
 	@glslc $< -o $@
 
-$(TARGETDIR)/%.vert.spv : sources/%.vert makefile
+$(TARGETDIR)/%.vert.spv : %.vert makefile
 	@echo " GLSLC $@"
 	@glslc $< -o $@
 
-$(TARGETDIR)/%.o : $(TARGETDIR)/%.spv makefile
+$(TARGETDIR)/%.o : $(TARGETDIR)/%.spv $(ME)
 	@echo " OBJCOPY $@"
 	@mkdir -p $(dir $@)
 	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
@@ -124,41 +132,34 @@ $(TARGETDIR)/%.o : $(TARGETDIR)/%.spv makefile
 
 ############################################################### RULES & TARGET
 
-$(TARGETDIR)/$(target): makefile $(nobjs)
+$(TARGETDIR)/$(target): makefile $(objs)
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
-	ar rc $@ $(nobjs)
+	ar rc $@ $(objs)
 else
 	@echo " LD $@"
-	gcc -o $(TARGETDIR)/$(target) $(nobjs) $(EXLIBS)
+	gcc -o $(TARGETDIR)/$(target) $(objs) $(EXLIBS)
 endif
 
 clean:
-	@echo test:$(addsuffix .test, )
 	rm -rf RELEASE DEBUG COVERAGE *.gcov
-	if [ -d toolbox ]; then make -C toolbox clean; fi
+	$(if $(subs), $(foreach $(subs), s, make -C $(s) clean))
 
-$(tmods) : $(tobjs) $(TARGETDIR)/$(target)
+$(TARGETDIR)/tests/% : $(TARGETDIR)/tests/%.o $(TARGETDIR)/$(target)
 	@echo " LD $@"
 	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS) $(subLibraries)
 
-testTargets := $(addsuffix .test, $(tmods))
-
-%.test : %
-	@echo $<
-ifeq ($(MAKECMDGOALS), manualTest)
+$(TARGETDIR)/tests/%.test : $(TARGETDIR)/tests/%
 	$<
-else
-	@AUTO_TEST=1 $<
-endif
-
-test: $(testTargets)
-manualTest: $(testTargets)
 
 
-RELEASE: RELEASE/$(target) test
+.PRECIOUS: $(tmods)
+test: $(addsuffix .test, $(tmods))
 
-DEBUG: DEBUG/$(target) test
+RELEASE: RELEASE/$(target)
 
+DEBUG: DEBUG/$(target)
+
+COVERAGE: EXLIBS += -lgcov
 COVERAGE: COVERAGE/$(target) test
 	@lcov -c -d $(TARGETDIR) -o $(TARGETDIR)/lcov.info

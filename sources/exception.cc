@@ -1,5 +1,5 @@
-/************************************************************************* App
- * Copyright (C) 2021,2023 tarosuke<webmaster@tarosuke.net>
+/** Exception
+ * Copyright (C) 2019 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,26 +15,36 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- *
- ** アプリケーションのフレームワーク
  */
-
-#include <tb/app.h>
-
-#include <assert.h>
-#include <stdexcept>
-#include <syslog.h>
+#include <stdlib.h>
+#include <string.h>
+#include <string>
+#include <toolbox/exception.h>
 
 
 
-tb::App* tb::App::instance(0);
-tb::Prefs<unsigned>
-	tb::App::logLevel("--logLevel", 1, 0, tb::CommonPrefs::nosave);
+namespace TB {
+	Exception::Exception(const Exception& e) {
+		char* message((char*)malloc(strlen(e.message)));
+		strcpy(message, e.message);
+	};
+	Exception::Exception(const char* m, const char* p, unsigned l) {
+		std::string mm;
+		if (p) {
+			mm += p;
+			mm += " : " + std::to_string(l);
+		}
+		mm += " :: ";
+		mm += m;
+		message = (char*)malloc(mm.length());
+		strcpy(message, mm.c_str());
+	}
+	Exception::~Exception() {
+		if (message) {
+			free(message);
+		};
+	}
 
-int main(int argc, char** argv) {
-	tb::CommonPrefs::Keeper k(
-		argc,
-		(const char**)argv,
-		tb::App::instance->Name());
-	return tb::App::instance->Main((uint)argc + k, (const char**)argv + k);
+	PosixException::PosixException(const char* path, unsigned line)
+		: Exception(strerror(errno), path, line) {}
 }

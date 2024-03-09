@@ -17,13 +17,13 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <toolbox/time.h>
+#include <tb/time.h>
 
 #include <time.h>
 
 
 
-namespace TB {
+namespace tb {
 	void nsec::Update() {
 		timespec ts;
 		clock_gettime(CLOCK_BOOTTIME, &ts);
