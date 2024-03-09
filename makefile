@@ -138,6 +138,7 @@ ifeq ($(suffix $(target)),.a)
 	ar rc $@ $(objs)
 else
 	@echo " LD $@"
+	@mkdir -p $(TARGETDIR)
 	gcc -o $(TARGETDIR)/$(target) $(objs) $(EXLIBS)
 endif
 
