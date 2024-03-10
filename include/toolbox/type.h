@@ -1,5 +1,5 @@
 /***** 基本型のクラスとシノニム
- * Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2021, 2023 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -79,12 +79,14 @@ namespace TB {
 }
 
 
-using u16 = __uint16_t;
-using i16 = __int16_t;
-using u32 = __uint32_t;
-using i32 = __int32_t;
-using u64 = __uint64_t;
-using i64 = __int64_t;
+using u8 = uint8_t;
+using i8 = int8_t;
+using u16 = uint16_t;
+using i16 = int16_t;
+using u32 = uint32_t;
+using i32 = int32_t;
+using u64 = uint64_t;
+using i64 = int64_t;
 using u128 = __uint128_t;
 using i128 = __int128_t;
 using f32 = float;

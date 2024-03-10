@@ -66,7 +66,6 @@ namespace tb {
 		return false;
 	}
 
-
 	/** 構築子
 	 */
 	Path::Path(const String& r, const char* p) : String(StatPath(r, p)) {}
@@ -85,6 +84,4 @@ namespace tb {
 		}
 		return b;
 	}
-
-
 }

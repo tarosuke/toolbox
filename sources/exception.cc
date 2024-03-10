@@ -16,13 +16,35 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#pragma once
+#include <stdlib.h>
+#include <string.h>
+#include <string>
+#include <toolbox/exception.h>
 
 
 
-namespace TB{
-	class Exception{
-	public:
-		virtual operator const char*(){ return ""; };
+namespace TB {
+	Exception::Exception(const Exception& e) {
+		char* message((char*)malloc(strlen(e.message)));
+		strcpy(message, e.message);
 	};
+	Exception::Exception(const char* m, const char* p, unsigned l) {
+		std::string mm;
+		if (p) {
+			mm += p;
+			mm += " : " + std::to_string(l);
+		}
+		mm += " :: ";
+		mm += m;
+		message = (char*)malloc(mm.length());
+		strcpy(message, mm.c_str());
+	}
+	Exception::~Exception() {
+		if (message) {
+			free(message);
+		};
+	}
+
+	PosixException::PosixException(const char* path, unsigned line)
+		: Exception(strerror(errno), path, line) {}
 }

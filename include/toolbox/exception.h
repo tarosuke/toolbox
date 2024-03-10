@@ -1,5 +1,5 @@
-/********************************************************** 3D -> ThreeD -> TD
- *  Copyright (C) 2021 tarosuke<webmaster@tarosuke.net>
+/***** 例外
+ *  Copyright (C) 2021, 2023 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,15 +18,28 @@
  */
 #pragma once
 
-#include <stdexcept>
 
 
+namespace TB {
+	struct Exception {
+		Exception() : message(0){};
+		Exception(const Exception& e);
+		Exception(const char* message, const char* path = 0, unsigned line = 0);
+		~Exception();
+		operator const char*() { return message ? message : ""; };
 
-#define _THROW_ARG(f, l, c) f ":" #l ":: fail: Posit failed - " #c
-#define THROW_ARG(f, l, c) _THROW_ARG(f, l, c)
-#define THROW throw THROW_ARG(__FILE__, __LINE__, )
+	protected:
+		char* message;
+	};
 
-#define Posit(c)                                                               \
+	class PosixException : Exception {
+	public:
+		PosixException();
+		PosixException(const char* path = 0, unsigned line = 0);
+	};
+}
+
+#define Assume(c)                                                              \
 	if (!c) {                                                                  \
-		throw THROW_ARG(__FILE__, __LINE__, c);                                \
+		throw TB::Exception("fail: Assume failed - " #c, __FILE__, __LINE__);  \
 	}

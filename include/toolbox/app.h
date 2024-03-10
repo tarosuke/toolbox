@@ -18,7 +18,8 @@
  *
  ** アプリケーションのフレームワーク
  * Appを導出してMain、必要があればFinallyをoverride
- * 導出したクラスのインスタンスを作りApp::mainへmainの引数とともに与える
+ * 導出したクラスのインスタンスをstaticに作るとmainがセットで付いてきて
+ * App::Mainが呼ばれる
  */
 #pragma once
 
@@ -27,23 +28,32 @@
 
 
 
-namespace TB{
+namespace TB {
 
-	class App{
+	class App {
 		App(const App&);
 		void operator=(const App&);
+
 	public:
-		App(){};
+		App() { instance = this; };
 		virtual ~App(){};
-		static int main(App& instance, int argc, const char* argv[]);
+		static int main(int argc, const char* argv[]);
 
 	protected:
-		static const char* projectName;
+		static std::string name;
 
 		virtual int Main() = 0;
 		virtual void Finally(){};
 
 	private:
+		static App* instance;
 		static Prefs<unsigned> logLevel;
+	};
+
+	/** Mainの時点でインスタンスを作れない場合
+	 * これをインスタンス化するとstaticなT::StaticMainが呼ばれる
+	 */
+	template <class T> struct StaticApp : App {
+		int Main() final { return T::StaticMain(); };
 	};
 }
