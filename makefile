@@ -68,16 +68,18 @@ endif
 
 vpath %.o $(TARGETDIR)
 
+absPath := 2>&1 | sed -e "s@^\(sources\|include\)@$(CURDIR)/\1@"
+
 
 $(TARGETDIR)/%.o : %.cc $(MAKEFILE)
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
-	@LANG=C $(CC) $(CCOPTS) -c -o $@ $<
+	@LANG=C $(CC) $(CCOPTS) -c -o $@ $< $(absPath)
 
 $(TARGETDIR)/%.o : %.c $(MAKEFILE)
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
-	@LANG=C ${CC} $(COPTS) -c -o $@ $<
+	@LANG=C ${CC} $(COPTS) -c -o $@ $< $(absPath)
 
 $(TARGETDIR)/%.o : %.glsl $(MAKEFILE)
 	@echo " OBJCOPY $@"
@@ -88,13 +90,13 @@ $(TARGETDIR)/%.dep : %.cc $(MAKEFILE)
 	@echo " CPP $@"
 	@mkdir -p $(dir $@)
 	@echo -n $(dir $@) > $@
-	@$(CPP) $(CCOPTS) -MM $< >> $@
+	@$(CPP) $(CCOPTS) -MM $< >> $@ $(absPath)
 
 $(TARGETDIR)/%.dep : %.c $(MAKEFILE)
 	@echo " CPP $@"
 	@echo -n $(dir $@) > $@
 	@mkdir -p $(dir $@)
-	@$(CPP) $(COPTS) -MM $< >> $@
+	@$(CPP) $(COPTS) -MM $< >> $@ $(absPath)
 
 # Vulkan shaders
 .PRECIOUS: $(addprefix $(TARGETDIR)/, $(spvs))
