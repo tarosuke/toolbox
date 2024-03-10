@@ -1,15 +1,15 @@
-#################################################################### $(ME)
+##################################################################### makefile
 # 1. ソースを勝手に探して依存関係ファイルを作成
-# 2. ターゲット情報を拾って、なければディレクトリ名を使う
+# 2. 隣のディレクトリにincludeがあればコンパイル時に-Iオプションに追加
+# 3. 隣のディレクトリの$(TARGETDIR)/*.aをリンク対象に追加
+# 4. target.makeで指定されない限りターゲット名はカレントディレクトリ名
+# 5. ターゲット名の末尾が.aならスタティックライブラリ、でなければ実行形式を生成
 
 .PHONY : clean test RELEASE DEBUG COVERAGE
 
 
 
 ############################################################# TARGET & OPTIONS
-
-ME := $(MAKEFILE_LIST)
-MAKECMDGOALS ?= RELEASE
 
 ifeq ($(MAKECMDGOALS), RELEASE)
 TARGETDIR := RELEASE
@@ -19,16 +19,14 @@ ifeq ($(MAKECMDGOALS), COVERAGE)
 TARGETDIR := COVERAGE
 COPTS += -g -coverage
 endif
-ifeq ($(MAKECMDGOALS), DEBUG)
+ifndef TARGETDIR
 TARGETDIR := DEBUG
 COPTS += -O0 -g3
 endif
 
-TARGETDIR ?= DEBUG
-COPTS += -O0 -g3
-
 
 COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
+CPOTS += $(addprefix -I, $(wildcard ../*/include))
 CCOPTS += $(COPTS) -std=c++20
 
 EXLIBS := -lstdc++ -lm
@@ -38,26 +36,12 @@ EXLIBS := -lstdc++ -lm
 target ?= $(notdir $(PWD))
 
 
-# targetがlibtoolbox.aでない場合の定義
-TOOLBOXDIR?=$(shell if [ -f toolbox/makefile ]; then echo toolbox; else echo ../toolbox; fi)
-ifneq ($(target),libtoolbox.a)
-COPTS += -I$(TOOLBOXDIR)/include
-$(TARGETDIR)/$(target): $(TOOLBOXDIR)/$(TARGETDIR)/libtoolbox.a
-$(TOOLBOXDIR)/$(TARGETDIR)/libtoolbox.a :
-	make -j -C $(TOOLBOXDIR) $(TARGETDIR)
-EXLIBS += -L$(TOOLBOXDIR)/$(TARGETDIR) -ltoolbox
-endif
+# このmakefileの場所を推定
+MAKEFILE := $(shell if [ -f toolbox/makefile ]; then echo toolbox/makefile; else echo ../toolbox/makefile; fi)
 
 
 
 ############################################################ FILE RECOGNITIONS
-
-subProjects:=$(dir $(wildcard */makefile */Makefile))
-subIncludes:=$(addsuffix include, $(addprefix -I, $(subProjects)))
-subLibraries:=$(wildcard */$(TARGETDIR)/*.a)
-
-COPTS += $(subIncludes)
-
 
 suffixes := %.c %.cc %.glsl
 
@@ -68,12 +52,12 @@ spvs := $(addsuffix .spv, $(ssrcs))
 mods := $(basename $(srcs) $(spvs))
 objs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(mods)))
 deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
-subs := $(dir $(wildcard */makefile))
 
 # 試験用設定
 testTarget = $(addprefix $(TARGETDIR)/, $(basename $(foreach s, $(suffix $(suffixes)), $(wildcard $(1)/*$(s)))))
 tmods:= $(call testTarget,tests)
 -include $(wildcard tests/*.make)
+
 
 
 ################################################################# COMMON RULES
@@ -85,28 +69,28 @@ endif
 vpath %.o $(TARGETDIR)
 
 
-$(TARGETDIR)/%.o : %.cc $(TOOLBOXDIR)/makefile
+$(TARGETDIR)/%.o : %.cc $(MAKEFILE)
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
 	@LANG=C $(CC) $(CCOPTS) -c -o $@ $<
 
-$(TARGETDIR)/%.o : %.c $(TOOLBOXDIR)/makefile
+$(TARGETDIR)/%.o : %.c $(MAKEFILE)
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
 	@LANG=C ${CC} $(COPTS) -c -o $@ $<
 
-$(TARGETDIR)/%.o : %.glsl $(TOOLBOXDIR)/makefile
+$(TARGETDIR)/%.o : %.glsl $(MAKEFILE)
 	@echo " OBJCOPY $@"
 	@mkdir -p $(dir $@)
 	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
 
-$(TARGETDIR)/%.dep : %.cc $(TOOLBOXDIR)/makefile
+$(TARGETDIR)/%.dep : %.cc $(MAKEFILE)
 	@echo " CPP $@"
 	@mkdir -p $(dir $@)
 	@echo -n $(dir $@) > $@
 	@$(CPP) $(CCOPTS) -MM $< >> $@
 
-$(TARGETDIR)/%.dep : %.c $(TOOLBOXDIR)/makefile
+$(TARGETDIR)/%.dep : %.c $(MAKEFILE)
 	@echo " CPP $@"
 	@echo -n $(dir $@) > $@
 	@mkdir -p $(dir $@)
@@ -115,15 +99,15 @@ $(TARGETDIR)/%.dep : %.c $(TOOLBOXDIR)/makefile
 # Vulkan shaders
 .PRECIOUS: $(addprefix $(TARGETDIR)/, $(spvs))
 
-$(TARGETDIR)/%.frag.spv : %.frag $(TOOLBOXDIR)/makefile
+$(TARGETDIR)/%.frag.spv : %.frag $(MAKEFILE)
 	@echo " GLSLC $@"
 	@glslc $< -o $@
 
-$(TARGETDIR)/%.vert.spv : %.vert $(TOOLBOXDIR)/makefile
+$(TARGETDIR)/%.vert.spv : %.vert $(MAKEFILE)
 	@echo " GLSLC $@"
 	@glslc $< -o $@
 
-$(TARGETDIR)/%.o : $(TARGETDIR)/%.spv $(ME)
+$(TARGETDIR)/%.o : $(TARGETDIR)/%.spv $(MAKEFILE)
 	@echo " OBJCOPY $@"
 	@mkdir -p $(dir $@)
 	@objcopy -I binary -O elf64-x86-64 -B i386 $< $@
@@ -132,14 +116,14 @@ $(TARGETDIR)/%.o : $(TARGETDIR)/%.spv $(ME)
 
 ############################################################### RULES & TARGET
 
-$(TARGETDIR)/$(target): $(TOOLBOXDIR)/makefile $(objs)
+$(TARGETDIR)/$(target): $(MAKEFILE) $(objs)
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
 	ar rc $@ $(objs)
 else
 	@echo " LD $@"
 	@mkdir -p $(TARGETDIR)
-	gcc -o $(TARGETDIR)/$(target) $(objs) $(EXLIBS)
+	gcc -o $(TARGETDIR)/$(target) $(objs) $(wildcard ../*/$(TARGETDIR)/*.a) $(EXLIBS)
 endif
 
 clean:
@@ -156,9 +140,9 @@ $(TARGETDIR)/tests/%.test : $(TARGETDIR)/tests/%
 .PRECIOUS: $(tmods)
 test: $(addsuffix .test, $(tmods))
 
-RELEASE: RELEASE/$(target)
+RELEASE: RELEASE/$(target) test
 
-DEBUG: DEBUG/$(target)
+DEBUG: DEBUG/$(target) test
 
 COVERAGE: EXLIBS += -lgcov
 COVERAGE: COVERAGE/$(target) test
