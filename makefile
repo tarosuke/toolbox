@@ -25,8 +25,7 @@ COPTS += -O0 -g3
 endif
 
 
-COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
-CPOTS += $(addprefix -I, $(wildcard ../*/include))
+COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude $(addprefix -I, $(wildcard ../*/include))
 CCOPTS += $(COPTS) -std=c++20
 
 EXLIBS := -lstdc++ -lm
@@ -90,13 +89,13 @@ $(TARGETDIR)/%.dep : %.cc $(MAKEFILE)
 	@echo " CPP $@"
 	@mkdir -p $(dir $@)
 	@echo -n $(dir $@) > $@
-	@$(CPP) $(CCOPTS) -MM $< >> $@ $(absPath)
+	@$(CPP) $(CCOPTS) -MM $< >> $@
 
 $(TARGETDIR)/%.dep : %.c $(MAKEFILE)
 	@echo " CPP $@"
 	@echo -n $(dir $@) > $@
 	@mkdir -p $(dir $@)
-	@$(CPP) $(COPTS) -MM $< >> $@ $(absPath)
+	@$(CPP) $(COPTS) -MM $< >> $@
 
 # Vulkan shaders
 .PRECIOUS: $(addprefix $(TARGETDIR)/, $(spvs))
