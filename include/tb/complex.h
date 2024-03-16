@@ -101,9 +101,13 @@ namespace tb {
 			if constexpr (D == 2) {
 				return a[0] * a[0] + a[1] * a[1];
 			} else if constexpr (D == 4) {
-				return a[0] * a[0] + a[1] * a[1] + a[2] + a[2] + a[3] * a[3];
+				return a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3];
 			}
-			return 0;
+			T r(0.0);
+			for (unsigned n(0); n < D; ++n) {
+				r += a[n] * a[n];
+			}
+			return r;
 		};
 		T Norm() const { return sqrt(Norm2()); };
 		void Normalize() { *this /= Norm(); };
@@ -143,7 +147,7 @@ namespace tb {
 			} else {
 				static_assert(
 					fail<T>,
-					"複素数の乗算は2, 4要素のみ(8, 15要素は未実装)");
+					"複素数の乗算は2, 4要素のみ(8, 16要素は未実装)");
 			}
 		};
 
@@ -155,9 +159,6 @@ namespace tb {
 				a[n] = o[n - 1];
 			}
 		};
-		operator ::tb::Vector<D - 1, T, ER>() { // ベクタの生成
-			return ::tb::Vector<D - 1, T, ER>(a, 1);
-		};
 		Complex operator~() const { // 共役を返す
 			Complex r;
 			r.a[0] = a[0];
@@ -168,15 +169,15 @@ namespace tb {
 		};
 		::tb::Vector<D - 1, T, ER>
 		Rotate(const ::tb::Vector<D - 1, T, ER>& v) const {
-			auto r(::tb::Vector<D - 1, T, ER>(*this * Complex(v) * ~*this));
+			auto r(*this * Complex(v) * ~*this);
 			r.Normalize();
-			return r;
+			return Vector<D - 1, T, ER>(r.a, 1);
 		};
 		::tb::Vector<D - 1, T, ER>
 		ReverseRotate(const ::tb::Vector<D - 1, T, ER>& v) const {
-			auto r(::tb::Vector<D - 1, T, ER>(~*this * Complex(v) * *this));
+			auto r(~*this * Complex(v) * *this);
 			r.Normalize();
-			return r;
+			return Vector<D - 1, T, ER>(r.a, 1);
 		};
 
 	private:

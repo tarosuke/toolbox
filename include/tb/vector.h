@@ -39,24 +39,17 @@ namespace tb {
 				*const_cast<T*>(&a[n]) = o;
 			}
 		};
-		template <unsigned E> Vector(const T (&o)[E], unsigned offset = 0) {
+		Vector(const T (&o)[D]) : a{o} {};
+		template <typename... A> Vector(T t, A... a) : a{t, a...} {};
+
+		Vector(const T (&o)[D + 1], unsigned offset) {
 			for (uint n(0); n < D; ++n) {
-				*const_cast<T*>(&a[n]) = o[n + E - D];
+				a[n] = o[n + offset];
 			}
 		};
 
-
-		template <unsigned E> const Vector& operator=(const T (&o)[E]) {
-			for (uint n(0); n < D; ++n) {
-				a[n] = o[n];
-			}
-		};
-		template <unsigned E> const Vector& operator=(const Vector<E, T>& o) {
-			return *this = o.arr;
-		};
-
-		operator T*() { return a; };
-		operator const T*() const { return a; };
+		operator auto &() { return a; };
+		operator const auto &() const { return a; };
 
 
 		// 比較(実数の場合誤差が一定以下なら同値とする)
@@ -78,32 +71,32 @@ namespace tb {
 
 		///// 四則演算
 		Vector operator+(const Vector& o) const {
-			T r[D]{};
+			Vector r;
 			for (uint n(0); n < D; ++n) {
-				r[n] = a[n] + o.a[n];
+				r.a[n] = a[n] + o.a[n];
 			}
-			return Vector(r);
+			return r;
 		};
 		Vector operator-(const Vector& o) const {
-			T r[D];
+			Vector r;
 			for (uint n(0); n < D; ++n) {
-				r[n] = a[n] - o.a[n];
+				r.a[n] = a[n] - o.a[n];
 			}
-			return Vector(r);
+			return r;
 		};
 		Vector operator*(T o) const {
-			T r[D];
+			Vector r;
 			for (uint n(0); n < D; ++n) {
-				r[n] = a[n] * o;
+				r.a[n] = a[n] * o;
 			}
-			return Vector(r);
+			return r;
 		};
 		Vector operator/(T o) const {
-			T r[D];
+			Vector r;
 			for (uint n(0); n < D; ++n) {
-				r[n] = a[n] / o;
+				r.a[n] = a[n] / o;
 			}
-			return Vector(r);
+			return r;
 		}
 
 		const Vector& operator+=(const Vector& o) {
@@ -154,10 +147,10 @@ namespace tb {
 		};
 
 		Vector Cross(const Vector& o) const {
-			return tb::Vector<3, T>((const T[D]){
+			return Vector<3, T>(
 				a[1] * o.a[2] - a[2] * o.a[1],
 				a[2] * o.a[0] - a[0] * o.a[2],
-				a[0] * o.a[1] - a[1] * o.a[0]});
+				a[0] * o.a[1] - a[1] * o.a[0]);
 		};
 
 	private:

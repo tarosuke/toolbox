@@ -150,7 +150,8 @@ $(TARGETDIR)/tests/% : $(TARGETDIR)/tests/%.o $(TARGETDIR)/$(target)
 	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS) $(subLibraries)
 
 $(TARGETDIR)/tests/%.test : $(TARGETDIR)/tests/%
-	$< $(absPath)
+	@echo $<
+	@$< $(absPath)
 
 
 .PRECIOUS: $(tmods)
