@@ -47,7 +47,7 @@ template <> tb::String::String(const int& o) { Append(o); }
 
 int main() {
 
-	tb::Complex<4, int> a((const int[4]){1, 2, 3, 4});
+	tb::Complex<4, int> a(1, 2, 3, 4);
 
 	assertEQ(a[0], 1);
 	assertEQ(a[1], 2);
@@ -57,8 +57,8 @@ int main() {
 	assertEQ(a.Norm2(), 30);
 	assertEQ(a.Norm(), 5);
 
-	const tb::Complex<4, int> b((const int[4]){4, 8, 12, 16});
-	const tb::Complex<4, int> c((const int[4]){2, 4, 6, 8});
+	const tb::Complex<4, int> b(4, 8, 12, 16);
+	const tb::Complex<4, int> c(2, 4, 6, 8);
 
 	a *= 4;
 	assertEQ(a, b);

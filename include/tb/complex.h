@@ -33,12 +33,7 @@ namespace tb {
 			}
 		};
 		Complex(const Complex&) = default;
-
-		Complex(const T (&o)[D]) {
-			for (uint n(0); n < D; ++n) {
-				*const_cast<T*>(&a[n]) = o[n];
-			}
-		};
+		Complex(const T (&o)[D]) : a{o} {};
 
 		// 各軸の回転角で初期化
 		Complex(const T axis[D - 1], T ratio) {
@@ -65,6 +60,8 @@ namespace tb {
 				a[0] = 1.0;
 			}
 		};
+
+		template <typename... A> Complex(T t, A... a) : a{t, a...} {};
 
 		template <unsigned E> const Complex& operator=(const T (&o)[E]) {
 			for (uint n(0); n < D; ++n) {
