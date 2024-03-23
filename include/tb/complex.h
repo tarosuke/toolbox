@@ -143,7 +143,7 @@ namespace tb {
 				return r;
 			} else {
 				static_assert(
-					fail<T>,
+					false,
 					"複素数の乗算は2, 4要素のみ(8, 16要素は未実装)");
 			}
 		};
