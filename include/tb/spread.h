@@ -18,41 +18,36 @@
  */
 #pragma once
 
+#include <tb/vector.h>
+
 
 
 namespace tb {
 
-	template <unsigned D, typename T> class Spread {
-	public:
-		// 型違い配列からコピー
-		template <typename U> const Spread& operator=(const U (&o)[D]) {
-			for (unsigned n(0); n < D; ++n) {
-				value[n] = (T)o[n];
-			}
-			return *this;
-		};
-		// 型違い、次元違い配列からコピー
-		template <unsigned E, typename U>
-		const Spread& operator=(const U (&o)[E]) {
-			for (unsigned n(0); n < D; ++n) {
-				value[n] = n < E ? (T)o[n] : 0;
-			}
-			return *this;
-		};
+	template <unsigned D, typename T> struct Spread {
+		// NOTE:Rect他で区別できなくなるのでVectorから継承してはいけない
+		Spread() : a{0, 0} {};
+		Spread(const Vector<D, T>& o) : a(o){};
+		template <typename... A> Spread(T t, A... a) : a{t, a...} {};
 
-		// コピーコンストラクタ
-		template <unsigned E, typename U> Spread(const Spread<E, U>& o) {
-			*this = o;
+		Spread& operator=(const Spread& o) {
+			for (unsigned n(0); n < D; ++n) {
+				a[n] = o[n];
+			}
 		};
-		template <unsigned E, typename U> Spread(const U (&o)[E]) { *this = o; }
+		Spread& operator=(const Vector<D, T>& o) {
+			for (unsigned n(0); n < D; ++n) {
+				a[n] = o[n];
+			}
+		};
 
 		// 配列として取り出す
-		operator T*() { return value; };
-		operator const T*() const { return value; }
+		operator auto &() { return a; };
+		operator const auto &() { return a; };
 
 		// 演算
 		void operator*=(T t) {
-			for (auto& e : value) {
+			for (auto& e : a) {
 				e *= t;
 			}
 		};
@@ -62,7 +57,7 @@ namespace tb {
 			return r;
 		};
 		void operator/=(T t) {
-			for (auto& e : value) {
+			for (auto& e : a) {
 				e /= t;
 			}
 		};
@@ -72,8 +67,8 @@ namespace tb {
 			return r;
 		};
 		operator bool() {
-			for (auto& e : value) {
-				if (e == 0) {
+			for (auto& e : a) {
+				if (e <= 0) {
 					return false;
 				}
 			}
@@ -81,6 +76,6 @@ namespace tb {
 		};
 
 	private:
-		T value[D];
+		T a[D];
 	};
 }
