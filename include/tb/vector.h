@@ -147,10 +147,16 @@ namespace tb {
 		};
 
 		Vector Cross(const Vector& o) const {
-			return Vector<3, T>(
-				a[1] * o.a[2] - a[2] * o.a[1],
-				a[2] * o.a[0] - a[0] * o.a[2],
-				a[0] * o.a[1] - a[1] * o.a[0]);
+			if constexpr (D == 3) {
+				return Vector<3, T>(
+					a[1] * o.a[2] - a[2] * o.a[1],
+					a[2] * o.a[0] - a[0] * o.a[2],
+					a[0] * o.a[1] - a[1] * o.a[0]);
+			} else if constexpr (D == 7) {
+				static_assert(false, "その次元数のクロス積は未実装");
+			} else {
+				static_assert(false, "その次元数のクロス積は定義できない");
+			}
 		};
 
 	private:
