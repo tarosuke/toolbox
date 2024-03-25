@@ -41,9 +41,14 @@ namespace tb {
 			}
 		};
 
-		// 配列として取り出す
+		// 配列としてアクセス
 		operator auto &() { return a; };
-		operator const auto &() { return a; };
+		operator const auto &() const { return a; };
+		T& operator[](unsigned n) { return a[n]; };
+		const T& operator[](unsigned n) const { return a[n]; };
+
+		operator Vector<D, T>() { return Vector<D, T>(a); };
+		operator const Vector<D, T>() const { return Vector<D, T>(a); };
 
 		// 演算
 		void operator*=(T t) {
@@ -66,9 +71,18 @@ namespace tb {
 			r /= t;
 			return r;
 		};
-		operator bool() {
+
+		operator bool() const {
 			for (auto& e : a) {
 				if (e <= 0) {
+					return false;
+				}
+			}
+			return true;
+		};
+		bool operator==(const Spread& o) const {
+			for (unsigned n(0); n < D; ++n) {
+				if (a[n] != o.a[n]) {
 					return false;
 				}
 			}

@@ -33,20 +33,22 @@ namespace tb {
 			}
 		};
 		Vector(const Vector&) = default;
-
+		template <typename... A> Vector(T t, A... a) : a{t, a...} {};
 		Vector(T o) {
 			for (uint n(0); n < D; ++n) {
 				*const_cast<T*>(&a[n]) = o;
 			}
 		};
-		Vector(const T (&o)[D]) : a{o} {};
+		Vector(const T (&o)[D]) {
+			for (unsigned n(0); n < D; ++n) {
+				a[n] = o[n];
+			}
+		};
 		Vector(const T (&o)[D + 1], unsigned offset) {
 			for (uint n(0); n < D; ++n) {
 				a[n] = o[n + offset];
 			}
 		};
-
-		template <typename... A> Vector(T t, A... a) : a{t, a...} {};
 
 		operator auto &() { return a; };
 		operator const auto &() const { return a; };

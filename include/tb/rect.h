@@ -25,109 +25,118 @@
 
 namespace tb {
 
-	template <unsigned D, typename T> class Rect {
-	public:
+	template <unsigned D, typename T> struct Rect {
 		Rect(){};
+		Rect(const Vector<D, T>& a, const Vector<D, T>& b)
+			: left(Less(a, b)), right(More(a, b)){};
+		Rect(const Vector<D, T>& p, const Spread<D, T>& s) : Rect(p, p + s){};
+		Rect(const Spread<D, T>& s) {
+			for (unsigned n(0); n < D; ++n) {
+				left[n] = 0;
+				right[n] = s[n];
+			}
+		};
 
-		// コンストラクタ
-		template <unsigned E, typename U>
-		Rect(const Vector<E, U>& a, const Vector<E, U>& b)
-			: points((const Vector<D, T>[]){Less(a, b), More(a, b)}){};
-		template <unsigned E, typename U>
-		Rect(const Vector<E, U>& p, const Spread<E, U>& s)
-			: Rect(p, p + Vector<D, T>({s[0], s[1]})){};
-
-		// コピー
-		template <unsigned E, typename U>
-		const Rect& operator=(const Rect<E, U>& o) {
-			points[0] = o.points[0];
-			points[1] = o.points[1];
+		Rect& operator=(const Rect&) = default;
+		template <typename U> const Rect& operator=(const Rect<D, U>& o) {
+			left = (T)o.left;
+			right = (T)o.right;
 		};
 
 
 		void Clear() {
-			points[0].Clear();
-			points[1].Clear();
+			left.Clear();
+			right.Clear();
 		};
-		void operator|=(const Rect& t) {
-			// check volume
-			if (!t.HaveVolume()) {
-				// no volume to append
-				return;
+		Rect& operator|=(const Rect& t) {
+			if (!t) {
+				// tが空なので何もしない
+				return *this;
+			} else if (!*this) {
+				// *thisが空なのでtに置き換える
+				*this = t;
+				return *this;
 			}
-			if (!HaveVolume()) {
-				// copy t
-				points[0] = t.points[0];
-				points[1] = t.points[1];
-				return;
-			}
-			// append volume
-			points[0] = Less(points[0], t.points[0]);
-			points[1] = More(points[1], t.points[1]);
+			// cどちらも空ではないので合成
+			const Vector<D, T> lp(Less(left, t.left));
+			const Vector<D, T> mp(Wore(right, t.right));
+			left = lp;
+			right = mp;
+			return *this;
 		};
 		Rect operator|(const Rect& t) {
-			Rect r(*this);
-			r |= t;
-			return r;
+			if (!t) {
+				// tが空なので*thisのコピー
+				return *this;
+			} else if (!*this) {
+				// *thisが空なのでtのコピー
+				return t;
+			}
+			// cどちらも空ではないので合成
+			return Rect(Less(*this, t), Wore(*this, t));
 		};
-		void operator&=(const Rect& t) {
-			points[0] = More(points[0], t.points[0]);
-			points[1] = Less(points[1], t.points[1]);
+		Rect& operator&=(const Rect& t) {
+			if (!t || !*this) {
+				// どちらかが空
+				Clear();
+				return *this;
+			}
+			left = More(left, t.left);
+			right = Less(right, t.right);
+			return *this;
 		};
 		Rect operator&(const Rect& t) const {
-			Rect r(*this);
-			r &= t;
-			return r;
-		};
-		T operator&&(const Rect& t) const {
-			const Vector<D, T> lt(More(points[0], t.points[0]));
-			const Vector<D, T> rb(Less(points[1], t.points[1]));
-			T v(0);
-			for (unsigned n(0); n < D; ++n) {
-				const T a(lt[n]);
-				const T b(rb[n]);
-				if (b <= a) {
-					return 0;
-				}
-				v += b - a;
+			if (!t || !*this) {
+				// どちらかが空
+				return Rect();
 			}
-			return v;
+			return Rect(More(left, t.left), Less(right, t.right));
 		};
-		const T* Left() const { return points[0]; };
-		const T* Right() const { return points[1]; };
+
+		bool operator&&(const Vector<D, T>& o) const {
+			return !!this && left[0] <= o[0] && left[1] <= o[1] &&
+				   o[0] < right[0] && o[1] < right[1];
+		};
+		bool operator&&(const Rect<D, T>& o) const { return *this & o; };
+
+		const Vector<D, T>& Left() const { return left; };
+		const Vector<D, T>& Right() const { return right; };
 		Rect operator+(const Vector<D, T>& t) const {
-			return Rect(points[0] + t, points[1] + t);
+			return Rect(left + t, right + t);
 		};
 		Rect operator-(const Vector<D, T>& t) const {
-			return Rect(points[0] - t, points[1] - t);
+			return Rect(left - t, right - t);
 		};
-		void operator-=(const Vector<D, T>& t) {
-			points[0] -= t;
-			points[1] -= t;
+		Rect& operator+=(const Vector<D, T>& t) {
+			left += t;
+			right += t;
+			return *this;
 		};
-		void operator*=(T m) {
-			points[0] *= m;
-			points[1] *= m;
+		Rect& operator-=(const Vector<D, T>& t) {
+			left -= t;
+			right -= t;
+			return *this;
 		};
-		Rect operator*(T m) { return Rect{points[0] * m, points[1] * m}; };
+		Rect& operator*=(T m) {
+			left *= m;
+			right *= m;
+			return *this;
+		};
+		Rect operator*(T m) { return Rect{left * m, right * m}; };
 		operator bool() const {
 			for (unsigned n(0); n < D; ++n) {
-				if (points[0][n] == points[1][n]) {
+				if (right[n] <= left[n]) {
 					return false;
 				}
 			}
 			return true;
 		};
-		operator T() const {
-			T v(1);
-			for (unsigned n(0); n < D; ++n) {
-				v *= points[1][n] - points[0][n];
-			}
-			return v;
-		};
+		operator Vector<D, T>&() { return left; };
+		operator Spread<D, T>() { return Spread<D, T>(right - left); };
 
 	private:
-		Vector<D, T> points[2]; // keep points[0] lesser value
+		Vector<D, T> left; // keep left lesser value
+		Vector<D, T> right;
 		static Vector<D, T> Less(const Vector<D, T>& a, const Vector<D, T>& b) {
 			T v[D];
 			for (unsigned n(0); n < D; ++n) {
@@ -145,15 +154,6 @@ namespace tb {
 				v[n] = aa < bb ? bb : aa;
 			}
 			return Vector<D, T>(v);
-		};
-		bool HaveVolume() const {
-			for (unsigned n(0); n < D; ++n) {
-				if (points[1][n] <= points[0][n]) {
-					// no volume
-					return false;
-				}
-			}
-			return true;
 		};
 	};
 }
