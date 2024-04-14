@@ -18,7 +18,9 @@
  */
 #pragma once
 
+#include <algorithm>
 #include <limits>
+#include <tb/spread.h>
 #include <tb/types.h>
 #include <type_traits>
 
@@ -26,94 +28,86 @@
 
 namespace tb {
 
-	template <typename T> struct Pixel {
-		static constexpr T max = std::numeric_limits<T>::max();
+	/***** 変換やらのための画素データ
+	 */
+	template <typename T> struct Pixel {};
 
-		Pixel(T v = 0) : arr{v, v, v, v} {};
+	template <> struct Pixel<tb::u8> {
+		Pixel(tb::u32 c) : color(c){};
+		Pixel(tb::u8 a, tb::u8 r, tb::u8 g, tb::u8 b)
+			: color(
+				  ((tb::u32)a << 24) | ((tb::u32)r << 16) | ((tb::u32)g << 8) |
+				  (tb::u32)b){};
+		Pixel(const float (&c)[4]) : color(F2u(c)){};
+		Pixel(const tb::u8 (&c)[4]) : color(A2u(c)){};
+		operator const tb::u32&() { return color; };
 
-		// Pixel(tb::u32 wc) // W:Tの4倍サイズの符号なし整数
-		// 	: arr{(tb::u32)(wc >> (3 * sizeof(T) / 8)),
-		// 		  (tb::u32)(wc >> (2 * sizeof(T) / 8)),
-		// 		  (tb::u32)(wc >> (1 * sizeof(T) / 8)),
-		// 		  (tb::u32)wc} {}
-		Pixel(const T (&iv)[4]) : arr{iv[0], iv[1], iv[2], iv[3]} {};
-		Pixel(T a, T b, T c, T d) : arr{a, b, c, d} {};
-
-		template <typename U> Pixel(T a, T b, T c, T d)
-			: arr{Limit(a), Limit(b), Limit(c), Limit(d)} {};
-		template <typename U> Pixel(const U (&o)[4])
-			: arr{Limit(o[0]), Limit(o[1]), Limit(o[2]), Limit(o[3])} {};
-
-		// 異なる型のPixel変換
-		template <typename U> Pixel(const Pixel<U>& o) : Pixel(o.GetArray()){};
-
-		// 内部へのアクセス
-		const T (&GetArray() const)[4] { return arr; };
-
-		// 演算子
-		bool operator==(const Pixel& o) const {
-			return arr[0] == o.arr[0] && arr[1] == o.arr[1] &&
-				   arr[2] == o.arr[2] && arr[3] == o.arr[3];
+		template <typename U> tb::u8 operator[](U n) const {
+			return color >> (8 * n);
 		};
-		bool operator!=(const Pixel& o) const { return !(*this == o); };
-
-		template <typename U> Pixel<U> operator*(U v) const {
-			static_assert(
-				std::is_floating_point<U>::value,
-				"引数は実数でなければならない。");
-			Pixel<U> r(arr);
-			r *= v;
-			return r;
-		};
-		template <typename U> Pixel& operator*=(U u) {
-			static_assert(
-				std::is_floating_point<U>::value,
-				"引数は実数でなければならない。");
-			arr[0] *= u;
-			arr[1] *= u;
-			arr[2] *= u;
-			arr[3] *= u;
-			return *this;
-		};
-		Pixel operator+(Pixel t) const {
-			return Pixel{
-				arr[0] + t.arr[0],
-				arr[1] + t.arr[1],
-				arr[2] + t.arr[2],
-				arr[3] + t.arr[3]};
-		};
-
-		T operator[](uint n) const { return arr[n]; };
+		bool operator==(const Pixel& t) const { return color == t.color; };
 
 	private:
-		T arr[4]; // 順番は知らない
-		template <typename U> static T Limit(U u) {
-			if constexpr (std::is_same_v<T, U>) {
-				// 同じ：そのまま
-				return u;
-			} else if constexpr (
-				std::is_unsigned_v<T> && std::is_unsigned_v<U>) {
-				// サイズの異なる整数間：最大サイズの整数でブレゼンハム
-				const u128 uu((u128)u * Pixel<T>::max / Pixel<U>::max);
-				return max < uu ? max : (T)uu;
-			} else if constexpr (
-				std::is_floating_point_v<T> && std::is_floating_point_v<U>) {
-				// 実数同士：範囲だけ補正
-				return u < (U)0 ? (U)0 : (U)1 < u ? 1 : u;
-			} else if constexpr (
-				std::is_unsigned_v<T> && std::is_floating_point_v<U>) {
-				// 実数から整数：maxをかけて範囲補正
-				const U vv(u * max);
-				return vv < 0 ? 0 : max < vv ? max : vv;
-			} else if constexpr (
-				// 整数から実数：0-1へ変換
-				std::is_floating_point_v<T> && std::is_unsigned_v<U>) {
-				return (T)u / Pixel<U>::max;
-			}
+		const tb::u32 color;
+
+		static tb::u32 F2p(float p) {
+			return std::clamp((tb::u32)p * 255, 0U, 255U);
+		};
+		static tb::u32 F2u(const float (&c)[4]) {
+			return (F2p(c[0]) << 24) | (F2p(c[1]) << 16) | (F2p(c[2]) << 8) |
+				   F2p(c[3]);
+		};
+		static tb::u32 A2u(const tb::u8 (&c)[4]) {
+			return ((tb::u32)c[0] << 24) | ((tb::u32)c[1] << 16) |
+				   ((tb::u32)c[2] << 8) | (tb::u32)c[3];
 		};
 	};
 
-	template <typename P = Pixel<u8>> struct Image {
+	template <> struct Pixel<float> {
+		Pixel(tb::u32 c)
+			: color{
+				  ((c >> 24) & 255) / 255.0f,
+				  ((c >> 16) & 255) / 255.0f,
+				  ((c >> 8) & 255) / 255.0f,
+				  (c & 255) / 255.0f} {};
+		Pixel(tb::u8 a, tb::u8 r, tb::u8 g, tb::u8 b)
+			: color{U2f(a), U2f(r), U2f(g), U2f(b)} {};
+		Pixel(float a, float r, float g, float b) : color{a, r, g, b} {};
+		Pixel(const float (&c)[4]) : color{c[0], c[1], c[2], c[3]} {};
+		Pixel(const tb::u8 (&c)[4])
+			: color{U2f(c[0]), U2f(c[1]), U2f(c[2]), U2f(c[3])} {};
+		operator tb::u32() const {
+			return ((*this)[0] << 24) | ((*this)[1] << 16) | ((*this)[2] << 8) |
+				   (*this)[3];
+		};
+		template <typename U> tb::u8 operator[](U n) const {
+			return (tb::u32)std::clamp(color[n] * 255.0f, 0.0f, 255.0f);
+		};
+		Pixel operator*(float t) {
+			return Pixel{
+				color[0] * t,
+				color[1] * t,
+				color[2] * t,
+				color[3] * t};
+		};
+		Pixel operator+(Pixel t) {
+			return Pixel{
+				color[0] + t.color[0],
+				color[1] + t.color[1],
+				color[2] + t.color[2],
+				color[3] + t.color[3]};
+		};
+
+	private:
+		const float color[4];
+		static float U2f(tb::u8 c) { return c / 255.0f; };
+	};
+
+
+	/***** 画像インターフェイス
+	 * 既存の画像データを取り出して扱うためのクラス
+	 */
+	template <typename P> struct Image {
 		Image() = delete;
 		Image(const Image&) = delete;
 		void operator=(const Image&) = delete;
@@ -123,13 +117,10 @@ namespace tb {
 		 * になっている。二次元配列のようにアクセスする。
 		 * NOTE:補間機能を使う場合はheightを指定すること。
 		 */
-		Image(
-			void* buffer,
-			unsigned width,
-			unsigned height = 0,
-			bool transparent = false)
-			: buffer((P*)buffer), width(width), height(height),
-			  transparent(transparent){};
+		Image(void* buffer, unsigned width, unsigned height = 0)
+			: buffer((P*)buffer), spread((int)width, (int)height){};
+		Image(void* buffer, const Spread<2, int>& spread)
+			: buffer((P*)buffer), spread(spread){};
 
 		/***** 一行分の画像
 		 */
@@ -152,13 +143,16 @@ namespace tb {
 			Lines(P* const h[2], const float (&r)[2], unsigned width)
 				: heads{h[0], h[1]}, ratios{r[0], r[1]}, width(width){};
 
-			template <typename U> const Pixel<float> operator[](U x) {
+			template <typename U> const Pixel<float> operator[](U x) const {
 				const auto hr(HeadsAndRatios(x, width));
-				return Pixel<U>(
-					heads[0][hr.heads[0]] * (ratios[0] * hr.ratios[0]) +
-					heads[1][hr.heads[0]] * (ratios[1] * hr.ratios[0]) +
-					heads[0][hr.heads[1]] * (ratios[0] * hr.ratios[1]) +
-					heads[1][hr.heads[1]] * (ratios[1] * hr.ratios[1]));
+				return Pixel<float>(heads[0][hr.heads[0]]) *
+						   (ratios[0] * hr.ratios[0]) +
+					   Pixel<float>(heads[1][hr.heads[0]]) *
+						   (ratios[1] * hr.ratios[0]) +
+					   Pixel<float>(heads[0][hr.heads[1]]) *
+						   (ratios[0] * hr.ratios[1]) +
+					   Pixel<float>(heads[1][hr.heads[1]]) *
+						   (ratios[1] * hr.ratios[1]);
 			};
 
 		private:
@@ -167,30 +161,28 @@ namespace tb {
 			const unsigned width;
 		};
 
-		Line operator[](unsigned y) { return Line(buffer + width * y); };
+		Line operator[](unsigned y) { return Line(buffer + spread[0] * y); };
 		Lines operator[](f32 y) {
-			const auto hr(HeadsAndRatios(y, height));
+			const auto hr(HeadsAndRatios(y, spread[1]));
 			P* const h[2]{
-				buffer + hr.heads[0] * width,
-				buffer + hr.heads[1] * width};
+				buffer + hr.heads[0] * spread[0],
+				buffer + hr.heads[1] * spread[0]};
 
-			return Lines(h, hr.ratios, width);
+			return Lines(h, hr.ratios, spread[0]);
 		};
 
 
 		// 直接アクセスのための情報取得
 		void* Data() { return (void*)buffer; };
 		const void* Data() const { return (void*)buffer; };
-		unsigned Width() const { return width; };
-		unsigned Height() const { return height; };
-		unsigned Step() const { return width; };
+		unsigned Width() const { return spread[0]; };
+		unsigned Height() const { return spread[1]; };
+		unsigned Step() const { return spread[0]; };
 		bool Transparent() const { return Transparent; };
 
 	private:
 		P* const buffer;
-		const unsigned width;
-		const unsigned height;
-		const bool transparent;
+		const Spread<2, int> spread;
 
 		struct HR {
 			unsigned heads[2]; // 配列の添字

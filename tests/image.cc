@@ -35,10 +35,10 @@ int main() {
 
 
 	const tb::Pixel<tb::u8> p(image[0.5f][0.5f]);
-
+	const tb::Pixel<tb::u8> q(hb);
 
 	assertEQ(p, hb);
-
+	assertEQ(q, hb);
 
 	return 0;
 }
