@@ -15,14 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- *
- ** アプリケーションのフレームワーク
- * Appを導出して必要に応じてMain, Nameをoverride。
- * Nameをoverrideすると設定ファイル名を変更できる(デフォルトは実行ファイル名)
- * 導出したクラスを適当なところにstaticに確保すると初期設定のあとに
- * Init, Mainが呼ばれ、Mainを終了するとFinallyが呼ばれてから終了する。
- * NOTE:構築子が呼ばれるのはstaticインスタンス構築時なので何もできない
- * NOTE:Appが参照された時点でmainはtb::App側で確保されたものがリンクされる
  */
 #pragma once
 
@@ -35,6 +27,14 @@ extern "C" {
 
 namespace tb {
 
+	/** アプリケーションのフレームワーク
+	 * Appを導出して必要に応じてMain, Nameをoverride。
+	 * Nameをoverrideすると設定ファイル名を変更できる
+	 * 導出したクラスを適当なところにstaticに確保すると初期設定のあとに
+	 * Init, Mainが呼ばれ、Mainを終了するとFinallyが呼ばれてから終了する。
+	 * NOTE:構築子が呼ばれるのはstaticインスタンス構築時なので何もできない
+	 * NOTE:Appが参照された時点でmainはtb::App側で確保されたものがリンクされる
+	 */
 	struct App {
 		friend int ::main(int, char**);
 		App(const App&) = delete;
