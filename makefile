@@ -11,6 +11,10 @@
 
 ############################################################# TARGET & OPTIONS
 
+ifndef buildRoot
+buildRoot := $(CURDIR)
+endif
+
 ifeq ($(MAKECMDGOALS), RELEASE)
 TARGETDIR := RELEASE
 COPTS += -O3 -DNDEBUG -Wno-stringop-overflow
@@ -26,7 +30,7 @@ endif
 
 
 COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
-CPOTS += $(addprefix -I, $(wildcard ../*/include))
+COPTS += $(addprefix -I, $(wildcard $(buildRoot)/*/include))
 CCOPTS += $(COPTS) -std=c++20
 
 EXLIBS := -lstdc++ -lm
