@@ -35,6 +35,7 @@ CCOPTS += $(COPTS) -std=c++20
 
 EXLIBS := -lstdc++ -lm
 # -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lvulkan -lgdbm
+EXLIBS += $(addprefix -L, $(wildcard */$(TARGETDIR)))
 
 -include target.make
 target ?= $(notdir $(PWD))
@@ -125,11 +126,11 @@ $(TARGETDIR)/%.o : $(TARGETDIR)/%.spv $(MAKEFILE)
 $(TARGETDIR)/$(target): $(MAKEFILE) $(objs)
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
-	ar rc $@ $(objs)
+	@ar rc $@ $(objs)
 else
 	@echo " LD $@"
 	@mkdir -p $(TARGETDIR)
-	gcc -o $(TARGETDIR)/$(target) $(objs) $(wildcard ../*/$(TARGETDIR)/*.a) $(EXLIBS)
+	@gcc -o $(TARGETDIR)/$(target) $(objs) $(wildcard ../*/$(TARGETDIR)/*.a) $(EXLIBS)
 endif
 
 clean:
