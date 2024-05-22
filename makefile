@@ -1,19 +1,18 @@
 ##################################################################### makefile
-# 1. ソースを勝手に探して依存関係ファイルを作成
-# 2. 隣のディレクトリにincludeがあればコンパイル時に-Iオプションに追加
-# 3. 隣のディレクトリの$(TARGETDIR)/*.aをリンク対象に追加
-# 4. target.makeで指定されない限りターゲット名はカレントディレクトリ名
-# 5. ターゲット名の末尾が.aならスタティックライブラリ、でなければ実行形式を生成
+# * ソースを勝手に探して依存関係ファイルを作成
+# * ソースはsources、ヘッダはinclude、試験コードはtestに
+# * subsystem/*の下にも同様な構造があると想定
+# * subsystem/*/includeが-Iオプションに追加される(これはsubsystem以下も)
+# * subsystem/*以下はリンク前に*これ*自体が再帰的に適用されてmakeされる
+# * target.makeで指定されない限りターゲット名はカレントディレクトリ名
+# * ターゲット名の末尾が.aならスタティックライブラリ、でなければ実行形式を生成
+# * RELEASE DEBUG COVERAGEターゲットでは同名のビルドディレクトリが掘られる
 
 .PHONY : clean test RELEASE DEBUG COVERAGE
 
 
 
 ############################################################# TARGET & OPTIONS
-
-ifndef buildRoot
-buildRoot := $(CURDIR)
-endif
 
 ifeq ($(MAKECMDGOALS), RELEASE)
 TARGETDIR := RELEASE
@@ -30,7 +29,6 @@ endif
 
 
 COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
-COPTS += $(addprefix -I, $(wildcard $(buildRoot)/*/include))
 CCOPTS += $(COPTS) -std=c++20
 
 EXLIBS := -lstdc++ -lm
@@ -50,13 +48,22 @@ MAKEFILE := $(shell if [ -f toolbox/makefile ]; then echo toolbox/makefile; else
 
 suffixes := %.c %.cc %.glsl
 
-files:= $(shell find sources tests -type f)
+files:= $(shell mkdir -p sources tests; find sources tests -type f)
 srcs := $(filter $(suffixes), $(files))
 ssrcs:= $(filter %.frag %.vert, $(files))
 spvs := $(addsuffix .spv, $(ssrcs))
 mods := $(basename $(srcs) $(spvs))
 objs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(mods)))
 deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
+
+
+# subsystems
+subsystems:= $(wildcard subsystems/*)
+EXINCS ?= $(addprefix -I$(CURDIR)/, $(addsuffix /include, $(subsystems)))
+MAKEFILEPATH?= $(CURDIR)/$(firstword $(MAKEFILE_LIST))
+export EXINCS
+export MAKEFILEPATH
+
 
 # 試験用設定
 testTarget = $(addprefix $(TARGETDIR)/, $(basename $(foreach s, $(suffix $(suffixes)), $(wildcard $(1)/*$(s)))))
@@ -79,12 +86,12 @@ absPath := 2>&1 | sed -e "s@^\(sources\|include\)@$(CURDIR)/\1@"
 $(TARGETDIR)/%.o : %.cc $(MAKEFILE)
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
-	@LANG=C $(CC) $(CCOPTS) -c -o $@ $< $(absPath)
+	@LANG=C $(CC) $(CCOPTS) $(EXINCS) -c -o $@ $< $(absPath)
 
 $(TARGETDIR)/%.o : %.c $(MAKEFILE)
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
-	@LANG=C ${CC} $(COPTS) -c -o $@ $< $(absPath)
+	@LANG=C ${CC} $(COPTS) $(EXINCS) -c -o $@ $< $(absPath)
 
 $(TARGETDIR)/%.o : %.glsl $(MAKEFILE)
 	@echo " OBJCOPY $@"
@@ -123,18 +130,20 @@ $(TARGETDIR)/%.o : $(TARGETDIR)/%.spv $(MAKEFILE)
 
 ############################################################### RULES & TARGET
 
-$(TARGETDIR)/$(target): $(MAKEFILE) $(objs)
+$(TARGETDIR)/$(target): $(objs) $(MAKEFILE)
 ifeq ($(suffix $(target)),.a)
 	@echo " AR $@"
 	@ar rc $@ $(objs)
 else
+	@for s in $(subsystems); do make -rj -f $(MAKEFILEPATH) -C $$s $(MAKECMDGOALS); done
 	@echo " LD $@"
 	@mkdir -p $(TARGETDIR)
-	@gcc -o $(TARGETDIR)/$(target) $(objs) $(wildcard ../*/$(TARGETDIR)/*.a) $(EXLIBS)
+	gcc -o $(TARGETDIR)/$(target) $(objs) $(wildcard $(addsuffix /$(TARGETDIR)/*.a, $(subsystems))) $(EXLIBS)
 endif
 
 clean:
 	rm -rf RELEASE DEBUG COVERAGE *.gcov
+	@for s in $(subsystems); do make -rj -f $(MAKEFILEPATH) -C $$s $(MAKECMDGOALS); done
 
 $(TARGETDIR)/tests/% : $(TARGETDIR)/tests/%.o $(TARGETDIR)/$(target)
 	@echo " LD $@"
@@ -147,9 +156,9 @@ $(TARGETDIR)/tests/%.test : $(TARGETDIR)/tests/%
 .PRECIOUS: $(tmods)
 test: $(addsuffix .test, $(tmods))
 
-RELEASE: RELEASE/$(target) test
+RELEASE: RELEASE/$(target)
 
-DEBUG: DEBUG/$(target) test
+DEBUG: DEBUG/$(target)
 
 COVERAGE: EXLIBS += -lgcov
 COVERAGE: COVERAGE/$(target) test
