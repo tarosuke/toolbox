@@ -123,8 +123,13 @@ namespace tb {
 		 * になっている。二次元配列のようにアクセスする。
 		 * NOTE:補間機能を使う場合はheightを指定すること。
 		 */
-		Image(void* buffer, unsigned width, unsigned height = 0)
-			: buffer((P*)buffer), width(width), height(height){};
+		Image(
+			void* buffer,
+			unsigned width,
+			unsigned height = 0,
+			bool transparent = false)
+			: buffer((P*)buffer), width(width), height(height),
+			  transparent(transparent){};
 
 		/***** 一行分の画像
 		 */
@@ -172,10 +177,20 @@ namespace tb {
 			return Lines(h, hr.ratios, width);
 		};
 
+
+		// 直接アクセスのための情報取得
+		void* Data() { return (void*)buffer; };
+		const void* Data() const { return (void*)buffer; };
+		unsigned Width() const { return width; };
+		unsigned Height() const { return height; };
+		unsigned Step() const { return width; };
+		bool Transparent() const { return Transparent; };
+
 	private:
 		P* const buffer;
 		const unsigned width;
 		const unsigned height;
+		const bool transparent;
 
 		struct HR {
 			unsigned heads[2]; // 配列の添字
