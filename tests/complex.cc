@@ -47,18 +47,18 @@ template <> tb::String::String(const int& o) { Append(o); }
 
 int main() {
 
-	tb::Complex<4, int> a((const int[4]){1, 2, 3, 4});
+	tb::Complex<4, int> a(1, 2, 3, 4);
 
 	assertEQ(a[0], 1);
 	assertEQ(a[1], 2);
 	assertEQ(a[2], 3);
 	assertEQ(a[3], 4);
 
-	assertEQ(a.Norm2(), 27);
+	assertEQ(a.Norm2(), 30);
 	assertEQ(a.Norm(), 5);
 
-	const tb::Complex<4, int> b((const int[4]){4, 8, 12, 16});
-	const tb::Complex<4, int> c((const int[4]){2, 4, 6, 8});
+	const tb::Complex<4, int> b(4, 8, 12, 16);
+	const tb::Complex<4, int> c(2, 4, 6, 8);
 
 	a *= 4;
 	assertEQ(a, b);
@@ -66,11 +66,11 @@ int main() {
 	assertEQ(a, c);
 
 	const tb::Complex<4, float, true> d((const float[3]){1, 0, 0}, 1.0f);
-	const tb::Vector<3, float, true> e((const float[3]){0, 1, 0});
-	const tb::Vector<3, float, true> f((const float[3]){0, cosf(1), sinf(1)});
-	const tb::Vector<3, float, true> g((const float[3]){0, 0, 1});
-	const tb::Vector<3, float, true> h((const float[3]){1, 0, 0});
-	const tb::Vector<3, float, true> i((const float[3]){0, -sinf(1), cosf(1)});
+	const tb::Vector<3, float, true> e(0.0f, 1.0f, 0.0f);
+	const tb::Vector<3, float, true> f(0.0f, cosf(1.0f), sinf(1.0f));
+	const tb::Vector<3, float, true> g(0.0f, 0.0f, 1.0f);
+	const tb::Vector<3, float, true> h(1.0f, 0.0f, 0.0f);
+	const tb::Vector<3, float, true> i(0.0f, -sinf(1.0f), cosf(1.0f));
 	assertEQ(d.Rotate(e), f);
 	assertEQ(d.Rotate(g), i);
 	assertEQ(d.Rotate(h), h);

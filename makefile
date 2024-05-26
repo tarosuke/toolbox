@@ -80,7 +80,7 @@ endif
 
 vpath %.o $(TARGETDIR)
 
-absPath := 2>&1 | sed -e "s@^\(sources\|include\)@$(CURDIR)/\1@"
+absPath := 2>&1 | sed -e "s@^\(sources\|include\|tests\)@$(CURDIR)/\1@"
 
 
 $(TARGETDIR)/%.o : %.cc $(MAKEFILE)
@@ -150,7 +150,8 @@ $(TARGETDIR)/tests/% : $(TARGETDIR)/tests/%.o $(TARGETDIR)/$(target)
 	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS) $(subLibraries)
 
 $(TARGETDIR)/tests/%.test : $(TARGETDIR)/tests/%
-	$<
+	@echo $<
+	@$< $(absPath)
 
 
 .PRECIOUS: $(tmods)
