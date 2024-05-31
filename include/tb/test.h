@@ -53,3 +53,27 @@
 				(const char*)tb::String(B));                                   \
 		}                                                                      \
 	}
+#define assertNear(a, b)                                                       \
+	{                                                                          \
+		if (0.001 < fabsf(a - b)) {                                            \
+			fprintf(                                                           \
+				stderr,                                                        \
+				"%s:%u:: info: %s != %s.\n",                                   \
+				__FILE__,                                                      \
+				__LINE__,                                                      \
+				(const char*)tb::String(a),                                    \
+				(const char*)tb::String(b));                                   \
+		}                                                                      \
+	}
+#define assertNearNorm(a, b)                                                   \
+	{                                                                          \
+		if (0.001 < (a - b).Norm()) {                                          \
+			fprintf(                                                           \
+				stderr,                                                        \
+				"%s:%u:: info: %s != %s.\n",                                   \
+				__FILE__,                                                      \
+				__LINE__,                                                      \
+				(const char*)tb::String(a),                                    \
+				(const char*)tb::String(b));                                   \
+		}                                                                      \
+	}
