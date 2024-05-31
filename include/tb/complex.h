@@ -24,7 +24,7 @@
 
 namespace tb {
 
-	template <unsigned D, typename T, bool ER = false> struct Complex {
+	template <unsigned D, typename T> struct Complex {
 		///// 構築子、代入、[]
 		Complex() { // Identityに初期化
 			a[0] = 1;
@@ -79,14 +79,8 @@ namespace tb {
 		// 比較
 		bool operator==(const Complex& o) const {
 			for (uint n(0); n < D; ++n) {
-				if constexpr (ER && std::is_floating_point<T>::value) {
-					if (0.000001 < abs(a[n] - o.a[n])) {
-						return false;
-					}
-				} else {
-					if (a[n] != o.a[n]) {
-						return false;
-					}
+				if (a[n] != o.a[n]) {
+					return false;
 				}
 			}
 			return true;
@@ -150,7 +144,7 @@ namespace tb {
 
 
 		// 回転ほか
-		Complex(const ::tb::Vector<D - 1, T, ER>& o) { // ベクタからの生成
+		Complex(const ::tb::Vector<D - 1, T>& o) { // ベクタからの生成
 			a[0] = 0;
 			for (unsigned n(1); n < D; ++n) {
 				a[n] = o[n - 1];
@@ -164,17 +158,16 @@ namespace tb {
 			}
 			return r;
 		};
-		::tb::Vector<D - 1, T, ER>
-		Rotate(const ::tb::Vector<D - 1, T, ER>& v) const {
+		::tb::Vector<D - 1, T> Rotate(const ::tb::Vector<D - 1, T>& v) const {
 			auto r(*this * Complex(v) * ~*this);
 			r.Normalize();
-			return Vector<D - 1, T, ER>(r.a, 1);
+			return Vector<D - 1, T>(r.a, 1);
 		};
-		::tb::Vector<D - 1, T, ER>
-		ReverseRotate(const ::tb::Vector<D - 1, T, ER>& v) const {
+		::tb::Vector<D - 1, T>
+		ReverseRotate(const ::tb::Vector<D - 1, T>& v) const {
 			auto r(~*this * Complex(v) * *this);
 			r.Normalize();
-			return Vector<D - 1, T, ER>(r.a, 1);
+			return Vector<D - 1, T>(r.a, 1);
 		};
 
 	private:

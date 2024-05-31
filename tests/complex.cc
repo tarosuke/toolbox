@@ -18,7 +18,7 @@ template <> tb::String::String(const tb::Complex<4, int>& c) {
 	push_back(',');
 	Append(c[3]);
 }
-template <> tb::String::String(const tb::Complex<4, float, true>& c) {
+template <> tb::String::String(const tb::Complex<4, float>& c) {
 	Append(c[0]);
 	push_back(':');
 	Append(c[1]);
@@ -34,7 +34,7 @@ template <> tb::String::String(const tb::Vector<3, int>& c) {
 	push_back(',');
 	Append(c[2]);
 }
-template <> tb::String::String(const tb::Vector<3, float, true>& c) {
+template <> tb::String::String(const tb::Vector<3, float>& c) {
 	Append(c[0]);
 	push_back(',');
 	Append(c[1]);
@@ -65,15 +65,15 @@ int main() {
 	a /= 2;
 	assertEQ(a, c);
 
-	const tb::Complex<4, float, true> d((const float[3]){1, 0, 0}, 1.0f);
-	const tb::Vector<3, float, true> e(0.0f, 1.0f, 0.0f);
-	const tb::Vector<3, float, true> f(0.0f, cosf(1.0f), sinf(1.0f));
-	const tb::Vector<3, float, true> g(0.0f, 0.0f, 1.0f);
-	const tb::Vector<3, float, true> h(1.0f, 0.0f, 0.0f);
-	const tb::Vector<3, float, true> i(0.0f, -sinf(1.0f), cosf(1.0f));
-	assertEQ(d.Rotate(e), f);
-	assertEQ(d.Rotate(g), i);
-	assertEQ(d.Rotate(h), h);
+	const tb::Complex<4, float> d((const float[3]){1, 0, 0}, 1.0f);
+	const tb::Vector<3, float> e(0.0f, 1.0f, 0.0f);
+	const tb::Vector<3, float> f(0.0f, cosf(1.0f), sinf(1.0f));
+	const tb::Vector<3, float> g(0.0f, 0.0f, 1.0f);
+	const tb::Vector<3, float> h(1.0f, 0.0f, 0.0f);
+	const tb::Vector<3, float> i(0.0f, -sinf(1.0f), cosf(1.0f));
+	assertNearNorm(d.Rotate(e), f);
+	assertNearNorm(d.Rotate(g), i);
+	assertNearNorm(d.Rotate(h), h);
 
 
 	return 0;

@@ -24,7 +24,7 @@
 
 
 namespace tb {
-	template <uint D, typename T, bool ER = false> struct Vector {
+	template <uint D, typename T> struct Vector {
 		///// 構築子、代入、[]
 		Vector() { Clear(); };
 		void Clear() {
@@ -57,14 +57,8 @@ namespace tb {
 		// 比較(実数の場合誤差が一定以下なら同値とする)
 		bool operator==(const Vector& o) const {
 			for (uint n(0); n < D; ++n) {
-				if constexpr (ER && std::is_floating_point<T>::value) {
-					if (0.000001 < abs(a[n] - o.a[n])) {
-						return false;
-					}
-				} else {
-					if (a[n] != o.a[n]) {
-						return false;
-					}
+				if (a[n] != o.a[n]) {
+					return false;
 				}
 			}
 			return true;
