@@ -24,8 +24,7 @@
 
 namespace tb {
 
-	template <unsigned COL, unsigned ROW, typename T, bool ER = false>
-	class Matrix {
+	template <unsigned COL, unsigned ROW, typename T> class Matrix {
 	public:
 		Matrix() = default;
 
@@ -61,14 +60,8 @@ namespace tb {
 		bool operator==(const Matrix& o) const {
 			for (unsigned r(0); r < ROW; ++r) {
 				for (unsigned c(0); c < COL; ++c) {
-					if constexpr (ER && std::is_floating_point<T>::value) {
-						if (0.000001 < abs(m[r][c] - o.m[r][c])) {
-							return false;
-						}
-					} else {
-						if (m[r][c] != o.m[r][c]) {
-							return false;
-						}
+					if (m[r][c] != o.m[r][c]) {
+						return false;
 					}
 				}
 			}
