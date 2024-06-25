@@ -31,8 +31,7 @@ endif
 COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
 CCOPTS += $(COPTS) -std=c++20
 
-EXLIBS := -lstdc++ -lm
-# -lopenvr_api -lX11 -lGL -lGLX -lGLEW -lcairo -ljpeg -lvulkan -lgdbm
+EXLIBS += -lstdc++ -lm
 EXLIBS += $(addprefix -L, $(wildcard */$(TARGETDIR)))
 
 -include target.make
@@ -138,7 +137,8 @@ else
 	@for s in $(subsystems); do make -rj -f $(MAKEFILEPATH) -C $$s $(MAKECMDGOALS); done
 	@echo " LD $@"
 	@mkdir -p $(TARGETDIR)
-	gcc -o $(TARGETDIR)/$(target) $(objs) $(wildcard $(addsuffix /$(TARGETDIR)/*.a, $(subsystems))) $(EXLIBS)
+	gcc -o $(TARGETDIR)/$(target) $(objs) $(shell echo $(addsuffix /$(TARGETDIR)/*.a, $(subsystems))) $(EXLIBS)
+# shellとかやってるのはwildcardがコマンド実行前に評価されるバグ故
 endif
 
 clean:
