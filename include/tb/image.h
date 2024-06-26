@@ -117,10 +117,18 @@ namespace tb {
 		 * になっている。二次元配列のようにアクセスする。
 		 * NOTE:補間機能を使う場合はheightを指定すること。
 		 */
-		Image(void* buffer, unsigned width, unsigned height = 0)
-			: buffer((P*)buffer), spread((int)width, (int)height){};
-		Image(void* buffer, const Spread<2, int>& spread)
-			: buffer((P*)buffer), spread(spread){};
+		Image(
+			void* buffer,
+			unsigned width,
+			unsigned height = 0,
+			bool transparent = false)
+			: buffer((P*)buffer), spread((int)width, (int)height),
+			  transparent(transparent){};
+		Image(
+			void* buffer,
+			const Spread<2, int>& spread,
+			bool transparent = false)
+			: buffer((P*)buffer), spread(spread), transparent(transparent){};
 
 		/***** 一行分の画像
 		 */
@@ -178,11 +186,12 @@ namespace tb {
 		unsigned Width() const { return spread[0]; };
 		unsigned Height() const { return spread[1]; };
 		unsigned Step() const { return spread[0]; };
-		bool Transparent() const { return Transparent; };
+		bool Transparent() const { return transparent; };
 
 	private:
 		P* const buffer;
 		const Spread<2, int> spread;
+		const bool transparent;
 
 		struct HR {
 			unsigned heads[2]; // 配列の添字
