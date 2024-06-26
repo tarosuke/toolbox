@@ -147,6 +147,9 @@ namespace tb {
 
 
 	// Integerみたいな抽象型がないばっかりにこんなことになっているksg
+	template <> String Prefs<bool>::Serialize() {
+		return String(body ? "true" : "false");
+	}
 	template <> String Prefs<i8>::Serialize() {
 		String r;
 		r.Append(body);
@@ -187,6 +190,15 @@ namespace tb {
 		r.Append(body);
 		return r;
 	}
+	// 誤差避けのためSerializeするときはメモリの形式そのままのダンプ
+	template <> String Prefs<float>::Serialize() {
+		String r("0x");
+		r.Append(*(u32*)&body);
+		return r;
+	}
+	template <> void Prefs<bool>::DeSerialize(const char* t) {
+		body = *t == 't' || *t == 'T' || *t == '1' || *t == 'y' || *t == 'Y';
+	}
 	template <> void Prefs<i8>::DeSerialize(const char* t) {
 		body = strtol(t, 0, 10);
 	}
@@ -210,6 +222,14 @@ namespace tb {
 	}
 	template <> void Prefs<u64>::DeSerialize(const char* t) {
 		body = strtoul(t, 0, 10);
+	}
+	// 0x始まりならダンプ形式
+	template <> void Prefs<float>::DeSerialize(const char* t) {
+		if (t[0] == '0' && t[1] == 'x') {
+			*(u32*)&body = strtoul(t + 2, 0, 16);
+		} else {
+			body = strtof(t, 0);
+		}
 	}
 
 
