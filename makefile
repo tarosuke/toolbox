@@ -36,6 +36,7 @@ EXLIBS += $(addprefix -L, $(wildcard */$(TARGETDIR)))
 
 -include target.make
 target ?= $(notdir $(CURDIR))
+libtarget:=$(basename $(target)).a
 
 
 # このmakefileの場所を推定
@@ -129,25 +130,28 @@ $(TARGETDIR)/%.o : $(TARGETDIR)/%.spv $(MAKEFILE)
 
 ############################################################### RULES & TARGET
 
-$(TARGETDIR)/$(target): $(objs) $(MAKEFILE)
-ifeq ($(suffix $(target)),.a)
+# ライブラリ(targetがライブラリでなくても試験にライブラリが必要)
+$(TARGETDIR)/$(libtarget): $(objs) $(MAKEFILE)
 	@echo " AR $@"
 	@ar rc $@ $(objs)
-else
+
+
+ifneq ($(suffix $(target)),.a)
+$(TARGETDIR)/$(target): $(objs) $(MAKEFILE)
 	@for s in $(subsystems); do make -rj -f $(MAKEFILEPATH) -C $$s $(MAKECMDGOALS); done
 	@echo " LD $@"
 	@mkdir -p $(TARGETDIR)
 	gcc -o $(TARGETDIR)/$(target) $(objs) $(shell echo $(addsuffix /$(TARGETDIR)/*.a, $(subsystems))) $(EXLIBS)
-# shellとかやってるのはwildcardがコマンド実行前に評価されるバグ故
+# shellとかやってるのはwildcardがコマンド実行前に評価されるgnu makeの妙な挙動故
 endif
 
 clean:
 	rm -rf RELEASE DEBUG COVERAGE *.gcov
 	@for s in $(subsystems); do make -rj -f $(MAKEFILEPATH) -C $$s $(MAKECMDGOALS); done
 
-$(TARGETDIR)/tests/% : $(TARGETDIR)/tests/%.o $(TARGETDIR)/$(target)
+$(TARGETDIR)/tests/% : $(TARGETDIR)/tests/%.o $(TARGETDIR)/$(target) $(TARGETDIR)/$(libtarget)
 	@echo " LD $@"
-	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS) $(subLibraries)
+	@gcc -o $@ $@.o $(TARGETDIR)/$(libtarget) -L$(TARGETDIR) -ltoolbox $(EXLIBS) $(subLibraries)
 
 $(TARGETDIR)/tests/%.test : $(TARGETDIR)/tests/%
 	@echo $<
