@@ -35,7 +35,7 @@ EXLIBS += -lstdc++ -lm
 EXLIBS += $(addprefix -L, $(wildcard */$(TARGETDIR)))
 
 -include target.make
-target ?= $(notdir $(PWD))
+target ?= $(notdir $(CURDIR))
 
 
 # このmakefileの場所を推定
