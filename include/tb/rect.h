@@ -59,7 +59,7 @@ namespace tb {
 			}
 			// cどちらも空ではないので合成
 			const Vector<D, T> lp(Less(left, t.left));
-			const Vector<D, T> mp(Wore(right, t.right));
+			const Vector<D, T> mp(More(right, t.right));
 			left = lp;
 			right = mp;
 			return *this;
@@ -73,7 +73,7 @@ namespace tb {
 				return t;
 			}
 			// cどちらも空ではないので合成
-			return Rect(Less(*this, t), Wore(*this, t));
+			return Rect(Less(*this, t), More(*this, t));
 		};
 		Rect& operator&=(const Rect& t) {
 			if (!t || !*this) {
