@@ -50,19 +50,27 @@ namespace tb {
 		Factory(const Factory&) = delete;
 		void operator=(const Factory&) = delete;
 
-		static T* Create() {
+		Factory() : next(start) { start = this; };
+
+		/***** Factoryにパラメタを渡すための空の構造体
+		 * 実際に何か渡すには継承して、受け取ったらダウンキャストする
+		 * NOTE: dynamic_castが0を返すのはassertで確認するレベルの明らかなバグ
+		 */
+		struct Param {
+			virtual ~Param(){};
+		};
+
+		static T* Create(const Param* p = 0) {
 			Match m;
 			for (Factory* f(start); f; f = (*f).next) {
-				m.Scored(f, f->Score());
+				m.Scored(f, f->Score(p));
 			}
-			return m ? m.matched->New() : 0;
+			return m ? m.matched->New(p) : 0;
 		}
 
 	protected:
-		Factory() : next(start) { start = this; };
-
-		virtual uint Score() { return 0; };
-		virtual T* New() { return 0; };
+		virtual uint Score(const Param*) { return 0; };
+		virtual T* New(const Param*) { return 0; };
 
 	private:
 		static Factory* start;

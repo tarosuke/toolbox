@@ -13,8 +13,8 @@ uint C::r(0);
 
 struct D : C {
 	struct F : tb::Factory<C> {
-		uint Score() override { return 1; };
-		D* New() override {
+		uint Score(const Param*) override { return 1; };
+		D* New(const Param*) override {
 			r = 1;
 			return 0;
 		};
@@ -22,8 +22,8 @@ struct D : C {
 };
 struct E : C {
 	struct F : tb::Factory<C> {
-		uint Score() override { return 2; };
-		E* New() override {
+		uint Score(const Param*) override { return 2; };
+		E* New(const Param*) override {
 			r = 2;
 			return 0;
 		};
