@@ -33,13 +33,14 @@ namespace tb {
 	template <typename T> struct Pixel {};
 
 	template <> struct Pixel<tb::u8> {
-		Pixel(tb::u32 c) : color(c){};
+		Pixel(tb::u32 c = 0) : color(c){};
 		Pixel(tb::u8 a, tb::u8 r, tb::u8 g, tb::u8 b)
 			: color(
 				  ((tb::u32)a << 24) | ((tb::u32)r << 16) | ((tb::u32)g << 8) |
 				  (tb::u32)b){};
 		Pixel(const float (&c)[4]) : color(F2u(c)){};
 		Pixel(const tb::u8 (&c)[4]) : color(A2u(c)){};
+		Pixel& operator=(const Pixel&) = default;
 		operator const tb::u32&() { return color; };
 
 		template <typename U> tb::u8 operator[](U n) const {
@@ -48,7 +49,7 @@ namespace tb {
 		bool operator==(const Pixel& t) const { return color == t.color; };
 
 	private:
-		const tb::u32 color;
+		tb::u32 color;
 
 		static tb::u32 F2p(float p) {
 			return std::clamp((tb::u32)p * 255, 0U, 255U);
@@ -99,7 +100,7 @@ namespace tb {
 		};
 
 	private:
-		const float color[4];
+		float color[4];
 		static float U2f(tb::u8 c) { return c / 255.0f; };
 	};
 
