@@ -47,7 +47,9 @@ MAKEFILE := $(shell if [ -f toolbox/makefile ]; then echo toolbox/makefile; else
 
 suffixes := %.c %.cc %.glsl
 
-files:= $(shell mkdir -p sources tests; find sources tests -type f)
+findFiles = $(shell mkdir -p $(1); find $(1) -type f)
+
+files:= $(call findFiles, sources)
 srcs := $(filter $(suffixes), $(files))
 ssrcs:= $(filter %.frag %.vert, $(files))
 spvs := $(addsuffix .spv, $(ssrcs))
@@ -65,8 +67,11 @@ export MAKEFILEPATH
 
 
 # 試験用設定
-testTarget = $(addprefix $(TARGETDIR)/, $(basename $(foreach s, $(suffix $(suffixes)), $(wildcard $(1)/*$(s)))))
-tmods:= $(call testTarget,tests)
+files:= $(call findFiles, test)
+tsrcs := $(filter $(suffixes), $(tfiles))
+tmods := $(basename $(tsrcs))
+tobjs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(tmods)))
+tdeps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(tmods)))
 -include $(wildcard tests/*.make)
 
 
