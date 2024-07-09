@@ -36,6 +36,7 @@ EXLIBS += $(addprefix -L, $(wildcard */$(TARGETDIR)))
 
 -include target.make
 target ?= $(notdir $(PWD))
+libtarget:=$(basename $(target)).a
 
 
 # このmakefileの場所を推定
@@ -67,7 +68,7 @@ export MAKEFILEPATH
 
 
 # 試験用設定
-files:= $(call findFiles, test)
+tfiles:= $(call findFiles, tests)
 tsrcs := $(filter $(suffixes), $(tfiles))
 tmods := $(basename $(tsrcs))
 tobjs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(tmods)))
@@ -134,11 +135,12 @@ $(TARGETDIR)/%.o : $(TARGETDIR)/%.spv $(MAKEFILE)
 
 ############################################################### RULES & TARGET
 
-$(TARGETDIR)/$(target): $(objs) $(MAKEFILE)
-ifeq ($(suffix $(target)),.a)
+$(TARGETDIR)/$(libtarget): $(objs) $(MAKEFILE)
 	@echo " AR $@"
 	@ar rc $@ $(objs)
-else
+
+ifneq ($(suffix $(target)),.a)
+$(TARGETDIR)/$(target): $(objs) $(MAKEFILE)
 	@for s in $(subsystems); do make -rj -f $(MAKEFILEPATH) -C $$s $(MAKECMDGOALS); done
 	@echo " LD $@"
 	@mkdir -p $(TARGETDIR)
@@ -150,17 +152,17 @@ clean:
 	rm -rf RELEASE DEBUG COVERAGE *.gcov
 	@for s in $(subsystems); do make -rj -f $(MAKEFILEPATH) -C $$s $(MAKECMDGOALS); done
 
-$(TARGETDIR)/tests/% : $(TARGETDIR)/tests/%.o $(TARGETDIR)/$(target)
+$(TARGETDIR)/tests/% : $(TARGETDIR)/tests/%.o $(TARGETDIR)/$(libtarget)
 	@echo " LD $@"
-	@gcc -o $@ $@.o -L$(TARGETDIR) -ltoolbox $(EXLIBS) $(subLibraries)
+	@gcc -o $@ $@.o $(TARGETDIR)/$(libtarget) $(subLibraries) $(EXLIBS)
 
 $(TARGETDIR)/tests/%.test : $(TARGETDIR)/tests/%
 	@echo $<
 	@$< $(absPath)
 
 
-.PRECIOUS: $(tmods)
-test: $(addsuffix .test, $(tmods))
+.PRECIOUS: $(addprefix $(TARGETDIR)/, $(tmods))
+test: $(addsuffix .test, $(addprefix $(TARGETDIR)/, $(tmods)))
 
 RELEASE: RELEASE/$(target)
 
