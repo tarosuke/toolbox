@@ -27,14 +27,19 @@
 
 #define assert(c)                                                              \
 	if (!(c)) {                                                                \
-		fprintf(stderr, "%s:%u:: info: %s.\n", __FILE__, __LINE__, #c);        \
+		fprintf(                                                               \
+			stderr,                                                            \
+			"%s:%u:: warning: assert %s failed.\n",                            \
+			__FILE__,                                                          \
+			__LINE__,                                                          \
+			#c);                                                               \
 	}
 #define assertEQ(A, B)                                                         \
 	{                                                                          \
-		if ((A) != (B)) {                                                      \
+		if (!((A) == (B))) {                                                   \
 			fprintf(                                                           \
 				stderr,                                                        \
-				"%s:%u:: info: %s != %s.\n",                                   \
+				"%s:%u:: warning: assert %s == %s failed.\n",                  \
 				__FILE__,                                                      \
 				__LINE__,                                                      \
 				(const char*)tb::String(A),                                    \
@@ -43,10 +48,10 @@
 	}
 #define assertNE(A, B)                                                         \
 	{                                                                          \
-		if ((A) == (B)) {                                                      \
+		if (!((A) != (B))) {                                                   \
 			fprintf(                                                           \
 				stderr,                                                        \
-				"%s:%u:: info: %s == %s\n",                                    \
+				"%s:%u:: warning: assert %s != %s failed.\n",                  \
 				__FILE__,                                                      \
 				__LINE__,                                                      \
 				(const char*)tb::String(A),                                    \
@@ -58,7 +63,7 @@
 		if (0.001 < fabsf(a - b)) {                                            \
 			fprintf(                                                           \
 				stderr,                                                        \
-				"%s:%u:: info: %s != %s.\n",                                   \
+				"%s:%u:: warning: assert %s == %s failed.\n",                  \
 				__FILE__,                                                      \
 				__LINE__,                                                      \
 				(const char*)tb::String(a),                                    \
@@ -70,7 +75,7 @@
 		if (0.001 < (a - b).Norm()) {                                          \
 			fprintf(                                                           \
 				stderr,                                                        \
-				"%s:%u:: info: %s != %s.\n",                                   \
+				"%s:%u:: warning: assert %s == %s failed.\n",                  \
 				__FILE__,                                                      \
 				__LINE__,                                                      \
 				(const char*)tb::String(a),                                    \
