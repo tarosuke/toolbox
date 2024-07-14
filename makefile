@@ -8,7 +8,7 @@
 # * ターゲット名の末尾が.aならスタティックライブラリ、でなければ実行形式を生成
 # * RELEASE DEBUG COVERAGEターゲットでは同名のビルドディレクトリが掘られる
 
-.PHONY : clean test RELEASE DEBUG COVERAGE
+.PHONY : clean test RELEASE DEBUG COVERAGE FULLTEST
 
 
 
@@ -68,7 +68,11 @@ export MAKEFILEPATH
 
 
 # 試験用設定
+ifeq ($(MAKECMDGOALS), FULLTEST)
 tfiles:= $(call findFiles, tests)
+else
+tfiles:= $(shell mkdir -p tests; find tests -maxdepth 1 -type f)
+endif
 tsrcs := $(filter $(suffixes), $(tfiles))
 tmods := $(basename $(tsrcs))
 tobjs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(tmods)))
@@ -144,7 +148,7 @@ $(TARGETDIR)/$(target): $(objs) $(MAKEFILE)
 	@for s in $(subsystems); do make -rj -f $(MAKEFILEPATH) -C $$s $(MAKECMDGOALS); done
 	@echo " LD $@"
 	@mkdir -p $(TARGETDIR)
-	gcc -o $(TARGETDIR)/$(target) $(objs) $(shell echo $(addsuffix /$(TARGETDIR)/*.a, $(subsystems))) $(EXLIBS)
+	@gcc -o $(TARGETDIR)/$(target) $(objs) $(shell echo $(addsuffix /$(TARGETDIR)/*.a, $(subsystems))) $(EXLIBS)
 # shellとかやってるのはwildcardがコマンド実行前に評価されるバグ故
 endif
 
@@ -163,10 +167,13 @@ $(TARGETDIR)/tests/%.test : $(TARGETDIR)/tests/%
 
 .PRECIOUS: $(addprefix $(TARGETDIR)/, $(tmods))
 test: $(addsuffix .test, $(addprefix $(TARGETDIR)/, $(tmods)))
+	@for s in $(subsystems); do make -rj -f $(MAKEFILEPATH) -C $$s $(MAKECMDGOALS); done
 
 RELEASE: RELEASE/$(target)
 
-DEBUG: DEBUG/$(target)
+DEBUG: DEBUG/$(target) test
+
+FULLTEST: test
 
 COVERAGE: EXLIBS += -lgcov
 COVERAGE: COVERAGE/$(target) test
