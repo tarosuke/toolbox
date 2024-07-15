@@ -35,12 +35,13 @@ EXLIBS += -lstdc++ -lm
 EXLIBS += $(addprefix -L, $(wildcard */$(TARGETDIR)))
 
 -include target.make
-target ?= $(notdir $(PWD))
+target ?= $(notdir $(CURDIR))
 libtarget:=$(basename $(target)).a
 
 
 # このmakefileの場所を推定
-MAKEFILE := $(shell if [ -f toolbox/makefile ]; then echo toolbox/makefile; else echo ../toolbox/makefile; fi)
+MAKEFILE ?= $(CURDIR)/$(firstword $(MAKEFILE_LIST))
+export MAKEFILE
 
 
 
@@ -62,16 +63,14 @@ deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
 # subsystems
 subsystems:= $(wildcard subsystems/*)
 EXINCS ?= $(addprefix -I$(CURDIR)/, $(addsuffix /include, $(subsystems)))
-MAKEFILEPATH?= $(CURDIR)/$(firstword $(MAKEFILE_LIST))
 export EXINCS
-export MAKEFILEPATH
 
 
 # 試験用設定
 ifeq ($(MAKECMDGOALS), FULLTEST)
 tfiles:= $(call findFiles, tests)
 else
-tfiles:= $(shell mkdir -p tests; find tests -maxdepth 1 -type f)
+tfiles:= $(wildcard tests/*)
 endif
 tsrcs := $(filter $(suffixes), $(tfiles))
 tmods := $(basename $(tsrcs))
@@ -139,22 +138,25 @@ $(TARGETDIR)/%.o : $(TARGETDIR)/%.spv $(MAKEFILE)
 
 ############################################################### RULES & TARGET
 
+.PHONY: SUBTARGETS
+SUBTARGETS:
+	@for s in $(subsystems); do make -rj -f $(MAKEFILE) -C $$s $(MAKECMDGOALS) || exit -1; done
+
+
 $(TARGETDIR)/$(libtarget): $(objs) $(MAKEFILE)
 	@echo " AR $@"
 	@ar rc $@ $(objs)
 
 ifneq ($(suffix $(target)),.a)
-$(TARGETDIR)/$(target): $(objs) $(MAKEFILE)
-	@for s in $(subsystems); do make -rj -f $(MAKEFILEPATH) -C $$s $(MAKECMDGOALS); done
+$(TARGETDIR)/$(target): $(objs) SUBTARGETS $(MAKEFILE)
 	@echo " LD $@"
 	@mkdir -p $(TARGETDIR)
 	@gcc -o $(TARGETDIR)/$(target) $(objs) $(shell echo $(addsuffix /$(TARGETDIR)/*.a, $(subsystems))) $(EXLIBS)
-# shellとかやってるのはwildcardがコマンド実行前に評価されるバグ故
+# shellとかやってるのはwildcardがコマンド実行前に評価される挙動故
 endif
 
-clean:
+clean: SUBTARGETS
 	rm -rf RELEASE DEBUG COVERAGE *.gcov
-	@for s in $(subsystems); do make -rj -f $(MAKEFILEPATH) -C $$s $(MAKECMDGOALS); done
 
 $(TARGETDIR)/tests/% : $(TARGETDIR)/tests/%.o $(TARGETDIR)/$(libtarget)
 	@echo " LD $@"
@@ -166,15 +168,15 @@ $(TARGETDIR)/tests/%.test : $(TARGETDIR)/tests/%
 
 
 .PRECIOUS: $(addprefix $(TARGETDIR)/, $(tmods))
-test: $(addsuffix .test, $(addprefix $(TARGETDIR)/, $(tmods)))
-	@for s in $(subsystems); do make -rj -f $(MAKEFILEPATH) -C $$s $(MAKECMDGOALS); done
 
-RELEASE: RELEASE/$(target)
+test: SUBTARGETS $(addsuffix .test, $(addprefix $(TARGETDIR)/, $(tmods)))
 
-DEBUG: DEBUG/$(target) test
+FULLTEST: SUBTARGETS test
 
-FULLTEST: test
+RELEASE: SUBTARGETS RELEASE/$(target)
+
+DEBUG: SUBTARGETS DEBUG/$(target)
 
 COVERAGE: EXLIBS += -lgcov
-COVERAGE: COVERAGE/$(target) test
+COVERAGE: SUBTARGETS COVERAGE/$(target) test
 	@lcov -c -d $(TARGETDIR) -o $(TARGETDIR)/lcov.info

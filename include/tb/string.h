@@ -30,10 +30,10 @@ namespace tb {
 		String() = default;
 
 		// std::stringへ丸投げして構築＆複製＆移動
-		String(const String& s) : ::std::string(s){};
-		String(String&& s) : ::std::string(s){};
-		String(const char* s) : ::std::string(s){};
-		String(char c) : ::std::string(1, c){};
+		String(const String& s) : ::std::string(s) {};
+		String(String&& s) : ::std::string(s) {};
+		String(const char* s) : ::std::string(s) {};
+		String(char c) : ::std::string(1, c) {};
 
 		String& operator=(const String& s) {
 			*(::std::string*)this = s;
