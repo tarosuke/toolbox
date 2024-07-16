@@ -1,5 +1,5 @@
 /*** 自動登録ファクトリ
- * Copyright (C) 2017,2017,2023 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2017,2017,2023,2024 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -37,6 +37,7 @@
  * のでどれが選択されるかはリンク順次第になる。
  *
  * NOTE:Factory<親クラス>::Createを呼ぶのはmainに入った後にすること
+ * NOTE:Score, Newの引数はCreateの引数と同じにすること(異なる方は呼ばれない)
  */
 #pragma once
 
@@ -57,10 +58,17 @@ namespace tb {
 		 * NOTE: dynamic_castが0を返すのはassertで確認するレベルの明らかなバグ
 		 */
 		struct Param {
-			virtual ~Param(){};
+			virtual ~Param() {};
 		};
 
-		static T* Create(const Param* p = 0) {
+		static T* Create() {
+			Match m;
+			for (Factory* f(start); f; f = (*f).next) {
+				m.Scored(f, f->Score());
+			}
+			return m ? m.matched->New() : 0;
+		}
+		static T* Create(const Param* p) {
 			Match m;
 			for (Factory* f(start); f; f = (*f).next) {
 				m.Scored(f, f->Score(p));
@@ -69,6 +77,15 @@ namespace tb {
 		}
 
 	protected:
+		// Scoreが返す値の目安
+		enum class Certitude : uint {
+			passiveMatch = 10, // 消極的一致
+			activeMatch = 20, // 種類は一致
+			uniqueMatch = 30, // 個別に一致
+		};
+
+		virtual uint Score() { return 0; };
+		virtual T* New() { return 0; };
 		virtual uint Score(const Param*) { return 0; };
 		virtual T* New(const Param*) { return 0; };
 
@@ -80,7 +97,7 @@ namespace tb {
 			uint score;
 			Factory* matched;
 			operator bool() { return matched && score; };
-			Match() : score(0), matched(0){};
+			Match() : score(0), matched(0) {};
 			void Scored(Factory* m, uint s) {
 				if (score < s) {
 					matched = m;

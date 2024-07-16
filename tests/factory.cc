@@ -13,8 +13,8 @@ uint C::r(0);
 
 struct D : C {
 	struct F : tb::Factory<C> {
-		uint Score(const Param*) override { return 1; };
-		D* New(const Param*) override {
+		uint Score() override { return (uint)Certitude::passiveMatch; };
+		D* New() override {
 			r = 1;
 			return 0;
 		};
@@ -22,8 +22,8 @@ struct D : C {
 };
 struct E : C {
 	struct F : tb::Factory<C> {
-		uint Score(const Param*) override { return 2; };
-		E* New(const Param*) override {
+		uint Score() override { return (uint)Certitude::activeMatch; };
+		E* New() override {
 			r = 2;
 			return 0;
 		};
