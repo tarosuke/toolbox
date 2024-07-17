@@ -15,29 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- *
- *
- * 下のようにして使う。
- * struct T : U{
- * 	...
- * 	struct V : tb::Factory<U>{
- * 		uint Score()override;
- * 		U* New()override{ return new T; };
- * 	};
- * 	static tb::Factory<U> factory;
- * };
- *
- * またどこかに以下を用意する。Uと同じソースがいいだろう。
- * tb::Factory<U>* tb::Factory<U>::start(0);
- *
- * さらに各クラス(T)のファクトリ(T::V)のインスタンスを関数外に用意する。
- *
- * Factory<U>::Createを呼ぶとT::Scoreにより適切なT::Newが選択されて呼ばれる。
- * なおScoreの戻り値が最大のものが選択される。同値の場合は先に呼ばれた方になる
- * のでどれが選択されるかはリンク順次第になる。
- *
- * NOTE:Factory<親クラス>::Createを呼ぶのはmainに入った後にすること
- * NOTE:Score, Newの引数はCreateの引数と同じにすること(異なる方は呼ばれない)
  */
 #pragma once
 
@@ -47,6 +24,28 @@
 
 namespace tb {
 
+	/***** 自動登録ファクトリ支援クラス
+	 * 抽象型をT、派生をUとすると、以下のように使う。
+	 * struct T{
+	 * 	...
+	 *	static tb::Factory* tb::Factory<T>::start; //-- ファクトリのスタック
+	 *	...
+	 * };
+	 * ------
+	 * struct U : T{
+	 * 	struct F : tb::Factory<TP{
+	 *		uint Score() override; //-- 評価のための関数
+	 *		T* New() override; //-- Sooreの戻り値が一番大きかったものが呼ばれる
+	 *	};
+	 *	...
+	 *	static F factory; //-- 構築子で自らをスタックに積む
+	 * };
+	 *
+	 * インスタンスを作るときは「tb::Factory<T>::Create();」
+	 *
+	 * NOTE:Factory<親クラス>::Createを呼ぶのはmainに入った後にすること
+	 * NOTE:Score, Newの引数はCreateの引数と同じにすること(異なる方は呼ばれない)
+	 */
 	template <class T> struct Factory {
 		Factory(const Factory&) = delete;
 		void operator=(const Factory&) = delete;
@@ -78,10 +77,10 @@ namespace tb {
 
 	protected:
 		// Scoreが返す値の目安
-		enum class Certitude : uint {
-			passiveMatch = 10, // 消極的一致
-			activeMatch = 20, // 種類は一致
-			uniqueMatch = 30, // 個別に一致
+		struct Certitude {
+			static constexpr uint passiveMatch = 10; // 消極的一致
+			static constexpr uint activeMatch = 20; // 種類は一致
+			static constexpr uint uniqueMatch = 30; // 個別に一致
 		};
 
 		virtual uint Score() { return 0; };
