@@ -33,13 +33,13 @@ namespace tb {
 	template <typename T> struct Pixel {};
 
 	template <> struct Pixel<tb::u8> {
-		Pixel(tb::u32 c = 0) : color(c){};
+		Pixel(tb::u32 c = 0) : color(c) {};
 		Pixel(tb::u8 a, tb::u8 r, tb::u8 g, tb::u8 b)
 			: color(
 				  ((tb::u32)a << 24) | ((tb::u32)r << 16) | ((tb::u32)g << 8) |
-				  (tb::u32)b){};
-		Pixel(const float (&c)[4]) : color(F2u(c)){};
-		Pixel(const tb::u8 (&c)[4]) : color(A2u(c)){};
+				  (tb::u32)b) {};
+		Pixel(const float (&c)[4]) : color(F2u(c)) {};
+		Pixel(const tb::u8 (&c)[4]) : color(A2u(c)) {};
 		Pixel& operator=(const Pixel&) = default;
 		operator const tb::u32&() { return color; };
 
@@ -119,24 +119,27 @@ namespace tb {
 		 * NOTE:補間機能を使う場合はheightを指定すること。
 		 */
 		Image(
-			void* buffer,
+			void* b,
 			unsigned width,
-			unsigned height = 0,
+			unsigned height,
+			unsigned stride,
 			bool transparent = false)
-			: buffer((P*)buffer), spread((int)width, (int)height),
-			  transparent(transparent){};
+			: buffer((P*)b), spread((int)width, (int)height), stride(stride),
+			  transparent(transparent) {};
 		Image(
 			void* buffer,
 			const Spread<2, int>& spread,
+			unsigned stride,
 			bool transparent = false)
-			: buffer((P*)buffer), spread(spread), transparent(transparent){};
+			: buffer((P*)buffer), spread(spread), stride(stride),
+			  transparent(transparent) {};
 
 		/***** 一行分の画像
 		 */
 		struct Line {
 			Line() = delete;
 			Line(const Line&) = delete;
-			Line(P* head) : head(head){};
+			Line(P* head) : head(head) {};
 
 			P& operator[](unsigned x) { return head[x]; };
 
@@ -149,11 +152,11 @@ namespace tb {
 		struct Lines {
 			Lines() = delete;
 			Lines(const Line&) = delete;
-			Lines(P* const h[2], const float (&r)[2], unsigned width)
-				: heads{h[0], h[1]}, ratios{r[0], r[1]}, width(width){};
+			Lines(P* const h[2], const float (&r)[2], unsigned stride)
+				: heads{h[0], h[1]}, ratios{r[0], r[1]}, stride(stride) {};
 
 			template <typename U> const Pixel<float> operator[](U x) const {
-				const auto hr(HeadsAndRatios(x, width));
+				const auto hr(HeadsAndRatios(x, stride));
 				return Pixel<float>(heads[0][hr.heads[0]]) *
 						   (ratios[0] * hr.ratios[0]) +
 					   Pixel<float>(heads[1][hr.heads[0]]) *
@@ -167,7 +170,7 @@ namespace tb {
 		private:
 			P* const heads[2];
 			const float ratios[2];
-			const unsigned width;
+			const unsigned stride;
 		};
 
 		Line operator[](unsigned y) { return Line(buffer + spread[0] * y); };
@@ -186,12 +189,13 @@ namespace tb {
 		const void* Data() const { return (void*)buffer; };
 		unsigned Width() const { return spread[0]; };
 		unsigned Height() const { return spread[1]; };
-		unsigned Step() const { return spread[0]; };
+		unsigned Stride() const { return stride; }; // 1ライン分のバイト数
 		bool Transparent() const { return transparent; };
 
 	private:
 		P* const buffer;
 		const Spread<2, int> spread;
+		const unsigned stride;
 		const bool transparent;
 
 		struct HR {
