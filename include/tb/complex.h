@@ -22,6 +22,10 @@
 
 
 
+#ifdef Complex
+#error "undef Complex when use this with Xlib.h"
+#endif
+
 namespace tb {
 
 	template <unsigned D, typename T> struct Complex {
