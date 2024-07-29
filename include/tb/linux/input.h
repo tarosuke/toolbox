@@ -30,6 +30,7 @@ namespace tb {
 		struct Input : public virtual tb::Input {
 			Input(msec outTime = 0, bool grab = false);
 			~Input();
+			void GetInput() override;
 
 		private:
 			struct LBR : tb::Input::ButtonReport {
@@ -51,8 +52,6 @@ namespace tb {
 
 			const int outms;
 			std::vector<pollfd> evs;
-
-			void GetInput() override;
 		};
 	}
 }
