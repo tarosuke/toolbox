@@ -18,6 +18,7 @@
 #pragma once
 
 #include <math.h>
+#include <tb/matrix.h>
 #include <tb/vector.h>
 
 
@@ -40,7 +41,7 @@ namespace tb {
 		Complex(const T (&o)[D]) : a{o} {};
 
 		// 各軸の回転角で初期化
-		Complex(const T axis[D - 1], T ratio) {
+		Complex(const T (&axis)[D - 1], T ratio) {
 			// 一旦格納
 			for (unsigned n(1); n < D; ++n) {
 				a[n] = axis[n - 1] * ratio;
@@ -63,6 +64,7 @@ namespace tb {
 				// norm2が0.0なら回転なし(a[1]〜a[dim-1]はすべて0)
 				a[0] = 1.0;
 			}
+			Normalize();
 		};
 
 		template <typename... A> Complex(T t, A... a) : a{t, a...} {};
@@ -172,6 +174,45 @@ namespace tb {
 			auto r(~*this * Complex(v) * *this);
 			r.Normalize();
 			return Vector<D - 1, T>(r.a, 1);
+		};
+
+		// 行列へ変換
+		operator tb::Matrix<D - 1, D - 1, T>() const {
+			if constexpr (D == 4) {
+				const auto xx(a[1] * a[1] * 2);
+				const auto yy(a[2] * a[2] * 2);
+				const auto zz(a[3] * a[3] * 2);
+				const auto xy(a[1] * a[2] * 2);
+				const auto yz(a[2] * a[3] * 2);
+				const auto zx(a[3] * a[1] * 2);
+				const auto xw(a[1] * a[0] * 2);
+				const auto yw(a[2] * a[0] * 2);
+				const auto zw(a[3] * a[0] * 2);
+				const T m[3][3] = {
+					{1 - yy - zz, xy + zw, zx - yw},
+					{xy - zw, 1 - zz - xx, yz + xw},
+					{zx + yw, yz - xw, 1 - xx - yy}};
+				return tb::Matrix<3, 3, T>(m);
+			}
+		};
+		operator tb::Matrix<D, D, T>() const {
+			if constexpr (D == 4) {
+				const auto xx(a[1] * a[1] * 2);
+				const auto yy(a[2] * a[2] * 2);
+				const auto zz(a[3] * a[3] * 2);
+				const auto xy(a[1] * a[2] * 2);
+				const auto yz(a[2] * a[3] * 2);
+				const auto zx(a[3] * a[1] * 2);
+				const auto xw(a[1] * a[0] * 2);
+				const auto yw(a[2] * a[0] * 2);
+				const auto zw(a[3] * a[0] * 2);
+				const T m[4][4] = {
+					{1 - yy - zz, xy + zw, zx - yw, 0},
+					{xy - zw, 1 - zz - xx, yz + xw, 0},
+					{zx + yw, yz - xw, 1 - xx - yy, 0},
+					{0, 0, 0, 1}};
+				return tb::Matrix<4, 4, T>(m);
+			}
 		};
 
 	private:
