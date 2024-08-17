@@ -52,7 +52,8 @@ namespace tb {
 			const int p = poll(evs.data(), evs.size(), outms);
 			if (0 < p) {
 				// イベント発生
-				AxisReport relativeReport, absoluteReport;
+				int rValue[AxisReport::nAxis]{};
+				AxisReport relativeReport(rValue), absoluteReport(aValue);
 				timestamp.Update();
 
 				for (auto& e : evs) {
@@ -91,10 +92,10 @@ namespace tb {
 							}
 							break;
 						case EV_REL:
-							relativeReport.AddEvent(ev.code, ev.value);
+							relativeReport.Event(ev.code, ev.value);
 							break;
 						case EV_ABS:
-							absoluteReport.SetEvent(ev.code, ev.value);
+							absoluteReport.Event(ev.code, ev.value);
 							break;
 						default:
 							break;
