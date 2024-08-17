@@ -193,7 +193,7 @@ namespace tb {
 	// 誤差避けのためSerializeするときはメモリの形式そのままのダンプ
 	template <> String Prefs<float>::Serialize() {
 		String r("0x");
-		r.Append(*(u32*)&body);
+		r.Append(*(u32*)&body, '0', 8, 16);
 		return r;
 	}
 	template <> void Prefs<bool>::DeSerialize(const char* t) {
