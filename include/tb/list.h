@@ -47,8 +47,8 @@ namespace tb {
 			virtual ~Node() { Detach(); };
 
 		protected:
-			Node() : prev(this), next(this){};
-			virtual void NotifyListDeleted(){};
+			Node() : prev(this), next(this) {};
+			virtual void NotifyListDeleted() {};
 
 		private:
 			Node* prev;
@@ -95,7 +95,7 @@ namespace tb {
 			// toolboxスタイル反復子
 			I(List& l)
 				: key(l), node(&l.anchor), prev((*node).prev),
-				  next((*node).next){};
+				  next((*node).next) {};
 			operator T*() { return *node; };
 			T* operator++() {
 				node = next;
@@ -196,6 +196,14 @@ namespace tb {
 		};
 		T* Top(Key<L>&) { return dynamic_cast<T*>(anchor.next); };
 		T* Bottom(Key<L>&) { return dynamic_cast<T*>(anchor.prev); };
+		T* Top() {
+			Key<L> k(*this);
+			return Top(k);
+		};
+		T* Botom() {
+			Key<L> k(*this);
+			return Bottom(k);
+		};
 
 		T* Get(Key<L>&) {
 			Node* const tn(anchor.next);
@@ -211,7 +219,7 @@ namespace tb {
 		};
 
 		// コンストラクタ／デストラクタ
-		List(){};
+		List() {};
 		~List() {
 			while (anchor.next != &anchor) {
 				Node* const n(anchor.next);
@@ -225,7 +233,7 @@ namespace tb {
 
 		// C++スタイル反復子
 		struct itor {
-			itor(Node& n) : node(&n){};
+			itor(Node& n) : node(&n) {};
 			T* operator*() { return dynamic_cast<T*>(node); };
 			bool operator==(const itor& t) const { return node == t.node; };
 			bool operator!=(const itor& t) const { return node != t.node; };
