@@ -26,16 +26,23 @@
 namespace tb {
 
 	template <unsigned D, typename T> struct Rect {
-		Rect(){};
+		Rect() {};
 		Rect(const Vector<D, T>& a, const Vector<D, T>& b)
-			: left(Less(a, b)), right(More(a, b)){};
-		Rect(const Vector<D, T>& p, const Spread<D, T>& s) : Rect(p, p + s){};
+			: left(Less(a, b)), right(More(a, b)) {};
+		Rect(const Vector<D, T>& p, const Spread<D, T>& s) : Rect(p, p + s) {};
 		Rect(const Spread<D, T>& s) {
 			for (unsigned n(0); n < D; ++n) {
 				left[n] = 0;
 				right[n] = s[n];
 			}
 		};
+
+		template <typename TT> Rect(const Rect<D, TT>& o) {
+			for (unsigned n(0); n < D; ++n) {
+				left[n] = o.Left()[n];
+				right[n] = o.Right()[n];
+			}
+		}
 
 		Rect& operator=(const Rect&) = default;
 		template <typename U> const Rect& operator=(const Rect<D, U>& o) {
@@ -101,6 +108,7 @@ namespace tb {
 
 		const Vector<D, T>& Left() const { return left; };
 		const Vector<D, T>& Right() const { return right; };
+		Spread<D, T> Spread() const { return right - left; };
 		Rect operator+(const Vector<D, T>& t) const {
 			return Rect(left + t, right + t);
 		};

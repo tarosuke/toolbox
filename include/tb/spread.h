@@ -27,7 +27,7 @@ namespace tb {
 	template <unsigned D, typename T> struct Spread {
 		// NOTE:Rect他で区別できなくなるのでVectorから継承してはいけない
 		Spread() : a{0, 0} {};
-		Spread(const Vector<D, T>& o) : a(o){};
+		Spread(const Vector<D, T>& o) : a(o) {};
 		template <typename... A> Spread(T t, A... a) : a{t, a...} {};
 
 		Spread& operator=(const Spread& o) {
@@ -87,6 +87,14 @@ namespace tb {
 				}
 			}
 			return true;
+		};
+
+		// 面積、体積
+		T Volume() const {
+			T v(1);
+			for (unsigned n(0); n < D; ++n) {
+				v *= a[n];
+			}
 		};
 
 	private:
