@@ -155,7 +155,7 @@ namespace tb {
 			}
 		};
 
-	private:
+	protected:
 		T a[D];
 	};
 

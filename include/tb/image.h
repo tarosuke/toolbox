@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <tb/rect.h>
 #include <tb/spread.h>
 #include <tb/types.h>
 #include <type_traits>
@@ -106,112 +107,118 @@ namespace tb {
 
 
 	/***** 画像インターフェイス
-	 * 既存の画像データを取り出して扱うためのクラス
+	 * 既存の画像データを取り出して扱うための抽象クラス
 	 */
-	template <typename P> struct Image {
+	struct Image {
 		Image() = delete;
 		Image(const Image&) = delete;
 		void operator=(const Image&) = delete;
 
-		/***** Imageインターフェイスの構築子
-		 * Imageは引数の範囲検証などはしないので引数も機能を提供できる最低限
-		 * になっている。二次元配列のようにアクセスする。
-		 * NOTE:補間機能を使う場合はheightを指定すること。
-		 */
-		Image(
-			void* b,
-			unsigned width,
-			unsigned height,
-			unsigned stride,
-			bool transparent = false)
-			: buffer((P*)b), spread((int)width, (int)height), stride(stride),
-			  transparent(transparent) {};
-		Image(
-			void* buffer,
-			const Spread<2, int>& spread,
-			unsigned stride,
-			bool transparent = false)
-			: buffer((P*)buffer), spread(spread), stride(stride),
-			  transparent(transparent) {};
+		virtual ~Image() {};
 
-		/***** 一行分の画像
-		 */
+		struct Profile {
+			struct {
+				unsigned position;
+				unsigned mask;
+			} a, r, g, b; // a.maskが0でなければ透過
+			unsigned bitsPerPixel;
+		};
+
+		// 生データ
+		void* Data() const { return (void*)buffer; };
+		unsigned Width() const { return width; };
+		unsigned Height() const { return height; };
+		bool Transparent() const { return !!profile.a.mask; }
+		tb::Spread<2, int> Spread() const {
+			return tb::Spread<2, int>((int[]){(int)width, (int)height});
+		};
+
+		// 一行分
 		struct Line {
 			Line() = delete;
-			Line(const Line&) = delete;
-			Line(P* head) : head(head) {};
+			Line(void* left, const Profile& profile, unsigned width)
+				: left(left), profile(profile), width(width) {};
 
-			P& operator[](unsigned x) { return head[x]; };
+			unsigned operator[](unsigned);
+			operator void*() { return left; };
 
 		private:
-			P* const head;
+			void* left;
+			const Profile& profile;
+			const unsigned width; // [px]
 		};
 
-		/***** 補間用の二行分
+		Line operator[](unsigned);
+
+	protected:
+		char* const buffer;
+
+		/***** Imageインターフェイスの構築子
+		 * 特クラスから貰った諸元を記録するだけ
 		 */
-		struct Lines {
-			Lines() = delete;
-			Lines(const Line&) = delete;
-			Lines(P* const h[2], const float (&r)[2], unsigned stride)
-				: heads{h[0], h[1]}, ratios{r[0], r[1]}, stride(stride) {};
-
-			template <typename U> const Pixel<float> operator[](U x) const {
-				const auto hr(HeadsAndRatios(x, stride));
-				return Pixel<float>(heads[0][hr.heads[0]]) *
-						   (ratios[0] * hr.ratios[0]) +
-					   Pixel<float>(heads[1][hr.heads[0]]) *
-						   (ratios[1] * hr.ratios[0]) +
-					   Pixel<float>(heads[0][hr.heads[1]]) *
-						   (ratios[0] * hr.ratios[1]) +
-					   Pixel<float>(heads[1][hr.heads[1]]) *
-						   (ratios[1] * hr.ratios[1]);
-			};
-
-		private:
-			P* const heads[2];
-			const float ratios[2];
-			const unsigned stride;
-		};
-
-		Line operator[](unsigned y) { return Line(buffer + spread[0] * y); };
-		Lines operator[](f32 y) {
-			const auto hr(HeadsAndRatios(y, spread[1]));
-			P* const h[2]{
-				buffer + hr.heads[0] * spread[0],
-				buffer + hr.heads[1] * spread[0]};
-
-			return Lines(h, hr.ratios, spread[0]);
-		};
+		Image(
+			void* buffer,
+			const Profile& profile,
+			unsigned width,
+			unsigned height,
+			unsigned stride)
+			: buffer((char*)buffer), profile(profile), width(width),
+			  height(height), stride(stride) {};
 
 
-		// 直接アクセスのための情報取得
-		void* Data() { return (void*)buffer; };
-		const void* Data() const { return (void*)buffer; };
-		unsigned Width() const { return spread[0]; };
-		unsigned Height() const { return spread[1]; };
-		unsigned Stride() const { return stride; }; // 1ライン分のバイト数
-		bool Transparent() const { return transparent; };
+		/***** 与えられたImageの一部を複製
+		 */
+		Image(
+			void* buffer,
+			const Image& org,
+			unsigned left,
+			unsigned top,
+			unsigned width,
+			unsigned height,
+			unsigned stride);
 
 	private:
-		P* const buffer;
-		const Spread<2, int> spread;
-		const unsigned stride;
-		const bool transparent;
+		const Profile& profile;
+		const unsigned width; // [px]
+		const unsigned height; // [px]
+		const unsigned stride; // [bytes]
+	};
 
-		struct HR {
-			unsigned heads[2]; // 配列の添字
-			f32 ratios[2]; // 補間用のレート(2つを足すと1になる)
-		};
-		// positionから整数部の添字と補間用の値を作る
-		static HR HeadsAndRatios(f32 position, uint limit) {
-			int i(position); // 整数部
-			const float r(position - i); // 小数点以下(必ず正)
 
-			// 整数部を正側へシフト
-			const unsigned u((unsigned)(i % limit + limit));
+	// ARGB32
+	struct ImageARGB32 : public Image {
+		ImageARGB32(void* buffer, unsigned width, unsigned height)
+			: Image(buffer, profile, width, height, width * 4) {};
 
-			// 結果を作って返す
-			return HR{{u % limit, (u + 1) % limit}, {1.0f - r, r}};
-		};
+	private:
+		static const Profile profile;
+	};
+	// xRGB32
+	struct ImageXRGB32 : public Image {
+		ImageXRGB32(void* buffer, unsigned width, unsigned height)
+			: Image(buffer, profile, width, height, width * 4) {};
+
+	private:
+		static const Profile profile;
+	};
+
+
+	template <class T> struct BufferedImage : public T {
+		BufferedImage(unsigned width, unsigned height)
+			: T(new tb::u32[width * height], width, height) {};
+		BufferedImage(
+			const Image& origin,
+			tb::Vector<2, int>& offset,
+			unsigned width,
+			unsigned height)
+			: Image(
+				  new tb::u32[width * height],
+				  origin,
+				  offset[0],
+				  offset[1],
+				  width,
+				  height) {};
+
+		~BufferedImage() { delete[] (tb::u32*)Image::buffer; };
 	};
 }
