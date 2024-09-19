@@ -108,7 +108,9 @@ namespace tb {
 
 		const Vector<D, T>& Left() const { return left; };
 		const Vector<D, T>& Right() const { return right; };
-		Spread<D, T> Spread() const { return right - left; };
+		Spread<D, T> GetSpread() const {
+			return tb::Spread<D, T>(right - left);
+		};
 		Rect operator+(const Vector<D, T>& t) const {
 			return Rect(left + t, right + t);
 		};
@@ -139,8 +141,7 @@ namespace tb {
 			}
 			return true;
 		};
-		operator Vector<D, T>&() { return left; };
-		operator Spread<D, T>() { return Spread<D, T>(right - left); };
+		tb::Spread<D, T> GetSpread() { return tb::Spread<D, T>(right - left); };
 
 	private:
 		Vector<D, T> left; // keep left lesser value

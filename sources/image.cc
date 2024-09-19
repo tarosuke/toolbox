@@ -16,6 +16,7 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#include <memory.h>
 #include <string.h>
 #include <tb/image.h>
 
@@ -55,4 +56,5 @@ namespace tb {
 			memcpy(d, s, stride);
 		}
 	}
+
 }

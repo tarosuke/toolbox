@@ -124,11 +124,20 @@ namespace tb {
 			unsigned bitsPerPixel;
 		};
 
+		// 生データ
+		void* Data() const { return (void*)buffer; };
+		unsigned Width() const { return width; };
+		unsigned Height() const { return height; };
+		bool Transparent() const { return !!profile.a.mask; }
+		tb::Spread<2, int> Spread() const {
+			return tb::Spread<2, int>((int[]){(int)width, (int)height});
+		};
+
 		// 一行分
 		struct Line {
 			Line() = delete;
 			Line(void* left, const Profile& profile, unsigned width)
-				: profile(profile), left(left), width(width) {};
+				: left(left), profile(profile), width(width) {};
 
 			unsigned operator[](unsigned);
 			operator void*() { return left; };
@@ -140,9 +149,6 @@ namespace tb {
 		};
 
 		Line operator[](unsigned);
-
-
-		virtual Image* Crop(tb::Rect<2, int>&) = 0;
 
 	protected:
 		char* const buffer;
@@ -171,52 +177,48 @@ namespace tb {
 			unsigned height,
 			unsigned stride);
 
-
 	private:
-		const Profile profile;
+		const Profile& profile;
 		const unsigned width; // [px]
 		const unsigned height; // [px]
 		const unsigned stride; // [bytes]
 	};
 
 
-	// 32bpp画像
-	struct Image32 : public Image {
-		Image32(
-			void* buffer,
-			const Profile& profile,
-			unsigned width,
-			unsigned height)
+	// ARGB32
+	struct ImageARGB32 : public Image {
+		ImageARGB32(void* buffer, unsigned width, unsigned height)
 			: Image(buffer, profile, width, height, width * 4) {};
 
-	protected:
-		static tb::u32* Alloc(unsigned elements) {
-			return new tb::u32[elements];
-		};
-	};
-
-	// ARGB32
-	struct ImageARGB32 : public Image32 {
-		ImageARGB32(void* buffer, unsigned width, unsigned height)
-			: Image32(buffer, profile, width, height) {};
-
-	protected:
+	private:
 		static const Profile profile;
 	};
 	// xRGB32
-	struct ImageXRGB32 : public Image32 {
+	struct ImageXRGB32 : public Image {
 		ImageXRGB32(void* buffer, unsigned width, unsigned height)
-			: Image32(buffer, profile, width, height) {};
+			: Image(buffer, profile, width, height, width * 4) {};
 
-	protected:
+	private:
 		static const Profile profile;
 	};
 
 
 	template <class T> struct BufferedImage : public T {
 		BufferedImage(unsigned width, unsigned height)
-			: T(Alloc(width * height), profile, width, height) {};
-		~BufferedImage() { delete[] buffer; };
-	};
+			: T(new tb::u32[width * height], width, height) {};
+		BufferedImage(
+			const Image& origin,
+			tb::Vector<2, int>& offset,
+			unsigned width,
+			unsigned height)
+			: Image(
+				  new tb::u32[width * height],
+				  origin,
+				  offset[0],
+				  offset[1],
+				  width,
+				  height) {};
 
+		~BufferedImage() { delete[] (tb::u32*)Image::buffer; };
+	};
 }
