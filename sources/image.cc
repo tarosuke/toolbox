@@ -23,21 +23,20 @@
 
 
 namespace tb {
-	const Image::Profile ImageARGB32::profile{
+	const BaseColor::Profile ARGB32::profile{
 		a : {24, 0xff000000},
 		r : {16, 0x00ff0000},
 		g : {8, 0x0000ff00},
 		b : {0, 0x000000ff},
 		bitsPerPixel : 32
 	};
-	const Image::Profile ImageXRGB32::profile{
+	const BaseColor::Profile XRGB32::profile{
 		a : {0, 0},
 		r : {16, 0x00ff0000},
 		g : {8, 0x0000ff00},
 		b : {0, 0x000000ff},
 		bitsPerPixel : 32
 	};
-
 
 	Image::Image(
 		void* buffer,
