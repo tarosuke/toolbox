@@ -20,17 +20,16 @@
 #include <string.h>
 #include <tb/image.h>
 
-
-
 namespace tb {
-	const BaseColor::Profile ARGB32::profile{
+
+	const Image::Profile ImageARGB32::profile{
 		a : {24, 0xff000000},
 		r : {16, 0x00ff0000},
 		g : {8, 0x0000ff00},
 		b : {0, 0x000000ff},
 		bitsPerPixel : 32
 	};
-	const BaseColor::Profile XRGB32::profile{
+	const Image::Profile ImageXRGB32::profile{
 		a : {0, 0},
 		r : {16, 0x00ff0000},
 		g : {8, 0x0000ff00},
@@ -38,19 +37,12 @@ namespace tb {
 		bitsPerPixel : 32
 	};
 
-	Image::Image(
-		void* buffer,
-		const Image& org,
-		unsigned left,
-		unsigned top,
-		unsigned width,
-		unsigned height,
-		unsigned stride)
+	Image::Image(void *buffer, const Image &org, unsigned left, unsigned top,
+				 unsigned width, unsigned height, unsigned stride)
 		: Image(buffer, org.profile, width, height, stride) {
-		const char* s(
-			org.buffer + org.stride * left +
-			top * org.profile.bitsPerPixel / 8);
-		char* d((char*)buffer);
+		const char *s(org.buffer + org.stride * left +
+					  top * org.profile.bitsPerPixel / 8);
+		char *d((char *)buffer);
 		for (unsigned h(0); h < height; ++h, s += org.stride, d += stride) {
 			memcpy(d, s, stride);
 		}
