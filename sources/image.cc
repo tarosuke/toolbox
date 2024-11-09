@@ -16,24 +16,24 @@
  * Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#include <math.h>
 #include <memory.h>
 #include <string.h>
 #include <tb/image.h>
 
 namespace tb {
 
+	bool operator==(const Color &o, const Color &t) {
+		return o.e[0] == t.e[0] && o.e[1] == t.e[1] && o.e[2] == t.e[2] &&
+			   o.e[3] == t.e[3];
+	};
+
 	const Image::Profile ImageARGB32::profile{
-		a : {24, 0xff000000},
-		r : {16, 0x00ff0000},
-		g : {8, 0x0000ff00},
-		b : {0, 0x000000ff},
+		elements : {{24, 255}, {16, 255}, {8, 255}, {0, 255}},
 		bitsPerPixel : 32
 	};
 	const Image::Profile ImageXRGB32::profile{
-		a : {0, 0},
-		r : {16, 0x00ff0000},
-		g : {8, 0x0000ff00},
-		b : {0, 0x000000ff},
+		elements : {{0, 0}, {16, 255}, {8, 255}, {0, 255}},
 		bitsPerPixel : 32
 	};
 
@@ -48,4 +48,16 @@ namespace tb {
 		}
 	}
 
+	Image::Line Image::operator[](unsigned v) {
+		return Line(Left(v), profile, width);
+	}
+
+	Color Image::Line::operator[](unsigned v) const {
+		return profile.C((const tb::u32 *)left, v);
+	}
+	Image::Lines Image::operator[](float v) {
+		const float ratio(modff(v, 0));
+
+		return Lines(Left(v), Left(v + 1), profile, width, ratio);
+	}
 }

@@ -28,74 +28,59 @@
 namespace tb {
 
 	struct Color {
-		struct E {
-			friend class Color;
-
-			E() : e(0) {};
-			template <std::floating_point R> E(R v) : e(v){};
-			template <std::unsigned_integral U> E(U v) : e(U(v)){};
-			E &operator=(float v) {
-				e = v;
-				return *this;
-			};
-			E &operator=(u8 v) {
-				e = U(v);
-				return *this;
-			};
-			operator float() const { return e; };
-			operator u8() const { return e * 255; };
-
-		private:
-			float e;
-			static float U(u8 v) { return ((float)v) / 255; };
-			E Learp(const E t, float ratio) {
-				return E(e * ratio + t.e * (1 - ratio));
-			};
-		};
+		friend bool operator==(const Color &, const Color &);
 
 		Color() = default;
 		Color(const Color &) = default;
 		explicit Color(u32 webColor)
 			: Color(u8(webColor >> 24), u8(webColor >> 16), u8(webColor >> 8),
 					u8(webColor)) {};
-		explicit Color(E a, E r, E g, E b) : e{a, r, g, b} {};
+		explicit Color(float a, float r, float g, float b) : e{a, r, g, b} {};
 		template <typename T>
-		Color(T a, T r, T g, T b) : e{E(a), E(r), E(g), E(b)} {};
 
-		explicit operator u32() const {
-			return ((u32)(u8)e[0] << 24) | ((u32)(u8)e[1] << 16) |
-				   ((u32)(u8)e[2] << 8) | (u32)(u8)e[3];
-		};
-		operator const E *() { return e; };
-		bool operator==(const Color &t) const {
-			return (u32) * this == (u32)t;
+		float operator-(const Color &t) const {
+			const float r[4]{e[0] - t.e[0], e[1] - t.e[1], e[2] - t.e[2],
+							 e[3] - t.e[3]};
+			return r[0] * r[0] + r[1] * r[1] + r[2] * r[2] + r[3] * r[3];
 		};
 
 		Color Learp(const Color t, float ratio) {
-			return Color(e[0].Learp(t.e[0], ratio), e[1].Learp(t.e[1], ratio),
-						 e[2].Learp(t.e[2], ratio), e[3].Learp(t.e[3], ratio));
+			const float rr(1 - ratio);
+			return Color(e[0] * rr + t.e[0] * ratio, e[1] * rr + t.e[1] * ratio,
+						 e[2] * rr + t.e[2] * ratio,
+						 e[3] * rr + t.e[3] * ratio);
 		};
 
-		const E &A() const { return e[0]; };
-		const E &R() const { return e[1]; };
-		const E &G() const { return e[2]; };
-		const E &B() const { return e[3]; };
+		const float &A() const { return e[0]; };
+		const float &R() const { return e[1]; };
+		const float &G() const { return e[2]; };
+		const float &B() const { return e[3]; };
 
 	private:
-		E e[4];
+		float e[4];
 	};
+	bool operator==(const Color &o, const Color &t);
 
 	/***** 画像インターフェイス
 	 * 既存の画像データを取り出して扱うための抽象クラス
 	 */
 	struct Image {
 		struct Profile {
-			struct {
+			struct E {
 				u32 bit;
 				u32 mask;
-			} a, r, g, b;
+				template <typename T> float F(T v) const {
+					return float((v >> bit) & mask) / mask;
+				};
+				u32 U(float v) const { return u32(v * mask) << bit; };
+			} elements[4];
 			unsigned bitsPerPixel;
-			bool IsTransparent() { return !!a.mask; };
+			bool IsTransparent() { return !!elements[0].mask; };
+			Color C(const void *left, unsigned v) const {
+				const u32 &t(((const u8 *)left)[v * bitsPerPixel / 8]);
+				return Color(elements[0].F(t), elements[1].F(t),
+							 elements[2].F(t), elements[3].F(t));
+			};
 		};
 
 		Image() = delete;
@@ -108,7 +93,7 @@ namespace tb {
 		void *Data() const { return (void *)buffer; };
 		unsigned Width() const { return width; };
 		unsigned Height() const { return height; };
-		bool Transparent() const { return !!profile.a.mask; }
+		bool Transparent() const { return !!profile.elements[0].mask; }
 		tb::Spread<2, int> Spread() const {
 			return tb::Spread<2, int>((int[]){(int)width, (int)height});
 		};
@@ -116,15 +101,15 @@ namespace tb {
 		// 一行分
 		struct Line {
 			Line() = delete;
-			Line(void *left, const Profile &profile, unsigned width)
+			Line(void *left, const Image::Profile &profile, unsigned width)
 				: left(left), profile(profile), width(width) {};
 
-			Color operator[](unsigned);
+			Color operator[](unsigned) const;
 			operator void *() { return left; };
 
 		private:
 			void *left;
-			const Profile &profile;
+			const Image::Profile &profile;
 			const unsigned width; // [px]
 		};
 		Line operator[](unsigned);
@@ -132,13 +117,15 @@ namespace tb {
 		// 補間用に二行分
 		struct Lines {
 			Lines() = delete;
-			Lines(void *left0, void *left1, const Profile &profile,
-				  unsigned width)
-				: lines{{left0, profile, width}, {left1, profile, width}} {};
-			Color operator[](float);
+			Lines(void *left0, void *left1, const Image::Profile &profile,
+				  unsigned width, float ratio)
+				: lines{{left0, profile, width}, {left1, profile, width}},
+				  ratio(ratio) {};
+			Color operator[](float) const;
 
 		private:
 			Line lines[2];
+			const float ratio; // 0.0:left0 - 1.0:left1
 		};
 		Lines operator[](float);
 
@@ -148,7 +135,7 @@ namespace tb {
 		/***** Imageインターフェイスの構築子
 		 * 特クラスから貰った諸元を記録するだけ
 		 */
-		Image(void *buffer, const Profile &profile, unsigned width,
+		Image(void *buffer, const Image::Profile &profile, unsigned width,
 			  unsigned height, unsigned stride)
 			: buffer((char *)buffer), profile(profile), width(width),
 			  height(height), stride(stride) {};
@@ -159,23 +146,25 @@ namespace tb {
 			  unsigned width, unsigned height, unsigned stride);
 
 	private:
-		const Profile &profile;
+		const Image::Profile &profile;
 		const unsigned width;  // [px]
 		const unsigned height; // [px]
 		const unsigned stride; // [bytes]
+
+		void *Left(unsigned y) { return buffer + (y % height) + stride; };
 	};
 
 	// ARGB32
 	struct ImageARGB32 : public Image {
 		ImageARGB32(void *buffer, unsigned width, unsigned height)
 			: Image(buffer, profile, width, height, width * 4) {};
-		static const Profile profile;
+		static const Image::Profile profile;
 	};
 	// xRGB32
 	struct ImageXRGB32 : public Image {
 		ImageXRGB32(void *buffer, unsigned width, unsigned height)
 			: Image(buffer, profile, width, height, width * 4) {};
-		static const Profile profile;
+		static const Image::Profile profile;
 	};
 
 	/***** バッファ自動管理Image
