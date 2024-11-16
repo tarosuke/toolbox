@@ -28,32 +28,33 @@
 namespace tb {
 
 	struct Color {
-		friend bool operator==(const Color &, const Color &);
+		friend bool operator==(const Color&, const Color&);
 
 		Color() = default;
-		Color(const Color &) = default;
+		Color(const Color&) = default;
 		explicit Color(u32 webColor)
-			: Color(u8(webColor >> 24), u8(webColor >> 16), u8(webColor >> 8),
-					u8(webColor)) {};
+			: Color(u8(webColor >> 24),
+				  u8(webColor >> 16),
+				  u8(webColor >> 8),
+				  u8(webColor)) {};
 		explicit Color(float a, float r, float g, float b) : e{a, r, g, b} {};
 
-		float operator-(const Color &t) const {
-			const float r[4]{e[0] - t.e[0], e[1] - t.e[1], e[2] - t.e[2],
-							 e[3] - t.e[3]};
+		float operator-(const Color& t) const {
+			const float r[4]{
+				e[0] - t.e[0], e[1] - t.e[1], e[2] - t.e[2], e[3] - t.e[3]};
 			return r[0] * r[0] + r[1] * r[1] + r[2] * r[2] + r[3] * r[3];
 		};
 
 		Color Learp(const Color t, float ratio) {
 			const float rr(1 - ratio);
 			return Color(e[0] * rr + t.e[0] * ratio, e[1] * rr + t.e[1] * ratio,
-						 e[2] * rr + t.e[2] * ratio,
-						 e[3] * rr + t.e[3] * ratio);
+				e[2] * rr + t.e[2] * ratio, e[3] * rr + t.e[3] * ratio);
 		};
 
-		const float &A() const { return e[0]; };
-		const float &R() const { return e[1]; };
-		const float &G() const { return e[2]; };
-		const float &B() const { return e[3]; };
+		const float& A() const { return e[0]; };
+		const float& R() const { return e[1]; };
+		const float& G() const { return e[2]; };
+		const float& B() const { return e[3]; };
 
 		operator u32() const {
 			return ((u32)(255 * A()) << 24) | ((u32)(255 * R()) << 16) |
@@ -63,7 +64,7 @@ namespace tb {
 	private:
 		float e[4];
 	};
-	bool operator==(const Color &o, const Color &t);
+	bool operator==(const Color& o, const Color& t);
 
 	/***** 画像インターフェイス
 	 * 既存の画像データを取り出して扱うための抽象クラス
@@ -80,21 +81,21 @@ namespace tb {
 			} elements[4];
 			unsigned bitsPerPixel;
 			bool IsTransparent() { return !!elements[0].mask; };
-			Color C(const u8 *left, unsigned v) const {
-				const u32 &t(*(const u32 *)&left[v * bitsPerPixel / 8]);
+			Color C(const u8* left, unsigned v) const {
+				const u32& t(*(const u32*)&left[v * bitsPerPixel / 8]);
 				return Color(elements[0].F(t), elements[1].F(t),
-							 elements[2].F(t), elements[3].F(t));
+					elements[2].F(t), elements[3].F(t));
 			};
 		};
 
 		Image() = delete;
-		Image(const Image &) = delete;
-		void operator=(const Image &) = delete;
+		Image(const Image&) = delete;
+		void operator=(const Image&) = delete;
 
 		virtual ~Image() {};
 
 		// 生データ
-		void *Data() const { return (void *)buffer; };
+		void* Data() const { return (void*)buffer; };
 		unsigned Width() const { return width; };
 		unsigned Height() const { return height; };
 		bool Transparent() const { return !!profile.elements[0].mask; }
@@ -106,39 +107,50 @@ namespace tb {
 		Color Get(float x, float y) const;
 
 	protected:
-		u8 *const buffer;
+		u8* const buffer;
 
 		/***** Imageインターフェイスの構築子
 		 * 特クラスから貰った諸元を記録するだけ
 		 */
-		Image(void *buffer, const Image::Profile &profile, unsigned width,
-			  unsigned height, unsigned stride)
-			: buffer((u8 *)buffer), profile(profile), width(width),
-			  height(height), stride(stride) {};
+		Image(void* buffer,
+			const Image::Profile& profile,
+			unsigned width,
+			unsigned height,
+			unsigned stride)
+			: buffer((u8*)buffer),
+			  profile(profile),
+			  width(width),
+			  height(height),
+			  stride(stride) {};
 
 		/***** 与えられたImageの一部を複製
 		 */
-		Image(void *buffer, const Image &org, unsigned left, unsigned top,
-			  unsigned width, unsigned height, unsigned stride);
+		Image(void* buffer,
+			const Image& org,
+			unsigned left,
+			unsigned top,
+			unsigned width,
+			unsigned height,
+			unsigned stride);
 
 	private:
-		const Image::Profile &profile;
+		const Image::Profile& profile;
 		const unsigned width;  // [px]
 		const unsigned height; // [px]
 		const unsigned stride; // [bytes]
 
-		u8 *Left(unsigned y) const { return buffer + (y % height) + stride; };
+		u8* Left(unsigned y) const { return buffer + (y % height) + stride; };
 	};
 
 	// ARGB32
 	struct ImageARGB32 : public Image {
-		ImageARGB32(void *buffer, unsigned width, unsigned height)
+		ImageARGB32(void* buffer, unsigned width, unsigned height)
 			: Image(buffer, profile, width, height, width * 4) {};
 		static const Image::Profile profile;
 	};
 	// xRGB32
 	struct ImageXRGB32 : public Image {
-		ImageXRGB32(void *buffer, unsigned width, unsigned height)
+		ImageXRGB32(void* buffer, unsigned width, unsigned height)
 			: Image(buffer, profile, width, height, width * 4) {};
 		static const Image::Profile profile;
 	};
@@ -151,11 +163,17 @@ namespace tb {
 	template <class T> struct BufferedImage : public T {
 		BufferedImage(unsigned width, unsigned height)
 			: T(new tb::u32[width * height], width, height) {};
-		BufferedImage(const Image &origin, tb::Vector<2, int> &offset,
-					  unsigned width, unsigned height)
-			: Image(new tb::u32[width * height], origin, offset[0], offset[1],
-					width, height) {};
+		BufferedImage(const Image& origin,
+			tb::Vector<2, int>& offset,
+			unsigned width,
+			unsigned height)
+			: Image(new tb::u32[width * height],
+				  origin,
+				  offset[0],
+				  offset[1],
+				  width,
+				  height) {};
 
-		~BufferedImage() { delete[] (tb::u32 *)Image::buffer; };
+		~BufferedImage() { delete[] (tb::u32*)Image::buffer; };
 	};
 }
