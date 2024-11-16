@@ -36,7 +36,6 @@ namespace tb {
 			: Color(u8(webColor >> 24), u8(webColor >> 16), u8(webColor >> 8),
 					u8(webColor)) {};
 		explicit Color(float a, float r, float g, float b) : e{a, r, g, b} {};
-		template <typename T>
 
 		float operator-(const Color &t) const {
 			const float r[4]{e[0] - t.e[0], e[1] - t.e[1], e[2] - t.e[2],
@@ -55,6 +54,11 @@ namespace tb {
 		const float &R() const { return e[1]; };
 		const float &G() const { return e[2]; };
 		const float &B() const { return e[3]; };
+
+		operator u32() const {
+			return ((u32)(255 * A()) << 24) | ((u32)(255 * R()) << 16) |
+				   ((u32)(255 * G()) << 8) | (u32)(255 * B());
+		};
 
 	private:
 		float e[4];
@@ -76,8 +80,8 @@ namespace tb {
 			} elements[4];
 			unsigned bitsPerPixel;
 			bool IsTransparent() { return !!elements[0].mask; };
-			Color C(const void *left, unsigned v) const {
-				const u32 &t(((const u8 *)left)[v * bitsPerPixel / 8]);
+			Color C(const u8 *left, unsigned v) const {
+				const u32 &t(*(const u32 *)&left[v * bitsPerPixel / 8]);
 				return Color(elements[0].F(t), elements[1].F(t),
 							 elements[2].F(t), elements[3].F(t));
 			};
@@ -98,46 +102,18 @@ namespace tb {
 			return tb::Spread<2, int>((int[]){(int)width, (int)height});
 		};
 
-		// 一行分
-		struct Line {
-			Line() = delete;
-			Line(void *left, const Image::Profile &profile, unsigned width)
-				: left(left), profile(profile), width(width) {};
-
-			Color operator[](unsigned) const;
-			operator void *() { return left; };
-
-		private:
-			void *left;
-			const Image::Profile &profile;
-			const unsigned width; // [px]
-		};
-		Line operator[](unsigned);
-
-		// 補間用に二行分
-		struct Lines {
-			Lines() = delete;
-			Lines(void *left0, void *left1, const Image::Profile &profile,
-				  unsigned width, float ratio)
-				: lines{{left0, profile, width}, {left1, profile, width}},
-				  ratio(ratio) {};
-			Color operator[](float) const;
-
-		private:
-			Line lines[2];
-			const float ratio; // 0.0:left0 - 1.0:left1
-		};
-		Lines operator[](float);
+		Color Get(unsigned x, unsigned y) const;
+		Color Get(float x, float y) const;
 
 	protected:
-		char *const buffer;
+		u8 *const buffer;
 
 		/***** Imageインターフェイスの構築子
 		 * 特クラスから貰った諸元を記録するだけ
 		 */
 		Image(void *buffer, const Image::Profile &profile, unsigned width,
 			  unsigned height, unsigned stride)
-			: buffer((char *)buffer), profile(profile), width(width),
+			: buffer((u8 *)buffer), profile(profile), width(width),
 			  height(height), stride(stride) {};
 
 		/***** 与えられたImageの一部を複製
@@ -151,7 +127,7 @@ namespace tb {
 		const unsigned height; // [px]
 		const unsigned stride; // [bytes]
 
-		void *Left(unsigned y) { return buffer + (y % height) + stride; };
+		u8 *Left(unsigned y) const { return buffer + (y % height) + stride; };
 	};
 
 	// ARGB32
