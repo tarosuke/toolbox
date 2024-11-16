@@ -19,206 +19,143 @@
 #pragma once
 
 #include <algorithm>
+#include <concepts>
 #include <limits>
 #include <tb/rect.h>
 #include <tb/spread.h>
 #include <tb/types.h>
-#include <type_traits>
-
-
 
 namespace tb {
 
-	/***** 変換やらのための画素データ
-	 */
-	template <typename T> struct Pixel {};
+	struct Color {
+		friend bool operator==(const Color &, const Color &);
 
-	template <> struct Pixel<tb::u8> {
-		Pixel(tb::u32 c = 0) : color(c) {};
-		Pixel(tb::u8 a, tb::u8 r, tb::u8 g, tb::u8 b)
-			: color(
-				  ((tb::u32)a << 24) | ((tb::u32)r << 16) | ((tb::u32)g << 8) |
-				  (tb::u32)b) {};
-		Pixel(const float (&c)[4]) : color(F2u(c)) {};
-		Pixel(const tb::u8 (&c)[4]) : color(A2u(c)) {};
-		Pixel& operator=(const Pixel&) = default;
-		operator const tb::u32&() { return color; };
+		Color() = default;
+		Color(const Color &) = default;
+		explicit Color(u32 webColor)
+			: Color(u8(webColor >> 24), u8(webColor >> 16), u8(webColor >> 8),
+					u8(webColor)) {};
+		explicit Color(float a, float r, float g, float b) : e{a, r, g, b} {};
 
-		template <typename U> tb::u8 operator[](U n) const {
-			return color >> (8 * n);
+		float operator-(const Color &t) const {
+			const float r[4]{e[0] - t.e[0], e[1] - t.e[1], e[2] - t.e[2],
+							 e[3] - t.e[3]};
+			return r[0] * r[0] + r[1] * r[1] + r[2] * r[2] + r[3] * r[3];
 		};
-		bool operator==(const Pixel& t) const { return color == t.color; };
 
-	private:
-		tb::u32 color;
+		Color Learp(const Color t, float ratio) {
+			const float rr(1 - ratio);
+			return Color(e[0] * rr + t.e[0] * ratio, e[1] * rr + t.e[1] * ratio,
+						 e[2] * rr + t.e[2] * ratio,
+						 e[3] * rr + t.e[3] * ratio);
+		};
 
-		static tb::u32 F2p(float p) {
-			return std::clamp((tb::u32)p * 255, 0U, 255U);
-		};
-		static tb::u32 F2u(const float (&c)[4]) {
-			return (F2p(c[0]) << 24) | (F2p(c[1]) << 16) | (F2p(c[2]) << 8) |
-				   F2p(c[3]);
-		};
-		static tb::u32 A2u(const tb::u8 (&c)[4]) {
-			return ((tb::u32)c[0] << 24) | ((tb::u32)c[1] << 16) |
-				   ((tb::u32)c[2] << 8) | (tb::u32)c[3];
-		};
-	};
+		const float &A() const { return e[0]; };
+		const float &R() const { return e[1]; };
+		const float &G() const { return e[2]; };
+		const float &B() const { return e[3]; };
 
-	template <> struct Pixel<float> {
-		Pixel(tb::u32 c)
-			: color{
-				  ((c >> 24) & 255) / 255.0f,
-				  ((c >> 16) & 255) / 255.0f,
-				  ((c >> 8) & 255) / 255.0f,
-				  (c & 255) / 255.0f} {};
-		Pixel(tb::u8 a, tb::u8 r, tb::u8 g, tb::u8 b)
-			: color{U2f(a), U2f(r), U2f(g), U2f(b)} {};
-		Pixel(float a, float r, float g, float b) : color{a, r, g, b} {};
-		Pixel(const float (&c)[4]) : color{c[0], c[1], c[2], c[3]} {};
-		Pixel(const tb::u8 (&c)[4])
-			: color{U2f(c[0]), U2f(c[1]), U2f(c[2]), U2f(c[3])} {};
-		operator tb::u32() const {
-			return ((*this)[0] << 24) | ((*this)[1] << 16) | ((*this)[2] << 8) |
-				   (*this)[3];
-		};
-		template <typename U> tb::u8 operator[](U n) const {
-			return (tb::u32)std::clamp(color[n] * 255.0f, 0.0f, 255.0f);
-		};
-		Pixel operator*(float t) {
-			return Pixel{
-				color[0] * t,
-				color[1] * t,
-				color[2] * t,
-				color[3] * t};
-		};
-		Pixel operator+(Pixel t) {
-			return Pixel{
-				color[0] + t.color[0],
-				color[1] + t.color[1],
-				color[2] + t.color[2],
-				color[3] + t.color[3]};
+		operator u32() const {
+			return ((u32)(255 * A()) << 24) | ((u32)(255 * R()) << 16) |
+				   ((u32)(255 * G()) << 8) | (u32)(255 * B());
 		};
 
 	private:
-		float color[4];
-		static float U2f(tb::u8 c) { return c / 255.0f; };
+		float e[4];
 	};
-
+	bool operator==(const Color &o, const Color &t);
 
 	/***** 画像インターフェイス
 	 * 既存の画像データを取り出して扱うための抽象クラス
 	 */
 	struct Image {
+		struct Profile {
+			struct E {
+				u32 bit;
+				u32 mask;
+				template <typename T> float F(T v) const {
+					return float((v >> bit) & mask) / mask;
+				};
+				u32 U(float v) const { return u32(v * mask) << bit; };
+			} elements[4];
+			unsigned bitsPerPixel;
+			bool IsTransparent() { return !!elements[0].mask; };
+			Color C(const u8 *left, unsigned v) const {
+				const u32 &t(*(const u32 *)&left[v * bitsPerPixel / 8]);
+				return Color(elements[0].F(t), elements[1].F(t),
+							 elements[2].F(t), elements[3].F(t));
+			};
+		};
+
 		Image() = delete;
-		Image(const Image&) = delete;
-		void operator=(const Image&) = delete;
+		Image(const Image &) = delete;
+		void operator=(const Image &) = delete;
 
 		virtual ~Image() {};
 
-		struct Profile {
-			struct {
-				unsigned position;
-				unsigned mask;
-			} a, r, g, b; // a.maskが0でなければ透過
-			unsigned bitsPerPixel;
-		};
-
 		// 生データ
-		void* Data() const { return (void*)buffer; };
+		void *Data() const { return (void *)buffer; };
 		unsigned Width() const { return width; };
 		unsigned Height() const { return height; };
-		bool Transparent() const { return !!profile.a.mask; }
+		bool Transparent() const { return !!profile.elements[0].mask; }
 		tb::Spread<2, int> Spread() const {
 			return tb::Spread<2, int>((int[]){(int)width, (int)height});
 		};
 
-		// 一行分
-		struct Line {
-			Line() = delete;
-			Line(void* left, const Profile& profile, unsigned width)
-				: left(left), profile(profile), width(width) {};
-
-			unsigned operator[](unsigned);
-			operator void*() { return left; };
-
-		private:
-			void* left;
-			const Profile& profile;
-			const unsigned width; // [px]
-		};
-
-		Line operator[](unsigned);
+		Color Get(unsigned x, unsigned y) const;
+		Color Get(float x, float y) const;
 
 	protected:
-		char* const buffer;
+		u8 *const buffer;
 
 		/***** Imageインターフェイスの構築子
 		 * 特クラスから貰った諸元を記録するだけ
 		 */
-		Image(
-			void* buffer,
-			const Profile& profile,
-			unsigned width,
-			unsigned height,
-			unsigned stride)
-			: buffer((char*)buffer), profile(profile), width(width),
+		Image(void *buffer, const Image::Profile &profile, unsigned width,
+			  unsigned height, unsigned stride)
+			: buffer((u8 *)buffer), profile(profile), width(width),
 			  height(height), stride(stride) {};
-
 
 		/***** 与えられたImageの一部を複製
 		 */
-		Image(
-			void* buffer,
-			const Image& org,
-			unsigned left,
-			unsigned top,
-			unsigned width,
-			unsigned height,
-			unsigned stride);
+		Image(void *buffer, const Image &org, unsigned left, unsigned top,
+			  unsigned width, unsigned height, unsigned stride);
 
 	private:
-		const Profile& profile;
-		const unsigned width; // [px]
+		const Image::Profile &profile;
+		const unsigned width;  // [px]
 		const unsigned height; // [px]
 		const unsigned stride; // [bytes]
-	};
 
+		u8 *Left(unsigned y) const { return buffer + (y % height) + stride; };
+	};
 
 	// ARGB32
 	struct ImageARGB32 : public Image {
-		ImageARGB32(void* buffer, unsigned width, unsigned height)
+		ImageARGB32(void *buffer, unsigned width, unsigned height)
 			: Image(buffer, profile, width, height, width * 4) {};
-
-	private:
-		static const Profile profile;
+		static const Image::Profile profile;
 	};
 	// xRGB32
 	struct ImageXRGB32 : public Image {
-		ImageXRGB32(void* buffer, unsigned width, unsigned height)
+		ImageXRGB32(void *buffer, unsigned width, unsigned height)
 			: Image(buffer, profile, width, height, width * 4) {};
-
-	private:
-		static const Profile profile;
+		static const Image::Profile profile;
 	};
 
-
+	/***** バッファ自動管理Image
+	 * 普通のImageはすでにあるImageを扱うことを意図しているが、BufferedImageは
+	 * バッファ自体も管理することを想定している
+	 * NOTE:テンプレート引数TにはImageARGB32のような具象Image型を与える
+	 */
 	template <class T> struct BufferedImage : public T {
 		BufferedImage(unsigned width, unsigned height)
 			: T(new tb::u32[width * height], width, height) {};
-		BufferedImage(
-			const Image& origin,
-			tb::Vector<2, int>& offset,
-			unsigned width,
-			unsigned height)
-			: Image(
-				  new tb::u32[width * height],
-				  origin,
-				  offset[0],
-				  offset[1],
-				  width,
-				  height) {};
+		BufferedImage(const Image &origin, tb::Vector<2, int> &offset,
+					  unsigned width, unsigned height)
+			: Image(new tb::u32[width * height], origin, offset[0], offset[1],
+					width, height) {};
 
-		~BufferedImage() { delete[] (tb::u32*)Image::buffer; };
+		~BufferedImage() { delete[] (tb::u32 *)Image::buffer; };
 	};
 }
