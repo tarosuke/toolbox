@@ -4,20 +4,12 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "build toolbox",
+			"label": "build (RELEASE)",
 			"type": "shell",
-			"command": "make -j mtest",
+			"command": "make -j RELEASE",
 			"problemMatcher": {
-				"owner": "$gcc",
-				"pattern": {
-					"regexp": "^(.*):(\\d+):(\\d+):\\s*(warning|errer|failed):\\s+(.*)$",
-					"file": 1,
-					"line": 2,
-					"column": 3,
-					"severity": 5,
-					"message": 5
-				},
-				"fileLocation": "relative"
+				"base": "$gcc",
+				"fileLocation": "autoDetect"
 			},
 			"group": {
 				"kind": "build",
@@ -28,10 +20,74 @@
 			}
 		},
 		{
-			"label": "clean toolbox",
+			"label": "build (DEBUG)",
+			"type": "shell",
+			"command": "make -j DEBUG",
+			"problemMatcher": {
+				"base": "$gcc",
+				"fileLocation": "autoDetect"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"clear": true
+			}
+		},
+		{
+			"label": "build (COVERAGE)",
+			"type": "shell",
+			"command": "make -j COVERAGE",
+			"problemMatcher": {
+				"base": "$gcc",
+				"fileLocation": "autoDetect"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"clear": true
+			}
+		},
+		{
+			"label": "clean",
 			"type": "shell",
 			"command": "make clean",
 			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"clear": true
+			}
+		},
+		{
+			"label": "TEST",
+			"type": "shell",
+			"command": "make -j test",
+			"problemMatcher": {
+				"base": "$gcc",
+				"fileLocation": "autoDetect"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"clear": true
+			}
+		},
+		{
+			"label": "FULLTEST",
+			"type": "shell",
+			"command": "make -j FULLTEST",
+			"problemMatcher": {
+				"base": "$gcc",
+				"fileLocation": "autoDetect"
+			},
 			"group": {
 				"kind": "build",
 				"isDefault": true

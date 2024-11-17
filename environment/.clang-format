@@ -1,0 +1,20 @@
+Language: Cpp
+UseTab: Always
+IndentWidth: 4
+TabWidth: 4
+AccessModifierOffset: -4
+BreakBeforeBraces: Attach
+AllowShortBlocksOnASingleLine: true
+AlwaysBreakBeforeMultilineStrings: true
+NamespaceIndentation: All
+IndentCaseLabels: false
+ColumnLimit: 80
+FixNamespaceComments: false
+PointerAlignment: Left
+ReferenceAlignment: Left
+#QualifierOrder: [inline, static, constexpr, const, volatile, type]
+PackConstructorInitializers: CurrentLine
+AllowAllArgumentsOnNextLine: true
+AlignAfterOpenBracket: false
+AllowAllParametersOfDeclarationOnNextLine: true
+BinPackParameters: false

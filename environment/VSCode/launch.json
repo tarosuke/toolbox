@@ -5,10 +5,10 @@
 			"name": "テストのデバッグ",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${workspaceFolder}/DEBUG/.tests/${fileBasenameNoExtension}",
+			"program": "${workspaceFolder}/DEBUG/tests/${fileBasenameNoExtension}",
 			"args": [],
 			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/DEBUG/.tests",
+			"cwd": "${workspaceFolder}/DEBUG/tests",
 			"environment": [],
 			"externalConsole": false,
 			"MIMode": "gdb",
@@ -17,18 +17,29 @@
 					"description": "gdb の再フォーマットを有効にする",
 					"text": "-enable-pretty-printing",
 					"ignoreFailures": true
+				},
+				{
+					"text": "set substitute-path /build/gcc/src/gcc-build/x86_64-pc-linux-gnu/libstdc++-v3/include /usr/include/c++/11.1.0"
+				},
+				{
+					"text": "set substitute-path /build/gcc/src/gcc/libstdc++-v3 /home/tarosuke/gcc/libstdc++-v3"
+				},
+				{
+					"text": "set substitute-path /build/vulkan-validation-layers/srczVulkan-ValidationLayers /home/tarosuke/Vulkan-ValidationLayers"
 				}
 			],
 			"miDebuggerPath": "/usr/bin/gdb"
 		},
 		{
-			"name": "手動テストのデバッグ",
+			"name": "DEBUG版で起動",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${workspaceFolder}/DEBUG/.mtests/${fileBasenameNoExtension}",
-			"args": [],
+			"program": "${workspaceFolder}/DEBUG/wODM",
+			"args": [
+				"--GLDummyHMD=true"
+			],
 			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/DEBUG/.mtests/",
+			"cwd": "${workspaceFolder}/DEBUG",
 			"environment": [],
 			"externalConsole": false,
 			"MIMode": "gdb",
