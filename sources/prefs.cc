@@ -1,5 +1,5 @@
 /*********************************************************************** prefs
- * Copyright (C) 2015-2021,2023 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2015-2021,2023,2024 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,8 +21,8 @@
  * くれる便利クラス
  */
 
+#include <fstream>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
 #include <unistd.h>
@@ -30,52 +30,63 @@
 #include <tb/prefs.h>
 #include <tb/string.h>
 
-
 namespace tb {
 
 	CommonPrefs* CommonPrefs::q(0);
-	Path CommonPrefs::path;
+	std::filesystem::path
+		CommonPrefs::pathes[(unsigned)CommonPrefs::Level::nLevel];
 
-
-	void CommonPrefs::LoadLine(const char* line) {
+	void CommonPrefs::LoadLine(unsigned level, const std::string& line) {
+		const unsigned delim(line.find_first_of('='));
+		const std::string key(line.substr(0, delim));
+		const std::string value(line.substr(delim + 1));
 		for (CommonPrefs* i(q); i; i = (*i).next) {
-			const auto len(strlen(i->key));
-			if (!strncmp(i->key, line, len)) {
-				// 形式チェック
-				if (len < 1 || line[len] != '=') {
-					syslog(LOG_ALERT, "invalid option:%s", line);
-					return;
-				}
-				i->DeSerialize(line + len + 1);
+			if (!strcmp(key.c_str(), i->key)) {
+				i->DeSerialize(level, value.c_str());
 			}
 		}
 	}
 
 	void CommonPrefs::Load(int argc, const char** argv, const char* n) {
 		// nが指定されていたらそれを、でなければargv[0]のファイル名を使う
-		String name(n ? n : Path::Base(argv[0]));
+		const std::filesystem::path base(
+			std::filesystem::path(argv[0]).filename());
+
+		// カレントを設定
+		pathes[(unsigned)Level::current] =
+			std::filesystem::current_path() / base;
 
 		// 設定ファイルのパスを生成
-		const char* const home(getenv("HOME"));
-		path = home ? home : "/root";
-		path += "/.";
-		path += name;
+		pathes[(unsigned)Level::home] =
+			std::filesystem::path(getenv("HOME")) / ".config/" / base;
 
-		FILE* const file(fopen(path.c_str(), "r"));
+		// システムファイルのパスを生成
+		pathes[(unsigned)Level::etc] = std::filesystem::path("/etc/") / base;
 
-		if (!file) {
+		// コマンドラインと設定読み込み
+		Parse(argc, argv);
+		for (unsigned n(1); n < (unsigned)Level::nLevel; ++n) {
+			Load(n);
+		}
+	}
+
+	void CommonPrefs::Load(unsigned level) {
+		const std::filesystem::path& p(pathes[level]);
+		if (!*p.c_str()) {
+			// 空：たぶんLevel::value
 			return;
 		}
 
-		for (char b[256]; fgets(b, sizeof(b), file);) {
-			auto l(strlen(b));
-			if (1 <= l && (b[l - 1] == '\n' || b[l - 1] == '\r')) {
-				// 末尾の改行は潰す
-				b[l - 1] = 0;
-			}
-			LoadLine(b);
+		std::ifstream file(p, std::ios_base::in);
+		if (!file) {
+			// 開けなかった：たぶんファイルがない
+			return;
 		}
-		fclose(file);
+
+		// 設定ファイルを行ごとに読む
+		for (std::string line; getline(file, line);) {
+			LoadLine(level, line);
+		}
 	}
 
 	unsigned CommonPrefs::Parse(int argc, const char** argv) {
@@ -111,128 +122,38 @@ namespace tb {
 				line += arg[0] == '-' ? 'f' : 't';
 			}
 
-			LoadLine(line.c_str());
+			LoadLine((unsigned)Level::value, line.c_str());
 		}
 		return argc;
 	}
 
 	void CommonPrefs::Store() {
-		FILE* const file(fopen(path.c_str(), "w"));
+		for (unsigned n(1); n < (unsigned)Level::nLevel; ++n) {
+			FILE* const file(fopen(pathes[n].c_str(), "w"));
 
-		if (!file) {
-			return;
-		}
-
-		for (CommonPrefs* i(q); i; i = (*i).next) {
-			if (i->attr == save) {
-				String line(i->key);
-				line += '=';
-				line += i->Serialize();
-				line += '\n';
-				fputs(line.c_str(), file);
+			if (!file) {
+				break;
 			}
-		}
-		fclose(file);
-	}
 
+			for (CommonPrefs* i(q); i; i = (*i).next) {
+				if (i->attr == save) {
+					String line(i->key);
+					line += '=';
+					line += i->Serialize(Level::value);
+					line += '\n';
+					fputs(line.c_str(), file);
+				}
+			}
+			fclose(file);
+		}
+	}
 
 	CommonPrefs::CommonPrefs(
 		const char* key, const char* description, Attribute attr)
-		: key(key), attr(attr) {
+		: key(key),
+		  attr(attr) {
 		// スタックに自身を追加
 		next = q;
 		q = this;
 	}
-
-
-
-	// Integerみたいな抽象型がないばっかりにこんなことになっているksg
-	template <> String Prefs<bool>::Serialize() {
-		return String(body ? "true" : "false");
-	}
-	template <> String Prefs<i8>::Serialize() {
-		String r;
-		r.Append(body);
-		return r;
-	}
-	template <> String Prefs<i16>::Serialize() {
-		String r;
-		r.Append(body);
-		return r;
-	}
-	template <> String Prefs<i32>::Serialize() {
-		String r;
-		r.Append(body);
-		return r;
-	}
-	template <> String Prefs<i64>::Serialize() {
-		String r;
-		r.Append(body);
-		return r;
-	}
-	template <> String Prefs<u8>::Serialize() {
-		String r;
-		r.Append(body);
-		return r;
-	}
-	template <> String Prefs<u16>::Serialize() {
-		String r;
-		r.Append(body);
-		return r;
-	}
-	template <> String Prefs<u32>::Serialize() {
-		String r;
-		r.Append(body);
-		return r;
-	}
-	template <> String Prefs<u64>::Serialize() {
-		String r;
-		r.Append(body);
-		return r;
-	}
-	// 誤差避けのためSerializeするときはメモリの形式そのままのダンプ
-	template <> String Prefs<float>::Serialize() {
-		String r("0x");
-		r.Append(*(u32*)&body, '0', 8, 16);
-		return r;
-	}
-	template <> void Prefs<bool>::DeSerialize(const char* t) {
-		body = *t == 't' || *t == 'T' || *t == '1' || *t == 'y' || *t == 'Y';
-	}
-	template <> void Prefs<i8>::DeSerialize(const char* t) {
-		body = strtol(t, 0, 10);
-	}
-	template <> void Prefs<i16>::DeSerialize(const char* t) {
-		body = strtol(t, 0, 10);
-	}
-	template <> void Prefs<i32>::DeSerialize(const char* t) {
-		body = strtol(t, 0, 10);
-	}
-	template <> void Prefs<i64>::DeSerialize(const char* t) {
-		body = strtol(t, 0, 10);
-	}
-	template <> void Prefs<u8>::DeSerialize(const char* t) {
-		body = strtoul(t, 0, 10);
-	}
-	template <> void Prefs<u16>::DeSerialize(const char* t) {
-		body = strtoul(t, 0, 10);
-	}
-	template <> void Prefs<u32>::DeSerialize(const char* t) {
-		body = strtoul(t, 0, 10);
-	}
-	template <> void Prefs<u64>::DeSerialize(const char* t) {
-		body = strtoul(t, 0, 10);
-	}
-	// 0x始まりならダンプ形式
-	template <> void Prefs<float>::DeSerialize(const char* t) {
-		if (t[0] == '0' && t[1] == 'x') {
-			*(u32*)&body = strtoul(t + 2, 0, 16);
-		} else {
-			body = strtof(t, 0);
-		}
-	}
-
-
-	template <> String Prefs<String>::Serialize() { return body; }
-	template <> void Prefs<String>::DeSerialize(const char* t) { body = t; }
 }

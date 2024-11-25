@@ -1,5 +1,5 @@
 /*********************************************************************** prefs
- * Copyright (C) 2015-2021,2023 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2015-2021,2023,2024 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,16 +24,24 @@
  * 設定はKeeperを作ると読み込まれ、Keeperが消滅すると保存される。
  * Keeperにはargc,argv,nameを与える。nameが省略されるとargv[0]の最後が使われる。
  *
+ * ファイルのパスにはレベルごとに以下のものが使われる。ただし0は読み書きされない
+ * 1: .
+ * 2: ~/.config
+ * 3: /etc
+ *
+ * 値の読み出しは変数のように行えるが、書き込みにはSetを使う。
+ * 代入演算子もあるがこれで設定するとlevelに0を指定するのと同じになる。
+ *
  * 末端の設定に何かさせたい時はPrefsの子クラスを作ってExtendedHandlerをオー
  * バーライドした上で呼び出す。また全ての設定を辿る時はItorを作って0になるま
  * でループする。
  */
 #pragma once
 
-#include <tb/path.h>
+#include <filesystem>
+#include <stdlib.h>
 #include <tb/string.h>
-
-
+#include <type_traits>
 
 namespace tb {
 
@@ -42,22 +50,24 @@ namespace tb {
 	 * のでインスタンスを共通化するための親クラス
 	 */
 	class CommonPrefs {
-		CommonPrefs();
-		CommonPrefs(const CommonPrefs&);
-		void operator=(const CommonPrefs&);
+		CommonPrefs() = delete;
+		CommonPrefs(const CommonPrefs&) = delete;
+		void operator=(const CommonPrefs&) = delete;
 
 	public:
+		enum class Level : unsigned { value = 0, current, home, etc, nLevel };
+
 		// 属性値
 		enum Attribute {
 			save,
 			nosave,
 		};
 
-		// 設定の読み込みと保存キー
+		// 設定の読み込みと保存のキー
 		class Keeper {
-			Keeper();
-			Keeper(const Keeper&);
-			void operator=(const Keeper&);
+			Keeper() = delete;
+			Keeper(const Keeper&) = delete;
+			void operator=(const Keeper&) = delete;
 
 		public:
 			Keeper(int argc, const char** argv, const char* name = 0) {
@@ -73,20 +83,19 @@ namespace tb {
 		};
 
 	protected:
-		CommonPrefs(
-			const char* key,
+		CommonPrefs(const char* key,
 			const char* description = 0,
 			Attribute attr = save);
-		virtual ~CommonPrefs(){};
+		virtual ~CommonPrefs() {};
 
-		virtual String Serialize() = 0;
-		virtual void DeSerialize(const char*) = 0;
+		virtual String Serialize(Level level) = 0;
+		virtual void DeSerialize(unsigned level, const char*) = 0;
 
 		// 拡張用ハンドラ
-		virtual void ExtendedHandler(void* = 0){};
+		virtual void ExtendedHandler(void* = 0) {};
 
 	private:
-		static Path path;
+		static std::filesystem::path pathes[(unsigned)Level::nLevel];
 
 		static CommonPrefs* q;
 		CommonPrefs* next;
@@ -96,10 +105,12 @@ namespace tb {
 
 		static unsigned Parse(int argc, const char** argv);
 		static void Load(int argc, const char** argv, const char* name);
+		static void Load(unsigned level);
 		static void Store();
-		static void LoadLine(const char*);
+		static void Store(const std::filesystem::path&);
+		static void LoadLine(unsigned, const std::string&);
 
-		const char* MatchedBody(const char*);
+		const char* MatchedBody(unsigned level, const char*);
 	};
 
 	/**
@@ -119,24 +130,74 @@ namespace tb {
 	public:
 		Prefs(
 			const char* key, const char* description = 0, Attribute attr = save)
-			: CommonPrefs(key, description, attr){};
-		Prefs(
-			const char* key,
+			: CommonPrefs(key, description, attr) {};
+		Prefs(const char* key,
 			const T& defaultValue,
 			const char* description = 0,
 			Attribute attr = save)
-			: CommonPrefs(key, description, attr), body(defaultValue){};
-		~Prefs(){};
+			: CommonPrefs(key, description, attr) {
+			Set((unsigned)Level::value, defaultValue);
+		};
+		~Prefs() {};
 
-		operator const T&() const { return body; };
-		void operator=(const T& v) { body = v; };
+		operator const T&() const { return GetValid(); };
+		void Set(unsigned level, const T& v) { values[level].Set(v, true); };
+		void operator=(const T& v) { Set(0, v); };
+		const T& Get(unsigned level) { return values[level].Get(); };
 
 	protected:
-		T body;
+		struct Value {
+			Value() : valid(false), dirty(false) {};
+			void Set(const T& v, bool d) {
+				value = v;
+				valid = true;
+				dirty = d;
+			};
+			String Serialize() {
+				String r;
+				r.Append(value);
+				return r;
+			};
+			void DeSerialize(const char* t) {
+				if constexpr (std::is_same<T, bool>::value) {
+					Set(!(*t == 'f' || *t == 'F' || *t == 'n' || *t == 'n' ||
+							*t == '0'),
+						false);
+				} else if constexpr (std::is_integral<T>::value) {
+					if constexpr (std::is_unsigned<T>::value) {
+						Set(strtoul(t, 0, 10), false);
+					} else {
+						Set(strtol(t, 0, 10), false);
+					}
+				} else if constexpr (std::is_floating_point<T>::value) {
+					Set(atof(t), false);
+				} else if (std::is_same<T, std::string>::value) {
+					value = t;
+					valid = true;
+					dirty = false;
+				}
+			};
+			bool valid;
+			bool dirty;
+			T value;
+		} values[(unsigned)Level::nLevel];
 
 	private:
-		String Serialize() final;
-		void DeSerialize(const char*) final;
+		String Serialize(Level level) final {
+			return values[(unsigned)level].Serialize();
+		};
+		void DeSerialize(unsigned level, const char* value) final {
+			values[level].DeSerialize(value);
+		};
+		const T& GetValid() const {
+			for (unsigned n(0); n < (unsigned)Level::nLevel; ++n) {
+				const auto& v(values[n]);
+				if (v.valid) {
+					return v.value;
+				}
+			}
+			return values[0].value;
+		};
 	};
 
 }

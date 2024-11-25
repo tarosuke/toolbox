@@ -20,11 +20,22 @@
 #include <stdio.h>
 #include <tb/string.h>
 
-
-
 namespace tb {
 
 	const char String::numericChars[] = "0123456789abcdef";
+
+	template <> String& String::Append(bool v, char, uint, uint) {
+		append(v ? "true" : "false");
+		return *this;
+	}
+	template <> String& String::Append(const String v, char, uint, uint) {
+		append(v);
+		return *this;
+	}
+	template <> String& String::Append(const char* v, char, uint, uint) {
+		append(v);
+		return *this;
+	}
 
 	template <> String& String::Append(u64 v, char p, uint w, uint r) {
 		if (!w) {
