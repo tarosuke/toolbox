@@ -21,8 +21,6 @@
 #include <tb/image.h>
 #include <tb/types.h>
 
-
-
 namespace tb {
 
 	// std::stringの拡張
