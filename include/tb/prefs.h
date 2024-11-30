@@ -90,6 +90,7 @@ namespace tb {
 
 		virtual String Serialize(Level level) = 0;
 		virtual void DeSerialize(unsigned level, const char*) = 0;
+		virtual bool IsDirty(unsigned) = 0;
 
 		// 拡張用ハンドラ
 		virtual void ExtendedHandler(void* = 0) {};
@@ -141,17 +142,16 @@ namespace tb {
 		~Prefs() {};
 
 		operator const T&() const { return GetValid(); };
-		void Set(unsigned level, const T& v) { values[level].Set(v, true); };
+		void Set(unsigned level, const T& v) { values[level].Set(v); };
 		void operator=(const T& v) { Set(0, v); };
 		const T& Get(unsigned level) { return values[level].Get(); };
 
 	protected:
 		struct Value {
 			Value() : valid(false), dirty(false) {};
-			void Set(const T& v, bool d) {
+			void Set(const T& v) {
 				value = v;
-				valid = true;
-				dirty = d;
+				valid = dirty = true;
 			};
 			String Serialize() {
 				String r;
@@ -165,16 +165,15 @@ namespace tb {
 						false);
 				} else if constexpr (std::is_integral<T>::value) {
 					if constexpr (std::is_unsigned<T>::value) {
-						Set(strtoul(t, 0, 10), false);
+						Set(strtoul(t, 0, 10));
 					} else {
-						Set(strtol(t, 0, 10), false);
+						Set(strtol(t, 0, 10));
 					}
 				} else if constexpr (std::is_floating_point<T>::value) {
-					Set(atof(t), false);
+					Set(atof(t));
 				} else if (std::is_same<T, std::string>::value) {
 					value = t;
-					valid = true;
-					dirty = false;
+					valid = dirty = true;
 				}
 			};
 			bool valid;
@@ -189,6 +188,7 @@ namespace tb {
 		void DeSerialize(unsigned level, const char* value) final {
 			values[level].DeSerialize(value);
 		};
+		bool IsDirty(unsigned l) final { return values[l].dirty; };
 		const T& GetValid() const {
 			for (unsigned n(0); n < (unsigned)Level::nLevel; ++n) {
 				const auto& v(values[n]);

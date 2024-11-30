@@ -129,14 +129,28 @@ namespace tb {
 
 	void CommonPrefs::Store() {
 		for (unsigned n(1); n < (unsigned)Level::nLevel; ++n) {
+			// dirtyチェック
+			bool dirty(false);
+			for (CommonPrefs* i(q); i; i = i->next) {
+				if (i->IsDirty(n)) {
+					dirty = true;
+					break;
+				}
+			}
+			if (!dirty) {
+				continue;
+			}
+
+			// ファイルを開いて
 			FILE* const file(fopen(pathes[n].c_str(), "w"));
 
 			if (!file) {
 				break;
 			}
 
+			// dirtyな項目だけ書き込む
 			for (CommonPrefs* i(q); i; i = (*i).next) {
-				if (i->attr == save) {
+				if (i->IsDirty(n) && i->attr == save) {
 					String line(i->key);
 					line += '=';
 					line += i->Serialize(Level::value);
