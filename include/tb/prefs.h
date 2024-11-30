@@ -161,8 +161,7 @@ namespace tb {
 			void DeSerialize(const char* t) {
 				if constexpr (std::is_same<T, bool>::value) {
 					Set(!(*t == 'f' || *t == 'F' || *t == 'n' || *t == 'n' ||
-							*t == '0'),
-						false);
+						  *t == '0'));
 				} else if constexpr (std::is_integral<T>::value) {
 					if constexpr (std::is_unsigned<T>::value) {
 						Set(strtoul(t, 0, 10));

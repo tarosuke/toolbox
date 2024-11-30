@@ -53,8 +53,8 @@ namespace tb {
 			std::filesystem::path(argv[0]).filename());
 
 		// カレントを設定
-		pathes[(unsigned)Level::current] =
-			std::filesystem::current_path() / base;
+		pathes[(unsigned)Level::current] = std::filesystem::current_path() /
+										   (std::string(".") + base.string());
 
 		// 設定ファイルのパスを生成
 		pathes[(unsigned)Level::home] =
