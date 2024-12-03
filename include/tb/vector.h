@@ -21,8 +21,6 @@
 #include <tb/types.h>
 #include <type_traits>
 
-
-
 namespace tb {
 	template <uint D, typename T> struct Vector {
 		///// 構築子、代入、[]
@@ -52,42 +50,46 @@ namespace tb {
 
 		operator auto &() { return a; };
 		operator const auto &() const { return a; };
-
+		template <typename U> const Vector& operator=(const U& o) {
+			for (unsigned n(0); n < D; ++n) {
+				a[n] = o[n];
+			}
+			return *this;
+		}
 
 		// 比較(実数の場合誤差が一定以下なら同値とする)
 		bool operator==(const Vector& o) const {
 			for (uint n(0); n < D; ++n) {
-				if (a[n] != o.a[n]) {
+				if (a[n] != o[n]) {
 					return false;
 				}
 			}
 			return true;
 		};
 
-
 		///// 四則演算
-		Vector operator+(const Vector& o) const {
+		template <typename U> Vector operator+(const U& o) const {
 			Vector r;
 			for (uint n(0); n < D; ++n) {
-				r.a[n] = a[n] + o.a[n];
+				r.a[n] = a[n] + o[n];
 			}
 			return r;
 		};
-		Vector operator-(const Vector& o) const {
+		template <typename U> Vector operator-(const U& o) const {
 			Vector r;
 			for (uint n(0); n < D; ++n) {
-				r.a[n] = a[n] - o.a[n];
+				r.a[n] = a[n] - o[n];
 			}
 			return r;
 		};
-		Vector operator*(T o) const {
+		template <typename U> Vector operator*(U o) const {
 			Vector r;
 			for (uint n(0); n < D; ++n) {
 				r.a[n] = a[n] * o;
 			}
 			return r;
 		};
-		Vector operator/(T o) const {
+		template <typename U> Vector operator/(U o) const {
 			Vector r;
 			for (uint n(0); n < D; ++n) {
 				r.a[n] = a[n] / o;
@@ -95,31 +97,31 @@ namespace tb {
 			return r;
 		}
 
-		const Vector& operator+=(const Vector& o) {
+		template <typename U> const Vector& operator+=(const U& o) {
+
 			for (uint n(0); n < D; ++n) {
-				a[n] += o.a[n];
+				a[n] += o[n];
 			}
 			return *this;
 		};
-		const Vector& operator-=(const Vector& o) {
+		template <typename U> const Vector& operator-=(const U& o) {
 			for (uint n(0); n < D; ++n) {
-				a[n] -= o.a[n];
+				a[n] -= o[n];
 			}
 			return *this;
 		};
-		const Vector& operator*=(T o) {
+		template <typename U> const Vector& operator*=(U o) {
 			for (uint n(0); n < D; ++n) {
 				a[n] *= o;
 			}
 			return *this;
 		};
-		const Vector& operator/=(T o) {
+		template <typename U> const Vector& operator/=(U o) {
 			for (uint n(0); n < D; ++n) {
 				a[n] /= o;
 			}
 			return *this;
 		};
-
 
 		///// ノルム
 		T Norm2() const {
@@ -132,7 +134,6 @@ namespace tb {
 		T Norm() const { return sqrt(Norm2()); };
 		void Normalize() { *this / Norm(); };
 
-
 		///// 積
 		T operator*(const Vector& o) const {
 			T r(0);
@@ -144,8 +145,7 @@ namespace tb {
 
 		Vector Cross(const Vector& o) const {
 			if constexpr (D == 3) {
-				return Vector<3, T>(
-					a[1] * o.a[2] - a[2] * o.a[1],
+				return Vector<3, T>(a[1] * o.a[2] - a[2] * o.a[1],
 					a[2] * o.a[0] - a[0] * o.a[2],
 					a[0] * o.a[1] - a[1] * o.a[0]);
 			} else if constexpr (D == 7) {
