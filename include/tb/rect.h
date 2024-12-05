@@ -21,23 +21,24 @@
 #include <tb/spread.h>
 #include <tb/vector.h>
 
-
-
 namespace tb {
 
 	template <unsigned D, typename T> struct Rect {
 		Rect() {};
-		Rect(const Vector<D, T>& a, const Vector<D, T>& b)
-			: left(Less(a, b)), right(More(a, b)) {};
-		Rect(const Vector<D, T>& p, const Spread<D, T>& s) : Rect(p, p + s) {};
-		Rect(const Spread<D, T>& s) {
+		template <typename U>
+		Rect(const Vector<D, T>& a, const Vector<D, U>& b)
+			: left(Less(a, b)),
+			  right(More(a, b)){};
+		template <typename U>
+		Rect(const Vector<D, T>& p, const Spread<D, U>& s) : Rect(p, p + s){};
+		template <typename U> Rect(const Spread<D, U>& s) {
 			for (unsigned n(0); n < D; ++n) {
 				left[n] = 0;
 				right[n] = s[n];
 			}
 		};
 
-		template <typename TT> Rect(const Rect<D, TT>& o) {
+		template <typename U> Rect(const Rect<D, U>& o) {
 			for (unsigned n(0); n < D; ++n) {
 				left[n] = o.Left()[n];
 				right[n] = o.Right()[n];
@@ -45,11 +46,10 @@ namespace tb {
 		}
 
 		Rect& operator=(const Rect&) = default;
-		template <typename U> const Rect& operator=(const Rect<D, U>& o) {
+		template <typename R> const Rect& operator=(const R& o) {
 			left = (T)o.left;
 			right = (T)o.right;
 		};
-
 
 		void Clear() {
 			left.Clear();
@@ -111,28 +111,30 @@ namespace tb {
 		Spread<D, T> GetSpread() const {
 			return tb::Spread<D, T>(right - left);
 		};
-		Rect operator+(const Vector<D, T>& t) const {
+		template <typename U> Rect operator+(const Vector<D, U>& t) const {
 			return Rect(left + t, right + t);
 		};
-		Rect operator-(const Vector<D, T>& t) const {
+		template <typename U> Rect operator-(const Vector<D, U>& t) const {
 			return Rect(left - t, right - t);
 		};
-		Rect& operator+=(const Vector<D, T>& t) {
+		template <typename U> Rect& operator+=(const Vector<D, U>& t) {
 			left += t;
 			right += t;
 			return *this;
 		};
-		Rect& operator-=(const Vector<D, T>& t) {
+		template <typename U> Rect& operator-=(const Vector<D, U>& t) {
 			left -= t;
 			right -= t;
 			return *this;
 		};
-		Rect& operator*=(T m) {
+		template <typename U> Rect& operator*=(U m) {
 			left *= m;
 			right *= m;
 			return *this;
 		};
-		Rect operator*(T m) { return Rect{left * m, right * m}; };
+		template <typename U> Rect operator*(U m) {
+			return Rect{left * m, right * m};
+		};
 		operator bool() const {
 			for (unsigned n(0); n < D; ++n) {
 				if (right[n] <= left[n]) {
@@ -146,7 +148,8 @@ namespace tb {
 	private:
 		Vector<D, T> left; // keep left lesser value
 		Vector<D, T> right;
-		static Vector<D, T> Less(const Vector<D, T>& a, const Vector<D, T>& b) {
+		template <typename U>
+		static Vector<D, T> Less(const Vector<D, T>& a, const Vector<D, U>& b) {
 			T v[D];
 			for (unsigned n(0); n < D; ++n) {
 				const T aa(a[n]);
@@ -155,7 +158,8 @@ namespace tb {
 			}
 			return Vector<D, T>(v);
 		};
-		static Vector<D, T> More(const Vector<D, T>& a, const Vector<D, T>& b) {
+		template <typename U>
+		static Vector<D, T> More(const Vector<D, T>& a, const Vector<D, U>& b) {
 			T v[D];
 			for (unsigned n(0); n < D; ++n) {
 				const T aa(a[n]);
