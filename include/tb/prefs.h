@@ -123,10 +123,10 @@ namespace tb {
 	 * ある
 	 * NOTE:処理がmainに入るまでは機能しない
 	 */
-	template <typename T> class Prefs : public CommonPrefs {
-		Prefs();
-		Prefs(const Prefs&);
-		void operator=(const Prefs&);
+	template <typename T> struct Prefs : public CommonPrefs {
+		Prefs() = delete;
+		Prefs(const Prefs&) = delete;
+		void operator=(const Prefs&) = delete;
 
 	public:
 		Prefs(
