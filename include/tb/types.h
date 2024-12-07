@@ -20,8 +20,6 @@
 
 #include <stdint.h>
 
-
-
 namespace tb {
 
 	using u8 = uint8_t;
@@ -40,28 +38,28 @@ namespace tb {
 
 	using uint = unsigned;
 
-
 	// クラス化(Tは基本型を想定している)
 	template <typename T> struct Class {
 		Class() = default;
-		Class(const T& t) : body(t){};
+		Class(const T& t) : body(t) {};
 		T& operator=(const T& t) { return body = t; };
 		operator T() const { return body; };
 
-		bool operator==(const T& t) const { return body == t; };
-		bool operator!=(const T& t) const { return body != t; };
+		// NOTE:二項演算子は既存のそれと重複する可能性があるので暫定的に削除
+		// bool operator==(const T& t) const { return body == t; };
+		// bool operator!=(const T& t) const { return body != t; };
 
-		T operator+(const T& t) const { return body + t; };
-		T operator-(const T& t) const { return body - t; };
-		T operator*(const T& t) const { return body * t; };
-		T operator/(const T& t) const { return body / t; };
-		T operator%(const T& t) const { return body % t; };
-		T operator&(const T& t) const { return body & t; };
-		T operator|(const T& t) const { return body | t; };
-		T operator^(const T& t) const { return body ^ t; };
-		T operator<<(const T& t) const { return body << t; };
-		T operator>>(const T& t) const { return body >> t; };
-		T operator~() const { return ~body; };
+		// T operator+(const T& t) const { return body + t; };
+		// T operator-(const T& t) const { return body - t; };
+		// T operator*(const T& t) const { return body * t; };
+		// T operator/(const T& t) const { return body / t; };
+		// T operator%(const T& t) const { return body % t; };
+		// T operator&(const T& t) const { return body & t; };
+		// T operator|(const T& t) const { return body | t; };
+		// T operator^(const T& t) const { return body ^ t; };
+		// T operator<<(const T& t) const { return body << t; };
+		// T operator>>(const T& t) const { return body >> t; };
+		// T operator~() const { return ~body; };
 
 		T& operator+=(const T& t) { return body += t; };
 		T& operator-=(const T& t) { return body -= t; };
