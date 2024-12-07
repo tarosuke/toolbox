@@ -19,30 +19,43 @@
  */
 #pragma once
 #include "tb/types.h"
-
-
+#include <sys/time.h>
 
 namespace tb {
 
 	/***** 時間関連クラスの基本
-	 * 正直なところ、これらのクラスを作ったのはtimespecを直接触りたくないから。
+	 * timespecやtimevalを直接触りたくない。
 	 * 十進ベースでバッチイことこの上ない。
 	 */
-	struct nsec : public Class<u64> {
+	struct nsec : public Class<i64> {
 		nsec() { Update(); };
-		nsec(u64 o) : Class(o){};
+		nsec(u64 o) : Class(o) {};
 		const nsec& operator=(const nsec& t) {
 			*(Class*)this = t;
 			return *this;
 		};
 		void Update();
+		operator timeval() {
+			struct timeval t = {
+				tv_sec : *this / 1000000000L,
+				tv_usec : (*this % 1000000000L) / 1000L
+			};
+			return t;
+		};
+		operator timespec() {
+			struct timespec t = {
+				tv_sec : *this / 1000000000LL,
+				tv_nsec : *this % 1000000000LL
+			};
+			return t;
+		};
 	};
 
 	template <unsigned S> struct Time : nsec {
-		Time(){};
-		Time(u64 init) : nsec(init * S){};
-		const Time& operator=(u64 t) { body = t * S; };
-		operator u64() const { return body / S; };
+		Time() {};
+		Time(i64 init) : nsec(init * S) {};
+		const Time& operator=(i64 t) { body = t * S; };
+		operator i64() const { return body / S; };
 
 		bool operator==(const nsec& t) const { return body == t * S; };
 		bool operator!=(const nsec& t) const { return body != t * S; };
@@ -52,10 +65,9 @@ namespace tb {
 	using msec = Time<1000000>;
 	using usec = Time<1000>;
 
-
 	// タイムスタンプ管理
 	struct Timestamp {
-		Timestamp() : uptime(1), delta(1){};
+		Timestamp() : uptime(1), delta(1) {};
 		void Update();
 		nsec Uptime() const { return uptime; };
 		nsec Delta() const { return delta; };
