@@ -1,4 +1,4 @@
-/** Copyright (C) 2023 tarosuke<webmaster@tarosuke.net>
+/** Copyright (C) 2023, 2024 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,106 +17,72 @@
  */
 #pragma once
 
-#include <limits>
 #include <tb/key.h>
 #include <tb/types.h>
 #include <vector>
-
-
 
 namespace tb {
 
 	/***** 要素がNodeで管理される配列
 	 * TはArray<T>::Nodeの特である必要がある
 	 * 排他制御が必要ならLにロックを設定する(規定は何もしないダミーのロック)
-	 * NodeをIDを指定して作るとArray上にIDとして設定される
-	 * NodeをIDなしで作るとIDが割り当てられて設定される
 	 * Arrayがなくなると繋がれている全NodeのNotifyArrayDeletedが呼ばれる
-	 * NOTE:ID指定NodeとIDなしNodeをひとつのArrayで混ぜて使わないこと
 	 */
-	template <class T, class L = NullLock, typename I = uint> struct Array : L {
+	template <class T, class L = NullLock, typename ID = uint> struct Array {
 		struct Node {
-			friend class Array;
-			Node() = delete;
-			Node(const Node&) = delete;
-			void operator=(const Node&) = delete;
-
-			Node(Array& a, I id) : array(a), id(id) { a.Attach(*this, id); };
-			Node(Array& a) : array(a), id(a.Attach(*this)){};
-			virtual ~Node() { array.Detach(id); };
-			I ID() const { return id; };
-
-		protected:
-			virtual void NotifyArrayDeleted(){};
+			void Attach(Array& t, ID i) {
+				array = &t;
+				id = i;
+				t.Attach(*this, i);
+			};
+			void Detach() {
+				if (array) {
+					array.Detach(id);
+					array = 0;
+				}
+			};
+			Node() : array(0) {};
+			Node(Array& t, ID i) { Attach(t, i); };
+			virtual ~Node() { Detach(); };
+			virtual void NotifyArrayDeleted() {};
 
 		private:
-			Array& array;
-			const I id;
+			Array* array;
+			ID id;
 		};
 
-		Array() : pool(invalid){};
-		~Array() {
-			for (auto& i : body) {
-				if (i.node) {
-					i.node->NotifyArrayDeleted();
-				}
-			}
-		};
 
-		T operator[](I index) { return body[index]; };
+		Array() = default;
+		T* operator[](ID id) { return (T*)array[id]; };
 
 	private:
-		static constexpr I invalid = std::numeric_limits<I>::max();
-		struct Index {
-			Index() : node(0){};
+		struct N {
+			void Attach(Node& t) { target = &t; };
+			void Detach() { target = 0; };
 
-			void operator=(Node& n) { node = &n; };
-			operator T&() { return *dynamic_cast<T*>(node); };
+			N() : target(0) {};
+			virtual ~N() {
+				if (target) {
+					target->NotifyArrayDeleted();
+				}
+			};
+			operator T*() { return dynamic_cast<T*>(target); };
 
-			Node* node;
-			I next;
+		private:
+			Node* target;
 		};
-		std::vector<Index> body;
-		I pool;
-		void Detach(I index) {
-			Key<L> key(*this);
+		std::vector<N> array;
 
-			// 要素をpoolへつなぐ
-			Index i(body[index]);
-			i.node = 0;
-			i.next = pool;
-			pool = index;
-		};
-		void Attach(Node& node, I index) {
-			Key<L> key(*this);
-
-			if (body.size() <= index) {
-				body.resize(index);
+		void Attach(T& target, ID id) {
+			Key<Array> key(*this);
+			if (array.size() <= id) {
+				array.resize(id + 1);
 			}
-
-			attach(node, index);
+			array[id].Attach(target);
 		};
-		I Attach(Node& node) {
-			Key<L> key(*this);
-
-			// 要素を割り当ててnodeを結びつける
-			if (pool == invalid) {
-				// 新規割当
-				const I l(body.size());
-				body.resize(l + 1);
-				attach(node, l);
-				return l;
-			}
-
-			// リサイクル
-			const I l(pool);
-			pool = body[pool].next;
-			attach(node, l);
-			return l;
-		};
-		void attach(Node& node, I index) {
-			// 要素にnodeを結びつける
-			body[index].node = &node;
+		void Detach(ID i) {
+			Key<Array> key(*this);
+			array[i].Detach();
 		};
 	};
 }
