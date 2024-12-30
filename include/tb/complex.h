@@ -1,4 +1,4 @@
-/* Copyright (C) 2023, 2924 tarosuke<webmaster@tarosuke.net>
+/* Copyright (C) 2023, 2024 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -143,8 +143,7 @@ namespace tb {
 				return r;
 			} else {
 				static_assert(
-					false,
-					"複素数の乗算は2, 4要素のみ(8, 16要素は未実装)");
+					false, "複素数の乗算は2, 4要素のみ(8, 16要素は未実装)");
 			}
 		};
 
@@ -169,8 +168,8 @@ namespace tb {
 			r.Normalize();
 			return Vector<D - 1, T>(r.a, 1);
 		};
-		::tb::Vector<D - 1, T>
-		ReverseRotate(const ::tb::Vector<D - 1, T>& v) const {
+		::tb::Vector<D - 1, T> ReverseRotate(
+			const ::tb::Vector<D - 1, T>& v) const {
 			auto r(~*this * Complex(v) * *this);
 			r.Normalize();
 			return Vector<D - 1, T>(r.a, 1);
@@ -188,8 +187,7 @@ namespace tb {
 				const auto xw(a[1] * a[0] * 2);
 				const auto yw(a[2] * a[0] * 2);
 				const auto zw(a[3] * a[0] * 2);
-				const T m[3][3] = {
-					{1 - yy - zz, xy + zw, zx - yw},
+				const T m[3][3] = {{1 - yy - zz, xy + zw, zx - yw},
 					{xy - zw, 1 - zz - xx, yz + xw},
 					{zx + yw, yz - xw, 1 - xx - yy}};
 				return tb::Matrix<3, 3, T>(m);
@@ -206,11 +204,9 @@ namespace tb {
 				const auto xw(a[1] * a[0] * 2);
 				const auto yw(a[2] * a[0] * 2);
 				const auto zw(a[3] * a[0] * 2);
-				const T m[4][4] = {
-					{1 - yy - zz, xy + zw, zx - yw, 0},
+				const T m[4][4] = {{1 - yy - zz, xy + zw, zx - yw, 0},
 					{xy - zw, 1 - zz - xx, yz + xw, 0},
-					{zx + yw, yz - xw, 1 - xx - yy, 0},
-					{0, 0, 0, 1}};
+					{zx + yw, yz - xw, 1 - xx - yy, 0}, {0, 0, 0, 1}};
 				return tb::Matrix<4, 4, T>(m);
 			}
 		};

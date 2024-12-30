@@ -59,12 +59,14 @@ mods := $(basename $(srcs) $(spvs))
 objs := $(addprefix $(TARGETDIR)/, $(addsuffix .o, $(mods)))
 deps := $(addprefix $(TARGETDIR)/, $(addsuffix .dep, $(mods)))
 
-
-# subsystems
-subsystems:= $(wildcard subsystems/*)
-EXINCS ?= $(addprefix -I$(CURDIR)/, $(addsuffix /include, $(subsystems)))
-export EXINCS
-
+# commons & subsystems
+commons := $(wildcard commons/*)
+COMMONS += $(abspath $(commons))
+export COMMONS # commonsは継承される
+subsystems := $(wildcard subsystems/*)
+subs := $(COMMONS) $(subsystems) # ヘッダ、ライブラリなどは両方
+IOPTS := $(addprefix -I, $(addsuffix /include, $(subs)))
+LIBS := $(foreach s, $(subs), $(wildcard $(s)/$(TARGETDIR)/*.a))
 
 # 試験用設定
 ifeq ($(MAKECMDGOALS), FULLTEST)
@@ -94,12 +96,12 @@ absPath := 2>&1 | sed -e "s@^\(sources\|include\|tests\)@$(CURDIR)/\1@"
 $(TARGETDIR)/%.o : %.cc $(MAKEFILE)
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
-	@LANG=C $(CC) $(CCOPTS) $(EXINCS) -c -o $@ $< $(absPath)
+	@LANG=C $(CC) $(CCOPTS) $(IOPTS) -c -o $@ $< $(absPath)
 
 $(TARGETDIR)/%.o : %.c $(MAKEFILE)
 	@echo " CC $@"
 	@mkdir -p $(dir $@)
-	@LANG=C ${CC} $(COPTS) $(EXINCS) -c -o $@ $< $(absPath)
+	@LANG=C ${CC} $(COPTS) $(IOPTS) -c -o $@ $< $(absPath)
 
 $(TARGETDIR)/%.o : %.glsl $(MAKEFILE)
 	@echo " OBJCOPY $@"
@@ -140,7 +142,7 @@ $(TARGETDIR)/%.o : $(TARGETDIR)/%.spv $(MAKEFILE)
 
 .PHONY: SUBTARGETS
 SUBTARGETS:
-	@for s in $(subsystems); do make -rj -f $(MAKEFILE) -C $$s $(MAKECMDGOALS) || exit -1; done
+	@for s in $(commons) $(subsystems); do make -rj -f $(MAKEFILE) -C $$s $(MAKECMDGOALS) || exit -1; done
 
 
 $(TARGETDIR)/$(libtarget): $(objs) $(MAKEFILE)
@@ -151,7 +153,7 @@ ifneq ($(suffix $(target)),.a)
 $(TARGETDIR)/$(target): $(objs) SUBTARGETS $(MAKEFILE)
 	@echo " LD $@"
 	@mkdir -p $(TARGETDIR)
-	@gcc -o $(TARGETDIR)/$(target) $(objs) $(shell echo $(addsuffix /$(TARGETDIR)/*.a, $(subsystems))) $(EXLIBS)
+	@gcc -o $(TARGETDIR)/$(target) $(objs) $(LIBS) $(EXLIBS)
 # shellとかやってるのはwildcardがコマンド実行前に評価される挙動故
 endif
 
