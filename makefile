@@ -66,7 +66,7 @@ export COMMONS # commonsは継承される
 subsystems := $(wildcard subsystems/*)
 subs := $(COMMONS) $(subsystems) # ヘッダ、ライブラリなどは両方
 IOPTS := $(addprefix -I, $(addsuffix /include, $(subs)))
-LIBS := $(foreach s, $(subs), $(wildcard $(s)/$(TARGETDIR)/*.a))
+LIBS = $(foreach s, $(subs), $(wildcard $(s)/$(TARGETDIR)/*.a))
 
 # 試験用設定
 ifeq ($(MAKECMDGOALS), FULLTEST)
