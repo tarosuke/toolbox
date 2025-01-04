@@ -28,7 +28,8 @@ namespace tb {
 	 * 排他制御が必要ならLにロックを設定する(規定は何もしないダミーのロック)
 	 * Arrayがなくなると繋がれている全NodeのNotifyArrayDeletedが呼ばれる
 	 */
-	template <class T, class L = NullLock, typename ID = uint> struct Array {
+	template <class T, typename ID = uint, class L = NullLock>
+	struct Array : L {
 		struct Node {
 			void Attach(Array& t, ID i) {
 				array = &t;
@@ -37,7 +38,7 @@ namespace tb {
 			};
 			void Detach() {
 				if (array) {
-					array.Detach(id);
+					array->Detach(id);
 					array = 0;
 				}
 			};
@@ -50,12 +51,6 @@ namespace tb {
 			Array* array;
 			ID id;
 		};
-
-
-		Array() = default;
-		T* operator[](ID id) { return (T*)array[id]; };
-
-	private:
 		struct N {
 			void Attach(Node& t) { target = &t; };
 			void Detach() { target = 0; };
@@ -67,13 +62,19 @@ namespace tb {
 				}
 			};
 			operator T*() { return dynamic_cast<T*>(target); };
+			void operator=(T& t) { target = &t; };
 
 		private:
 			Node* target;
 		};
-		std::vector<N> array;
 
-		void Attach(T& target, ID id) {
+
+		Array() = default;
+		N& operator[](ID id) { return array[id]; };
+
+	private:
+		std::vector<N> array;
+		void Attach(Node& target, ID id) {
 			Key<Array> key(*this);
 			if (array.size() <= id) {
 				array.resize(id + 1);
