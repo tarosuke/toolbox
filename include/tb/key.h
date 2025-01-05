@@ -27,18 +27,18 @@ namespace tb {
 	 * キーが存在する間はロックされる
 	 */
 	template <class L> struct Key {
-		Key(L& l) : lock(l) { l.Lock(); };
+		Key(const L& l) : lock(l) { l.Lock(); };
 		~Key() { lock.Unlock(); };
 
 	private:
-		L& lock;
+		const L& lock;
 	};
 
 	/***** 何もしないロック
 	 */
 	struct NullLock {
 		friend class Key<NullLock>;
-		void Lock(){};
-		void Unlock(){};
+		void Lock() const {};
+		void Unlock() const {};
 	};
 };
