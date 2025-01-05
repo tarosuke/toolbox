@@ -47,10 +47,17 @@ namespace tb {
 			virtual ~Node() { Detach(); };
 			virtual void NotifyArrayDeleted() {};
 
+			ID GetID() const { return id; };
+
 		private:
 			Array* array;
 			ID id;
 		};
+
+		Array() = default;
+		T* operator[](ID id) { return dynamic_cast<T*>(GetNode(id)); };
+
+	private:
 		struct N {
 			void Attach(Node& t) { target = &t; };
 			void Detach() { target = 0; };
@@ -64,15 +71,8 @@ namespace tb {
 			operator T*() { return dynamic_cast<T*>(target); };
 			void operator=(T& t) { target = &t; };
 
-		private:
 			Node* target;
 		};
-
-
-		Array() = default;
-		N& operator[](ID id) { return array[id]; };
-
-	private:
 		std::vector<N> array;
 		void Attach(Node& target, ID id) {
 			Key<Array> key(*this);
@@ -84,6 +84,10 @@ namespace tb {
 		void Detach(ID i) {
 			Key<Array> key(*this);
 			array[i].Detach();
+		};
+		Node* GetNode(ID i) const {
+			Key<Array> key(*this);
+			return array[i].target;
 		};
 	};
 }
