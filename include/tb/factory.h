@@ -1,5 +1,5 @@
 /*** 自動登録ファクトリ
- * Copyright (C) 2017,2017,2023,2024 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2017,2017,2023,2024,2025 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,68 +25,52 @@
 namespace tb {
 
 	/***** 自動登録ファクトリ支援クラス
-	 * 抽象型をT、派生をUとすると、以下のように使う。
+	 * 抽象型をT、派生をU, スコアリング/生成時のパラメタをARGSとする。
+	 * ARGSは可変引数なので0個以上であればよいはずだが、2つ以上は未検証。
 	 * struct T{
 	 * 	...
-	 *	static tb::Factory* tb::Factory<T>::start; //-- ファクトリのスタック
+	 *	static tb::Factory* tb::Factory<T, ARGS>::start;
 	 *	...
 	 * };
 	 * ------
 	 * struct U : T{
 	 * 	struct F : tb::Factory<TP{
-	 *		uint Score() override; //-- 評価のための関数
-	 *		T* New() override; //-- Sooreの戻り値が一番大きかったものが呼ばれる
+	 *		uint Score(ARGS) override; //-- 評価のための関数
+	 *		T* New(ARGS) override; //-- Sooreの値が一番大きかったものが呼ばれる
 	 *	};
 	 *	...
 	 *	static F factory; //-- 構築子で自らをスタックに積む
 	 * };
 	 *
-	 * インスタンスを作るときは「tb::Factory<T>::Create();」
+	 * インスタンスを作るときは「tb::Factory<T>::Create(ARGS);」
 	 *
 	 * NOTE:Factory<親クラス>::Createを呼ぶのはmainに入った後にすること
-	 * NOTE:Score, Newの引数はCreateの引数と同じにすること(異なる方は呼ばれない)
+	 * NOTE:Score, Newの引数はCreateの引数と同じにすること
 	 */
-	template <class T> struct Factory {
+	template <class T, typename... ARGS> struct Factory {
 		Factory(const Factory&) = delete;
 		void operator=(const Factory&) = delete;
 
 		Factory() : next(start) { start = this; };
 
-		/***** Factoryにパラメタを渡すための空の構造体
-		 * 実際に何か渡すには継承して、受け取ったらダウンキャストする
-		 * NOTE: dynamic_castが0を返すのはassertで確認するレベルの明らかなバグ
-		 */
-		struct Param {
-			virtual ~Param() {};
-		};
-
-		static T* Create() {
+		static T* Create(ARGS... args) {
 			Match m;
 			for (Factory* f(start); f; f = (*f).next) {
-				m.Scored(f, f->Score());
+				m.Scored(f, f->Score(args...));
 			}
-			return m ? m.matched->New() : 0;
-		}
-		static T* Create(const Param* p) {
-			Match m;
-			for (Factory* f(start); f; f = (*f).next) {
-				m.Scored(f, f->Score(p));
-			}
-			return m ? m.matched->New(p) : 0;
+			return m ? m.matched->New(args...) : 0;
 		}
 
 	protected:
 		// Scoreが返す値の目安
 		struct Certitude {
 			static constexpr uint passiveMatch = 10; // 消極的一致
-			static constexpr uint activeMatch = 20; // 種類は一致
-			static constexpr uint uniqueMatch = 30; // 個別に一致
+			static constexpr uint activeMatch = 20;	 // 種類は一致
+			static constexpr uint uniqueMatch = 30;	 // 個別に一致
 		};
 
-		virtual uint Score() { return 0; };
-		virtual T* New() { return 0; };
-		virtual uint Score(const Param*) { return 0; };
-		virtual T* New(const Param*) { return 0; };
+		virtual uint Score(ARGS...) { return 0; };
+		virtual T* New(ARGS...) { return 0; };
 
 	private:
 		static Factory* start;
@@ -105,4 +89,5 @@ namespace tb {
 			};
 		};
 	};
+
 }
