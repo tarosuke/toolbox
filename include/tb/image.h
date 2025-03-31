@@ -49,7 +49,7 @@ namespace tb {
 		tb::Spread<2, int> Spread() const {
 			return tb::Spread<2, int>((int[]){(int)width, (int)height});
 		};
-		u8* Left(unsigned y) const { return buffer + (y % height) + stride; };
+		u8* Left(unsigned y) const { return buffer + (y % height) * stride; };
 
 		Color Get(unsigned x, unsigned y) const;
 		void Set(unsigned x, unsigned y, const Color&);
@@ -57,13 +57,32 @@ namespace tb {
 
 
 
+		struct Line {
+			struct Pixel {
+				Pixel(const Color::Format& format, tb::u8* left, unsigned x)
+					: format(format),
+					  x(x),
+					  left(left) {};
 
-	protected:
-		u8* const buffer;
-		const Color::Format& format;
-		const unsigned width;  // [px]
-		const unsigned height; // [px]
-		const unsigned stride; // [bytes]
+				operator Color() { return format.Pick(left, x); };
+				void operator=(const Color& c) { format.Post(left, x, c); };
+
+			private:
+				const Color::Format& format;
+				const unsigned x;
+				tb::u8* const left;
+			};
+
+			Line(Image& image, unsigned y)
+				: format(image.Format()),
+				  left(image.Left(y)) {};
+			Pixel operator[](unsigned x) { return Pixel(format, left, x); };
+
+		private:
+			const Color::Format& format;
+			tb::u8* const left;
+		};
+		Line operator[](unsigned y) { return Line(*this, y); };
 
 		/***** Imageインターフェイスの構築子
 		 * 特クラスから貰った諸元を記録するだけ
@@ -100,6 +119,13 @@ namespace tb {
 		};
 		Image(const Spec& s)
 			: Image(s.buffer, s.format, s.width, s.height, s.stride) {};
+
+	protected:
+		u8* const buffer;
+		const Color::Format& format;
+		const unsigned width;  // [px]
+		const unsigned height; // [px]
+		const unsigned stride; // [bytes]
 	};
 
 	/***** バッファ自動管理Image

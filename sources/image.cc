@@ -103,4 +103,5 @@ namespace tb {
 		spec.buffer = malloc(spec.stride * h);
 		return spec;
 	};
+
 }

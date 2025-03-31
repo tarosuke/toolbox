@@ -20,55 +20,53 @@
 
 
 namespace tb {
-	bool operator==(const Color& o, const Color& t) {
-		return o.e[0] == t.e[0] && o.e[1] == t.e[1] && o.e[2] == t.e[2] &&
-			   o.e[3] == t.e[3];
-	}
-
-	template <typename T, typename E> struct ByteFormat : Color::Format {
-		struct Element {
-			T mask;
-			unsigned bit;
+	template <typename T> struct ByteFormat : Color::Format {
+		struct Elements {
+			struct Element {
+				T mask; // 最大値を兼ねるのでbitでシフトする前の値
+				unsigned bit;
+			} a, r, g, b;
 		};
-		const Element (&elements)[4];
+		const Elements elements;
 
-		ByteFormat(const Element (&elements)[4])
-			: Format((sizeof(T) + 7) / 8, !!elements[3].mask),
+		ByteFormat(const Elements& elements)
+			: Format(sizeof(T) * 8, !!elements.a.mask),
 			  elements(elements) {};
 
 		void Post(void* left, unsigned x, const Color& c) const final {
-			*(T*)((tb::u8*)left + x * bytesPerPixel) =
-				(((T)c.U(c[0], max) << elements[0].bit) & elements[0].mask) |
-				(((T)c.U(c[1], max) << elements[1].bit) & elements[1].mask) |
-				(((T)c.U(c[2], max) << elements[2].bit) & elements[2].mask) |
-				(((T)c.U(c[3], max) << elements[3].bit) & elements[3].mask);
+			*(T*)Pixel(left, x) =
+				(U(c.A(), elements.a.mask) << elements.a.bit) |
+				(U(c.R(), elements.r.mask) << elements.r.bit) |
+				(U(c.G(), elements.g.mask) << elements.g.bit) |
+				(U(c.B(), elements.b.mask) << elements.b.bit);
 		};
 		Color Pick(const void* left, unsigned x) const final {
-			const T& t(*(const T*)((const tb::u8*)left + x * bytesPerPixel));
-			return Color((T)((t & elements[0].mask) >> elements[0].bit),
-				(T)((t & elements[1].mask) >> elements[1].bit),
-				(T)((t & elements[2].mask) >> elements[2].bit),
-				(T)((t & elements[3].mask) >> elements[3].bit), max);
+			const T& t(*(const T*)(Pixel(left, x)));
+			return Color(F((t >> elements.a.bit), elements.a.mask),
+				F((t >> elements.r.bit), elements.r.mask),
+				F((t >> elements.g.bit), elements.g.mask),
+				F((t >> elements.b.bit), elements.b.mask));
 		};
 
 	private:
-		static constexpr E max = ~(E)0;
+		static T U(float v, T max) { return (T)(v * max); };
+		static float F(T v, T max) { return (float)(v & max) / max; };
 	};
 
-	template <typename T, typename E> struct GrayFormat : Color::Format {
+	template <typename T, T max> struct GrayFormat : Color::Format {
 		GrayFormat() : Format(8, false) {};
 
 		void Post(void* left, unsigned x, const Color& c) const final {
-			*(T*)((tb::u8*)left + x * bytesPerPixel) = (T)c.U(c, max);
+			*(T*)(Pixel(left, x)) = U(c.Brightness());
 		};
 		Color Pick(const void* left, unsigned x) const final {
-			const float c(
-				Color::F(*(T*)((tb::u8*)left + x * bytesPerPixel), max));
+			const float c(F(*(const T*)Pixel(left, x)));
 			return Color(1.0, c, c, c);
 		};
 
 	private:
-		static constexpr E max = ~(E)0;
+		static T U(float v) { return (T)(v * max); };
+		static float F(T v) { return (float)(v & max) / max; };
 	};
 
 	struct BitFormat : Color::Format {
@@ -77,7 +75,7 @@ namespace tb {
 		void Post(void* left, unsigned x, const Color& c) const final {
 			tb::u8& t(((tb::u8*)left)[x / 8]);
 			const tb::u8 mask(1 << (x & 7));
-			if (0.5 < c) {
+			if (0.5 < c.Brightness()) {
 				t |= mask;
 			} else {
 				t &= ~mask;
@@ -90,36 +88,36 @@ namespace tb {
 	};
 
 
-	static const ByteFormat<tb::u32, tb::u8>::Element elements8888[4] = {
-		{mask : 0x00ff0000, bit : 16},
-		{mask : 0x0000ff00, bit : 8},
-		{mask : 0x000000ff, bit : 0},
-		{mask : 0xff000000, bit : 24},
+	static const ByteFormat<tb::u32>::Elements elements8888{
+		a : {mask : 255, bit : 24},
+		r : {mask : 255, bit : 16},
+		g : {mask : 255, bit : 8},
+		b : {mask : 255, bit : 0},
 	};
-	static const ByteFormat<tb::u32, tb::u8> format8888(elements8888);
-	static const ByteFormat<tb::u32, tb::u8>::Element elements0888[4] = {
-		{mask : 0x00ff0000, bit : 16},
-		{mask : 0x0000ff00, bit : 8},
-		{mask : 0x000000ff, bit : 0},
-		{mask : 0, bit : 0},
+	static const ByteFormat<tb::u32> format8888(elements8888);
+	static const ByteFormat<tb::u32>::Elements elements0888{
+		a : {mask : 0, bit : 0},
+		r : {mask : 255, bit : 16},
+		g : {mask : 255, bit : 8},
+		b : {mask : 255, bit : 0},
 	};
-	static const ByteFormat<tb::u32, tb::u8> format0888(elements0888);
-	static const ByteFormat<tb::u16, tb::u8>::Element elements1555[4] = {
-		{mask : 0x7c00, bit : 10},
-		{mask : 0x03e0, bit : 5},
-		{mask : 0x001f, bit : 0},
-		{mask : 0x7000, bit : 15},
+	static const ByteFormat<tb::u32> format0888(elements0888);
+	static const ByteFormat<tb::u16>::Elements elements1555{
+		a : {mask : 0x1, bit : 15},
+		r : {mask : 0x001f, bit : 10},
+		g : {mask : 0x001f, bit : 5},
+		b : {mask : 0x001f, bit : 0},
 	};
-	static const ByteFormat<tb::u16, tb::u8> format1555(elements1555);
-	static const ByteFormat<tb::u16, tb::u8>::Element elements0565[4] = {
-		{mask : 0xf800, bit : 11},
-		{mask : 0x07e0, bit : 5},
-		{mask : 0x001f, bit : 0},
-		{mask : 0, bit : 0},
+	static const ByteFormat<tb::u16> format1555(elements1555);
+	static const ByteFormat<tb::u16>::Elements elements0565{
+		a : {mask : 0, bit : 0},
+		r : {mask : 0x001f, bit : 11},
+		g : {mask : 0x003f, bit : 5},
+		b : {mask : 0x001f, bit : 0},
 	};
-	static const ByteFormat<tb::u16, tb::u8> format0565(elements0565);
+	static const ByteFormat<tb::u16> format0565(elements0565);
 
-	static const GrayFormat<tb::u8, tb::u8> format8;
+	static const GrayFormat<tb::u8, 255> format8;
 	static const BitFormat format1;
 
 	const Color::Format* const Color::Format::formats[] = {&format8888,

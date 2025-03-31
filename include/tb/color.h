@@ -25,8 +25,6 @@
 namespace tb {
 
 	struct Color {
-		friend bool operator==(const Color&, const Color&);
-
 		// 特定色フォーマット
 		struct Format {
 			enum Index {
@@ -38,7 +36,9 @@ namespace tb {
 				BW,
 			};
 
-			const Format& Select(Index i) { return *formats[(unsigned)i]; };
+			static const Format& Select(Index i) {
+				return *formats[(unsigned)i];
+			};
 
 			virtual void Post(
 				void* left, unsigned x, const Color& color) const = 0;
@@ -55,27 +55,31 @@ namespace tb {
 			static const Format* const formats[];
 			Format(unsigned bpp, bool isTransparent)
 				: bpp(bpp),
-				  bytesPerPixel(bpp / 8),
+				  bytesPerPixel((bpp + 7) / 8),
 				  isTransparent(isTransparent) {};
+			Format() = delete;
+			void* Pixel(void* left, unsigned x) const {
+				return (void*)((tb::u8*)left + x * bytesPerPixel);
+			};
+			const void* Pixel(const void* left, unsigned x) const {
+				return (const void*)((const tb::u8*)left + x * bytesPerPixel);
+			};
 		};
 
 		Color() = default;
 		Color(const Color&) = default;
-		explicit Color(u32 webColor)
-			: Color(u8(webColor >> 24),
-				  u8(webColor >> 16),
-				  u8(webColor >> 8),
-				  u8(webColor)) {};
+		explicit Color(tb::u32 webColor)
+			: Color(FM(webColor >> 24, 255U),
+				  FM(webColor >> 16, 255U),
+				  FM(webColor >> 8, 255U),
+				  FM(webColor, 255U)) {};
 		explicit Color(float a, float r, float g, float b) : e{a, r, g, b} {};
-		template <typename T, typename E>
-		explicit Color(T a, T r, T g, T b, E max)
-			: e{F(a, max), F(r, max), F(g, max), F(b, max)} {};
 
-		float operator-(const Color& t) const {
-			const float r[4]{
-				e[0] - t.e[0], e[1] - t.e[1], e[2] - t.e[2], e[3] - t.e[3]};
-			return r[0] * r[0] + r[1] * r[1] + r[2] * r[2] + r[3] * r[3];
-		};
+		// float operator-(const Color& t) const {
+		// 	const float r[4]{
+		// 		e[0] - t.e[0], e[1] - t.e[1], e[2] - t.e[2], e[3] - t.e[3]};
+		// 	return r[0] * r[0] + r[1] * r[1] + r[2] * r[2] + r[3] * r[3];
+		// };
 
 		Color Learp(const Color t, float ratio) {
 			const float rr(1 - ratio);
@@ -83,18 +87,43 @@ namespace tb {
 				e[2] * rr + t.e[2] * ratio, e[3] * rr + t.e[3] * ratio);
 		};
 
-		float operator[](unsigned i) const { return e[i]; };
-		template <typename T> T U(float v, T max) const {
-			return (T)(v * max);
+		// 値の取得
+		float A() const { return e[3]; };
+		float R() const { return e[2]; };
+		float G() const { return e[1]; };
+		float B() const { return e[0]; };
+
+		tb::u32 WebColor() const {
+			return (U(A(), 255) << 24) | (U(R(), 255) << 16) |
+				   (U(G(), 255) << 8) | U(B(), 255);
 		};
-		template <typename T, typename E> static float F(T o, E max) {
-			return ((float)o) / max;
+
+		float Brightness() const { return (R() + G() + B()) / 3; };
+
+		// 設定
+		void A(float v) { e[3] = v; };
+		void R(float v) { e[2] = v; };
+		void G(float v) { e[1] = v; };
+		void B(float v) { e[0] = v; };
+
+		void WebColor(tb::u32 v) {
+			A(FM(v >> 24, 255U));
+			R(FM(v >> 16, 255U));
+			G(FM(v >> 8, 255U));
+			B(FM(v, 255U));
 		};
-		operator float() const { return (e[0] + e[1] + e[2]) / 3; };
 
 	private:
 		float e[4];
-	};
-	bool operator==(const Color&, const Color&);
 
+		template <typename T> static T U(float v, T max) {
+			return (T)(v * max);
+		};
+		template <typename T> static float F(T o, T max) {
+			return ((float)o) / max;
+		};
+		template <typename T> static float FM(T o, T max) {
+			return F(o & max, max);
+		};
+	};
 }
