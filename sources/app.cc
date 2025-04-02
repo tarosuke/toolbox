@@ -28,13 +28,13 @@
 
 
 tb::App* tb::App::instance(0);
-tb::Prefs<unsigned>
-	tb::App::logLevel("--logLevel", 1, 0, tb::CommonPrefs::nosave);
+tb::Prefs<unsigned> tb::App::logLevel(
+	"--logLevel", 1, 0, tb::CommonPrefs::nosave);
 
 int main(int argc, char** argv) {
+	int rv(0);
 	tb::CommonPrefs::Keeper k(
-		argc,
-		(const char**)argv,
-		tb::App::instance->Name());
-	return tb::App::instance->Main((uint)argc + k, (const char**)argv + k);
+		argc, (const char**)argv, tb::App::instance->Name());
+	rv = tb::App::instance->Main((uint)argc - k, (const char**)argv + k);
+	return rv;
 }

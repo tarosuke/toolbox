@@ -170,7 +170,10 @@ namespace tb {
 					}
 				} else if constexpr (std::is_floating_point<T>::value) {
 					Set(atof(t));
-				} else if (std::is_same<T, std::string>::value) {
+				} else if constexpr (std::is_same<T, std::string>::value) {
+					value = t;
+					valid = dirty = true;
+				} else if constexpr (std::is_same<T, tb::String>::value) {
 					value = t;
 					valid = dirty = true;
 				}
