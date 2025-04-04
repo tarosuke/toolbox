@@ -42,7 +42,9 @@ namespace tb {
 		};
 		Color Pick(const void* left, unsigned x) const final {
 			const T& t(*(const T*)(Pixel(left, x)));
-			return Color(F((t >> elements.a.bit), elements.a.mask),
+			return Color(elements.a.mask
+							 ? F((t >> elements.a.bit), elements.a.mask)
+							 : 1.0f,
 				F((t >> elements.r.bit), elements.r.mask),
 				F((t >> elements.g.bit), elements.g.mask),
 				F((t >> elements.b.bit), elements.b.mask));

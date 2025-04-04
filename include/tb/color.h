@@ -73,7 +73,7 @@ namespace tb {
 				  FM(webColor >> 16, 255U),
 				  FM(webColor >> 8, 255U),
 				  FM(webColor, 255U)) {};
-		explicit Color(float a, float r, float g, float b) : e{a, r, g, b} {};
+		explicit Color(float a, float r, float g, float b) : e{b, g, r, a} {};
 
 		// float operator-(const Color& t) const {
 		// 	const float r[4]{
