@@ -59,13 +59,16 @@ namespace tb {
 
 		struct Line {
 			struct Pixel {
-				Pixel(const Color::Format& format, tb::u8* left, unsigned x)
-					: format(format),
-					  x(x),
-					  left(left) {};
+				Pixel(const Color::Format& format, tb::u8* left, unsigned x) :
+					format(format),
+					x(x),
+					left(left) {};
 
 				operator Color() { return format.Pick(left, x); };
 				void operator=(const Color& c) { format.Post(left, x, c); };
+				void operator=(const Pixel& p) {
+					format.Post(left, x, format.Pick(p.left, p.x));
+				};
 
 			private:
 				const Color::Format& format;
@@ -73,9 +76,9 @@ namespace tb {
 				tb::u8* const left;
 			};
 
-			Line(Image& image, unsigned y)
-				: format(image.Format()),
-				  left(image.Left(y)) {};
+			Line(Image& image, unsigned y) :
+				format(image.Format()),
+				left(image.Left(y)) {};
 			Pixel operator[](unsigned x) { return Pixel(format, left, x); };
 
 		private:
@@ -87,20 +90,22 @@ namespace tb {
 		/***** Imageインターフェイスの構築子
 		 * 特クラスから貰った諸元を記録するだけ
 		 */
-		Image(void* buffer,
+		Image(
+			void* buffer,
 			const Color::Format& format,
 			unsigned width,
 			unsigned height,
-			unsigned stride)
-			: buffer((u8*)buffer),
-			  format(format),
-			  width(width),
-			  height(height),
-			  stride(stride) {};
+			unsigned stride) :
+			buffer((u8*)buffer),
+			format(format),
+			width(width),
+			height(height),
+			stride(stride) {};
 
 		/***** 与えられたImageの一部を複製
 		 */
-		Image(void* buffer,
+		Image(
+			void* buffer,
 			const Image& org,
 			unsigned left,
 			unsigned top,
@@ -117,8 +122,8 @@ namespace tb {
 			unsigned height;
 			unsigned stride;
 		};
-		Image(const Spec& s)
-			: Image(s.buffer, s.format, s.width, s.height, s.stride) {};
+		Image(const Spec& s) :
+			Image(s.buffer, s.format, s.width, s.height, s.stride) {};
 
 	protected:
 		u8* const buffer;
