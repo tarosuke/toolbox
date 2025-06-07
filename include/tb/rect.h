@@ -26,9 +26,9 @@ namespace tb {
 	template <unsigned D, typename T> struct Rect {
 		Rect() {};
 		template <typename U>
-		Rect(const Vector<D, T>& a, const Vector<D, U>& b)
-			: left(Less(a, b)),
-			  right(More(a, b)){};
+		Rect(const Vector<D, T>& a, const Vector<D, U>& b) :
+			left(Less(a, b)),
+			right(More(a, b)){};
 		template <typename U>
 		Rect(const Vector<D, T>& p, const Spread<D, U>& s) : Rect(p, p + s){};
 		template <typename U> Rect(const Spread<D, U>& s) {
@@ -56,10 +56,10 @@ namespace tb {
 			right.Clear();
 		};
 		Rect& operator|=(const Rect& t) {
-			if (!t) {
+			if (t.IsEmpty()) {
 				// tが空なので何もしない
 				return *this;
-			} else if (!*this) {
+			} else if (IsEmpty()) {
 				// *thisが空なのでtに置き換える
 				*this = t;
 				return *this;
@@ -93,7 +93,7 @@ namespace tb {
 			return *this;
 		};
 		Rect operator&(const Rect& t) const {
-			if (!t || !*this) {
+			if (t.IsEmpty() || IsEmpty()) {
 				// どちらかが空
 				return Rect();
 			}
@@ -101,8 +101,8 @@ namespace tb {
 		};
 
 		bool operator&&(const Vector<D, T>& o) const {
-			return !!this && left[0] <= o[0] && left[1] <= o[1] &&
-				   o[0] < right[0] && o[1] < right[1];
+			return !!this && left[0] <= o[0] && left[1] <= o[1]
+				   && o[0] < right[0] && o[1] < right[1];
 		};
 		bool operator&&(const Rect<D, T>& o) const { return *this & o; };
 
@@ -135,13 +135,13 @@ namespace tb {
 		template <typename U> Rect operator*(U m) {
 			return Rect{left * m, right * m};
 		};
-		operator bool() const {
+		bool IsEmpty() const {
 			for (unsigned n(0); n < D; ++n) {
 				if (right[n] <= left[n]) {
-					return false;
+					return true;
 				}
 			}
-			return true;
+			return false;
 		};
 		tb::Spread<D, T> GetSpread() { return tb::Spread<D, T>(right - left); };
 

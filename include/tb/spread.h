@@ -34,6 +34,7 @@ namespace tb {
 			for (unsigned n(0); n < D; ++n) {
 				a[n] = o[n];
 			}
+			return *this;
 		};
 		Spread& operator=(const Vector<D, T>& o) {
 			for (unsigned n(0); n < D; ++n) {
@@ -73,14 +74,6 @@ namespace tb {
 			return r;
 		};
 
-		operator bool() const {
-			for (auto& e : a) {
-				if (e <= 0) {
-					return false;
-				}
-			}
-			return true;
-		};
 		bool operator==(const Spread& o) const {
 			for (unsigned n(0); n < D; ++n) {
 				if (a[n] != o.a[n]) {
@@ -96,6 +89,14 @@ namespace tb {
 			for (unsigned n(0); n < D; ++n) {
 				v *= a[n];
 			}
+		};
+		bool IsEmpty() const {
+			for (auto& e : a) {
+				if (e <= 0) {
+					return true;
+				}
+			}
+			return false;
 		};
 
 	private:
