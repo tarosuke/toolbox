@@ -93,9 +93,11 @@ namespace tb {
 		class I {
 		public:
 			// toolboxスタイル反復子
-			I(List& l)
-				: key(l), node(&l.anchor), prev((*node).prev),
-				  next((*node).next) {};
+			I(List& l) :
+				key(l),
+				node(&l.anchor),
+				prev((*node).prev),
+				next((*node).next) {};
 			operator T*() { return *node; };
 			T* operator++() {
 				node = next;
@@ -130,40 +132,34 @@ namespace tb {
 
 		/** コールバックによる反復
 		 */
-		template <typename U> T* Foreach(bool (T::*handler)(U&), U& param) {
+		template <typename... U>
+		T* Foreach(bool (T::*handler)(U...), U&&... params) {
 			for (I i(*this); ++i;) {
-				if (((*i).*handler)(param)) {
+				if (((*i).*handler)(params...)) {
 					return i;
 				}
 			}
 			return 0;
 		};
-		template <typename U> void Foreach(void (T::*handler)(U&), U& param) {
+		template <typename... U>
+		void Foreach(void (T::*handler)(U...), U&&... params) {
 			for (I i(*this); ++i;) {
-				((*i).*handler)(param);
+				((*i).*handler)(params...);
 			}
 		};
-		void Foreach(void (T::*handler)()) {
-			for (I i(*this); ++i;) {
-				((*i).*handler)();
-			}
-		}
-		template <typename U> T* Reveach(bool (T::*handler)(U&), U& param) {
+		template <typename... U>
+		T* Reveach(bool (T::*handler)(U...), U&&... params) {
 			for (I i(*this); --i;) {
-				if (((*i).*handler)(param)) {
+				if (((*i).*handler)(params...)) {
 					return i;
 				}
 			}
 			return 0;
 		};
-		template <typename U> void Reveach(void (T::*handler)(U&), U& param) {
+		template <typename... U>
+		void Reveach(void (T::*handler)(U...), U&&... params) {
 			for (I i(*this); --i;) {
-				((*i).*handler)(param);
-			}
-		};
-		void Reveach(void (T::*handler)()) {
-			for (I i(*this); --i;) {
-				((*i).*handler)();
+				((*i).*handler)(params...);
 			}
 		};
 
