@@ -18,6 +18,7 @@
  */
 #pragma once
 
+#include <cmath>
 #include <tb/types.h>
 #include <type_traits>
 
@@ -131,7 +132,7 @@ namespace tb {
 			}
 			return r;
 		};
-		T Norm() const { return sqrt(Norm2()); };
+		T Norm() const { return std::sqrt(Norm2()); };
 		void Normalize() { *this / Norm(); };
 
 		///// 積
