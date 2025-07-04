@@ -208,6 +208,14 @@ namespace tb {
 			return r;
 		};
 
+		/***** 方向のみを返す
+		 */
+		Matrix FilterDirection() {
+			Matrix r(*this);
+			r[3] = r[7] = r[11] = r[12] = r[13] = r[14] = 0;
+			return r;
+		}
+
 	private:
 		union {
 			T raw[COL * ROW];
