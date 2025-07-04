@@ -53,6 +53,8 @@ namespace tb {
 
 		Factory() : next(start) { start = this; };
 
+		/***** 最もスコアが高かったクラスをNew
+		 */
 		static T* Create(ARGS... args) {
 			Match m;
 			for (Factory* f(start); f; f = (*f).next) {
@@ -60,6 +62,14 @@ namespace tb {
 			}
 			return m ? m.matched->New(args...) : 0;
 		}
+
+		/***** スコアの評価なしに全部New
+		 */
+		static void CreateAll(ARGS... args) {
+			for (Factory* f(start); f; f = (*f).next) {
+				f->New(args...);
+			}
+		};
 
 	protected:
 		// Scoreが返す値の目安
