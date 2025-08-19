@@ -76,7 +76,6 @@ namespace tb {
 				(*next).prev = prev;
 				prev = next = this;
 			};
-			operator T*() { return dynamic_cast<T*>(this); };
 		};
 
 		/** toolbox反復子
@@ -98,16 +97,18 @@ namespace tb {
 				node(&l.anchor),
 				prev((*node).prev),
 				next((*node).next) {};
-			operator T*() { return *node; };
+			operator T*() { return dynamic_cast<T*>(node); };
+			T& operator*() { return *dynamic_cast<T*>(node); };
+			T& operator->() { return *dynamic_cast<T*>(node); };
 			T* operator++() {
 				node = next;
 				Prepare();
-				return *node;
+				return dynamic_cast<T*>(node);
 			};
 			T* operator--() {
 				node = prev;
 				Prepare();
-				return *node;
+				return dynamic_cast<T*>(node);
 			};
 			void Insert(Node& n) {
 				n.Insert(*node);
@@ -144,13 +145,13 @@ namespace tb {
 		template <typename... U>
 		void Foreach(void (T::*handler)(U...), U&&... params) {
 			for (I i(*this); ++i;) {
-				((*i).*handler)(params...);
+				(i->*handler)(params...);
 			}
 		};
 		template <typename... U>
 		T* Reveach(bool (T::*handler)(U...), U&&... params) {
 			for (I i(*this); --i;) {
-				if (((*i).*handler)(params...)) {
+				if ((i->*handler)(params...)) {
 					return i;
 				}
 			}
@@ -159,7 +160,7 @@ namespace tb {
 		template <typename... U>
 		void Reveach(void (T::*handler)(U...), U&&... params) {
 			for (I i(*this); --i;) {
-				((*i).*handler)(params...);
+				(i->*handler)(params...);
 			}
 		};
 
