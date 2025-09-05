@@ -65,7 +65,7 @@ namespace tb {
 
 		void Thread::Keeper::Bury(Thread& t) {
 			t.next = bodies;
-			bodies = t;
+			bodies = &t;
 			pthread_mutex_unlock(&igniter);
 		}
 
