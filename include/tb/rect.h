@@ -25,12 +25,18 @@ namespace tb {
 
 	template <unsigned D, typename T> struct Rect {
 		Rect() {};
+
+		// a, bで囲まれた範囲
 		template <typename U>
 		Rect(const Vector<D, T>& a, const Vector<D, U>& b) :
 			left(Less(a, b)),
 			right(More(a, b)){};
+
+		// 左上をp、大きさをsとする
 		template <typename U>
 		Rect(const Vector<D, T>& p, const Spread<D, U>& s) : Rect(p, p + s){};
+
+		// 左上を0、大きさをsとする
 		template <typename U> Rect(const Spread<D, U>& s) {
 			for (unsigned n(0); n < D; ++n) {
 				left[n] = 0;
@@ -38,17 +44,20 @@ namespace tb {
 			}
 		};
 
+		// コピー
 		template <typename U> Rect(const Rect<D, U>& o) {
 			for (unsigned n(0); n < D; ++n) {
 				left[n] = o.Left()[n];
 				right[n] = o.Right()[n];
 			}
 		}
-
 		Rect& operator=(const Rect&) = default;
 		template <typename R> const Rect& operator=(const R& o) {
-			left = (T)o.left;
-			right = (T)o.right;
+			for (unsigned n(0); n < D; ++n) {
+				left[n] = (T)o.Left()[n];
+				right[n] = (T)o.Right()[n];
+			}
+			return *this;
 		};
 
 		void Clear() {
@@ -101,8 +110,8 @@ namespace tb {
 		};
 
 		bool operator&&(const Vector<D, T>& o) const {
-			return !!this && left[0] <= o[0] && left[1] <= o[1]
-				   && o[0] < right[0] && o[1] < right[1];
+			return !!this && left[0] <= o[0] && left[1] <= o[1] &&
+				   o[0] < right[0] && o[1] < right[1];
 		};
 		bool operator&&(const Rect<D, T>& o) const { return *this & o; };
 
