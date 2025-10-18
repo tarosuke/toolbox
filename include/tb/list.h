@@ -191,13 +191,13 @@ namespace tb {
 			Key<L> k(*this);
 			Insert(k, n);
 		};
-		T* Top(Key<L>&) { return dynamic_cast<T*>(anchor.next); };
-		T* Bottom(Key<L>&) { return dynamic_cast<T*>(anchor.prev); };
-		T* Top() {
+		T* Top(Key<L>&) const { return dynamic_cast<T*>(anchor.next); };
+		T* Bottom(Key<L>&) const { return dynamic_cast<T*>(anchor.prev); };
+		T* Top() const {
 			Key<L> k(*this);
 			return Top(k);
 		};
-		T* Botom() {
+		T* Botom() const {
 			Key<L> k(*this);
 			return Bottom(k);
 		};
