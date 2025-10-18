@@ -28,7 +28,7 @@ COPTS += -O0 -g3
 endif
 
 
-COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude
+COPTS += -Wall -Werror -D_BUILD_TARGET_=$(TARGETDIR) -Iinclude -fdiagnostics-all-candidates
 CCOPTS += $(COPTS) -std=c++20
 
 EXLIBS += -lstdc++ -lm
