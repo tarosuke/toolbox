@@ -83,6 +83,20 @@ namespace tb {
 			return true;
 		};
 
+		Spread operator+(const Spread& s) const {
+			Spread ss;
+			for (unsigned n(0); n < D; ++n) {
+				ss.a[n] = a[n] + s.a[n];
+			}
+			return ss;
+		};
+		const Spread& operator+=(const Spread& s) {
+			for (unsigned n(0); n < D; ++n) {
+				a[n] += s.a[n];
+			}
+			return *this;
+		};
+
 		// 面積、体積
 		T Volume() const {
 			T v(1);
