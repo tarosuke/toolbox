@@ -40,8 +40,8 @@ namespace tb {
 				return *formats[(unsigned)i];
 			};
 
-			virtual void
-			Post(void* left, unsigned x, const Color& color) const = 0;
+			virtual void Post(
+				void* left, unsigned x, const Color& color) const = 0;
 			virtual Color Pick(const void* left, unsigned x) const = 0;
 
 			const unsigned bpp;
@@ -69,8 +69,7 @@ namespace tb {
 		Color() = default;
 		Color(const Color&) = default;
 		explicit Color(tb::u32 webColor) :
-			Color(
-				FM(webColor >> 24, 255U),
+			Color(FM(webColor >> 24, 255U),
 				FM(webColor >> 16, 255U),
 				FM(webColor >> 8, 255U),
 				FM(webColor, 255U)) {};
@@ -84,8 +83,7 @@ namespace tb {
 
 		Color Learp(const Color t, float ratio) {
 			const float rr(1 - ratio);
-			return Color(
-				e[0] * rr + t.e[0] * ratio, e[1] * rr + t.e[1] * ratio,
+			return Color(e[0] * rr + t.e[0] * ratio, e[1] * rr + t.e[1] * ratio,
 				e[2] * rr + t.e[2] * ratio, e[3] * rr + t.e[3] * ratio);
 		};
 
@@ -94,10 +92,12 @@ namespace tb {
 		float R() const { return e[2]; };
 		float G() const { return e[1]; };
 		float B() const { return e[0]; };
+		operator const float*() const { return e; };
+
 
 		tb::u32 WebColor() const {
-			return (U(A(), 255) << 24) | (U(R(), 255) << 16)
-				   | (U(G(), 255) << 8) | U(B(), 255);
+			return (U(A(), 255) << 24) | (U(R(), 255) << 16) |
+				   (U(G(), 255) << 8) | U(B(), 255);
 		};
 
 		float Brightness() const { return (R() + G() + B()) / 3; };
@@ -114,6 +114,8 @@ namespace tb {
 			G(FM(v >> 8, 255U));
 			B(FM(v, 255U));
 		};
+
+
 
 	private:
 		float e[4];
