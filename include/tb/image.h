@@ -46,8 +46,8 @@ namespace tb {
 		unsigned Width() const { return width; };
 		unsigned Height() const { return height; };
 		bool Transparent() const { return !!format.isTransparent; }
-		tb::Spread<2, int> Spread() const {
-			return tb::Spread<2, int>((int[]){(int)width, (int)height});
+		tb::Spread<2, unsigned> Spread() const {
+			return tb::Spread<2, unsigned>((unsigned[]){width, height});
 		};
 		u8* Left(unsigned y) const { return buffer + (y % height) * stride; };
 
@@ -90,8 +90,7 @@ namespace tb {
 		/***** Imageインターフェイスの構築子
 		 * 特クラスから貰った諸元を記録するだけ
 		 */
-		Image(
-			void* buffer,
+		Image(void* buffer,
 			const Color::Format& format,
 			unsigned width,
 			unsigned height,
@@ -104,8 +103,7 @@ namespace tb {
 
 		/***** 与えられたImageの一部を複製
 		 */
-		Image(
-			void* buffer,
+		Image(void* buffer,
 			const Image& org,
 			unsigned left,
 			unsigned top,
