@@ -93,6 +93,7 @@ namespace tb {
 		float G() const { return e[1]; };
 		float B() const { return e[0]; };
 		operator const float*() const { return e; };
+		bool IsTranslucent() { return A() < 1.0; };
 
 
 		tb::u32 WebColor() const {
