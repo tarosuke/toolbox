@@ -44,8 +44,8 @@ namespace tb {
 		};
 
 		// 配列としてアクセス
-		operator auto &() { return a; };
-		operator const auto &() const { return a; };
+		operator auto&() { return a; };
+		operator const auto&() const { return a; };
 		T& operator[](unsigned n) { return a[n]; };
 		const T& operator[](unsigned n) const { return a[n]; };
 
@@ -58,9 +58,11 @@ namespace tb {
 				e *= t;
 			}
 		};
-		Spread operator*(T t) const {
-			Spread r(*this);
-			r *= t;
+		template <typename U> Spread<D, U> operator*(U t) const {
+			Spread<D, U> r;
+			for (unsigned n(0); n < D; ++n) {
+				r[n] = t * a[n];
+			}
 			return r;
 		};
 		void operator/=(T t) {
@@ -68,9 +70,11 @@ namespace tb {
 				e /= t;
 			}
 		};
-		Spread operator/(T t) const {
-			Spread r(*this);
-			r /= t;
+		template <typename U> Spread<D, U> operator/(U t) const {
+			Spread<D, U> r;
+			for (unsigned n(0); n < D; ++n) {
+				r[n] = (U)a[n] / t;
+			}
 			return r;
 		};
 
