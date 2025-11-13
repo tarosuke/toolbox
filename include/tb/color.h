@@ -24,6 +24,9 @@
 
 namespace tb {
 
+	/* 色の定義
+	 * NOTE:「webcolor」は値なので「0xaabbggrr」とwebの表記とは逆順になる
+	 */
 	struct Color {
 		// 特定色フォーマット
 		struct Format {
