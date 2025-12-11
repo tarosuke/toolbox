@@ -72,6 +72,8 @@ namespace tb {
 		nsec Uptime() const { return uptime; };
 		nsec Delta() const { return delta; };
 
+		nsec operator-(Timestamp t) const { return uptime - t.uptime; };
+
 	private:
 		nsec start;
 		nsec uptime;
