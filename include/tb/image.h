@@ -43,13 +43,11 @@ namespace tb {
 		// 生データ
 		const Color::Format& Format() const { return format; };
 		void* Data() const { return (void*)buffer; };
-		unsigned Width() const { return width; };
-		unsigned Height() const { return height; };
+		unsigned Width() const { return spread[0]; };
+		unsigned Height() const { return spread[1]; };
 		bool Transparent() const { return !!format.isTransparent; }
-		tb::Spread<2, unsigned> Spread() const {
-			return tb::Spread<2, unsigned>((unsigned[]){width, height});
-		};
-		u8* Left(unsigned y) const { return buffer + (y % height) * stride; };
+		const tb::Spread<2, unsigned>& Spread() const { return spread; };
+		u8* Left(unsigned y) const { return buffer + (y % Height()) * stride; };
 
 		Color Get(unsigned x, unsigned y) const;
 		void Set(unsigned x, unsigned y, const Color&);
@@ -97,8 +95,7 @@ namespace tb {
 			unsigned stride) :
 			buffer((u8*)buffer),
 			format(format),
-			width(width),
-			height(height),
+			spread{width, height},
 			stride(stride) {};
 
 		/***** 与えられたImageの一部を複製
@@ -126,8 +123,7 @@ namespace tb {
 	protected:
 		u8* const buffer;
 		const Color::Format& format;
-		const unsigned width;  // [px]
-		const unsigned height; // [px]
+		const tb::Spread<2, unsigned> spread;
 		const unsigned stride; // [bytes]
 	};
 
