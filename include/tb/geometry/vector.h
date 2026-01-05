@@ -22,39 +22,31 @@
 #include <tb/types.h>
 #include <type_traits>
 
-namespace tb {
+
+
+namespace tb::geometry {
 	template <uint D, typename T> struct Vector {
 		///// 構築子、代入、[]
 		Vector() { Clear(); };
 		void Clear() {
-			for (uint n(0); n < D; ++n) {
-				a[n] = 0;
-			}
+			for (uint n(0); n < D; ++n) { a[n] = 0; }
 		};
 		Vector(const Vector&) = default;
 		template <typename... A> Vector(T t, A... a) : a{t, a...} {};
 		Vector(T o) {
-			for (uint n(0); n < D; ++n) {
-				*const_cast<T*>(&a[n]) = o;
-			}
+			for (uint n(0); n < D; ++n) { *const_cast<T*>(&a[n]) = o; }
 		};
 		Vector(const T (&o)[D]) {
-			for (unsigned n(0); n < D; ++n) {
-				a[n] = o[n];
-			}
+			for (unsigned n(0); n < D; ++n) { a[n] = o[n]; }
 		};
 		Vector(const T (&o)[D + 1], unsigned offset) {
-			for (uint n(0); n < D; ++n) {
-				a[n] = o[n + offset];
-			}
+			for (uint n(0); n < D; ++n) { a[n] = o[n + offset]; }
 		};
 
-		operator auto &() { return a; };
-		operator const auto &() const { return a; };
+		operator auto&() { return a; };
+		operator const auto&() const { return a; };
 		template <typename U> const Vector& operator=(const U& o) {
-			for (unsigned n(0); n < D; ++n) {
-				a[n] = o[n];
-			}
+			for (unsigned n(0); n < D; ++n) { a[n] = o[n]; }
 			return *this;
 		}
 
@@ -71,65 +63,47 @@ namespace tb {
 		///// 四則演算
 		template <typename U> Vector operator+(const U& o) const {
 			Vector r;
-			for (uint n(0); n < D; ++n) {
-				r.a[n] = a[n] + o[n];
-			}
+			for (uint n(0); n < D; ++n) { r.a[n] = a[n] + o[n]; }
 			return r;
 		};
 		template <typename U> Vector operator-(const U& o) const {
 			Vector r;
-			for (uint n(0); n < D; ++n) {
-				r.a[n] = a[n] - o[n];
-			}
+			for (uint n(0); n < D; ++n) { r.a[n] = a[n] - o[n]; }
 			return r;
 		};
 		template <typename U> Vector operator*(U o) const {
 			Vector r;
-			for (uint n(0); n < D; ++n) {
-				r.a[n] = a[n] * o;
-			}
+			for (uint n(0); n < D; ++n) { r.a[n] = a[n] * o; }
 			return r;
 		};
 		template <typename U> Vector operator/(U o) const {
 			Vector r;
-			for (uint n(0); n < D; ++n) {
-				r.a[n] = a[n] / o;
-			}
+			for (uint n(0); n < D; ++n) { r.a[n] = a[n] / o; }
 			return r;
 		}
 
 		template <typename U> const Vector& operator+=(const U& o) {
 
-			for (uint n(0); n < D; ++n) {
-				a[n] += o[n];
-			}
+			for (uint n(0); n < D; ++n) { a[n] += o[n]; }
 			return *this;
 		};
 		template <typename U> const Vector& operator-=(const U& o) {
-			for (uint n(0); n < D; ++n) {
-				a[n] -= o[n];
-			}
+			for (uint n(0); n < D; ++n) { a[n] -= o[n]; }
 			return *this;
 		};
 		template <typename U> const Vector& operator*=(U o) {
-			for (uint n(0); n < D; ++n) {
-				a[n] *= o;
-			}
+			for (uint n(0); n < D; ++n) { a[n] *= o; }
 			return *this;
 		};
 		template <typename U> const Vector& operator/=(U o) {
-			for (uint n(0); n < D; ++n) {
-				a[n] /= o;
-			}
+			for (uint n(0); n < D; ++n) { a[n] /= o; }
 			return *this;
 		};
 
 		///// ノルム
 		T Norm2() const {
 			T r(0);
-			for (uint n(0); n < D; ++n) {
-				r += a[n] * a[n];
-			}
+			for (uint n(0); n < D; ++n) { r += a[n] * a[n]; }
 			return r;
 		};
 		T Norm() const { return std::sqrt(Norm2()); };
@@ -138,19 +112,16 @@ namespace tb {
 		///// 積
 		T operator*(const Vector& o) const {
 			T r(0);
-			for (uint n(0); n < D; ++n) {
-				r += a[n] * o.a[n];
-			}
+			for (uint n(0); n < D; ++n) { r += a[n] * o.a[n]; }
 			return r;
 		};
 
 		Vector Cross(const Vector& o) const {
 			if constexpr (D == 3) {
-				return Vector<3, T>(
-					a[1] * o.a[2] - a[2] * o.a[1],
+				return Vector<3, T>(a[1] * o.a[2] - a[2] * o.a[1],
 					a[2] * o.a[0] - a[0] * o.a[2],
 					a[0] * o.a[1] - a[1] * o.a[0]);
-			} else if constexpr (D == 7) {
+			} else if constexpr (D == 7 || D == 15) {
 				static_assert(false, "その次元数のクロス積は未実装");
 			} else {
 				static_assert(false, "その次元数のクロス積は定義できない");

@@ -31,8 +31,8 @@ namespace tb {
 		unsigned top,
 		unsigned width,
 		unsigned height,
-		unsigned stride)
-		: Image(buffer, org.format, width, height, stride) {
+		unsigned stride) :
+		Image(buffer, org.format, width, height, stride) {
 		const u8* s(org.buffer + org.stride * left + top * org.format.bpp / 8);
 		char* d((char*)buffer);
 		for (unsigned h(0); h < height; ++h, s += org.stride, d += stride) {
@@ -61,8 +61,8 @@ namespace tb {
 
 
 	BufferedImage::BufferedImage(
-		const Color::Format& format, unsigned width, unsigned height)
-		: Image(MkSpec(format, width, height)) {}
+		const Color::Format& format, unsigned width, unsigned height) :
+		Image(MkSpec(format, width, height)) {}
 	BufferedImage::~BufferedImage() {
 		if (buffer) {
 			free(buffer);
@@ -70,8 +70,8 @@ namespace tb {
 	}
 
 	BufferedImage::BufferedImage(
-		const Image& o, int l, int t, unsigned w, unsigned h)
-		: Image(MkSpec(o.Format(), w, h)) {
+		const Image& o, int l, int t, unsigned w, unsigned h) :
+		Image(MkSpec(o.Format(), w, h)) {
 
 		// NOTE:以下4つはo上の座標
 		const int sy(0 <= t ? t : -t);
@@ -84,8 +84,8 @@ namespace tb {
 		}
 
 		const int th(ey - sy);
-		const int offset(sx * format.bpp);
-		const int len((ex - sx) * format.bpp);
+		const int offset(sx * format.bpp / 8);
+		const int len((ex - sx) * format.bpp / 8);
 
 		for (int y(0 <= t ? 0 : -t); y < th; ++y) {
 			memcpy(Left(y), o.Left(t + y) + offset, len);

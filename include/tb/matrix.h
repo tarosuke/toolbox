@@ -18,7 +18,7 @@
  */
 #pragma once
 
-#include <tb/vector.h>
+#include <tb/geometry/vector.h>
 
 
 
@@ -37,16 +37,12 @@ namespace tb {
 		// 代入とコピーコンストラクタ
 		template <typename U> const Matrix& operator=(const U (&o)[ROW][COL]) {
 			for (unsigned r(0); r < ROW; ++r) {
-				for (unsigned c(0); c < COL; ++c) {
-					m[r][c] = (T)o[r][c];
-				}
+				for (unsigned c(0); c < COL; ++c) { m[r][c] = (T)o[r][c]; }
 			}
 			return *this;
 		};
 		template <typename U> const Matrix& operator=(const U (&o)[COL * ROW]) {
-			for (unsigned n(0); n < COL * ROW; ++n) {
-				raw[n] = (T)o[n];
-			}
+			for (unsigned n(0); n < COL * ROW; ++n) { raw[n] = (T)o[n]; }
 			return *this;
 		};
 		template <typename U> Matrix(const U (&o)[ROW * COL]) : Matrix() {
@@ -69,27 +65,19 @@ namespace tb {
 		};
 
 		void Identity() {
-			for (unsigned n(0); n < ROW * COL; ++n) {
-				raw[n] = 0;
-			}
-			for (unsigned n(0); n < ROW && n < COL; ++n) {
-				m[n][n] = 1;
-			}
+			for (unsigned n(0); n < ROW * COL; ++n) { raw[n] = 0; }
+			for (unsigned n(0); n < ROW && n < COL; ++n) { m[n][n] = 1; }
 		};
 		void Transpose(const T (&o)[COL][ROW]) {
 			T* d(raw);
 			for (unsigned x(0); x < COL; ++x) {
-				for (unsigned y(0); y < ROW; ++y) {
-					*d++ = o[y][x];
-				}
+				for (unsigned y(0); y < ROW; ++y) { *d++ = o[y][x]; }
 			}
 		};
 		void TransposeAffine(const T (&o)[COL - 1][ROW]) {
 			T* d(raw);
 			for (unsigned x(0); x < ROW; ++x) {
-				for (unsigned y(0); y < COL - 1; ++y) {
-					*d++ = o[y][x];
-				}
+				for (unsigned y(0); y < COL - 1; ++y) { *d++ = o[y][x]; }
 				*d++ = 0;
 			}
 			raw[COL * ROW - 1] = 1;
@@ -227,8 +215,9 @@ namespace tb {
 
 		// Matrix<ROW, COL, T> * Vector<ROW - 1, T> → Vector<ROW - 1, T>
 		// NOTE:Vector as Matrix(ROW, 1, T>
-		Vector<ROW - 1, T> operator*(const Vector<COL - 1, T>& v) const {
-			Vector<ROW - 1, T> r;
+		geometry::Vector<ROW - 1, T> operator*(
+			const geometry::Vector<COL - 1, T>& v) const {
+			geometry::Vector<ROW - 1, T> r;
 			for (unsigned n(0); n < ROW - 1; ++n) {
 				for (unsigned c(0); c < COL - 1; ++c) {
 					r[n] += v[c] * m[n][c];

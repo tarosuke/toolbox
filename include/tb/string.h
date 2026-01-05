@@ -18,7 +18,6 @@
 #pragma once
 
 #include <string>
-#include <tb/image.h>
 #include <tb/types.h>
 
 namespace tb {

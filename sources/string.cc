@@ -17,8 +17,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <limits>
 #include <stdio.h>
 #include <tb/string.h>
+
+
 
 namespace tb {
 
@@ -46,13 +49,9 @@ namespace tb {
 		String s(numericChars[v % r]);
 
 		// 剰余を並べて
-		for (; v /= r, (w ? --w : w) || v;) {
-			s += numericChars[v % r];
-		}
+		for (; v /= r, (w ? --w : w) || v;) { s += numericChars[v % r]; }
 		// 逆順に追加
-		for (auto i(s.crbegin()); i != s.crend(); ++i) {
-			push_back(*i);
-		}
+		for (auto i(s.crbegin()); i != s.crend(); ++i) { push_back(*i); }
 
 		return *this;
 	}
@@ -87,7 +86,7 @@ namespace tb {
 		return Append((i64)v, p, w, r);
 	}
 	template <> String& String::Append(double v, char p, uint w, uint r) {
-		char b[std::numeric_limits<double>::max_digits10];
+		char b[std::numeric_limits<double>::max_digits10 + 1];
 		snprintf(b, sizeof(b), "%*f", w, v);
 		append(b);
 		return *this;

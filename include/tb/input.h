@@ -26,8 +26,8 @@
  * 使用するときはデバイスファイルのパーミッションを取得しておくこと *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
+#include <tb/geometry/vector.h>
 #include <tb/time.h>
-#include <tb/vector.h>
 #include <vector>
 
 
@@ -67,7 +67,7 @@ namespace tb {
 			};
 			operator bool() const { return !!moved; };
 			int (&value)[nAxis]; // 軸ごとの値
-			unsigned moved; // イベントがあったビットが1
+			unsigned moved;		 // イベントがあったビットが1
 		};
 		/***** グループごとの各種ボタン */
 		struct ButtonReport {

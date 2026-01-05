@@ -21,7 +21,7 @@ tb::String Show(const tb::Matrix<C, R, int>& v) {
 	return s;
 }
 
-template <unsigned N> tb::String Show(const tb::Vector<N, int>& v) {
+template <unsigned N> tb::String Show(const tb::geometry::Vector<N, int>& v) {
 	tb::String s("{ ");
 	for (unsigned n(0); n < N; ++n) {
 		s.Append(v[n]);
@@ -32,15 +32,16 @@ template <unsigned N> tb::String Show(const tb::Vector<N, int>& v) {
 }
 
 template <> tb::String::String(const M22& v) : String(Show(v)){};
-template <> tb::String::String(const tb::Matrix<2, 3, int>& v)
-	: String(Show(v)){};
-template <> tb::String::String(const tb::Matrix<4, 2, int>& v)
-	: String(Show(v)){};
-template <> tb::String::String(const tb::Matrix<4, 3, int>& v)
-	: String(Show(v)){};
-template <> tb::String::String(const tb::Matrix<3, 3, int>& v)
-	: String(Show(v)){};
-template <> tb::String::String(const tb::Vector<2, int>& v) : String(Show(v)){};
+template <>
+tb::String::String(const tb::Matrix<2, 3, int>& v) : String(Show(v)){};
+template <>
+tb::String::String(const tb::Matrix<4, 2, int>& v) : String(Show(v)){};
+template <>
+tb::String::String(const tb::Matrix<4, 3, int>& v) : String(Show(v)){};
+template <>
+tb::String::String(const tb::Matrix<3, 3, int>& v) : String(Show(v)){};
+template <>
+tb::String::String(const tb::geometry::Vector<2, int>& v) : String(Show(v)){};
 
 
 int main() {
@@ -61,8 +62,8 @@ int main() {
 
 	{
 		const tb::Matrix<3, 3, int> a((const int[9]){1, 2, 3, 4, 5, 6});
-		const tb::Vector<2, int> b(10, 11);
-		const tb::Vector<2, int> c(35, 101);
+		const tb::geometry::Vector<2, int> b(10, 11);
+		const tb::geometry::Vector<2, int> c(35, 101);
 		assertEQ(a * b, c);
 	}
 

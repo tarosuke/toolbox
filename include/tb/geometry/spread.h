@@ -18,34 +18,28 @@
  */
 #pragma once
 
-#include <tb/vector.h>
+#include <tb/geometry/vector.h>
 
 
 
-namespace tb {
+namespace tb::geometry {
 
 	template <unsigned D, typename T> struct Spread {
 		// NOTE:Rect他で区別できなくなるのでVectorから継承してはいけない
 		Spread() : a{0, 0} {};
 		Spread(const Vector<D, T>& o) { *this = o; };
-		template <typename... A> Spread(T t, A... a) : a{t, a...} {};
+		template <typename... A> Spread(A... a) : a{a...} {};
 
 		Spread& operator=(const Spread& o) {
-			for (unsigned n(0); n < D; ++n) {
-				a[n] = o[n];
-			}
+			for (unsigned n(0); n < D; ++n) { a[n] = o[n]; }
 			return *this;
 		};
 		Spread& operator=(const Vector<D, T>& o) {
-			for (unsigned n(0); n < D; ++n) {
-				a[n] = o[n];
-			}
+			for (unsigned n(0); n < D; ++n) { a[n] = o[n]; }
 			return *this;
 		};
 
 		// 配列としてアクセス
-		operator auto&() { return a; };
-		operator const auto&() const { return a; };
 		T& operator[](unsigned n) { return a[n]; };
 		const T& operator[](unsigned n) const { return a[n]; };
 
@@ -54,27 +48,19 @@ namespace tb {
 
 		// 演算
 		void operator*=(T t) {
-			for (auto& e : a) {
-				e *= t;
-			}
+			for (auto& e : a) { e *= t; }
 		};
 		template <typename U> Spread<D, U> operator*(U t) const {
 			Spread<D, U> r;
-			for (unsigned n(0); n < D; ++n) {
-				r[n] = t * a[n];
-			}
+			for (unsigned n(0); n < D; ++n) { r[n] = t * a[n]; }
 			return r;
 		};
 		void operator/=(T t) {
-			for (auto& e : a) {
-				e /= t;
-			}
+			for (auto& e : a) { e /= t; }
 		};
 		template <typename U> Spread<D, U> operator/(U t) const {
 			Spread<D, U> r;
-			for (unsigned n(0); n < D; ++n) {
-				r[n] = (U)a[n] / t;
-			}
+			for (unsigned n(0); n < D; ++n) { r[n] = (U)a[n] / t; }
 			return r;
 		};
 
@@ -89,24 +75,18 @@ namespace tb {
 
 		Spread operator+(const Spread& s) const {
 			Spread ss;
-			for (unsigned n(0); n < D; ++n) {
-				ss.a[n] = a[n] + s.a[n];
-			}
+			for (unsigned n(0); n < D; ++n) { ss.a[n] = a[n] + s.a[n]; }
 			return ss;
 		};
 		const Spread& operator+=(const Spread& s) {
-			for (unsigned n(0); n < D; ++n) {
-				a[n] += s.a[n];
-			}
+			for (unsigned n(0); n < D; ++n) { a[n] += s.a[n]; }
 			return *this;
 		};
 
 		// 面積、体積
 		T Volume() const {
 			T v(1);
-			for (unsigned n(0); n < D; ++n) {
-				v *= a[n];
-			}
+			for (unsigned n(0); n < D; ++n) { v *= a[n]; }
 		};
 		bool IsEmpty() const {
 			for (auto& e : a) {
@@ -116,6 +96,7 @@ namespace tb {
 			}
 			return false;
 		};
+		bool operator!() const { return IsEmpty(); };
 
 	private:
 		T a[D];

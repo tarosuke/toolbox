@@ -22,8 +22,8 @@
 #include <concepts>
 #include <limits>
 #include <tb/color.h>
-#include <tb/rect.h>
-#include <tb/spread.h>
+#include <tb/geometry/rect.h>
+#include <tb/geometry/spread.h>
 #include <tb/types.h>
 
 
@@ -46,7 +46,9 @@ namespace tb {
 		unsigned Width() const { return spread[0]; };
 		unsigned Height() const { return spread[1]; };
 		bool Transparent() const { return !!format.isTransparent; }
-		const tb::Spread<2, unsigned>& Spread() const { return spread; };
+		const tb::geometry::Spread<2, unsigned>& Spread() const {
+			return spread;
+		};
 		u8* Left(unsigned y) const { return buffer + (y % Height()) * stride; };
 
 		Color Get(unsigned x, unsigned y) const;
@@ -123,7 +125,7 @@ namespace tb {
 	protected:
 		u8* const buffer;
 		const Color::Format& format;
-		const tb::Spread<2, unsigned> spread;
+		const tb::geometry::Spread<2, unsigned> spread;
 		const unsigned stride; // [bytes]
 	};
 

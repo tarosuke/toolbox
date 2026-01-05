@@ -18,8 +18,8 @@
 #pragma once
 
 #include <math.h>
+#include <tb/geometry/vector.h>
 #include <tb/matrix.h>
-#include <tb/vector.h>
 
 
 
@@ -33,9 +33,7 @@ namespace tb {
 		///// 構築子、代入、[]
 		Complex() { // Identityに初期化
 			a[0] = 1;
-			for (unsigned n(1); n < D; ++n) {
-				a[n] = 0;
-			}
+			for (unsigned n(1); n < D; ++n) { a[n] = 0; }
 		};
 		Complex(const Complex&) = default;
 		Complex(const T (&o)[D]) : a{o} {};
@@ -43,23 +41,17 @@ namespace tb {
 		// 各軸の回転角で初期化
 		Complex(const T (&axis)[D - 1], T ratio) {
 			// 一旦格納
-			for (unsigned n(1); n < D; ++n) {
-				a[n] = axis[n - 1] * ratio;
-			}
+			for (unsigned n(1); n < D; ++n) { a[n] = axis[n - 1] * ratio; }
 			// 回転角を算出
 			T norm2(0.0);
-			for (unsigned n(1); n < D; ++n) {
-				norm2 += a[n] * a[n];
-			}
+			for (unsigned n(1); n < D; ++n) { norm2 += a[n] * a[n]; }
 			if (0.0 < norm2) {
 				// 回転角が0.0ではない場合は普通にn元数算出
 				const T norm(sqrt(norm2));
 				const T half(norm * 0.5);
 				const T sinA(sin(half) / norm);
 				a[0] = cos(half);
-				for (unsigned n(1); n < D; ++n) {
-					a[n] *= sinA;
-				}
+				for (unsigned n(1); n < D; ++n) { a[n] *= sinA; }
 			} else {
 				// norm2が0.0なら回転なし(a[1]〜a[dim-1]はすべて0)
 				a[0] = 1.0;
@@ -70,9 +62,7 @@ namespace tb {
 		template <typename... A> Complex(T t, A... a) : a{t, a...} {};
 
 		template <unsigned E> const Complex& operator=(const T (&o)[E]) {
-			for (uint n(0); n < D; ++n) {
-				a[n] = o[n];
-			}
+			for (uint n(0); n < D; ++n) { a[n] = o[n]; }
 		};
 		template <unsigned E> const Complex& operator=(const Complex<E, T>& o) {
 			return *this = o.a;
@@ -101,9 +91,7 @@ namespace tb {
 				return a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3];
 			}
 			T r(0.0);
-			for (unsigned n(0); n < D; ++n) {
-				r += a[n] * a[n];
-			}
+			for (unsigned n(0); n < D; ++n) { r += a[n] * a[n]; }
 			return r;
 		};
 		T Norm() const { return sqrt(Norm2()); };
@@ -112,14 +100,10 @@ namespace tb {
 
 		// 対スカラー演算
 		void operator*=(T o) {
-			for (unsigned n(0); n < D; ++n) {
-				a[n] *= o;
-			}
+			for (unsigned n(0); n < D; ++n) { a[n] *= o; }
 		};
 		void operator/=(T o) {
-			for (unsigned n(0); n < D; ++n) {
-				a[n] /= o;
-			}
+			for (unsigned n(0); n < D; ++n) { a[n] /= o; }
 		};
 
 
@@ -149,27 +133,24 @@ namespace tb {
 
 
 		// 回転ほか
-		Complex(const ::tb::Vector<D - 1, T>& o) { // ベクタからの生成
+		Complex(const ::tb::geometry::Vector<D - 1, T>& o) { // ベクタからの生成
 			a[0] = 0;
-			for (unsigned n(1); n < D; ++n) {
-				a[n] = o[n - 1];
-			}
+			for (unsigned n(1); n < D; ++n) { a[n] = o[n - 1]; }
 		};
 		Complex operator~() const { // 共役を返す
 			Complex r;
 			r.a[0] = a[0];
-			for (unsigned n(1); n < D; ++n) {
-				r.a[n] = -a[n];
-			}
+			for (unsigned n(1); n < D; ++n) { r.a[n] = -a[n]; }
 			return r;
 		};
-		::tb::Vector<D - 1, T> Rotate(const ::tb::Vector<D - 1, T>& v) const {
+		::tb::geometry::Vector<D - 1, T> Rotate(
+			const ::tb::geometry::Vector<D - 1, T>& v) const {
 			auto r(*this * Complex(v) * ~*this);
 			r.Normalize();
-			return Vector<D - 1, T>(r.a, 1);
+			return geometry::Vector<D - 1, T>(r.a, 1);
 		};
-		::tb::Vector<D - 1, T> ReverseRotate(
-			const ::tb::Vector<D - 1, T>& v) const {
+		::tb::geometry::Vector<D - 1, T> ReverseRotate(
+			const ::tb::geometry::Vector<D - 1, T>& v) const {
 			auto r(~*this * Complex(v) * *this);
 			r.Normalize();
 			return Vector<D - 1, T>(r.a, 1);
