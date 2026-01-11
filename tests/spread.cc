@@ -12,16 +12,16 @@ template <> tb::String::String(const tb::geometry::Spread<2, int>& o) {
 
 
 int main() {
-	const tb::geometry::Spread<2, int> a(0, 0);
-	const tb::geometry::Spread<2, int> b(-1, 1);
-	tb::geometry::Spread<2, int> c(2, 2);
+	const tb::geometry::Spread<2, int> a({0, 0});
+	const tb::geometry::Spread<2, int> b({-1, 1});
+	tb::geometry::Spread<2, int> c({2, 2});
 
 	assert(!a);
 	assert(!b);
 	assert(c);
 
-	const tb::geometry::Spread<2, int> d(6, 6);
-	const tb::geometry::Spread<2, int> e(1, 1);
+	const tb::geometry::Spread<2, int> d({6, 6});
+	const tb::geometry::Spread<2, int> e({1, 1});
 	tb::geometry::Spread<2, int> f(c);
 	assertEQ(c * 3, d);
 	assertEQ(c / 2, e);

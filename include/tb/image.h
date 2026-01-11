@@ -97,7 +97,7 @@ namespace tb {
 			unsigned stride) :
 			buffer((u8*)buffer),
 			format(format),
-			spread{width, height},
+			spread{{width, height}},
 			stride(stride) {};
 
 		/***** 与えられたImageの一部を複製

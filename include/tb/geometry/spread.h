@@ -1,5 +1,5 @@
 /************************************************************ toolbox geometry
- * Copyright (C) 2021, 2024 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2021, 2024, 2026 tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,9 +26,17 @@ namespace tb::geometry {
 
 	template <unsigned D, typename T> struct Spread {
 		// NOTE:Rect他で区別できなくなるのでVectorから継承してはいけない
-		Spread() : a{0, 0} {};
-		Spread(const Vector<D, T>& o) { *this = o; };
-		template <typename... A> Spread(A... a) : a{a...} {};
+		Spread() {
+			for (unsigned n(0); n < D; ++n) { a[n] = 0; }
+		};
+		template <typename U> Spread(const U (&o)[D]) {
+			for (unsigned n(0); n < D; ++n) { a[n] = o[n]; }
+		};
+		Spread(const Spread& o) = default;
+		template <typename U> Spread(const Spread<D, U>& o) {
+			for (unsigned n(0); n < D; ++n) { a[n] = o[n]; }
+		};
+
 
 		Spread& operator=(const Spread& o) {
 			for (unsigned n(0); n < D; ++n) { a[n] = o[n]; }
@@ -40,8 +48,8 @@ namespace tb::geometry {
 		};
 
 		// 配列としてアクセス
-		T& operator[](unsigned n) { return a[n]; };
-		const T& operator[](unsigned n) const { return a[n]; };
+		operator auto&() { return a; };
+		operator const auto&() const { return a; };
 
 		operator Vector<D, T>() { return Vector<D, T>(a); };
 		operator const Vector<D, T>() const { return Vector<D, T>(a); };

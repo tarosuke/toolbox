@@ -1,5 +1,6 @@
 /** Vector
- * Copyright (C) 2016, 2017, 2021, 2023, 2024 tarosuke<webmaster@tarosuke.net>
+ * Copyright (C) 2016, 2017, 2021, 2023, 2024, 2026
+ * tarosuke<webmaster@tarosuke.net>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +21,6 @@
 
 #include <cmath>
 #include <tb/types.h>
-#include <type_traits>
 
 
 
@@ -32,25 +32,19 @@ namespace tb::geometry {
 			for (uint n(0); n < D; ++n) { a[n] = 0; }
 		};
 		Vector(const Vector&) = default;
-		template <typename... A> Vector(T t, A... a) : a{t, a...} {};
-		Vector(T o) {
-			for (uint n(0); n < D; ++n) { *const_cast<T*>(&a[n]) = o; }
-		};
-		Vector(const T (&o)[D]) {
+		template <typename U> Vector(const Vector<D, U>& o) {
 			for (unsigned n(0); n < D; ++n) { a[n] = o[n]; }
 		};
-		Vector(const T (&o)[D + 1], unsigned offset) {
-			for (uint n(0); n < D; ++n) { a[n] = o[n + offset]; }
+		template <typename U> Vector(const U (&o)[D]) { // 配列で初期化
+			for (unsigned n(0); n < D; ++n) { a[n] = o[n]; }
 		};
 
+
+		// 配列としてアクセス
 		operator auto&() { return a; };
 		operator const auto&() const { return a; };
-		template <typename U> const Vector& operator=(const U& o) {
-			for (unsigned n(0); n < D; ++n) { a[n] = o[n]; }
-			return *this;
-		}
 
-		// 比較(実数の場合誤差が一定以下なら同値とする)
+		// 比較
 		bool operator==(const Vector& o) const {
 			for (uint n(0); n < D; ++n) {
 				if (a[n] != o[n]) {
@@ -118,9 +112,9 @@ namespace tb::geometry {
 
 		Vector Cross(const Vector& o) const {
 			if constexpr (D == 3) {
-				return Vector<3, T>(a[1] * o.a[2] - a[2] * o.a[1],
+				return Vector<3, T>({a[1] * o.a[2] - a[2] * o.a[1],
 					a[2] * o.a[0] - a[0] * o.a[2],
-					a[0] * o.a[1] - a[1] * o.a[0]);
+					a[0] * o.a[1] - a[1] * o.a[0]});
 			} else if constexpr (D == 7 || D == 15) {
 				static_assert(false, "その次元数のクロス積は未実装");
 			} else {

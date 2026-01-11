@@ -62,8 +62,8 @@ int main() {
 
 	{
 		const tb::Matrix<3, 3, int> a((const int[9]){1, 2, 3, 4, 5, 6});
-		const tb::geometry::Vector<2, int> b(10, 11);
-		const tb::geometry::Vector<2, int> c(35, 101);
+		const tb::geometry::Vector<2, int> b({10, 11});
+		const tb::geometry::Vector<2, int> c({35, 101});
 		assertEQ(a * b, c);
 	}
 

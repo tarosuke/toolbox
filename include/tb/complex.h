@@ -147,7 +147,7 @@ namespace tb {
 			const ::tb::geometry::Vector<D - 1, T>& v) const {
 			auto r(*this * Complex(v) * ~*this);
 			r.Normalize();
-			return geometry::Vector<D - 1, T>(r.a, 1);
+			return geometry::Vector<D - 1, T>({r.a, 1});
 		};
 		::tb::geometry::Vector<D - 1, T> ReverseRotate(
 			const ::tb::geometry::Vector<D - 1, T>& v) const {
