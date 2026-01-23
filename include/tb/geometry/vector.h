@@ -38,6 +38,9 @@ namespace tb::geometry {
 		template <typename U> Vector(const U (&o)[D]) { // 配列で初期化
 			for (unsigned n(0); n < D; ++n) { a[n] = o[n]; }
 		};
+		template <typename U> Vector(const U (&o)[D + 1]) { // Complexから専用
+			for (unsigned n(0); n < D; ++n) { a[n] = o[n + 1]; }
+		};
 
 
 		// 配列としてアクセス
