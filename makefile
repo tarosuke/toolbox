@@ -154,7 +154,6 @@ $(TARGETDIR)/$(target): $(objs) SUBTARGETS $(MAKEFILE)
 	@echo " LD $@"
 	@mkdir -p $(TARGETDIR)
 	@gcc -o $(TARGETDIR)/$(target) $(objs) $(LIBS) $(EXLIBS)
-# shellとかやってるのはwildcardがコマンド実行前に評価される挙動故
 endif
 
 clean: SUBTARGETS
@@ -162,7 +161,7 @@ clean: SUBTARGETS
 
 $(TARGETDIR)/tests/% : $(TARGETDIR)/tests/%.o $(TARGETDIR)/$(libtarget)
 	@echo " LD $@"
-	@gcc -o $@ $@.o $(TARGETDIR)/$(libtarget) $(subLibraries) $(EXLIBS)
+	@gcc -o $@ $@.o $(TARGETDIR)/$(libtarget) $(subLibraries) $(LIBS) $(EXLIBS)
 
 $(TARGETDIR)/tests/%.test : $(TARGETDIR)/tests/%
 	@echo $<
