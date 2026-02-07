@@ -3,12 +3,12 @@
 
 // ダンプ用コピーコンストラクタ
 template <> tb::String::String(const tb::Color& c) : String('#') {
-	Append(c.WebColor(), '0', 8, 16);
+	Append(c.ARGB32(), '0', 8, 16);
 }
 
 // 色比較
 bool operator==(const tb::Color& a, const tb::Color& b) {
-	return a.WebColor() == b.WebColor();
+	return a.ARGB32() == b.ARGB32();
 }
 
 

@@ -99,7 +99,7 @@ namespace tb {
 		bool IsTranslucent() { return A() < 1.0; };
 
 
-		tb::u32 WebColor() const {
+		tb::u32 ARGB32() const {
 			return (U(A(), 255) << 24) | (U(R(), 255) << 16) |
 				   (U(G(), 255) << 8) | U(B(), 255);
 		};
@@ -112,7 +112,7 @@ namespace tb {
 		void G(float v) { e[1] = v; };
 		void B(float v) { e[0] = v; };
 
-		void WebColor(tb::u32 v) {
+		void ARGB32(tb::u32 v) {
 			A(FM(v >> 24, 255U));
 			R(FM(v >> 16, 255U));
 			G(FM(v >> 8, 255U));
